@@ -1,0 +1,147 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% macro plot(data) %}
+<div style="text-align: center;">
+    <img src="data:image/png;base64,{{ data }}"/>
+</div>
+{% endmacro %}
+
+{% macro render_table(table) %}
+<table class="table">
+    <thead>
+        <tr>
+            {% for i, value in enumerate(table.columns) %}
+            <th {% if i == 0 %}style="width: 50%;"{% endif %}>{{ value }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for i, row in enumerate(table.rows) %}
+            <tr>
+                <td>{{ table.labels[i] }}</td>
+                {% for value in row %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            {% for value in table.footer %}
+                <td><strong>{{ value }}</strong></td>
+            {% endfor %}
+        </tr>
+    </tfoot>
+</table>
+{{ plot(table.plot()) }}
+{% endmacro %}
+
+{% block content %}
+<div class="container">
+<h1>Informe d'activitat de la plataforma</h1>
+
+<h2>Entitats</h2>
+
+<h3>Mapa d'entitats</h3>
+
+<div id="citymap" style="height: 700px;"></div>
+
+<h3>Graf de relacions entre entitats</h3>
+
+{{ plot(graph.plot()) }}
+
+<h3>Evolució temporal de l'alta d'entitats</h3>
+
+{{ plot(organizations.plot()) }}
+
+<h2>Recursos</h2>
+
+{{ render_table(resources_by_org_type) }}
+{{ render_table(resources_by_org_scope) }}
+{{ render_table(resources_by_resource_type) }}
+{{ render_table(resources_by_resource_option) }}
+
+<h3>Suggerències de necessitats indicades en «altres»</h3>
+
+<p>Paraules més repetides en les necessitats:</p>
+
+<ul>
+  {% for x in most_needed[:10] %}
+  <li>{{ x[0] }} ({{ x[1] }} vegades)</li>
+  {% endfor %}
+</ul>
+
+<p>Una mostra d'exemples de necessitats expressades:</p>
+
+<ul>
+  {% for need in other_needs[:10] %}
+  <li>{{ need.comments }}</li>
+  {% endfor %}
+</ul>
+
+<h3>Suggerències de oferiments indicades en «altres»</h3>
+
+<p>Paraules més repetides en els oferiments:</p>
+
+<ul>
+  {% for x in most_offered[:10]%}
+  <li>{{ x[0] }} ({{ x[1] }} vegades)</li>
+  {% endfor %}
+</ul>
+
+<p>Una mostra d'exemples de oferiments expressats:</p>
+
+<ul>
+  {% for offer in other_offers[:10] %}
+  <li>{{ offer.comments }}</li>
+  {% endfor %}
+</ul>
+
+
+<h2>Interaccions</h2>
+
+{{ render_table(agreements_by_solicitor_type) }}
+{{ render_table(agreements_by_solicitor_scope) }}
+
+{{ render_table(agreements_by_solicitee_type) }}
+{{ render_table(agreements_by_solicitee_scope) }}
+
+{{ render_table(agreements_by_resource_type) }}
+
+<h3>Evolució temporal de les peticions de col·laboració</h3>
+
+{{ plot(agreements_started.plot()) }}
+{{ plot(agreements_comm.plot()) }}
+{{ plot(agreements_success.plot()) }}
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+var orgs = {{ orgs_json|safe }};
+var lat = 0, lng = 0;
+for (var i = 0; i < orgs.length; i++) {
+    lat += +orgs[i].lat;
+    lng += +orgs[i].lng;
+}
+
+var map = L.map('citymap').setView([lat / orgs.length, lng / orgs.length], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var markers = [];
+for (var i = 0; i < orgs.length; i++) {
+    var o = orgs[i];
+    var marker = L.marker([+o.lat, +o.lng]).addTo(map);
+    marker.bindPopup(`${o.name}`);
+    markers.push(marker);
+}
+
+var group = new L.featureGroup(markers);
+map.fitBounds(group.getBounds());
+</script>
+{% endblock %}
+

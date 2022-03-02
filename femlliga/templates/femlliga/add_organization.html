@@ -1,0 +1,72 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, render_select, render_multi_checkboxes %}
+
+{% block content %}
+<div class="container">
+{% if edit %}
+<h1>Edita la informació de l'entitat</h1>
+{% else %}
+<div class="alert alert-primary" role="alert" style="margin-top: 20px;">
+  Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les dades de sota per crear-la.
+</div>
+{% endif %}
+
+<form method="post" action="{{ request.path }}" class="mb-2">
+    {{ csrf_input }}
+    {{ form_feedback(form) }}
+
+    <label for="id_name">Nom de l'entitat</label>
+    <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="Nom" required id="id_name" {{ input_value(form, "name") }}>
+    {{ input_feedback(form, "name") }}
+
+    <div style="height: 20px;"></div>
+    {{ render_select(form, "org_type", "Forma jurídica") }}
+
+    <div style="height: 20px;"></div>
+    {{ render_multi_checkboxes(form, "scopes", "Àmbits") }}
+
+    <div style="height: 20px;"></div>
+    <p>Indica en el mapa la posició aproximada de l'entitat</p>
+    {% if form.errors.lat or form.errors.lng %}
+    <div class="invalid-feedback" style="display: block;">
+        <ul><li>És necessari indicar la posició de l'entitat</li></ul>
+    </div>
+    {% endif %}
+    <div id="citymap" style="height: 300px;"></div>
+
+    <input type="hidden" id="lat" name="lat" {{ input_value(form, "lat") }}>
+    <input type="hidden" id="lng" name="lng" {{ input_value(form, "lng") }}>
+
+    <button type="submit" class="btn btn-custom" style="margin-top: 20px;">
+      {% if edit %}
+      Desa
+      {% else %}
+      Crea l'entitat
+      {% endif %}
+    </button>
+</form>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+var map = L.map('citymap').setView([39.98606316571185, -0.03754693138659535], 15);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var marker;
+map.on('click', function(e) {
+    if (marker) { marker.remove(); }
+    marker = L.marker(e.latlng).addTo(map);
+    document.getElementById("lat").value = ("" + e.latlng.lat).slice(0, 10);
+    document.getElementById("lng").value = ("" + e.latlng.lng).slice(0, 10);
+});
+
+{% if form.cleaned_data and form.cleaned_data["lat"] and form.cleaned_data["lng"] %}
+marker = L.marker([{{ form.cleaned_data["lat"] }}, {{ form.cleaned_data["lng"] }}]).addTo(map);
+{% endif %}
+</script>
+{% endblock %}

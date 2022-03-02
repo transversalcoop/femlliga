@@ -1,0 +1,31 @@
+{
+  "services": {
+    "web": {
+      "build": ".",
+      "command": "bash -c 'python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8000'",
+      "volumes": [
+        ".:/code",
+      ],
+      "ports": [
+        "127.0.0.1:8000:8000",
+      ],
+      "environment": [
+        "PYTHONDONTWRITEBYTECODE=true",
+        "WEB_CONCURRENCY=1",
+        "WEB_RELOAD=true",
+        "DJANGO_SECRET_KEY=insecure_key_for_dev",
+        "DJANGO_DEBUG=true",
+        "DJANGO_ALLOWED_HOSTS=.localhost,127.0.0.1,[::1],192.168.0.21",
+        "DJANGO_DATABASE=sqlite",
+        "DJANGO_EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend",
+        "DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL=http",
+        "DJANGO_CSRF_COOKIE_SECURE=false",
+        "DJANGO_SESSION_COOKIE_SECURE=false",
+        "DJANGO_SECURE_HSTS_SECONDS=0",
+        "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS=false",
+        "DJANGO_SECURE_HSTS_PRELOAD=false",
+        "DJANGO_SECURE_SSL_REDIRECT=false",
+      ]
+    }
+  }
+}

@@ -1,0 +1,225 @@
+{% macro page_heading(heading, subheading) %}
+<section style="background-color: transparent; background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);">
+  <div style="padding-top: 100px;" class="container">
+    <h1 style="font-weight: 900; font-size: 3.75em; color: #000;" class="text-center">{{ heading }}</h1>
+  </div>
+</section>
+<div class="container">
+  <div class="divider-1"></div>
+  <h3 style="font-weight: 700; color: gray; font-size: 1.125em;" class="text-center">{{ subheading }}</h3>
+  <div>
+    <img src="{{ static("decorations/heading-bird.png") }}" alt="" style="margin: 30px 0 30px 250px;">
+  </div>
+</div>
+{% endmacro %}
+
+{% macro show_messages(messages) %}
+    {% for message in messages %}
+        {% if message.extra_tags == "SHOW_USER" %}
+            {% if message.message == "CELEBRATION" %}
+            {% else %}
+            <div class="alert alert-info" style="margin-top: 20px;">{{ message }}</div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% macro resource_details(resource, match_type) %}
+  <div style="margin-bottom: 10px;">
+    {% if resource.charge %}
+      <span class="badge bg-light" title="Es demana remuneració a canvi">€</span>
+    {% endif %}
+    {% for option in resource.options.all() %}
+      <span class="badge bg-light">{{ option }}</span>
+    {% endfor %}
+  </div>
+  {% if resource.comments %}
+      <p><strong>Observacions:</strong> {{ resource.comments }}</p>
+  {% endif %}
+  {% if resource.images.all() %}
+  <div class="image-thumbnails">
+    {% for image in resource.images.all() %}
+    <div class="thumbnail">
+      <a data-bs-toggle="modal" href="#carouselModal{{ match_type }}{{ resource.id }}" role="button">
+        <img src="{{ image.image.url }}/">
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="modal fade" id="carouselModal{{ match_type }}{{ resource.id }}" tabindex="-1" aria-labelledby="carouselModalImages" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content" style="background: none;">
+        <div class="modal-header" style="background-color: white;">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="background-color: rgba(0, 0, 0, 0.3);">
+          <div id="carouselImages{{ match_type }}{{ resource.id }}" class="carousel slide" style="height: 100%;" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              {% for i, image in enumerate(resource.images.all()) %}
+              <div class="carousel-item text-center{% if i == 0 %} active{% endif %}">
+                <img src="{{ image.image.url }}/" class="d-block" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
+              </div>
+              {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselImages{{ match_type }}{{ resource.id }}" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselImages{{ match_type }}{{ resource.id }}" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro input_classes(form, name) %}
+    class="form-control{% if form.errors[name] %} is-invalid{% endif %}"
+{% endmacro %}
+
+{% macro input_value(form, name) %}
+    {% if form.cleaned_data and form.cleaned_data[name] %}
+        value="{{ form.cleaned_data[name] }}"
+    {% endif %}
+{% endmacro %}
+
+{% macro input_feedback(form, name) %}
+    {% if form.errors[name] %}
+    <div class="invalid-feedback">
+        {{ form.errors[name] }}
+    </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro form_feedback(form) %}
+    {% if form.non_field_errors() %}
+    <div class="alert alert-danger">
+        {{ form.non_field_errors() }}
+    </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_select(form, name, label, options = []) %}
+    {% if form.fields[name] %}
+        <label for="id_{{ name }}">{{ label }}</label>
+        <select id="id_{{ name }}" name="{{ name }}" {{ input_value(form, name) }} class="form-select {% if form.errors[name] %} is-invalid{% endif %}">
+            {% set choices = form.fields[name].choices %}
+            {% if len(options) > 0 %}
+                {% set choices = (choices[0],) + options %}
+            {% endif %}
+            {% for choice in choices %}
+            <option value="{{ choice[0] }}"
+                {% if form and form.cleaned_data and form.cleaned_data[name] == choice[0] %}selected{% endif %}>
+                {{ choice[1] }}
+            </option>
+            {% endfor %}
+        </select>
+        {{ input_feedback(form, name) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_multi_checkboxes(form, name, label, options = []) %}
+  {% if form.fields[name] %}
+    <div class="{% if form.errors[name] %}is-invalid{% endif %}">
+      <label for="id_{{ name }}">{{ label }}</label>
+      {% set choices = form.fields[name].choices %}
+      {% for i, choice in enumerate(choices) %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="{{ choice[0] }}" id="{{ name }}_{{ i }}" name="{{ name }}"
+               {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}checked{% endif %}>
+        <label class="form-check-label" for="{{ name }}_{{ i }}">
+        {{ choice[1] }}
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+    {{ input_feedback(form, name) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro render_multiple_tags(form, name, label, options = []) %}
+    {% if form.fields[name] %}
+        {% set choices = form.fields[name].choices %}
+        {% if len(options) > 0 %}
+            {% set choices = options %}
+        {% endif %}
+        <label for="id_{{ name }}">{{ label }}</label>
+        <div class="multi-select">
+            {% for choice in choices %}
+            {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}
+              {% set selected=True %}
+            {% endif %}
+            <button class="btn multi-select-choice {% if selected %}selected{% endif %}"
+                  type="button"
+                  role="switch"
+                  value="{{ choice[0] }}"
+                  onclick="clickOption(this);"
+                  {% if selected %}selected="true"{% endif %}>
+                {{ choice[1] }}
+            </button>
+            {% endfor %}
+        </div>
+        <select
+          id="id_{{ name }}"
+          name="{{ name }}"
+          style="display: none;"
+          class="multi-select {% if form.errors[name] %} is-invalid{% endif %}"
+          multiple>
+            {% for choice in choices %}
+            <option value="{{ choice[0] }}"
+                {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}selected{% endif %}>
+                {{ choice[1] }}
+            </option>
+            {% endfor %}
+        </select>
+        {{ input_feedback(form, name) }}
+
+        <script>
+function clickOption(element) {
+    if (element.getAttribute("selected") === "true") {
+        element.setAttribute("selected", "false");
+        element.classList.remove("selected");
+    } else {
+        element.setAttribute("selected", "true");
+        element.classList.add("selected");
+    }
+    var s = document.getElementById("id_{{ name }}");
+    for (var i = 0; i < s.children.length; i++) {
+        if (s.children[i].value === element.getAttribute("value")) {
+            s.children[i].selected = !s.children[i].selected;
+        }
+    }
+}
+        </script>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_select_raw(name, options, value="") %}
+    <select id="id_{{ name }}" name="{{ name }}" class="form-select" value="{{ value }}">
+        {% for option in options %}
+            <option value="{{ option[0] }}" {% if value == option[0] %}selected{% endif %}>{{ option[1] }}</option>
+        {% endfor %}
+    </select>
+{% endmacro %}
+
+{% macro render_match_badges(org, resource, offer_matches, need_matches, link=False) %}
+  {% if resource.resource in offer_matches %}
+    {% set count = len(offer_matches[resource.resource]) %}
+    {% if link %}<a href="{{ url("matches", args=[org.id]) }}" style="text-decoration: none;">{% endif %}
+    <span class="badge bg-success" title="Hi ha {{ count }} entitats que ofereixen el que necessiteu">
+        {{ count }}
+    </span>
+    {% if link %}</a>{% endif %}
+  {% endif %}
+  {% if resource.resource in need_matches %}
+    {% set count = len(need_matches[resource.resource]) %}
+    {% if link %}<a href="{{ url("matches", args=[org.id]) }}">{% endif %}
+    <span class="badge bg-warning" title="Hi ha {{ count }} entitats que necessiten el mateix que vosaltres">{{ count }}</span>
+    {% if link %}</a>{% endif %}
+  {% endif %}
+{% endmacro %}

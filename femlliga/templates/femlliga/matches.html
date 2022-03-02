@@ -1,0 +1,79 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import render_select_raw, resource_details, render_match_badges %}
+
+{% macro show_matches(resource, matches, match_type, match_name) %}
+  {% set others = matches[resource.resource] %}
+  {% for result in others %}
+  <hr>
+  <div class="row">
+    <h3>
+      {{ result.organization.type() }} «{{ result.organization.name }}» <span style="border-bottom: 2px solid black;">{{ match_name }}</span> {{ resource_name(resource.resource) }}
+    </h3>
+    <div>
+      <span style="margin-right: 15px;">A {{ org.distance_text(result.organization) }} de vosaltres</span>
+      <a href="{{ url("send_message", args=[org.id, result.organization.id, match_type, result.resource]) }}" style="text-decoration: none;">
+        <i class="bi-send" style="font-size: 1rem;"></i>
+        Posa't en contacte amb {{ result.organization.name }}
+      </a>
+    </div>
+    {{ resource_details(result, match_type) }}
+  </div>
+  {% endfor %}
+{% endmacro %}
+
+{% block content %}
+<main id="content" class="container-fluid">
+  <div class="row">
+    <div class="col-md-4 d-md-block bg-light sidebar">
+      {% if len(offer_matches) > 0 or len(need_matches) > 0 %}
+      <h1>Has lligat!</h1>
+      <p>
+        Hem trobat coincidències entre les vostres necessitats i les d'altres entitats, pots clicar a sota per veure'n els detalls
+      </p>
+      {% else %}
+      <h1>Sembla que no hi ha sort...</h1>
+      <p>No cal patir! Amb el temps s'incorporaran noves entitats que probablement compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-ho en uns dies.</p>
+      {% endif %}
+      <hr>
+      <ul class="nav nav-pills flex-column mb-auto">
+        {% for resource in own_needs %}
+        {% if resource.resource in offer_matches or resource.resource in need_matches %}
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-current="page"
+            data-bs-toggle="tab"
+            style="width: 100%; text-align: left;"
+            data-bs-target="#showDetails{{ resource.resource }}">
+            <span style="float: right;">
+              {{ render_match_badges(org, resource, offer_matches, need_matches) }}
+            </span>
+            {{ resource_name(resource.resource) }}
+          </button>
+        </li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="col-md-8 ms-sm-auto px-md-4">
+    {% for resource in own_needs %}
+      <div class="row collapse fade" id="showDetails{{ resource.resource }}" style="margin-top: 20px;">
+        <div class="col-12">
+          <p>Heu indicat que necessiteu un {{ resource_name(resource.resource) }}. A sota podeu veure quines entitats l'ofereixen per compartir-lo, i quines tenen també aquesta necessitat i amb les que podrieu contactar per buscar una solució comuna.</p>
+
+          {{ show_matches(resource, offer_matches, "offer", "ofereix") }}
+          {{ show_matches(resource, need_matches, "need", "també necessita") }}
+
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+  </div>
+</main>
+{% endblock %}
+

@@ -1,0 +1,7 @@
+Hola!
+
+{% block content %}{% endblock %}
+
+Gràcies per fer servir {{ current_site.name }}!
+{{ current_site.domain }}
+

@@ -1,0 +1,33 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback %}
+
+{% block content %}
+<div class="container">
+<h2 id="contacte">Contacta amb nosaltres</h2>
+
+{% if form_sent %}
+<div class="alert alert-primary" role="alert" style="margin-top: 20px;">
+    Gràcies per enviar el missatge! Et respondrem tan aviat com puguem.
+</div>
+{% else %}
+<p>Si tens qualsevol pregunta o suggerència, no dubtes a contactar amb nosaltres, envia'ns un missatge!</p>
+
+<form method="POST" action="{{ url("contact") }}" style="margin-bottom: 40px;">
+    {{ csrf_input }}
+    {{ form_feedback(form) }}
+
+    <label for="id_email">Correu electrònic</label>
+    <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="Nom" required id="id_email" {{ input_value(form, "email") }}>
+    {{ input_feedback(form, "email") }}
+
+    <label for="id_content" style="margin-top: 20px;">Missatge</label>
+    <textarea id="content" name="content" rows="8" {{ input_classes(form, "content") }} {{ input_value(form, "content") }}></textarea>
+    {{ input_feedback(form, "content") }}
+
+    <button type="submit" class="btn btn-success" style="margin-top: 20px;">Envia</button>
+</form>
+
+{% endif %}
+</div>
+{% endblock %}

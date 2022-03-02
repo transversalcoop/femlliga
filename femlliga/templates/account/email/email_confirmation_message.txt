@@ -1,0 +1,5 @@
+{% extends "account/email/base_message.txt" %}
+
+{% block content %}Has rebut aquest correu perquè s'ha registrat un usuari en {{ current_site.domain }} amb aquesta adreça de correu electrònic.
+
+Per confirmar que és correcte, i poder entrar a la web, ves a {{ activate_url }} i confirma.{% endblock %}

@@ -1,0 +1,6 @@
+uploads/
+static/
+!femlliga/static/
+db.sqlite3
+run
+Dockerfile.*

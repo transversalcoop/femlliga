@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ca">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+        <link rel="icon" type="image/x-icon" href="{{ static("favicon.ico") }}">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+
+        <link href="{{ static("style.css") }}" rel="stylesheet">
+{% block css %}{% endblock %}
+        <title>
+{% block title %}{{ consts.APP_NAME }}{% endblock %}
+        </title>
+    </head>
+
+    <body>
+      <div class="skippy visually-hidden-focusable overflow-hidden">
+        <div class="container-xl">
+          <a class="d-inline-flex p-2 m-1" href="#content">Salta al contingut principal</a>
+        </div>
+      </div>
+      <header class="navbar navbar-expand-md bd-navbar" style="background-color: #FFCE1C;">
+        <nav class="container-xxl flex-wrap flex-md-nowrap" aria-label="Main navigation">
+          <a class="navbar-brand" href="/">
+{% block brand %}<span style="font-weight: 900; text-transform: uppercase; font-size: 1.75em;">{{ consts.APP_NAME }}</span>{% endblock %}
+          </a>
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="bi-list" style="font-size: 2rem;"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbar">
+{% block primary_navigation %}{% endblock %}
+          </div>
+        </nav>
+      </header>
+      <wrapper class="d-flex flex-column">
+        <main id="content">
+{% block content %}{% endblock %}
+        </main>
+        <footer class="border-top">
+          <div class="py-3 my-4 container">
+            <div class="row" style="color: #4b4b4b; font-size: 0.9em;">
+              <div class="col-lg-4">
+                <p style="font-weight: bold; text-transform: uppercase;">Informació</p>
+                <ul style="list-style: none; padding: 0;">
+                  <li style="margin-bottom: 6px;"><a href="{{ url("page", args=["legal"]) }}">Avís legal</a></li>
+                  <li style="margin-bottom: 6px;"><a href="{{ url("page", args=["privacy"]) }}">Política de protecció de dades</a></li>
+                  <li style="margin-bottom: 6px;"><a href="{{ url("page", args=["faq"]) }}">Preguntes freqüents</a></li>
+                  <li style="margin-bottom: 6px;"><a href="{{ url("contact") }}">Contacte</a></li>
+                </ul>
+              </div>
+              <div class="col-lg-4">
+                <p style="font-weight: bold; text-transform: uppercase;">Contacte</p>
+                <p style="margin: 0;">Tlf: 643 015 716</p>
+                <p>Correu electrònic: contacte@femlliga.org</p>
+                <p>Les imatges emprades pertanyen a <a href="https://www.freepik.com/vectors/invitation">pikisuperstar - www.freepik.com</a></p>
+                <p>Web creada amb <a target="_blank" href="https://github.com/transversalcoop/femlliga">programari lliure</a></p>
+              </div>
+              <div class="col-lg-4">
+                <p style="margin: 0;">Un projecte desenvolupat per </p>
+                <a target="_blank" href="https://transversalcoop.org">
+                  <img src="{{ static("transversal.png") }}" style="height: 58px;">
+                </a>
+
+                <p style="margin: 20px 0 0 0;">Amb el suport econòmic de</p>
+                <a target="_blank" href="https://castello.es/">
+                  <img src="{{ static("ajuntament_cs.png") }}" style="height: 85px;">
+                </a>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </wrapper>
+      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+{% block js %}{% endblock %}
+    </body>
+</html>
+
+

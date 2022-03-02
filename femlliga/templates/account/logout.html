@@ -1,0 +1,15 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% block title %}Surt{% endblock title %}
+
+{% block content %}
+<div class="container">
+<h2>Tanca la sessió</h2>
+<p>Segur que vols tancar la sessió?</p>
+<form method="post" class="mb-2">
+    {{ csrf_input }}
+    <button type="submit" class="btn btn-custom">Surt</button>
+</form>
+</div>
+{% endblock %}
+

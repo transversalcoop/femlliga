@@ -1,0 +1,38 @@
+{% extends "email/_base_template.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    Us enviem aquest missatge des de {{ consts.APP_NAME }} ja que heu iniciat una col·laboració a través de la nostra plataforma.
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    Concretament, {{ a.solicitor.name }} va demanar a {{ a.solicitee.name }}
+    {% if a.resource_type == "need" %}
+      buscar conjuntament
+    {% else %}
+      compartir
+    {% endif %}
+    {{ resource_name(a.resource) }} ({{ a.render_options() }}), amb aquest missatge:
+  </td>
+</tr>
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    <pre style="margin-top: 20px; padding-left: 20px; max-width: 590px;">{{ a.message }}</pre>
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    A partir d'aquest moment podeu seguir comunicant-vos per correu electrònic, simplement fent servir la opció de «Respon a tots» en aquest mateix correu, i concretar els detalls de la vostra col·laboració.
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    Tant si arribeu a un acord com si no, us agraim si ho indiqueu a l'aplicació. També us agrairem si ens feu arribar qualsevol suggerència sobre com podríem millorar la plataforma.
+  </td>
+</tr>
+{% endblock %}

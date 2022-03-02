@@ -1,0 +1,15 @@
+{% extends "email/_base_template.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    El missatge que ens has enviat a través del formulari de contacte de {{ consts.APP_NAME }} ha arribat correctament, i intentarem respondre't el més aviat possible. A sota pots veure una còpia del missatge que has enviat:
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    <pre style="margin-top: 20px; padding-left: 20px; max-width: 590px;">{{ content }}</pre>
+  </td>
+</tr>
+{% endblock %}

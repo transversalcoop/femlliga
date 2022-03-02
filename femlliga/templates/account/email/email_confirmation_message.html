@@ -1,0 +1,15 @@
+{% extends "account/email/base_message.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    Has rebut aquest correu perquè s'ha registrat un usuari en {{ current_site.domain }} amb aquesta adreça de correu electrònic.
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    Per confirmar que és correcte, i poder entrar a la web, clica <a href="{{ activate_url }}">ací</a> i confirma.
+  </td>
+</tr>
+{% endblock %}

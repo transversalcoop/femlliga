@@ -1,0 +1,117 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import show_messages %}
+
+{% macro render_form(a, value, action, class, button_text) %}
+  <form method="POST" action="{{ url("agreement_" + action, args=[org.id, a.id]) }}" class="row" style="width: 100%;">
+    {{ csrf_input }}
+    <input type="hidden" name="return_url" value="{{ view_type }}">
+    <input type="hidden" name="{{ action }}" value="{{ value }}">
+    <button type="submit" class="btn btn-sm btn-{{ class }}" style="width: 100%;">{{ button_text }}</button>
+  </form>
+{% endmacro %}
+
+{% block content %}
+<div class="container">
+{{ show_messages(messages) }}
+{% if view_type == "sent" %}
+<h1>Peticions de col·laboració enviades</h1>
+{% else %}
+<h1>Peticions de col·laboració rebudes</h1>
+{% endif %}
+
+{% if len(agreements) == 0 %}
+{% if view_type == "sent" %}
+<p>Encara no has enviat cap petició de col·laboració. Pots fer-ho des de la pàgina de <a href="{{ url("matches", args=[org.id]) }}">coincidències</a>.</p>
+{% else %}
+<p>Encara no has rebut cap petició de col·laboració.</p>
+{% endif %}
+{% endif %}
+
+{% for a in agreements %}
+  <hr>
+  <div class="row">
+    <div class="col-10">
+    <h2>
+      <a data-bs-toggle="collapse" href="#showDetails{{ a.id }}" role="button" aria-expanded="false" aria-controls="showDetails{{ a.id }}">
+        <i class="bi-chevron-down" style="font-size: 1.5rem;"></i>
+      </a>
+      {% if view_type == "sent" %}
+        {% if a.resource_type == "need" %}
+          Buscar {{ resource_name(a.resource) }} conjuntament amb {{ a.solicitee.name }}
+        {% else %}
+          {{ resource_name(a.resource) }} sol·licitat a {{ a.solicitee.name }}
+        {% endif %}
+      {% else %}
+        {% if a.resource_type == "need" %}
+          {{ a.solicitor.full_name() }} ens demana buscar conjuntament {{ resource_name(a.resource) }}
+        {% else %}
+          {{ a.solicitor.full_name() }} ens sol·licita {{ resource_name(a.resource) }}
+        {% endif %}
+      {% endif %}
+    </h2>
+    {% for option in a.options.all() %}
+      <span class="badge bg-light">{{ option }}</span>
+    {% endfor %}
+    {% if a.communication_accepted == None %}
+      <p>
+        <i class="bi-hourglass-split text-muted" style="font-size: 1.5rem;"></i>
+        {% if view_type == "sent" %}
+          {{ a.solicitee.name }} encara no ha acceptat ni declinat la comunicació. Si l'accepten, s'iniciarà una cadena de correus electrònics en la que podreu concretar els detalls de la possible col·laboració.
+        {% else %}
+          {{ a.solicitor.full_name() }} ha sol·licitat una comunicació. Per favor, indiqueu si accepteu o no. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la comunicació no us obliga a arribar a cap acord.
+        {% endif %}
+      </p>
+    {% elif a.communication_accepted == False %}
+      <p>
+        <i class="bi-x-lg text-danger" style="font-size: 1.5rem;"></i>
+        Es va rebutjar la comunicació
+      </p>
+    {% else %}
+      {% if a.agreement_successful == None %}
+        <p>
+          <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
+          <i class="bi-hourglass-split text-muted" style="font-size: 1.5rem;"></i>
+          {% if view_type == "sent" %}
+            {{ a.solicitee.name }} va acceptar la comunicació.
+          {% else %}
+            Vau acceptar la comunicació.
+          {% endif %}
+          Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. Aquesta informació es farà servir només a nivell estadístic.
+        </p>
+      {% elif a.agreement_successful == False %}
+        <p>
+          <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
+          <i class="bi-x-lg text-danger" style="font-size: 1.5rem;"></i>
+          Es va iniciar una comunicació, però aquesta no va acabar en acord.
+        </p>
+      {% else %}
+        <p>
+          <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
+          <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
+          Es va iniciar una comunicació i es va arribar a un acord.
+        </p>
+      {% endif %}
+    {% endif %}
+    </div>
+    <div class="col-2">
+      {% if a.communication_accepted == True and a.agreement_successful == None %}
+        {{ render_form(a, "yes", "successful", "success", "S'ha fet acord") }}
+        <div style="height: 10px;"></div>
+        {{ render_form(a, "no", "successful", "danger", "No s'ha aconseguit acord") }}
+      {% endif %}
+      {% if a.communication_accepted == None and view_type == "received" %}
+        {{ render_form(a, "yes", "connect", "success", "Inicia la comunicació") }}
+        <div style="height: 10px;"></div>
+        {{ render_form(a, "no", "connect", "danger", "Declina la comunicació") }}
+      {% endif %}
+    </div>
+  </div>
+  <div class="collapse" id="showDetails{{ a.id }}" style="margin-left: 20px;">
+      <p>Missatge que es va enviar el {{ format_time(a.date) }}:</p>
+      <pre style="margin-left: 20px; padding-left: 10px; border-left: 1px solid gray;">{{ a.message }}</pre>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}
+

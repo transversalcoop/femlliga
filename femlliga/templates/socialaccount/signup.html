@@ -1,0 +1,11 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% block content %}
+<div class="container">
+  <h1>El correu electrònic ja s'ha fet servir</h1>
+
+  <p>Sembla que el correu electrònic de {{ account.get_provider().name }} amb el que us esteu intentant identificar ja es va fer servir per registrar-se en aquesta web. Si us plau, inicieu la sessió fent servir el correu electrònic i la contrasenya:</p>
+
+  <a href="{{ url("account_login") }}" class="btn btn-custom">Inicia sessió</a>
+</div>
+{% endblock %}

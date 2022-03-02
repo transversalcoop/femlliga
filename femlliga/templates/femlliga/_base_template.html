@@ -1,0 +1,63 @@
+{% extends "femlliga/_base.html" %}
+
+{% macro pending_dot() %}
+<span
+  class="position-absolute bg-danger rounded-circle"
+  style="padding: 4px;"
+  title="Peticions pendents de respondre">
+</span>
+{% endmacro %}
+{% macro menu_url(name, href, args=[]) %}
+<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" style="" href="{{ url(href, args=args) }}">{{ name }}</a>
+{% endmacro %}
+{% macro dropdown_menu(name, href, args=[], pending=False) %}
+<a
+  class="nav-link dropdown-toogle {% if parent(request.path) == parent(url(href, args=args)) %} active{% endif %}"
+  role="button"
+  data-bs-toggle="dropdown"
+  aria-expanded="false"
+  href="#">
+    {{ name }}
+  {% if pending %}
+    {{ pending_dot() }}
+  {% endif %}
+</a>
+{% endmacro %}
+
+{% block primary_navigation %}
+  <ul class="navbar-nav me-auto mb-lg-0">
+  {% if not user.is_anonymous %}
+    <li>{{ menu_url("Entitat", "app") }}</li>
+    {% set organization = request.user.get_organization() %}
+    {% if organization %}
+    <li>{{ menu_url("Has lligat?", "matches", [organization.id]) }}</li>
+    <li class="nav-item dropdown">
+      {% set pending_sent, pending_received = organization.pending_agreements() %}
+      {{ dropdown_menu("Peticions", "agreements_sent", [organization.id], pending=pending_sent or pending_received) }}
+      <ul class="dropdown-menu" aria-labelledby="agreementsDropdownMenuLink">
+        <li><a class="dropdown-item" href="{{ url("agreements_sent", args=[organization.id]) }}">
+            Enviades{% if pending_sent %}{{ pending_dot() }}{% endif %}
+        </a></li>
+        <li><a class="dropdown-item" href="{{ url("agreements_received", args=[organization.id]) }}">
+            Rebudes{% if pending_received %}{{ pending_dot() }}{% endif %}
+        </a></li>
+      </ul>
+    </li>
+    {% endif %}
+  {% endif %}
+  {% if user.is_staff %}
+  <li>{{ menu_url("Informe", "report") }}</li>
+  {% endif %}
+{% block menu %}{% endblock %}
+  </ul>
+  <ul class="navbar-nav">
+  {% if user.is_anonymous %}
+  <li>{{ menu_url("Entra", "account_login") }}</li>
+  {% endif %}
+  <li>{{ menu_url("Preguntes freqüents", "page", args=["faq"]) }}</li>
+  <li>{{ menu_url("Contacte", "contact") }}</li>
+  {% if not user.is_anonymous %}
+  <li>{{ menu_url("Surt", "account_logout") }}</li>
+  {% endif %}
+  </ul>
+{% endblock %}

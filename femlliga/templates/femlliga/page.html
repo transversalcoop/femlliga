@@ -1,0 +1,15 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import page_heading %}
+
+{% block content %}
+{{ page_heading(page.heading, page.subheading) }}
+
+<section class="fons-cercle-groc">
+  <div class="fons-imatge" {% if page.image %}style="background-image: url({{ static("pages/" + page.image) }});"{% endif %}>
+    <div class="container static-page">
+    {{ page.content|safe }}
+    </div>
+  </div>
+</section>
+{% endblock %}

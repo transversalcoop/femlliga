@@ -1,0 +1,32 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% block content %}
+<div class="container">
+{% if resource_type == "needs" %}
+<h1>Benvinguda!</h1>
+
+<p>Ara que has donat d'alta la teua {{ org.type().lower() }}, ens agradaria que ens indiques de quins recursos disposeu i quines necessitats teniu en el vostre dia a dia. Aquesta informació es farà servir per saber amb quines altres organitzacions podeu col·laborar.</p>
+
+<p>Et farem una sèrie de preguntes sobre els recursos que teniu o necessiteu, i podreu respondre «Sí» o «No» a cadascuna, i també indicar alguns detalls si així ho voleu.</p>
+{% else %}
+<h1>Ja vas per la meitat!</h1>
+
+<p>Has acabat d'introduir les necessitats de la teua {{ org.type().lower() }}, només et falta introduir els recursos que podeu oferir a les altres organitzacions.</p>
+{% endif %}
+
+<p>Si et va bé fer el procés ara, clica «Endavant!». Si no, pots clicar «Ho faré més tard».</p>
+
+<form method="POST" action="{{ url(page, args=[org.id]) }}">
+  {{ csrf_input }}
+  <div class="row" style="margin-top: 15px;">
+    <div class="col-6 d-grid gap-2">
+      <button type="submit" class="btn btn-lg btn-warning" name="start" value="no">Ho faré més tard</button>
+    </div>
+    <div class="col-6 d-grid gap-2">
+      <button type="submit" class="btn btn-lg btn-success" name="start" value="yes">Endavant!</button>
+    </div>
+  </div>
+</form>
+</div>
+{% endblock %}
+
