@@ -26,7 +26,7 @@
     <input type="password" {{ input_classes(form, "password2") }} name="password2" autocomplete="contrasenya-de-nou" required="" id="id_password2">
     {{ input_feedback(form, "password2") }}
 
-    <p class="mt-2">En registrar-te, acceptes la <a target="_blank" href="{{ url("page", args=["legal"]) }}">política de privacitat</a>.</p>
+    <p class="mt-2">En registrar-te, acceptes la <a target="_blank" rel="noopener noreferrer" href="{{ url("page", args=["legal"]) }}">política de privacitat</a>.</p>
 
     <div style="margin-top: 10px;">
         <button type="submit" class="btn btn-custom">Registra't</button>

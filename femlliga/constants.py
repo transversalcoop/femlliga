@@ -102,8 +102,10 @@ RESOURCE_OPTIONS_MAP = {
     "OTHER": (),
 }
 
-RESOURCE_OPTIONS = []
-for v in RESOURCE_OPTIONS_MAP.values():
+RESOURCES_LIST, RESOURCE_OPTIONS = [], []
+for k in RESOURCE_OPTIONS_MAP:
+    RESOURCES_LIST.append(k)
+    v = RESOURCE_OPTIONS_MAP[k]
     for vv in v:
         if vv not in RESOURCE_OPTIONS:
             RESOURCE_OPTIONS.append(vv)

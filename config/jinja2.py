@@ -6,6 +6,7 @@ from jinja2 import Environment
 from femlliga.models import *
 from allauth.socialaccount import providers
 
+import bleach
 import femlliga.constants
 
 def format_time(t):
@@ -27,6 +28,23 @@ def provider_login_url(request, provider_id, **kwargs):
 
     return provider.get_login_url(request, **query)
 
+def clean(s, style=False):
+    tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul', 'table', 'thead',
+            'tbody', 'th', 'tr', 'td', 'span', 'div', 'br', 'pre', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+    if style:
+        tags.append('style')
+    return bleach.clean(
+        s,
+        tags = tags,
+        attributes = {
+        '*': ['class'],
+        'a': ['href', 'title'],
+        'th': ['colspan'],
+        'img': ['alt'],
+        'abbr': 'title',
+        'acronym': 'title',
+    })
+
 def environment(**options):
     env = Environment(**options)
     env.globals.update({
@@ -43,5 +61,6 @@ def environment(**options):
         "sort_resources": sort_resources,
         "parent": path_parent,
         "provider_login_url": provider_login_url,
+        "clean": clean,
     })
     return env

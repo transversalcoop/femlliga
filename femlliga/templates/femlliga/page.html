@@ -8,7 +8,7 @@
 <section class="fons-cercle-groc">
   <div class="fons-imatge" {% if page.image %}style="background-image: url({{ static("pages/" + page.image) }});"{% endif %}>
     <div class="container static-page">
-    {{ page.content|safe }}
+    {{ clean(page.content)|safe }}
     </div>
   </div>
 </section>

@@ -7,7 +7,7 @@ import urllib.request
 from pathlib import Path
 from functools import cmp_to_key, reduce
 
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse, FileResponse, Http404
 from django.forms import formset_factory, inlineformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail, EmailMessage
@@ -162,6 +162,8 @@ def process_organization_post(request, org = None):
 @login_required
 @require_own_organization
 def force_resources_wizard(request, organization_id, resource_type, resource):
+    assert_url_param_in_list(resource_type, ["needs", "offers"])
+    assert_url_param_in_list(resource, RESOURCES_LIST)
     if request.method == "POST":
         return resources_wizard(request, organization_id, resource_type, forced = True)
 
@@ -208,6 +210,7 @@ def render_wizard(request, org, resource, form, resource_type, forced = False, d
 @login_required
 @require_own_organization
 def resources_wizard(request, organization_id, resource_type, forced = False):
+    assert_url_param_in_list(resource_type, ["needs", "offers"])
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
         model, imagemodel = get_resources_models(resource_type)
@@ -322,6 +325,8 @@ def get_model_matches(organization, need, need_options, model):
 @login_required
 @require_own_organization
 def send_message(request, organization_id, organization_to, resource_type, resource):
+    assert_url_param_in_list(resource_type, ["need", "offer"])
+    assert_url_param_in_list(resource, RESOURCES_LIST)
     organization = get_object_or_404(Organization, pk = organization_id)
     other = get_object_or_404(Organization, pk = organization_to)
     model = Offer
@@ -427,7 +432,9 @@ def get_city_from_coordinates(lat, lng):
 
 def http_get(url):
     f = urllib.request.urlopen(url)
-    return json.loads(f.read().decode('utf-8'))
+    res = json.loads(f.read().decode('utf-8'))
+    f.close()
+    return res
 
 def organization_prefetches(queryset):
     return queryset.\
@@ -648,9 +655,13 @@ def uploads(request, path):
         if modified < modified_since:
             return HttpResponse(status=304)
 
-    response = FileResponse(open(f, 'rb'))
+    response = FileResponse(open(f, 'rb')) # FileResponse closes the file, don't use context manager
     response.headers["Last-Modified"] = timezone.now().strftime(date_format)
     return response
+
+def assert_url_param_in_list(param, l):
+    if param not in l:
+        raise Http404("Unknown parameter")
 
 def is_subpath(f, path):
     return os.path.abspath(f).startswith(os.path.abspath(path))

@@ -18,6 +18,7 @@ psycopg2-binary = "*"
 networkx = "*"
 scipy = "*"
 django-debug-toolbar = "*"
+bleach = "*"
 
 [dev-packages]
 
