@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'csp.middleware.CSPMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -220,6 +221,38 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = bool(strtobool(os.getenv("DJANGO_SECURE_HSTS_IN
 SECURE_HSTS_PRELOAD = bool(strtobool(os.getenv("DJANGO_SECURE_HSTS_PRELOAD", "true")))
 SECURE_SSL_REDIRECT = bool(strtobool(os.getenv("DJANGO_SECURE_SSL_REDIRECT", "true")))
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSP_DEFAULT_SRC = ("'self'", )
+CSP_STYLE_SRC = ("'self'",
+    "'unsafe-inline'",
+    "cdn.jsdelivr.net",
+    "unpkg.com",
+    "fonts.googleapis.com",
+    "fonts.gstatic.com",
+)
+CSP_SCRIPT_SRC = ("'self'",
+    "'unsafe-inline'",
+    "unpkg.com",
+    "cdn.jsdelivr.net",
+)
+CSP_IMG_SRC = ("'self'",
+    "*.tile.openstreetmap.org",
+    "unpkg.com",
+    "data:",
+)
+CSP_FONT_SRC = ("'self'",
+    "fonts.gstatic.com",
+    "cdn.jsdelivr.net",
+)
+CSP_CONNECT_SRC = ("'self'", )
+CSP_OBJECT_SRC = ("'self'", )
+CSP_BASE_URI = ("'self'", )
+CSP_FRAME_ANCESTORS = ("'self'", )
+CSP_FORM_ACTION = ("'self'", )
+CSP_INCLUDE_NONCE_IN = ('script-src', )
+CSP_MANIFEST_SRC = ("'self'", )
+CSP_WORKER_SRC = ("'self'", )
+CSP_MEDIA_SRC = ("'self'", )
 
 if not DEBUG:
     LOGGING = {

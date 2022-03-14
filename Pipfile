@@ -19,6 +19,7 @@ networkx = "*"
 scipy = "*"
 django-debug-toolbar = "*"
 bleach = "*"
+django-csp = "*"
 
 [dev-packages]
 
