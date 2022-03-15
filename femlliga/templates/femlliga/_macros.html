@@ -13,6 +13,16 @@
 </div>
 {% endmacro %}
 
+{% macro show_password_message() %}Mostra la contrasenya com a text pla. Avís: això deixarà veure la teua contrasenya en la pantalla.{% endmacro %}
+
+{% macro toggle_password_button() %}
+<span class="input-group-text">
+  <button type="button" aria-label="{{ show_password_message() }}" class="toggle-password">
+    <i class="bi-eye"></i>
+  </button>
+</span>
+{% endmacro %}
+
 {% macro show_messages(messages) %}
     {% for message in messages %}
         {% if message.extra_tags == "SHOW_USER" %}

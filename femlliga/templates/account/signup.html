@@ -1,6 +1,6 @@
-{% extends "femlliga/_base_template.html" %}
+{% extends "account/_passwords.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, toggle_password_button  %}
 
 {% block title %}Registre{% endblock title %}
 
@@ -19,14 +19,20 @@
     {{ input_feedback(form, "email") }}
 
     <label for="id_password1">Contrasenya</label>
-    <input type="password" {{ input_classes(form, "password1") }} name="password1" autocomplete="contrasenya-actual" required="" id="id_password1">
-    {{ input_feedback(form, "password1") }}
+    <div class="input-group">
+      <input type="password" {{ input_classes(form, "password1") }} name="password1" autocomplete="contrasenya-actual" required="" id="id_password1">
+      {{ toggle_password_button() }}
+      {{ input_feedback(form, "password1") }}
+    </div>
 
     <label for="id_password2">Contrasenya (de nou)</label>
-    <input type="password" {{ input_classes(form, "password2") }} name="password2" autocomplete="contrasenya-de-nou" required="" id="id_password2">
-    {{ input_feedback(form, "password2") }}
+    <div class="input-group">
+      <input type="password" {{ input_classes(form, "password2") }} name="password2" autocomplete="contrasenya-de-nou" required="" id="id_password2">
+      {{ toggle_password_button() }}
+      {{ input_feedback(form, "password2") }}
+    </div>
 
-    <p class="mt-2">En registrar-te, acceptes la <a target="_blank" rel="noopener noreferrer" href="{{ url("page", args=["legal"]) }}">política de privacitat</a>.</p>
+    <p class="mt-2">En registrar-te, acceptes la <a target="_blank" rel="noopener noreferrer" href="{{ url("page", args=["privacy"]) }}">política de protecció de dades</a>.</p>
 
     <div style="margin-top: 10px;">
         <button type="submit" class="btn btn-custom">Registra't</button>

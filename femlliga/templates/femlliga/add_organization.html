@@ -27,10 +27,13 @@
     {{ render_multi_checkboxes(form, "scopes", "Àmbits") }}
 
     <div style="height: 20px;"></div>
-    <p>Indica en el mapa la posició aproximada de l'entitat</p>
-    {% if form.errors.lat or form.errors.lng %}
+    <label for="id_name">Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça aproximada (carrer, codi postal, ciutat):</label>
+    <input type="text" {{ input_classes(form, "address") }} name="address" autocomplete="Adreça" id="id_address" {{ input_value(form, "address") }}>
+    <div class="spacing"></div>
+
+    {% if form.errors.lat or form.errors.lng or form.errors.address %}
     <div class="invalid-feedback" style="display: block;">
-        <ul><li>És necessari indicar la posició de l'entitat</li></ul>
+      <ul><li>És necessari indicar la posició o l'adreça de l'entitat</li></ul>
     </div>
     {% endif %}
     <div id="citymap" style="height: 300px;"></div>
@@ -68,5 +71,12 @@ map.on('click', function(e) {
 {% if form.cleaned_data and form.cleaned_data["lat"] and form.cleaned_data["lng"] %}
 marker = L.marker([{{ form.cleaned_data["lat"] }}, {{ form.cleaned_data["lng"] }}]).addTo(map);
 {% endif %}
+
+var addressInput = document.getElementById("id_address");
+addressInput.addEventListener("change", function() {
+    if (marker) { marker.remove(); }
+    document.getElementById("lat").value = "";
+    document.getElementById("lng").value = "";
+})
 </script>
 {% endblock %}

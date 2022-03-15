@@ -31,9 +31,7 @@
 
   {{ render_multiple_tags(form, "options", "Indiqueu per favor les opcions que us interessen:", resource.get_options()) }}
 
-  <textarea id="message" name="message" rows="8" {{ input_classes(form, "message") }}>
-    {% if form.cleaned_data and form.cleaned_data["message"] %}{{ form.cleaned_data["message"] }}{% endif %}
-  </textarea>
+  <textarea id="message" name="message" rows="8" {{ input_classes(form, "message") }}>{% if form.cleaned_data and form.cleaned_data["message"] %}{{ form.cleaned_data["message"] }}{% endif %}</textarea>
   {{ input_feedback(form, "message") }}
 
   <button type="submit" class="btn btn-success" style="margin-top: 20px;">Envia</button>

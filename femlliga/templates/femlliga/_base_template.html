@@ -47,6 +47,7 @@
   {% endif %}
   {% if user.is_staff %}
   <li>{{ menu_url("Informe", "report") }}</li>
+  <li>{{ menu_url("Dashboard", "dashboard") }}</li>
   {% endif %}
 {% block menu %}{% endblock %}
   </ul>

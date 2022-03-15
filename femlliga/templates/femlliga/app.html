@@ -8,7 +8,7 @@
             {{ name }}
         {% if len(missing) > 0 %}
             <span style="float: right;">
-                <a class="dropdown-toogle btn btn-custom" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#" style="background-color: #f4f4f4; margin-top: -5px;">
+                <a class="dropdown-toogle btn btn-custom" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#" style="background-color: #f4f4f4; margin-top: -5px;" title="Afegeix">
                   <i class="bi-plus-lg"></i> <span class="d-none d-md-inline">Afegeix</span>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="afegeix{{ resource_type }}">
@@ -28,7 +28,7 @@
             {% endif %}
             <div class="edit-row">
                 <span class="edit d-md-none d-block" style="float: right; position: relative; z-index: 1;">
-                    <a href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.resource]) }}">
+                    <a href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.resource]) }}" title="Edita">
                         <i class="bi-pencil-square edit" style="font-size: 1.5rem;"></i>
                     </a>
                 </span>
@@ -55,7 +55,7 @@
       <div class="col-md-4">
         <div class="edit-row">
           <span class="edit d-md-none d-block" style="float: right;">
-            <a href="{{ url("edit_organization", args=[org.id]) }}" style="color: black;">
+            <a href="{{ url("edit_organization", args=[org.id]) }}" style="color: black;" title="Edita">
               <i class="bi-pencil-square edit" style="font-size: 1.5rem; margin-top: 10px;"></i>
             </a>
           </span>

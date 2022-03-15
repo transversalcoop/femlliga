@@ -27,6 +27,7 @@ ORG_SCOPES = [
     ("TECHNOLOGY", "Tecnologia i electrònica"),
     ("TEXTILE", "Textil"),
     ("ACCESSIBILITY", "Accessibilitat"),
+    ("FUNCTIONAL_DIVERSITY", "Diversitat funcional"),
     ("OTHER", "Altres"),
 ]
 

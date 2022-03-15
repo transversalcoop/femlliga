@@ -17,7 +17,7 @@
     {{ csrf_input }}
     {{ form_feedback(form) }}
 
-    <label for="id_email">Correu electrònic</label>
+    <label for="id_email">El teu correu electrònic. El farem servir per respondre't</label>
     <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="Nom" required id="id_email" {{ input_value(form, "email") }}>
     {{ input_feedback(form, "email") }}
 

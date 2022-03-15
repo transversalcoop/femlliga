@@ -5,7 +5,7 @@
 {% macro collaboration_example(image, heading, text, alternatives, active=False, mobile=False) %}
 <div class="carousel-item{% if active %} active{% endif %}">
   <div class="card" {% if not mobile %}style="width: 33%; margin-right: 1%; position: relative;"{% endif %}>
-    <img src="{{ static("decorations/quote.svg") }}" class="example-quote">
+    <img src="{{ static("decorations/quote.svg") }}" class="example-quote" alt="">
 
     <img src="{{ static("home-images/"+image) }}" class="card-img-top pt-4 ps-4 pe-4" alt="">
     <div class="card-body">
@@ -23,7 +23,7 @@
 {% macro initial_block_text() %}
       <p>{{ consts.APP_NAME }} és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.</p>
       <div style="text-align: center; margin-top: 20px;">
-        <a id="inscripcio" type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
+        <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
           Inscriu la teua entitat
         </a>
       </div>
@@ -46,7 +46,7 @@
 <!-- mobile initial block -->
 <div class="container d-block d-md-none">
   <div style="background-color: #f4f4f4;">
-    <img src="{{ static("home-images/gent-portada-mobile.png") }}" style="max-width: 100%">
+    <img src="{{ static("home-images/gent-portada-mobile.png") }}" style="max-width: 100%" alt="Persones diverses">
     <div style="padding: 7px;">
       <em>Fer lliga: unir-se, fer causa comuna, acordar, amistar-se, anar a l’una, fer pinya…</em>
       <h1 class="app-title app-title-mobile">Fem lliga!</h1>

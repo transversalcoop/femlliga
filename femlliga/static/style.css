@@ -47,6 +47,11 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     overflow: hidden;
 }
 
+.toggle-password {
+    border: 0;
+    background: none;
+}
+
 .navbar-brand {
     padding: 0;
 }

@@ -16,6 +16,7 @@ urlpatterns = [
     path('organization/<uuid:organization_id>/edit/', views.edit_organization, name='edit_organization'),
     path('organization/<uuid:organization_id>/pre-wizard/', views.pre_wizard, name='pre-wizard'),
     path('organization/<uuid:organization_id>/mid-wizard/', views.mid_wizard, name='mid-wizard'),
+    path('organization/<uuid:organization_id>/post-wizard/', views.post_wizard, name='post-wizard'),
     path('organization/<uuid:organization_id>/reset-wizard/', views.reset_wizard, name='reset-wizard'),
     path('organization/<uuid:organization_id>/resources-wizard/<str:resource_type>/', views.resources_wizard, name='resources-wizard'),
     path('organization/<uuid:organization_id>/resources-wizard/<str:resource_type>/force/<str:resource>/', views.force_resources_wizard, name='force-resources-wizard'),
@@ -30,6 +31,7 @@ urlpatterns = [
 
     # admin required
     path('report/', views.report, name='report'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('admin/', admin.site.urls),
 
     # otherwise tested

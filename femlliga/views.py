@@ -2,7 +2,6 @@ import os
 import json
 import datetime
 import unicodedata
-import urllib.request
 
 from pathlib import Path
 from functools import cmp_to_key, reduce
@@ -55,7 +54,7 @@ def page(request, name):
     try:
         page = get_object_or_404(Page, name=name)
     except:
-        if name in ["faq", "legal", "privacy"]:
+        if name in ["faq", "legal", "privacy", "accessibility"]:
             page = Page(name=name, heading="Títol", subheading="Subtítol", content="<p>Cal definir aquesta pàgina</p>")
             page.save()
         else:
@@ -93,6 +92,16 @@ def mid_wizard(request, organization_id):
 
 @login_required
 @require_own_organization
+def post_wizard(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    if request.method == "POST":
+        org.resources_set = True
+        org.save()
+        return redirect("app")
+    return render(request, "femlliga/aux-wizard.html", {"org": org, "page": "post-wizard"})
+
+@login_required
+@require_own_organization
 def reset_wizard(request, organization_id):
     if request.method == "POST":
         org = get_object_or_404(Organization, pk=organization_id)
@@ -109,7 +118,7 @@ def aux_wizard(request, organization_id, resource_type, page):
             org.resources_set = True
             org.save()
             return redirect("app")
-    return render(request, "femlliga/aux-wizard.html", { "org": org, "resource_type": resource_type, "page": page })
+    return render(request, "femlliga/aux-wizard.html", { "org": org, "page": page })
 
 @login_required
 def add_organization(request):
@@ -131,6 +140,7 @@ def edit_organization(request, organization_id):
         "scopes": [x.name for x in org.scopes.all()],
         "lat": org.lat,
         "lng": org.lng,
+        "address": org.address,
     })})
 
 def process_organization_post(request, org = None):
@@ -142,6 +152,7 @@ def process_organization_post(request, org = None):
         lng = form.cleaned_data["lng"]
         org.name = form.cleaned_data["name"]
         org.org_type = form.cleaned_data["org_type"]
+        org.address = form.cleaned_data.get("address", None)
         org.lat = lat
         org.lng = lng
         org.city = get_city_from_coordinates(lat, lng)
@@ -273,9 +284,7 @@ def resources_wizard(request, organization_id, resource_type, forced = False):
     if resource_type == "needs" and not org.resources_set:
         return redirect("mid-wizard", organization_id=org.id)
 
-    org.resources_set = True
-    org.save()
-    return redirect("app")
+    return redirect("post-wizard", organization_id=org.id)
 
 @login_required
 @require_own_organization
@@ -430,12 +439,6 @@ def get_city_from_coordinates(lat, lng):
     except:
         return "Unknown city"
 
-def http_get(url):
-    f = urllib.request.urlopen(url)
-    res = json.loads(f.read().decode('utf-8'))
-    f.close()
-    return res
-
 def organization_prefetches(queryset):
     return queryset.\
         prefetch_related("scopes").\
@@ -447,6 +450,14 @@ def organization_prefetches(queryset):
         prefetch_related("offers__images").\
         prefetch_related("sent_agreements__options").\
         prefetch_related("received_agreements__options")
+
+@user_passes_test(lambda u: u.is_staff)
+def dashboard(request):
+    return render(request, "femlliga/dashboard.html", {
+        "organizations": Organization.objects.count(),
+        "agreements": Agreement.objects.count(),
+        "contacts": Contact.objects.count(),
+    })
 
 @user_passes_test(lambda u: u.is_staff)
 def report(request):
