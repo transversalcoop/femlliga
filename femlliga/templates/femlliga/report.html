@@ -57,8 +57,10 @@
 <h2>Recursos</h2>
 
 {{ render_table(resources_by_org_type) }}
+{{ render_table(charge_by_org_type) }}
 {{ render_table(resources_by_org_scope) }}
 {{ render_table(resources_by_resource_type) }}
+{{ render_table(charge_by_resource_type) }}
 {{ render_table(resources_by_resource_option) }}
 
 <h3>Suggerències de necessitats indicades en «altres»</h3>
@@ -79,6 +81,14 @@
   {% endfor %}
 </ul>
 
+<h3>Comentaris en necessitats concretes</h3>
+
+<ul>
+  {% for need in needs_comments[:10] %}
+  <li>{{ need.comments }}</li>
+  {% endfor %}
+</ul>
+
 <h3>Suggerències de oferiments indicades en «altres»</h3>
 
 <p>Paraules més repetides en els oferiments:</p>
@@ -93,6 +103,14 @@
 
 <ul>
   {% for offer in other_offers[:10] %}
+  <li>{{ offer.comments }}</li>
+  {% endfor %}
+</ul>
+
+<h3>Comentaris en oferiments concrets</h3>
+
+<ul>
+  {% for offer in offers_comments[:10] %}
   <li>{{ offer.comments }}</li>
   {% endfor %}
 </ul>

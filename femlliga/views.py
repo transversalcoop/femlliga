@@ -472,6 +472,12 @@ def report(request):
             len(orgs),
         ]
 
+    def offers_charge_orgs(orgs):
+        return [
+            count(orgs, lambda x: [r for r in x.offers.all() if r.has_resource==True and r.charge]),
+            count(orgs, lambda x: [r for r in x.offers.all() if r.has_resource==True and not r.charge]),
+        ]
+
     def agreements_orgs(orgs, f):
         return [
             count(orgs, lambda x: [a for a in f(x) if a.communication_accepted==None]),
@@ -483,10 +489,12 @@ def report(request):
         ]
 
     org_types, resources_by_org_type, agreements_by_solicitor_type, agreements_by_solicitee_type  = [], [], [], []
+    charge_by_org_type = []
     for org_type in sort_by_name(ORG_TYPES):
         orgs = [o for o in organizations if o.org_type == org_type[0]]
         org_types.append(org_type_name(org_type[0]))
         resources_by_org_type.append(offers_needs_orgs(orgs))
+        charge_by_org_type.append(offers_charge_orgs(orgs))
         agreements_by_solicitor_type.append(agreements_orgs(orgs, lambda x: x.sent_agreements.all()))
         agreements_by_solicitee_type.append(agreements_orgs(orgs, lambda x: x.received_agreements.all()))
 
@@ -499,6 +507,7 @@ def report(request):
         agreements_by_solicitee_scope.append(agreements_orgs(orgs, lambda x: x.received_agreements.all()))
 
     resource_names, resources_by_resource_type, agreements_by_resource_type = [], [], []
+    charge_by_resource_type = []
     for resource in RESOURCES_ORDER:
         needs, offers = [], []
         for o in organizations:
@@ -510,6 +519,7 @@ def report(request):
                     offers.append(x)
         resource_names.append(resource_name(resource))
         resources_by_resource_type.append([len(offers), len(needs)])
+        charge_by_resource_type.append([len([x for x in offers if x.charge]), len([x for x in offers if not x.charge])])
         agreements_by_resource_type.append(agreements_orgs(
             organizations, lambda x: [a for a in x.sent_agreements.all() if a.resource==resource]))
 
@@ -544,12 +554,18 @@ def report(request):
         "resources_by_org_type": Table(
             ["Recursos per tipus d'entitat", "Oferiments", "Necessitats", "Entitats"], org_types,
             resources_by_org_type),
+        "charge_by_org_type": Table(
+            ["Oferiments que es cobren per tipus d'entitat", "Oferiments cobrant", "Oferiments gratuïts"], org_types,
+            charge_by_org_type),
         "resources_by_org_scope": Table(
             ["Recursos per àmbit de treball de l'entitat", "Oferiments", "Necessitats", "Entitats"], org_scopes,
             resources_by_org_scope),
         "resources_by_resource_type": Table(
             ["Recursos per tipus de recurs", "Oferiments", "Necessitats"], resource_names,
             resources_by_resource_type),
+        "charge_by_resource_type": Table(
+            ["Oferiments que es cobren per tipus de recurs", "Oferiments cobrant", "Oferiments gratuïts"],
+            resource_names, charge_by_resource_type),
         "resources_by_resource_option": Table(
             ["Recursos per tipus concret de recurs", "Oferiments", "Necessitats"], resource_options,
             resources_by_resource_option),
@@ -581,6 +597,8 @@ def report(request):
         "other_offers": other_offers,
         "most_needed": most_needed,
         "most_offered": most_offered,
+        "needs_comments": Need.objects.exclude(resource="OTHER").exclude(comments=""),
+        "offers_comments": Offer.objects.exclude(resource="OTHER").exclude(comments=""),
     })
 
 def strip_accents(s):
