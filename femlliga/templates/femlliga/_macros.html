@@ -69,7 +69,7 @@
             <div class="carousel-inner">
               {% for i, image in enumerate(resource.images.all()) %}
               <div class="carousel-item text-center{% if i == 0 %} active{% endif %}">
-                <img src="{{ image.image.url }}/" class="d-block" style="max-height: 100%; max-width: 100%; margin: 0 auto;">
+                <img src="{{ image.image.url }}/" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;">
               </div>
               {% endfor %}
             </div>
@@ -97,6 +97,8 @@
         value="{{ form.cleaned_data[name] }}"
     {% endif %}
 {% endmacro %}
+
+{% macro textarea_value(form, name) %}{% if form.cleaned_data and form.cleaned_data[name] %}{{ form.cleaned_data[name] }}{% endif %}{% endmacro %}
 
 {% macro input_feedback(form, name) %}
     {% if form.errors[name] %}

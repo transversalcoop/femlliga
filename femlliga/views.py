@@ -1,21 +1,26 @@
 import os
+import exif
+import uuid
 import json
 import datetime
 import unicodedata
 
+from io import BytesIO
 from pathlib import Path
 from functools import cmp_to_key, reduce
 
-from django.http import HttpResponse, FileResponse, Http404
+from django.http import Http404
 from django.forms import formset_factory, inlineformset_factory
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.mail import send_mail, EmailMessage
-from django.core.exceptions import PermissionDenied
+from django.core.mail import EmailMessage
 from django.utils import timezone
 from django.utils.cache import patch_response_headers
-from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.views.static import serve
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.template.loader import render_to_string
 
 import networkx as nx
@@ -235,7 +240,7 @@ def resources_wizard(request, organization_id, resource_type, forced = False):
                 m.save()
 
             ImageFormSet = inlineformset_factory(model, imagemodel, fields=("image",))
-            imageformset = ImageFormSet(request.POST, request.FILES, instance = m)
+            imageformset = ImageFormSet(request.POST, clean_files(request.FILES), instance = m)
 
             for option, _ in Resource.resource(resource).options():
                 ro = ResourceOption(name=option)
@@ -263,9 +268,8 @@ def resources_wizard(request, organization_id, resource_type, forced = False):
                         if f.is_file():
                             f.unlink()
                         image.delete()
-
                     except Exception as ex:
-                        print("EXCEPTION:", ex)
+                        raise
             return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type)
         else:
             return render_wizard(request, org, form.cleaned_data["resource"], form, resource_type, forced = forced)
@@ -285,6 +289,32 @@ def resources_wizard(request, organization_id, resource_type, forced = False):
         return redirect("mid-wizard", organization_id=org.id)
 
     return redirect("post-wizard", organization_id=org.id)
+
+def clean_files(FILES):
+    for key in FILES:
+        FILES[key] = clean_file(FILES[key])
+
+    return FILES
+
+def clean_file(posted_file):
+    filename = str(uuid.uuid4()) + Path(posted_file.name).suffix
+    try:
+        f = exif.Image(posted_file.read())
+        f.delete_all()
+        f = f.get_file()
+        posted_file = InMemoryUploadedFile(
+            BytesIO(f),
+            posted_file.field_name,
+            filename,
+            posted_file.content_type,
+            len(f),
+            posted_file.charset,
+        )
+        return posted_file
+    except:
+        posted_file.seek(0)
+        posted_file.name = filename
+        return posted_file # exif will not work for files other than JPEG
 
 @login_required
 @require_own_organization
@@ -673,27 +703,11 @@ def contact(request):
 
 @login_required
 def uploads(request, path):
-    date_format = '%a, %d %b %Y %H:%M:%S %Z'
-    f = MEDIA_ROOT / path
-    if not is_subpath(f, MEDIA_ROOT):
-        return HttpResponse(status=403)
-
-    if "If-Modified-Since" in request.headers:
-        modified_since = datetime.datetime.strptime(request.headers["If-Modified-Since"], date_format)
-        modified = datetime.datetime.fromtimestamp(f.lstat().st_mtime)
-        if modified < modified_since:
-            return HttpResponse(status=304)
-
-    response = FileResponse(open(f, 'rb')) # FileResponse closes the file, don't use context manager
-    response.headers["Last-Modified"] = timezone.now().strftime(date_format)
-    return response
+    return serve(request, path, MEDIA_ROOT)
 
 def assert_url_param_in_list(param, l):
     if param not in l:
         raise Http404("Unknown parameter")
-
-def is_subpath(f, path):
-    return os.path.abspath(f).startswith(os.path.abspath(path))
 
 def most_requested(resources):
     m = {}

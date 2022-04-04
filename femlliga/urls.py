@@ -24,8 +24,8 @@ urlpatterns = [
     path('organization/<uuid:organization_id>/matches/', views.matches, name='matches'),
     path('organization/<uuid:organization_id>/agreements/sent/', views.agreements_sent, name='agreements_sent'),
     path('organization/<uuid:organization_id>/agreements/received/', views.agreements_received, name='agreements_received'),
-    path('organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/connect', views.agreement_connect, name='agreement_connect'),
-    path('organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/successful', views.agreement_successful, name='agreement_successful'),
+    path('organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/connect/', views.agreement_connect, name='agreement_connect'),
+    path('organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/successful/', views.agreement_successful, name='agreement_successful'),
 
     path('uploads/<path:path>/', views.uploads, name='uploads'),
 

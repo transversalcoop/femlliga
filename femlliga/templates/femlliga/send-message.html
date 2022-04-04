@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, render_select, resource_details, render_multiple_tags %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, resource_details, render_multiple_tags %}
 
 {% block content %}
 <div class="container">
@@ -31,7 +31,7 @@
 
   {{ render_multiple_tags(form, "options", "Indiqueu per favor les opcions que us interessen:", resource.get_options()) }}
 
-  <textarea id="message" name="message" rows="8" {{ input_classes(form, "message") }}>{% if form.cleaned_data and form.cleaned_data["message"] %}{{ form.cleaned_data["message"] }}{% endif %}</textarea>
+  <textarea id="message" name="message" rows="8" {{ input_classes(form, "message") }}>{{ textarea_value(form, "message") }}</textarea>
   {{ input_feedback(form, "message") }}
 
   <button type="submit" class="btn btn-success" style="margin-top: 20px;">Envia</button>

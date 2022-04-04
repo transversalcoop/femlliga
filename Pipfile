@@ -20,6 +20,7 @@ scipy = "*"
 django-debug-toolbar = "*"
 bleach = "*"
 django-csp = "*"
+exif = "*"
 
 [dev-packages]
 

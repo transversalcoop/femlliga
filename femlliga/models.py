@@ -9,11 +9,19 @@ from io import BytesIO
 from pathlib import Path
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 
 from .constants import *
 from .utils import date_intervals
+
+def limit_file_size(MB):
+    limit = MB * 1024 * 1024
+    def f(value):
+        if value.size > limit:
+            raise ValidationError(f"L'arxiu és massa gran, hauria d'ocupar menys de {MB} MB.")
+    return f
 
 class CustomUser(AbstractUser):
     def get_organization(self):
@@ -329,9 +337,9 @@ def offer_images_directory_path(instance, filename):
 
 class NeedImage(models.Model):
     resource = models.ForeignKey(Need, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to=need_images_directory_path)
+    image = models.ImageField(upload_to=need_images_directory_path, validators=[limit_file_size(10)])
 
 class OfferImage(models.Model):
     resource = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to=offer_images_directory_path)
+    image = models.ImageField(upload_to=offer_images_directory_path, validators=[limit_file_size(10)])
 
