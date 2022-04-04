@@ -21,6 +21,7 @@ django-debug-toolbar = "*"
 bleach = "*"
 django-csp = "*"
 exif = "*"
+django-axes = "*"
 
 [dev-packages]
 

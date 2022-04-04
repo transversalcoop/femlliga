@@ -1,14 +1,17 @@
 from decimal import Decimal
 from datetime import datetime
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 
 from .models import *
 from .constants import *
 from .utils import date_intervals
+
+AUTH_BACKENDS = settings.AUTHENTICATION_BACKENDS[1:]
 
 class ResourcesTestCase(TestCase):
     def test_resource_types_match(self):
@@ -93,6 +96,7 @@ class SmokeTests(TestCase):
         for x in URLS:
             self.aux_get(x[0], args=x[1], status_code=302)
 
+    @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)
     def test_logged(self):
         self.client.login(email='test@example.com', password='passfortests')
         org, org2 = self.get_orgs()
@@ -107,6 +111,7 @@ class SmokeTests(TestCase):
         for x in URLS:
             self.aux_get(x[0], x[1], args=x[2])
 
+    @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)
     def test_logged_error(self):
         self.client.login(email='test@example.com', password='passfortests')
         org, org2 = self.get_orgs()

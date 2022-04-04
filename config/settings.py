@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 import re
+
 from pathlib import Path
+from datetime import timedelta
 from distutils.util import strtobool
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'debug_toolbar',
+    'axes',
 
     'femlliga',
 ]
@@ -64,7 +67,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'femlliga.middleware.middleware.SessionTimeoutMiddleware',
     'femlliga.middleware.middleware.TimezoneMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -177,6 +182,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'femlliga.CustomUser'
 SITE_ID = 1
 AUTHENTICATION_BACKENDS = (
+    'axes.backends.AxesBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
@@ -190,6 +196,7 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https")
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = None
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -303,3 +310,6 @@ if DEBUG:
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[:-1] + '1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
 
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(hours=1)
+AXES_LOCKOUT_TEMPLATE = "femlliga/lockout.html"
