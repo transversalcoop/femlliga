@@ -13,7 +13,7 @@ from django.http import Http404
 from django.forms import formset_factory, inlineformset_factory
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, mail_managers
 from django.utils import timezone
 from django.utils.cache import patch_response_headers
 from django.core.exceptions import PermissionDenied
@@ -686,6 +686,13 @@ def contact(request):
             email = email,
             content = content,
         ).save()
+        # send contact to managers
+        mail_managers(
+            f"S'ha rebut un contacte a la web de {APP_NAME}",
+            f"Des del correu {email} envien el següent missatge:\n\n{content}",
+        )
+
+        # send confirmation to user
         body = render_to_string("email/contact_received.html", {
             "content": content,
             "current_site": get_current_site(request),

@@ -25,6 +25,8 @@
         "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS=false",
         "DJANGO_SECURE_HSTS_PRELOAD=false",
         "DJANGO_SECURE_SSL_REDIRECT=false",
+        "DJANGO_ADMINS=root:root@localhost",
+        "DJANGO_MANAGERS=root:root@localhost",
       ]
     }
   }

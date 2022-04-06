@@ -23,18 +23,14 @@
 {% endmacro %}
 
 {% block content %}
+{% if len(offer_matches) > 0 or len(need_matches) > 0 %}
 <main id="content" class="container-fluid">
   <div class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
-      {% if len(offer_matches) > 0 or len(need_matches) > 0 %}
       <h1>Has lligat!</h1>
       <p>
         Hem trobat coincidències entre les vostres necessitats i les d'altres entitats, pots clicar a sota per veure'n els detalls
       </p>
-      {% else %}
-      <h1>Sembla que no hi ha sort...</h1>
-      <p>No cal patir! Amb el temps s'incorporaran noves entitats que probablement compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-ho en uns dies.</p>
-      {% endif %}
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
         {% for resource in own_needs %}
@@ -75,5 +71,11 @@
     </div>
   </div>
 </main>
+{% else %}
+<div class="container text-center pt-4">
+  <h1>Sembla que no hi ha sort...</h1>
+  <p>No cal patir! Amb el temps s'incorporaran noves entitats que probablement compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-ho en uns dies.</p>
+</div>
+{% endif %}
 {% endblock %}
 

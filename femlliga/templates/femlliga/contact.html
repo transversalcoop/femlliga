@@ -18,11 +18,11 @@
     {{ form_feedback(form) }}
 
     <label for="id_email">El teu correu electrònic. El farem servir per respondre't</label>
-    <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="Nom" id="id_email" {{ input_value(form, "email") }}>
+    <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="Nom" id="id_email" {{ input_value(form, "email") }} required>
     {{ input_feedback(form, "email") }}
 
     <label for="id_content" class="mt-2">Missatge</label>
-    <textarea id="content" name="content" rows="8" {{ input_classes(form, "content") }}>{{ textarea_value(form, "content") }}</textarea>
+    <textarea id="content" name="content" rows="8" {{ input_classes(form, "content") }} required>{{ textarea_value(form, "content") }}</textarea>
     {{ input_feedback(form, "content") }}
 
     <button type="submit" class="btn btn-success mt-2">Envia</button>

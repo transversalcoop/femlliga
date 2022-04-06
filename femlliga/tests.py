@@ -1,6 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
 
+from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.conf import settings
@@ -13,7 +14,7 @@ from .utils import date_intervals
 
 AUTH_BACKENDS = settings.AUTHENTICATION_BACKENDS[1:]
 
-class ResourcesTestCase(TestCase):
+class ResourcesTests(TestCase):
     def test_resource_types_match(self):
         for resource in RESOURCES:
             self.assertIn(resource[0], RESOURCE_ICONS_MAP)
@@ -21,7 +22,7 @@ class ResourcesTestCase(TestCase):
             self.assertIn(resource[0], RESOURCE_NEED_DESCRIPTIONS)
             self.assertIn(resource[0], RESOURCE_OFFER_DESCRIPTIONS)
 
-class OrganizationsTestCase(TestCase):
+class OrganizationTests(TestCase):
     def test_disstance(self):
         p1 = (39.982639180269345, -0.030035858750823794)
         p2 = (39.96994470876123, 0.014310397939378215)
@@ -33,7 +34,7 @@ class OrganizationsTestCase(TestCase):
         self.assertEqual(o1.distance(o3), 4.047659967585039)
         self.assertEqual(o2.distance(o3), 0.677473274790817)
 
-class UtilsTestCase(TestCase):
+class UtilsTests(TestCase):
     def test_date_intervals(self):
         start1 = datetime(year=2022, month=1, day=10, hour=10, minute=21)
         end1   = datetime(year=2022, month=1, day=10, hour=14, minute=21)
@@ -128,6 +129,23 @@ class SmokeTests(TestCase):
         org = get_user_model().objects.get(email='test@example.com').organizations.all()[0]
         org2 = get_user_model().objects.get(email='test2@example.com').organizations.all()[0]
         return org, org2
+
+class ComponentTests(TestCase):
+    fixtures = ["testdata.json"]
+
+    def test_contact(self):
+        self.assertEqual(len(mail.outbox), 0)
+
+        response = self.client.post(reverse("contact"), {})
+        self.assertContains(response, "Aquest camp és obligatori", count=2)
+        self.assertEqual(len(mail.outbox), 0)
+
+        content = "Email test content"
+        response = self.client.post(reverse("contact"), {"email": "test@example.com", "content": content})
+        self.assertContains(response, "Gràcies per enviar el missatge! Et respondrem tan aviat com puguem", count=1)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("S'ha rebut un contacte a la web", mail.outbox[0].subject)
+        self.assertIn("s'ha enviat correctament", mail.outbox[1].subject)
 
 class IntegrationTests(TestCase):
     fixtures = ["testdata.json"]
