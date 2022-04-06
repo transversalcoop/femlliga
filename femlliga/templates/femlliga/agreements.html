@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import show_messages %}
+{% from 'femlliga/_macros.html' import show_messages, organization_link %}
 
 {% macro render_form(a, value, action, class, button_text) %}
   <form method="POST" action="{{ url("agreement_" + action, args=[org.id, a.id]) }}" class="row" style="width: 100%;">
@@ -38,15 +38,15 @@
       </a>
       {% if view_type == "sent" %}
         {% if a.resource_type == "need" %}
-          Buscar {{ resource_name(a.resource) }} conjuntament amb {{ a.solicitee.name }}
+          Buscar {{ resource_name(a.resource) }} conjuntament amb {{ organization_link(a.solicitee) }}
         {% else %}
-          {{ resource_name(a.resource) }} sol·licitat a {{ a.solicitee.name }}
+          {{ resource_name(a.resource) }} sol·licitat a {{ organization_link(a.solicitee) }}
         {% endif %}
       {% else %}
         {% if a.resource_type == "need" %}
-          {{ a.solicitor.full_name() }} ens demana buscar conjuntament {{ resource_name(a.resource) }}
+          {{ organization_link(a.solicitor) }} ens demana buscar conjuntament {{ resource_name(a.resource) }}
         {% else %}
-          {{ a.solicitor.full_name() }} ens sol·licita {{ resource_name(a.resource) }}
+          {{ organization_link(a.solicitor) }} ens sol·licita {{ resource_name(a.resource) }}
         {% endif %}
       {% endif %}
     </h2>
@@ -57,9 +57,9 @@
       <p>
         <i class="bi-hourglass-split text-muted" style="font-size: 1.5rem;"></i>
         {% if view_type == "sent" %}
-          {{ a.solicitee.name }} encara no ha acceptat ni declinat la comunicació. Si l'accepten, s'iniciarà una cadena de correus electrònics en la que podreu concretar els detalls de la possible col·laboració.
+          {{ organization_link(a.solicitee) }} encara no ha acceptat ni declinat la comunicació. Si l'accepten, s'iniciarà una cadena de correus electrònics en la que podreu concretar els detalls de la possible col·laboració.
         {% else %}
-          {{ a.solicitor.full_name() }} ha sol·licitat una comunicació. Per favor, indiqueu si accepteu o no. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la comunicació no us obliga a arribar a cap acord.
+          {{ organization_link(a.solicitor) }} ha sol·licitat una comunicació. Per favor, indiqueu si accepteu o no. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la comunicació no us obliga a arribar a cap acord.
         {% endif %}
       </p>
     {% elif a.communication_accepted == False %}
@@ -73,7 +73,7 @@
           <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
           <i class="bi-hourglass-split text-muted" style="font-size: 1.5rem;"></i>
           {% if view_type == "sent" %}
-            {{ a.solicitee.name }} va acceptar la comunicació.
+            {{ organization_link(a.solicitee) }} va acceptar la comunicació.
           {% else %}
             Vau acceptar la comunicació.
           {% endif %}

@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import render_select_raw, resource_details, render_match_badges %}
+{% from 'femlliga/_macros.html' import render_select_raw, resource_details, render_match_badges, organization_link %}
 
 {% macro show_matches(resource, matches, match_type, match_name) %}
   {% set others = matches[resource.resource] %}
@@ -8,7 +8,9 @@
   <hr>
   <div class="row">
     <h3>
-      {{ result.organization.type() }} «{{ result.organization.name }}» <span style="border-bottom: 2px solid black;">{{ match_name }}</span> {{ resource_name(resource.resource) }}
+      {{ organization_link(result.organization) }}
+      <span style="border-bottom: 2px solid black;">{{ match_name }}</span>
+      {{ resource_name(resource.resource) }}
     </h3>
     <div>
       <span style="margin-right: 15px;">A {{ org.distance_text(result.organization) }} de vosaltres</span>

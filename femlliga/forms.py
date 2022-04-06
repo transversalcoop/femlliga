@@ -21,7 +21,7 @@ class OrganizationForm(forms.ModelForm):
     )
     class Meta:
         model = Organization
-        fields = ["name", "org_type", "lat", "lng", "address"]
+        fields = ["name", "description", "org_type", "lat", "lng", "address"]
 
     def clean(self):
         super().clean()

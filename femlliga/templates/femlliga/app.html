@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import resource_details, render_match_badges %}
+{% from 'femlliga/_macros.html' import resource_details, render_match_badges, render_social_media %}
 
 {% macro resources(name, resource_type, data, missing, description) %}
     <div class="col-lg-6">
@@ -61,13 +61,17 @@
           </span>
           <h1 style="font-size: 2.5em; margin: 0;">{{ org.name }}</h1>
         </div>
-        <p style="margin: 20px 0 0 0;"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
-        <p style="margin: 10px 0 0 0;"><strong>Àmbits de treball</strong></p>
-        <ul>
+        <p class="mt-1 mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
+        <p class="mt-1 mb-0"><strong>Àmbits de treball</strong></p>
+        <ul class="mb-0">
           {% for scope in org.scopes.all() %}
             <li>{{ scope }}</li>
           {% endfor %}
         </ul>
+        {% if org.description %}
+        <p class="mt-1 mb-1"><strong>Descripció</strong>: {{ org.description }}</p>
+        {% endif %}
+        {{ render_social_media(org) }}
       </div>
       <div class="col-md-7 offset-md-1">
         <p style="font-size: 1.25em;">Quina <strong>lliga</strong> has fet</p>
@@ -93,7 +97,7 @@
 <div class="container mb-4">
   {% if org.needs_not_set() or org.offers_not_set() %}
   <div class="alert alert-primary" role="alert" style="margin-top: 20px;">
-    Pareix que encara no heu completat el procés d'alta. Ho voleu fer ara?
+    Pareix que encara no heu completat el procés d'alta. Voleu fer-ho ara?
     <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" style="float: right;">
         {{ csrf_input }}
         <button class="btn btn-sm btn-custom">Completa l'alta</button>

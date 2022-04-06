@@ -11,17 +11,24 @@ from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.utils.deconstruct import deconstructible
 from django.contrib.auth.models import AbstractUser
 
 from .constants import *
 from .utils import date_intervals
 
-def limit_file_size(MB):
-    limit = MB * 1024 * 1024
-    def f(value):
-        if value.size > limit:
-            raise ValidationError(f"L'arxiu és massa gran, hauria d'ocupar menys de {MB} MB.")
-    return f
+@deconstructible
+class LimitFileSize:
+    def __init__(self, MB):
+        self.MB = MB
+        self.limit = MB * 1024 * 1024
+
+    def __call__(self, value):
+        if value.size > self.limit:
+            raise ValidationError(f"L'arxiu és massa gran, hauria d'ocupar menys de {self.MB} MB.")
+
+    def __eq__(self, other):
+        return self.MB == other.MB
 
 class CustomUser(AbstractUser):
     def get_organization(self):
@@ -50,6 +57,7 @@ class Organization(models.Model):
         editable = False,
     )
     name = models.CharField(max_length = 200)
+    description = models.TextField(blank=True)
     date = models.DateTimeField(auto_now_add=True)
     scopes = models.ManyToManyField(OrganizationScope)
     org_type = models.CharField(max_length=100, choices=ORG_TYPES)
@@ -68,9 +76,6 @@ class Organization(models.Model):
 
     def __str__(self):
         return f"(Entitat) {self.name}"
-
-    def full_name(self):
-        return f"{self.type()} «{self.name}»"
 
     def type(self):
         for t in ORG_TYPES:
@@ -132,6 +137,11 @@ class Organization(models.Model):
         received0 = self.received_agreements.filter(communication_accepted=None)
         received1 = self.received_agreements.filter(communication_accepted=True, agreement_successful=None)
         return len(sent) > 0, len(received0) > 0 or len(received1) > 0
+
+class SocialMedia(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="social_media")
+    media_type = models.CharField(max_length=30, choices=SOCIAL_MEDIA_TYPES)
+    value = models.CharField(max_length=200)
 
 class Resource:
     def __init__(self, values):
@@ -245,9 +255,13 @@ def option_name(code):    return RESOURCE_OPTIONS_DEF_MAP[code]
 def resource_name(code):  return RESOURCE_NAMES_MAP[code]
 def org_scope_name(code): return ORG_SCOPES_NAMES_MAP[code]
 def org_type_name(code):  return ORG_TYPES_NAMES_MAP[code]
+def social_media_type_name(code): return SOCIAL_MEDIA_TYPES_MAP[code]
 
 def sort_resources(resources):
     return sorted(resources, key = lambda r: RESOURCES_ORDER.index(r.resource))
+
+def sort_social_media(social_media):
+    return sorted(social_media, key = lambda sm: SOCIAL_MEDIA_TYPES_ORDER.index(sm.media_type))
 
 class ResourceOption(models.Model):
     name = models.CharField(max_length=100, choices=RESOURCE_OPTIONS, primary_key = True)
@@ -337,9 +351,9 @@ def offer_images_directory_path(instance, filename):
 
 class NeedImage(models.Model):
     resource = models.ForeignKey(Need, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to=need_images_directory_path, validators=[limit_file_size(10)])
+    image = models.ImageField(upload_to=need_images_directory_path, validators=[LimitFileSize(10)])
 
 class OfferImage(models.Model):
     resource = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to=offer_images_directory_path, validators=[limit_file_size(10)])
+    image = models.ImageField(upload_to=offer_images_directory_path, validators=[LimitFileSize(10)])
 

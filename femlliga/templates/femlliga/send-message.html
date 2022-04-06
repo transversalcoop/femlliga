@@ -1,17 +1,17 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, resource_details, render_multiple_tags %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, resource_details, render_multiple_tags, organization_link %}
 
 {% block content %}
 <div class="container">
 {% if resource_type == "need" %}
-<h1>Busca {{ resource }} conjuntament amb {{ other.name }}</h1>
+<h1>Busca {{ resource }} conjuntament amb {{ organization_link(other) }}</h1>
 {% else %}
-<h1>Sol·licita {{ resource }} a {{ other.name }}</h1>
+<h1>Sol·licita {{ resource }} a {{ organization_link(other) }}</h1>
 {% endif %}
 
 <div class="alert alert-primary" role="alert" style="margin-top: 20px;">
-  Se li enviarà un missatge a {{ other.type() }} «{{ other.name }}», que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
+  Se li enviarà un missatge a {{ organization_link(other) }}, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
 </div>
 
 <div>

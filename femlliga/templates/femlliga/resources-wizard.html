@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_multiple_tags %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_multiple_tags, render_formset_field %}
 
 {% block content %}
 <div class="container">
@@ -59,14 +59,11 @@
       {{ imageforms.management_form }}
       {% for i, imageform in enumerate(imageforms) %}
           <div id="add-image-{{ i }}" style="display: none;">
-              {% set field = imageform.image %}
-              <label for="id_{{ field.html_name }}" style="margin-top: 10px;">Imatge</label>
-              <input type="file" {{ input_classes(imageform, field.html_name) }} name="{{ field.html_name }}" autocomplete="Imatge" id="id_{{ field.html_name }}" {{ input_value(imageform, field.html_name) }}>
-              {{ input_feedback(imageform, field.html_name) }}
+            {{ render_formset_field(imageform, imageform.image, "image", "file", "Imatge") }}
           </div>
       {% endfor %}
 
-      <a class="btn btn-custom" style="border-radius: 50px; margin-top: 20px;" id="add-image-button" href="#" onclick="addImage()">
+      <a class="btn btn-custom mt-3" href="#" onclick="addImage(event)">
           <i class="bi-plus-lg"></i> Afegeix imatge
       </a>
     {% endif %}
@@ -92,13 +89,13 @@
 </div>
 
 <script>
-function addImage() {
+function addImage(event) {
     for (let i = 0; i < 6; i++) {
         var element = document.getElementById("add-image-" + i);
         if (element.style.display == "none") {
             element.style.display = "block";
             if (i === 5) {
-                document.getElementById("add-image-button").style.display = "none";
+                event.target.style.display = "none";
             }
             return;
         }

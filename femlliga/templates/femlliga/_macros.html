@@ -98,6 +98,10 @@
     {% endif %}
 {% endmacro %}
 
+{% macro formset_input_value(field) %}
+  {% if field.value() %}value="{{ field.value() }}"{% endif %}
+{% endmacro %}
+
 {% macro textarea_value(form, name) %}{% if form.cleaned_data and form.cleaned_data[name] %}{{ form.cleaned_data[name] }}{% endif %}{% endmacro %}
 
 {% macro input_feedback(form, name) %}
@@ -126,7 +130,8 @@
             {% endif %}
             {% for choice in choices %}
             <option value="{{ choice[0] }}"
-                {% if form and form.cleaned_data and form.cleaned_data[name] == choice[0] %}selected{% endif %}>
+                {% if form and form.cleaned_data and form.cleaned_data[name] == choice[0] %}selected{% endif %}
+            >
                 {{ choice[1] }}
             </option>
             {% endfor %}
@@ -234,4 +239,67 @@ function clickOption(element) {
     <span class="badge bg-warning" title="Hi ha {{ count }} entitats que necessiten el mateix que vosaltres">{{ count }}</span>
     {% if link %}</a>{% endif %}
   {% endif %}
+{% endmacro %}
+
+{% macro render_social_media(org) %}
+  {% if len(org.social_media.all()) > 0 %}
+    <p class="mt-1 mb-0"><strong>Xarxes socials</strong></p>
+    <ul class="mb-0">
+    {% for m in sort_social_media(org.social_media.all()) %}
+      <li>
+        {{ social_media_type_name(m.media_type) }}:
+        {% if m.media_type == "WEBSITE" %}
+          <a target="_blank" rel="noopener noreferrer" href="{{ add_http(m.value) }}">{{ m.value }}</a>
+        {% elif m.media_type == "FACEBOOK" %}
+          <a target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/{{ m.value }}">{{ m.value }}</a>
+        {% elif m.media_type == "INSTAGRAM" %}
+          <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/{{ m.value }}">{{ m.value }}</a>
+        {% elif m.media_type == "TWITTER" %}
+          <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/{{ m.value }}">{{ m.value }}</a>
+        {% elif m.media_type == "LINKEDIN" %}
+          <a target="_blank" rel="noopener noreferrer" href="https://es.linkedin.com/in/{{ m.value }}">{{ m.value }}</a>
+        {% else %}
+          {{ m.value }}
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}
+
+{% macro render_formset_field(form, field, field_name, input_type, label) %}
+  {% if label %}
+    <label for="id_{{ field.html_name }}" style="margin-top: 10px;">{{ label }}</label>
+  {% endif %}
+  <input type="{{ input_type }}" {{ input_classes(form, field_name) }} name="{{ field.html_name }}" id="id_{{ field.html_name }}" {{ formset_input_value(field) }}>
+  {{ input_feedback(form, field_name) }}
+{% endmacro %}
+
+{% macro render_formset_select(form, field, field_name, label) %}
+  {% if label %}
+    <label for="id_{{ field.html_name }}">{{ label }}</label>
+  {% endif %}
+  <select id="id_{{ field.html_name }}" name="{{ field.html_name }}" class="form-select {% if form.errors[field_name] %} is-invalid{% endif %}">
+      {% for choice in form.fields[field_name].choices %}
+      <option value="{{ choice[0] }}"
+          {% if field.value() and field.value() == choice[0] %}selected{% endif %}
+      >
+          {{ choice[1] }}
+      </option>
+      {% endfor %}
+  </select>
+  {{ input_feedback(form, field_name) }}
+{% endmacro %}
+
+{% macro render_formset_delete(form, field, field_name) %}
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="id_{{ field.html_name }}" name="{{ field.html_name }}">
+    <label class="form-check-label" for="{{ field.html_name }}">
+      Marca aquesta casella per esborrar
+    </label>
+  </div>
+{% endmacro %}
+
+{% macro organization_link(organization) %}
+  <a href="{{ url("view_organization", kwargs={"organization_id": organization.id}) }}">{{ organization.name }}</a>
 {% endmacro %}

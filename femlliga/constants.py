@@ -1,6 +1,21 @@
 APP_NAME = "Fem lliga!"
 FROM_EMAIL = f"{APP_NAME} <no-reply@femlliga.org>"
 
+SOCIAL_MEDIA_TYPES = [
+    ("EMAIL", "Correu electrònic"),
+    ("WEBSITE", "Lloc web"),
+    ("FACEBOOK", "Facebook"),
+    ("INSTAGRAM", "Instagram"),
+    ("TWITTER", "Twitter"),
+    ("LINKEDIN", "Linkedin"),
+    ("WHATSAPP", "Whatsapp"),
+]
+
+SOCIAL_MEDIA_TYPES_MAP, SOCIAL_MEDIA_TYPES_ORDER = {}, []
+for mt in SOCIAL_MEDIA_TYPES:
+    SOCIAL_MEDIA_TYPES_MAP[mt[0]] = mt[1]
+    SOCIAL_MEDIA_TYPES_ORDER.append(mt[0])
+
 ORG_SCOPES = [
     ("EQUALITY", "Dona/Igualtat/Feminismes"),
     ("EDUCATION", "Educació"),

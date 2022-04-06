@@ -1,0 +1,29 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import render_social_media %}
+
+{% block content %}
+<div class="container">
+  <h1>{{ org.name }}</h1>
+  <p>{{ org.description }}</p>
+
+  <div class="row">
+    <div class="col-md-4">
+      <p class="mt-1 mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
+    </div>
+
+    <div class="col-md-4">
+      <p class="mt-1 mb-0"><strong>Àmbits de treball</strong></p>
+      <ul class="mb-0">
+        {% for scope in org.scopes.all() %}
+          <li>{{ scope }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="col-md-4">
+      {{ render_social_media(org) }}
+    </div>
+  </div>
+</div>
+{% endblock %}

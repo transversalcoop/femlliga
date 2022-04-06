@@ -9,6 +9,11 @@ from allauth.socialaccount import providers
 import bleach
 import femlliga.constants
 
+def add_http(url):
+    if not url.startswith("http://") and not url.startswith("https://"):
+        return "https://" + url
+    return url
+
 def format_time(t):
     return timezone.localtime(t).strftime("%d/%m/%Y a les %H:%M")
 
@@ -52,6 +57,7 @@ def environment(**options):
         "url": reverse,
         "static": static,
         "resource_name": resource_name,
+        "social_media_type_name": social_media_type_name,
         "org_type_name": org_type_name,
         "org_scope_name": org_scope_name,
         "format_time": format_time,
@@ -59,8 +65,10 @@ def environment(**options):
         "enumerate": enumerate,
         "resource_icon": lambda x: femlliga.constants.RESOURCE_ICONS_MAP[x],
         "sort_resources": sort_resources,
+        "sort_social_media": sort_social_media,
         "parent": path_parent,
         "provider_login_url": provider_login_url,
         "clean": clean,
+        "add_http": add_http,
     })
     return env

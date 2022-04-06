@@ -130,7 +130,15 @@ def add_organization(request):
     if request.method == "POST":
         return process_organization_post(request)
 
-    return render(request, "femlliga/add_organization.html", { "form": OrganizationForm() })
+    return render(request, "femlliga/add_organization.html", {
+        "form": OrganizationForm(),
+        "social_media_forms": social_media_forms()(),
+    })
+
+@login_required
+def view_organization(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    return render(request, "femlliga/view_organization.html", { "org": org })
 
 @login_required
 @require_own_organization
@@ -139,23 +147,39 @@ def edit_organization(request, organization_id):
     if request.method == "POST":
         return process_organization_post(request, org = org)
 
-    return render(request, "femlliga/add_organization.html", { "edit": True, "form": OrganizationForm({
-        "name": org.name,
-        "org_type": org.org_type,
-        "scopes": [x.name for x in org.scopes.all()],
-        "lat": org.lat,
-        "lng": org.lng,
-        "address": org.address,
-    })})
+    return render(request, "femlliga/add_organization.html", {
+        "edit": True,
+        "form": OrganizationForm({
+            "name": org.name,
+            "description": org.description,
+            "org_type": org.org_type,
+            "scopes": [x.name for x in org.scopes.all()],
+            "lat": org.lat,
+            "lng": org.lng,
+            "address": org.address,
+        }),
+        "social_media_forms": social_media_forms()(instance=org),
+    })
+
+def social_media_forms():
+    return inlineformset_factory(
+        Organization,
+        SocialMedia,
+        fields=("media_type", "value"),
+        extra=len(SOCIAL_MEDIA_TYPES)-1,
+    )
 
 def process_organization_post(request, org = None):
     form = OrganizationForm(request.POST)
-    if form.is_valid():
+    socialmedia_formset = social_media_forms()(request.POST, instance=org)
+    if form.is_valid() and socialmedia_formset.is_valid():
         if org is None:
             org = Organization()
+            socialmedia_formset.instance = org
         lat = form.cleaned_data["lat"]
         lng = form.cleaned_data["lng"]
         org.name = form.cleaned_data["name"]
+        org.description = form.cleaned_data["description"]
         org.org_type = form.cleaned_data["org_type"]
         org.address = form.cleaned_data.get("address", None)
         org.lat = lat
@@ -163,6 +187,7 @@ def process_organization_post(request, org = None):
         org.city = get_city_from_coordinates(lat, lng)
         org.creator = request.user
         org.save()
+        socialmedia_formset.save()
         for scope in ORG_SCOPES:
             s = OrganizationScope(name = scope[0])
             s.save()
@@ -173,7 +198,11 @@ def process_organization_post(request, org = None):
 
         return redirect("app")
 
-    return render(request, "femlliga/add_organization.html", { "form": form })
+    return render(request, "femlliga/add_organization.html", {
+        "form": form,
+        "social_media_forms": socialmedia_formset,
+        "edit": org != None,
+    })
 
 @login_required
 @require_own_organization
@@ -356,6 +385,7 @@ def get_model_matches(organization, need, need_options, model):
     exclude(organization=organization).\
     exclude(resource="OTHER").\
     prefetch_related("organization").\
+    prefetch_related("organization__social_media").\
     prefetch_related("images").\
     prefetch_related("options").\
     distinct()
@@ -474,6 +504,7 @@ def organization_prefetches(queryset):
         prefetch_related("scopes").\
         prefetch_related("needs").\
         prefetch_related("offers").\
+        prefetch_related("social_media").\
         prefetch_related("needs__options").\
         prefetch_related("offers__options").\
         prefetch_related("needs__images").\

@@ -104,7 +104,7 @@ class SmokeTests(TestCase):
         URLS = [
             ("app", "Example organization", []),
             ("force-resources-wizard", "Esteu buscant un local", [org.id, "needs", "PLACE"]),
-            ("send_message", "Sol·licita Servei a Second example org", [org.id, org2.id, "offer", "SERVICE"]),
+            ("send_message", ["Sol·licita Servei a", "Second example org"], [org.id, org2.id, "offer", "SERVICE"]),
             ("matches", "Has lligat!", [org.id]),
             ("agreements_sent", "Encara no has enviat cap petició", [org.id]),
             ("agreements_received", "Encara no has rebut", [org.id]),
@@ -118,12 +118,15 @@ class SmokeTests(TestCase):
         org, org2 = self.get_orgs()
         self.aux_get("edit_organization", args=[org2.id], status_code=403)
 
-    def aux_get(self, url, contains="", args=[], status_code=200):
+    def aux_get(self, url, contains=None, args=[], status_code=200):
         full_url = reverse(url, args=args)
         response = self.client.get(full_url)
         self.assertEqual(response.status_code, status_code, msg=url)
-        if contains != "":
+        if isinstance(contains, str):
             self.assertContains(response, contains, msg_prefix=url)
+        elif isinstance(contains, list):
+            for s in contains:
+                self.assertContains(response, s, msg_prefix=url)
 
     def get_orgs(self):
         org = get_user_model().objects.get(email='test@example.com').organizations.all()[0]
