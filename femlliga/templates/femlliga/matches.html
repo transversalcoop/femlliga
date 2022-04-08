@@ -36,39 +36,41 @@
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
         {% for resource in own_needs %}
-        {% if resource.resource in offer_matches or resource.resource in need_matches %}
-        <li class="nav-item">
-          <button
-            class="nav-link"
-            type="button"
-            role="tab"
-            aria-selected="false"
-            aria-current="page"
-            data-bs-toggle="tab"
-            style="width: 100%; text-align: left;"
-            data-bs-target="#showDetails{{ resource.resource }}">
-            <span style="float: right;">
-              {{ render_match_badges(org, resource, offer_matches, need_matches) }}
-            </span>
-            {{ resource_name(resource.resource) }}
-          </button>
-        </li>
-        {% endif %}
+          {% if resource.resource in offer_matches or resource.resource in need_matches %}
+          <li class="nav-item">
+            <button
+              class="nav-link"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-current="page"
+              data-bs-toggle="tab"
+              style="width: 100%; text-align: left;"
+              data-bs-target="#showDetails{{ resource.resource }}">
+              <span style="float: right;">
+                {{ render_match_badges(org, resource, offer_matches, need_matches) }}
+              </span>
+              {{ resource_name(resource.resource) }}
+            </button>
+          </li>
+          {% endif %}
         {% endfor %}
       </ul>
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
     {% for resource in own_needs %}
-      <div class="row collapse fade" id="showDetails{{ resource.resource }}" style="margin-top: 20px;">
-        <div class="col-12">
-          <p>Heu indicat que necessiteu un {{ resource_name(resource.resource) }}. A sota podeu veure quines entitats l'ofereixen per compartir-lo, i quines tenen també aquesta necessitat i amb les que podrieu contactar per buscar una solució comuna.</p>
+      {% if resource.resource in offer_matches or resource.resource in need_matches %}
+        <div class="row collapse fade" id="showDetails{{ resource.resource }}" style="margin-top: 20px;">
+          <div class="col-12">
+            <p>Heu indicat que necessiteu un {{ resource_name(resource.resource) }}. A sota podeu veure quines entitats l'ofereixen per compartir-lo, i quines tenen també aquesta necessitat i amb les que podrieu contactar per buscar una solució comuna.</p>
 
-          {{ show_matches(resource, offer_matches, "offer", "ofereix") }}
-          {{ show_matches(resource, need_matches, "need", "també necessita") }}
+            {{ show_matches(resource, offer_matches, "offer", "ofereix") }}
+            {{ show_matches(resource, need_matches, "need", "també necessita") }}
 
+          </div>
         </div>
-    </div>
+      {% endif %}
     {% endfor %}
     </div>
   </div>

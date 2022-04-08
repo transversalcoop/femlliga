@@ -36,6 +36,7 @@
 
 {% macro resource_details(resource, match_type) %}
   <div style="margin-bottom: 10px;">
+    <strong class="me-2">{{ resource }}</strong>
     {% if resource.charge %}
       <span class="badge bg-light" title="Es demana remuneració a canvi">€</span>
     {% endif %}
@@ -56,7 +57,6 @@
     </div>
     {% endfor %}
   </div>
-  {% endif %}
 
   <div class="modal fade" id="carouselModal{{ match_type }}{{ resource.id }}" tabindex="-1" aria-labelledby="carouselModalImages" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
@@ -86,6 +86,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
 {% endmacro %}
 
 {% macro input_classes(form, name) %}
