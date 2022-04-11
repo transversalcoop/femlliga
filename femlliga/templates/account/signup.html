@@ -32,6 +32,9 @@
       {{ input_feedback(form, "password2") }}
     </div>
 
+    <div class="mt-2"></div>
+    {{ form.captcha }}
+
     <p class="mt-2">En registrar-te, acceptes la <a target="_blank" rel="noopener noreferrer" href="{{ url("page", args=["privacy"]) }}">política de protecció de dades</a>.</p>
 
     <div style="margin-top: 10px;">

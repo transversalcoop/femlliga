@@ -22,6 +22,7 @@ bleach = "*"
 django-csp = "*"
 exif = "*"
 django-axes = "*"
+django-recaptcha = "*"
 
 [dev-packages]
 

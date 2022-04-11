@@ -152,7 +152,11 @@ class ComponentTests(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
         content = "Email test content"
-        response = self.client.post(reverse("contact"), {"email": "test@example.com", "content": content})
+        response = self.client.post(reverse("contact"), {
+            "email": "test@example.com",
+            "content": content,
+            "g-recaptcha-response": "test",
+        })
         self.assertContains(response, "Gràcies per enviar el missatge! Et respondrem tan aviat com puguem", count=1)
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("S'ha rebut un contacte a la web", mail.outbox[0].subject)
@@ -180,6 +184,7 @@ class IntegrationTests(TestCase):
             "email": "test3@example.com",
             "password1": PASS_FOR_TESTS,
             "password2": PASS_FOR_TESTS,
+            "g-recaptcha-response": "test",
         }, follow=True)
         self.assertContains(response, "Verifica el correu electrònic")
         e = EmailAddress.objects.get(email="test3@example.com")

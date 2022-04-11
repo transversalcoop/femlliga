@@ -21,6 +21,9 @@
       {{ input_feedback(form, "password") }}
     </div>
 
+    <div class="mt-2"></div>
+    {{ form.captcha }}
+
     <div style="margin-top: 10px;">
         <button type="submit" class="btn btn-custom">Entra</button>
         <a class="btn btn-light" href="{{ url("account_signup") }}">Registra't</a>

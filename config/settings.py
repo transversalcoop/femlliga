@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'debug_toolbar',
     'axes',
+    'captcha',
 
     'femlliga',
 ]
@@ -197,6 +198,10 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https")
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = None
+ACCOUNT_FORMS = {
+    "login": "femlliga.forms.CaptchaLoginForm",
+    "signup": "femlliga.forms.CaptchaSignupForm",
+}
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -241,6 +246,8 @@ CSP_SCRIPT_SRC = ("'self'",
     "'unsafe-inline'",
     "unpkg.com",
     "cdn.jsdelivr.net",
+    "www.google.com",
+    "www.gstatic.com",
 )
 CSP_IMG_SRC = ("'self'",
     "*.tile.openstreetmap.org",
@@ -254,6 +261,9 @@ CSP_FONT_SRC = ("'self'",
 CSP_CONNECT_SRC = ("'self'", )
 CSP_OBJECT_SRC = ("'self'", )
 CSP_BASE_URI = ("'self'", )
+CSP_FRAME_SRC = ("'self'",
+    "www.google.com",
+)
 CSP_FRAME_ANCESTORS = ("'self'", )
 CSP_FORM_ACTION = ("'self'",
     "accounts.google.com",
@@ -313,3 +323,11 @@ if DEBUG:
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(hours=1)
 AXES_LOCKOUT_TEMPLATE = "femlliga/lockout.html"
+
+recaptcha_public = os.getenv("DJANGO_RECAPTCHA_PUBLIC", "")
+recaptcha_private = os.getenv("DJANGO_RECAPTCHA_PRIVATE", "")
+if recaptcha_public != "" and recaptcha_private != "":
+    RECAPTCHA_PUBLIC_KEY = recaptcha_public
+    RECAPTCHA_PRIVATE_KEY = recaptcha_private
+else:
+    SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']

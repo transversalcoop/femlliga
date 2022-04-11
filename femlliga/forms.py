@@ -4,6 +4,9 @@ import urllib
 import django.forms as forms
 from django.utils.translation import gettext_lazy as _
 
+from captcha.fields import ReCaptchaField
+from allauth.account.forms import LoginForm, SignupForm
+
 from .models import Organization, Contact, Resource
 from .constants import *
 
@@ -77,6 +80,14 @@ class MessageForm(forms.Form):
         return self.cleaned_data
 
 class ContactForm(forms.ModelForm):
+    captcha = ReCaptchaField()
+
     class Meta:
         model = Contact
         fields = ["email", "content"]
+
+class CaptchaLoginForm(LoginForm):
+    captcha = ReCaptchaField()
+
+class CaptchaSignupForm(SignupForm):
+    captcha = ReCaptchaField()

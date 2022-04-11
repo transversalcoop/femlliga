@@ -25,6 +25,9 @@
     <textarea id="content" name="content" rows="8" {{ input_classes(form, "content") }} required>{{ textarea_value(form, "content") }}</textarea>
     {{ input_feedback(form, "content") }}
 
+    <div class="mt-2"></div>
+    {{ form.captcha }}
+
     <button type="submit" class="btn btn-success mt-2">Envia</button>
 </form>
 
