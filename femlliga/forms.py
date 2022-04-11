@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from captcha.fields import ReCaptchaField
 from allauth.account.forms import LoginForm, SignupForm
 
-from .models import Organization, Contact, Resource
+from .models import CustomUser, Organization, Contact, Resource
 from .constants import *
 
 def http_get(url):
@@ -15,6 +15,11 @@ def http_get(url):
     res = json.loads(f.read().decode('utf-8'))
     f.close()
     return res
+
+class NotificationsForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ["notifications_frequency"]
 
 class OrganizationForm(forms.ModelForm):
     scopes = forms.MultipleChoiceField(

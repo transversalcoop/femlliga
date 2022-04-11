@@ -31,6 +31,9 @@ class LimitFileSize:
         return self.MB == other.MB
 
 class CustomUser(AbstractUser):
+    notifications_frequency = models.CharField(max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY")
+    last_notification_date = models.DateTimeField(auto_now_add=True)
+
     def get_organization(self):
         organizations = self.organizations.all()
         if len(organizations) > 0:

@@ -11,6 +11,7 @@ urlpatterns = [
     path('page/<slug:name>/', views.page, name='page'),
 
     # login required
+    path('notifications/', views.notifications, name='notifications'),
     path('app/', views.app, name='app'),
     path('organization/add/', views.add_organization, name='add_organization'),
     path('organization/<uuid:organization_id>/view/', views.view_organization, name='view_organization'),

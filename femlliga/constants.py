@@ -1,6 +1,12 @@
 APP_NAME = "Fem lliga!"
 FROM_EMAIL = f"{APP_NAME} <no-reply@femlliga.org>"
 
+NOTIFICATION_CHOICES = [
+    ("DAILY", "Diàriament"),
+    ("WEEKLY", "Setmanalment"),
+    ("NEVER", "Mai"),
+]
+
 SOCIAL_MEDIA_TYPES = [
     ("EMAIL", "Correu electrònic"),
     ("WEBSITE", "Lloc web"),

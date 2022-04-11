@@ -392,6 +392,18 @@ def get_model_matches(organization, need, need_options, model):
     return sorted(results, key=lambda r: r.organization.distance(need.organization))
 
 @login_required
+def notifications(request):
+    form, saved = NotificationsForm({"notifications_frequency": request.user.notifications_frequency}), False
+    if request.method == "POST":
+        form = NotificationsForm(request.POST)
+        if form.is_valid():
+            request.user.notifications_frequency = form.cleaned_data["notifications_frequency"]
+            request.user.save()
+            saved = True
+
+    return render(request, "femlliga/notifications.html", {"form": form, "saved": saved})
+
+@login_required
 @require_own_organization
 def send_message(request, organization_id, organization_to, resource_type, resource):
     assert_url_param_in_list(resource_type, ["need", "offer"])

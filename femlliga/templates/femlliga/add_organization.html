@@ -7,7 +7,7 @@
 {% if edit %}
 <h1>Edita la informació de l'entitat</h1>
 {% else %}
-<div class="alert alert-primary" role="alert" style="margin-top: 20px;">
+<div class="alert alert-primary mt-2" role="alert">
   Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les dades de sota per crear-la. Podràs modificar i afegir més informació després.
 </div>
 {% endif %}
@@ -72,7 +72,7 @@
     <input type="hidden" id="lat" name="lat" {{ input_value(form, "lat") }}>
     <input type="hidden" id="lng" name="lng" {{ input_value(form, "lng") }}>
 
-    <button type="submit" class="btn btn-custom" style="margin-top: 20px;">
+    <button type="submit" class="btn btn-custom mt-2">
       {% if edit %}
       Desa
       {% else %}

@@ -12,12 +12,13 @@
 {% endmacro %}
 {% macro dropdown_menu(name, href, args=[], pending=False) %}
 <a
-  class="nav-link dropdown-toogle {% if parent(request.path) == parent(url(href, args=args)) %} active{% endif %}"
+  class="nav-link dropdown-toogle {% if href and parent(request.path) == parent(url(href, args=args)) %} active{% endif %}"
   role="button"
   data-bs-toggle="dropdown"
   aria-expanded="false"
   href="#">
     {{ name }}
+    <i class="bi-chevron-down"></i>
   {% if pending %}
     {{ pending_dot() }}
   {% endif %}
@@ -53,12 +54,19 @@
   </ul>
   <ul class="navbar-nav">
   {% if user.is_anonymous %}
-  <li>{{ menu_url("Entra", "account_login") }}</li>
-  {% endif %}
-  <li>{{ menu_url("Preguntes freqüents", "page", args=["faq"]) }}</li>
-  <li>{{ menu_url("Contacte", "contact") }}</li>
-  {% if not user.is_anonymous %}
-  <li>{{ menu_url("Surt", "account_logout") }}</li>
+    <li>{{ menu_url("Entra", "account_login") }}</li>
+    <li>{{ menu_url("Preguntes freqüents", "page", args=["faq"]) }}</li>
+    <li>{{ menu_url("Contacte", "contact") }}</li>
+  {% else %}
+    <li class="nav-item dropstart">
+      {{ dropdown_menu("Perfil", "") }}
+      <ul class="dropdown-menu" aria-labelledby="agreementsDropdownMenuLink">
+        <li><a class="dropdown-item" href="{{ url("notifications") }}">Notificacions</a></li>
+        <li><a class="dropdown-item" href="{{ url("page", args=["faq"]) }}">Preguntes freqüents</a></li>
+        <li><a class="dropdown-item" href="{{ url("contact") }}">Contacte</a></li>
+        <li><a class="dropdown-item" href="{{ url("account_logout") }}">Surt</a></li>
+      </ul>
+    </li>
   {% endif %}
   </ul>
 {% endblock %}
