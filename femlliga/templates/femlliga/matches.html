@@ -5,7 +5,7 @@
 {% macro show_matches(resource, matches, match_type, match_name) %}
   {% set others = matches[resource.resource] %}
   {% for result in others %}
-  <hr>
+  <div class="divider-2"></div>
   <div class="row">
     <h3>
       {{ organization_link(result.organization) }}
@@ -33,7 +33,7 @@
       <p>
         Hem trobat coincidències entre les vostres necessitats i les d'altres entitats, pots clicar a sota per veure'n els detalls
       </p>
-      <hr>
+      <div class="divider-2"></div>
       <ul class="nav nav-pills flex-column mb-auto">
         {% for resource in own_needs %}
           {% if resource.resource in offer_matches or resource.resource in need_matches %}

@@ -60,18 +60,18 @@
             </a>
           </span>
           <h1 style="font-size: 2.5em; margin: 0;">{{ org.name }}</h1>
+          <p class="mt-1 mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
+          <p class="mt-1 mb-0"><strong>Àmbits de treball</strong></p>
+          <ul class="mb-0">
+            {% for scope in org.scopes.all() %}
+              <li>{{ scope }}</li>
+            {% endfor %}
+          </ul>
+          {% if org.description %}
+          <p class="mt-1 mb-1"><strong>Descripció</strong>: {{ org.description }}</p>
+          {% endif %}
+          {{ render_social_media(org) }}
         </div>
-        <p class="mt-1 mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
-        <p class="mt-1 mb-0"><strong>Àmbits de treball</strong></p>
-        <ul class="mb-0">
-          {% for scope in org.scopes.all() %}
-            <li>{{ scope }}</li>
-          {% endfor %}
-        </ul>
-        {% if org.description %}
-        <p class="mt-1 mb-1"><strong>Descripció</strong>: {{ org.description }}</p>
-        {% endif %}
-        {{ render_social_media(org) }}
       </div>
       <div class="col-md-7 offset-md-1">
         <p style="font-size: 1.25em;">Quina <strong>lliga</strong> has fet</p>

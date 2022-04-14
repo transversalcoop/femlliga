@@ -217,12 +217,12 @@ class IntegrationTests(TestCase):
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs"])
         self.aux_wizard(needs_url, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"], "comentaris de necessita local de test", "yes",
-            "Esteu buscant algú que us proporcione aquests serveis")
-
-        self.aux_wizard(needs_url, "SERVICE", ["AGENCY"], "comentaris de necessita servei de test", "yes",
             "Voleu rebre formació en algun d&#39;aquests temes")
 
         self.aux_wizard(needs_url, "TRAINING", ["TRAINING_DIGITAL"], "comentaris de necessita formació de test", "yes",
+            "Esteu buscant algú que us proporcione aquests serveis")
+
+        self.aux_wizard(needs_url, "SERVICE", ["AGENCY"], "comentaris de necessita servei de test", "yes",
             "Necessiteu alguna d&#39;aquestes coses")
 
         self.aux_wizard(needs_url, "EQUIPMENT", [], "comentaris de necessita material de test", "no",
@@ -237,12 +237,12 @@ class IntegrationTests(TestCase):
 
         offers_url = reverse("resources-wizard", args=[o.id, "offers"])
         self.aux_wizard(offers_url, "PLACE", [], "comentaris de ofereix local de test", "no",
-            "Oferiu algun d&#39;aquests serveis per a altres entitats")
-
-        self.aux_wizard(offers_url, "SERVICE", [], "comentaris de ofereix serveis de test", "no",
             "Oferiu formació en algun d&#39;aquests temes")
 
         self.aux_wizard(offers_url, "TRAINING", ["TRAINING_DIGITAL"], "comentaris de ofereix formació de test", "yes",
+            "Oferiu algun d&#39;aquests serveis per a altres entitats")
+
+        self.aux_wizard(offers_url, "SERVICE", [], "comentaris de ofereix serveis de test", "no",
             "Teniu alguna d&#39;aquestes coses que pugueu compartir", charge = True)
 
         self.aux_wizard(offers_url, "EQUIPMENT", [], "comentaris de ofereix material de test", "yes",

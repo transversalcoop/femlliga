@@ -73,8 +73,8 @@ for org_type in ORG_TYPES:
 
 RESOURCES = [
     ("PLACE", "Local"),
-    ("SERVICE", "Servei"),
     ("TRAINING", "Formació"),
+    ("SERVICE", "Servei"),
     ("EQUIPMENT", "Equipaments"),
     ("OTHER", "Altres"),
 ]
@@ -96,6 +96,15 @@ RESOURCE_OPTIONS_MAP = {
     "PLACE": (
         ("DAILY_USAGE", "Ús diari"),
         ("PUNCTUAL_USAGE", "Ús puntual"),
+        ("PUNCTUAL_MEETINGS", "Puntualment per a reunions"),
+        ("PUNCTUAL_EVENTS", "Puntualment per a actes"),
+    ),
+    "TRAINING": (
+        ("TRAINING_DIGITAL", "Digitalització"),
+        ("TRAINING_BUREAUCRACY", "Relacions amb l'administració"),
+        ("TRAINING_EQUALITY", "Igualtat"),
+        ("TRAINING_ENERGY_SAVING", "Estalvi energètic"),
+        ("TRAINING_HISTORICAL_MEMORY", "Memòria històrica"),
     ),
     "SERVICE": (
         ("COMMUNITY_MANAGER", "Gestió de la comunicació (web, xarxes socials, etc.)"),
@@ -103,12 +112,6 @@ RESOURCE_OPTIONS_MAP = {
         ("AGENCY", "Gestoria"),
         ("PROJECT_WRITING", "Redacció de projectes"),
         ("DIGITAL_BUREAUCRACY", "Relacions digitals amb l'administració"),
-    ),
-    "TRAINING": (
-        ("TRAINING_DIGITAL", "Digitalització"),
-        ("TRAINING_BUREAUCRACY", "Relacions amb l'administració"),
-        ("TRAINING_EQUALITY", "Igualtat"),
-        ("TRAINING_ENERGY_SAVING", "Estalvi energètic"),
     ),
     "EQUIPMENT": (
         ("SOUND_SYSTEM_ACOUSTIC", "Equip de so per a xerrades"),
