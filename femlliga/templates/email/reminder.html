@@ -1,0 +1,35 @@
+{% extends "email/_base_template.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    Us enviem aquest missatge des de {{ consts.APP_NAME }} ja que heu indicat que teniu algunes necessitats que podrieu cobrir col·laborant amb altres entitats de la plataforma. Només cal que entreu a l'aplicació, al menú de «Has lligat», i enviar un missatge a l'entitat que preferiu.
+  </td>
+</tr>
+{% if need.count > 0 %}
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    Entre altres, heu indicat que necessiteu {{ need.name }}, i hi ha {{ need.count }} entitats que estan en la mateixa situació que vosaltres. Podeu contactar amb elles per buscar solucions comunes a la vostra necessitat.
+  </td>
+</tr>
+{% endif %}
+{% if offer.count > 0 %}
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    {% if need.count > 0 %}
+    També
+    {% else %}
+    Entre altres,
+    {% endif %}
+    heu indicat que necessiteu {{ offer.name }}, i hi ha {{ offer.count }} entitats que ho ofereixen. Podeu contactar amb elles per concretar la manera de col·laborar.
+  </td>
+</tr>
+{% endif %}
+<tr>
+  <td style="font-family: 'Open Sans', sans-serif;">
+    Si voleu deixar de rebre aquestes notificacions, ho podeu configurar dins de l'aplicació, a l'enllaç de Perfil, notificacions.
+  </td>
+</tr>
+{% endblock %}
+
+

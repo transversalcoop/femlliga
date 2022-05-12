@@ -127,6 +127,32 @@ RESOURCE_OPTIONS_MAP = {
     "OTHER": (),
 }
 
+RESOURCE_OPTIONS_READABLE_MAP = {
+    ("PLACE", "DAILY_USAGE"): "local per a ús diari",
+    ("PLACE", "PUNCTUAL_USAGE"): "local per a ús puntual",
+    ("PLACE", "PUNCTUAL_MEETINGS"): "local per fer servir puntualment per a reunions",
+    ("PLACE", "PUNCTUAL_EVENTS"): "local per fer servir puntualment per a actes",
+    ("TRAINING", "TRAINING_DIGITAL"): "formació en igitalització",
+    ("TRAINING", "TRAINING_BUREAUCRACY"): "formació en relacions amb l'administració",
+    ("TRAINING", "TRAINING_EQUALITY"): "formació en igualtat",
+    ("TRAINING", "TRAINING_ENERGY_SAVING"): "formació en estalvi energètic",
+    ("TRAINING", "TRAINING_HISTORICAL_MEMORY"): "formació en memòria històrica",
+    ("SERVICE", "COMMUNITY_MANAGER"): "ajuda amb la gestió de la comunicació (web, xarxes socials, etc.)",
+    ("SERVICE", "INSURANCE"): "servei d'assegurança",
+    ("SERVICE", "AGENCY"): "servei de gestoria",
+    ("SERVICE", "PROJECT_WRITING"): "ajuda amb la redacció de projectes",
+    ("SERVICE", "DIGITAL_BUREAUCRACY"): "ajuda amb les relacions digitals amb l'administració",
+    ("EQUIPMENT", "SOUND_SYSTEM_ACOUSTIC"): "equip de so per a xerrades",
+    ("EQUIPMENT", "SOUND_SYSTEM_CONCERT"): "equip de so per a concerts",
+    ("EQUIPMENT", "PROJECTOR"): "projector",
+    ("EQUIPMENT", "VEHICLE"): "vehicle",
+    ("EQUIPMENT", "STAGE"): "escenari",
+    ("EQUIPMENT", "CHAIRS_TABLES"): "cadires i taules",
+    ("EQUIPMENT", "DISHES"): "plats, gots i coberts",
+    ("EQUIPMENT", "KITCHEN_EQUIPMENT"): "material de cuina",
+    ("EQUIPMENT", "CAMPING_EQUIPMENT"): "material d'acampada",
+}
+
 RESOURCES_LIST, RESOURCE_OPTIONS = [], []
 for k in RESOURCE_OPTIONS_MAP:
     RESOURCES_LIST.append(k)
