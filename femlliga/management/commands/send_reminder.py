@@ -16,11 +16,11 @@ notificacions si ha passat el temps configurat en el camp `notifications_frequen
         needs, offers = self.get_ordered_needs_and_offers()
         sent = 1
         for user in users:
-            need, offer = self.has_matches(user, needs, offers)
+            org, need, offer = self.has_matches(user, needs, offers)
             if need["count"] > 0 or offer["count"] > 0:
                 print(f"Sending email to {user.email}...", end="")
                 send_notification(
-                    f"Saps què et pot oferir Fem lliga?",
+                    f"{org.name} ha fet lliga, descobreix amb qui! Saps què et pot oferir Fem lliga?",
                     "email/reminder.html",
                     user,
                     {
@@ -37,7 +37,7 @@ notificacions si ha passat el temps configurat en el camp `notifications_frequen
         try:
             org = Organization.objects.get(creator=user)
         except:
-            return need, offer
+            return None, need, offer
 
         for n in needs:
             if self.has_need(org, n):
@@ -47,7 +47,7 @@ notificacions si ha passat el temps configurat en el camp `notifications_frequen
             if self.has_offer(org, o):
                 offer = {"name": RESOURCE_OPTIONS_READABLE_MAP[(o[0], o[1])], "count": o[2]}
 
-        return need, offer
+        return org, need, offer
 
     def has_need(self, org, n):
         return len(Need.objects.filter(organization=org, resource=n[0], options=n[1])) > 0
