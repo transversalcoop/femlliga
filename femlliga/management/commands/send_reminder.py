@@ -42,18 +42,17 @@ notificacions si ha passat el temps configurat en el camp `notifications_frequen
         for n in needs:
             if self.has_need(org, n):
                 need = {"name": RESOURCE_OPTIONS_READABLE_MAP[(n[0], n[1])], "count": n[2]}
+                break
 
         for o in offers:
-            if self.has_offer(org, o):
+            if self.has_need(org, o):
                 offer = {"name": RESOURCE_OPTIONS_READABLE_MAP[(o[0], o[1])], "count": o[2]}
+                break
 
         return org, need, offer
 
     def has_need(self, org, n):
-        return len(Need.objects.filter(organization=org, resource=n[0], options=n[1])) > 0
-
-    def has_offer(self, org, o):
-        return len(Offer.objects.filter(organization=org, resource=o[0], options=o[1])) > 0
+        return len(Need.objects.filter(organization=org, resource=n[0], options=n[1], has_resource=True)) > 0
 
     def get_ordered_needs_and_offers(self):
         organizations = Organization.objects.all()
