@@ -2,6 +2,7 @@ import os
 import exif
 import uuid
 import json
+import logging
 import datetime
 import unicodedata
 
@@ -29,6 +30,7 @@ from config.settings import MEDIA_ROOT
 from .models import *
 from .constants import *
 from .forms import *
+from .utils import clean_form_email
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
@@ -725,6 +727,10 @@ def contact(request):
     if form.is_valid():
         email = form.cleaned_data["email"]
         content = form.cleaned_data["content"]
+        if ContactDenyList.objects.filter(email=clean_form_email(email)).count() > 0:
+            logging.warning(f"Ignoring SPAM message from {email}")
+            return render(request, "femlliga/contact.html", {"form": ContactForm(), "form_sent": True})
+
         Contact(
             email = email,
             content = content,

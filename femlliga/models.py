@@ -15,7 +15,7 @@ from django.utils.deconstruct import deconstructible
 from django.contrib.auth.models import AbstractUser
 
 from .constants import *
-from .utils import date_intervals
+from .utils import date_intervals, clean_form_email
 
 @deconstructible
 class LimitFileSize:
@@ -345,6 +345,16 @@ class Contact(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     email = models.EmailField()
     content = models.TextField()
+
+class ContactDenyList(models.Model):
+    email = models.EmailField()
+
+    def __str__(self):
+        return self.email
+
+    def save(self, *args, **kwargs):
+        self.email = clean_form_email(self.email)
+        super(ContactDenyList, self).save(*args, **kwargs)
 
 def need_images_directory_path(instance, filename):
     return str(Path("images/needs") / filename)

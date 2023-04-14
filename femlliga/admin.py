@@ -16,5 +16,6 @@ class OrganizationAdmin(admin.ModelAdmin):
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Agreement)
 admin.site.register(Contact)
+admin.site.register(ContactDenyList)
 admin.site.register(CustomUser)
 admin.site.register(Page)

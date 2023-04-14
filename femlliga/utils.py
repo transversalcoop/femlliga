@@ -1,3 +1,5 @@
+import unicodedata
+
 from datetime import datetime, timedelta
 
 from django.utils import timezone
@@ -47,3 +49,7 @@ def add_one_month(t):
     t = t + timedelta(days=32)
     t = t.replace(day=1)
     return t
+
+def clean_form_email(s):
+    return unicodedata.normalize("NFKC", s.strip()).casefold()
+
