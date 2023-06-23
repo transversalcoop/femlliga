@@ -23,6 +23,7 @@ django-csp = "*"
 exif = "*"
 django-axes = "*"
 django-recaptcha = "*"
+typing-extensions = "*"
 
 [dev-packages]
 

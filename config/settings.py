@@ -250,7 +250,7 @@ CSP_SCRIPT_SRC = ("'self'",
     "www.gstatic.com",
 )
 CSP_IMG_SRC = ("'self'",
-    "*.tile.openstreetmap.org",
+    "tile.openstreetmap.org",
     "unpkg.com",
     "data:",
 )
@@ -304,7 +304,8 @@ IGNORABLE_404_URLS = [
     re.compile(r'^/apple-touch-icon.*\.png$'),
     re.compile(r'^/favicon\.ico$'),
     re.compile(r'^/robots\.txt$'),
-    re.compile(r'^/.*wp-login\.php$'),
+    re.compile(r'^/.*\.php$'),
+    re.compile(r'^/.*\.php.bak$'),
 ]
 
 admins_str = os.getenv("DJANGO_ADMINS", "")
