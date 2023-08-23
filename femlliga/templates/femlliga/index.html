@@ -58,6 +58,38 @@
 </div>
 
 <div class="container" style="margin: 100px auto;">
+  <h2 style="font-weight: 900;" class="text-center">Què pots trobar dins de l'aplicació?</h2>
+  <div class="divider-1"></div>
+  <p class="text-center">
+    A sota podeu veure captures de com es veu l'aplicació per dins, com és el procés d'alta, la pàgina de la vostra organització, i el procés de fer lliga amb altres entitats.
+  </p>
+  <div class="container">
+    <div class="row" style="margin-top: 20px;">
+      <div id="carousel-screenshots" class="carousel slide" data-bs-ride="carousel">
+        <div style="padding: 0 120px;">
+          <div class="carousel-inner" style="overflow: hidden; padding: 0 0 30px 0;">
+            {% for i in range(1, 7) %}
+            <div class="carousel-item{% if i == 1 %} active{% endif %}">
+              <img src="{{ static("screenshots-carousel/"+str(i)+".png") }}" class="d-block w-100" alt="">
+            </div>
+            {% endfor %}
+          </div>
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#carousel-screenshots" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carousel-screenshots" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="margin: 100px auto;">
     <h2 style="font-weight: 900;" class="text-center">Entre totes, associacions amb més impacte!</h2>
     <div class="divider-1"></div>
     <p class="text-center">
