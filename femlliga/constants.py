@@ -15,6 +15,7 @@ SOCIAL_MEDIA_TYPES = [
     ("TWITTER", "Twitter"),
     ("LINKEDIN", "Linkedin"),
     ("WHATSAPP", "Whatsapp"),
+    # TODO add phone
 ]
 
 SOCIAL_MEDIA_TYPES_MAP, SOCIAL_MEDIA_TYPES_ORDER = {}, []

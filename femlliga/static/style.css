@@ -338,37 +338,37 @@ nav .nav-link.active {
         column-count: 1;
     }
 
-    .carousel-inner .carousel-item > div {
+    .carousel-triple .carousel-inner .carousel-item > div {
         display: none;
     }
 
-    .carousel-inner .carousel-item > div:first-child {
+    .carousel-triple .carousel-inner .carousel-item > div:first-child {
         display: block;
     }
 }
 
-.carousel-inner .carousel-item.active,
-.carousel-inner .carousel-item-next,
-.carousel-inner .carousel-item-prev {
+.carousel-triple .carousel-inner .carousel-item.active,
+.carousel-triple .carousel-inner .carousel-item-next,
+.carousel-triple .carousel-inner .carousel-item-prev {
     display: flex;
     align-items: flex-start;
 }
 
 /* medium and up screens */
 @media (min-width: 992px) {
-    .carousel-inner .carousel-item-end.active,
-    .carousel-inner .carousel-item-next {
+    .carousel-triple .carousel-inner .carousel-item-end.active,
+    .carousel-triple .carousel-inner .carousel-item-next {
         transform: translateX(33%);
     }
 
-    .carousel-inner .carousel-item-start.active,
-    .carousel-inner .carousel-item-prev {
+    .carousel-triple .carousel-inner .carousel-item-start.active,
+    .carousel-triple .carousel-inner .carousel-item-prev {
         transform: translateX(-33%);
     }
 }
 
-.carousel-inner .carousel-item-end,
-.carousel-inner .carousel-item-start {
+.carousel-triple .carousel-inner .carousel-item-end,
+.carousel-triple .carousel-inner .carousel-item-start {
     transform: translateX(0);
 }
 

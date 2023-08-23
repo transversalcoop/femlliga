@@ -54,6 +54,8 @@ def environment(**options):
     env = Environment(**options)
     env.globals.update({
         "len": len,
+        "str": str,
+        "range": range,
         "url": reverse,
         "static": static,
         "resource_name": resource_name,
