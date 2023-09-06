@@ -22,6 +22,11 @@
     </head>
 
     <body>
+      {% if settings.STAGING_ENVIRONMENT_NAME %}
+      <div class="staging-bow">
+        {{ settings.STAGING_ENVIRONMENT_NAME }}
+      </div>
+      {% endif %}
       <div class="skippy visually-hidden-focusable overflow-hidden">
         <div class="container-xl">
           <a class="d-inline-flex p-2 m-1" href="#content">Salta al contingut principal</a>

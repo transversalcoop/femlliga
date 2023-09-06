@@ -34,6 +34,8 @@ ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(",")))
 allowed_csrf = os.getenv("DJANGO_ALLOWED_CSRF", "http://localhost")
 CSRF_TRUSTED_ORIGINS = list(map(str.strip, allowed_csrf.split(",")))
 
+STAGING_ENVIRONMENT_NAME = os.getenv("DJANGO_STAGING_ENVIRONMENT_NAME", "")
+
 # Application definition
 
 INSTALLED_APPS = [

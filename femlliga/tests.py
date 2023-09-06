@@ -78,6 +78,7 @@ class SmokeTests(TestCase):
             ("page", "és una xarxa on les organitzacions", ["faq"]),
             ("page", "Avís legal", ["legal"]),
             ("contact", "Si tens qualsevol pregunta o suggerència", []),
+            ("account_login", "Inicia sessió", []),
         ]
         for x in URLS:
             self.aux_get(x[0], x[1], args=x[2])
