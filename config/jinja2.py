@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
+from django.utils.html import json_script
 from django.templatetags.static import static
 
 import bleach
@@ -83,5 +84,6 @@ def environment(**options):
         "clean": clean,
         "add_http": add_http,
         "settings": settings,
+        "json_script": json_script,
     })
     return env

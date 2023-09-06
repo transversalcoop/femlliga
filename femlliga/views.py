@@ -78,7 +78,10 @@ def app(request):
     if not org.resources_set:
         return redirect("pre-wizard", organization_id=org.id)
 
-    offer_matches, need_matches = get_organization_matches(org)
+    own_needs = sort_resources([
+        n for n in org.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
+    ])
+    offer_matches, need_matches = get_organization_matches(org, own_needs)
     return render(request, "femlliga/app.html", {
         "org": org,
         "needs": [n for n in org.needs.all() if n.has_resource],
@@ -350,23 +353,26 @@ def clean_file(posted_file):
 @login_required
 @require_own_organization
 def matches(request, organization_id):
-    orgs = organization_prefetches(request.user.organizations.all())
-    if len(orgs) == 0:
-        return redirect("add_organization")
-
-    organization = orgs[0]
-    offer_matches, need_matches = get_organization_matches(organization)
+    organization = request.user.organizations.first()
+    own_needs = sort_resources([
+        n for n in organization.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
+    ])
+    offer_matches, need_matches = get_organization_matches(organization, own_needs)
     return render(request, "femlliga/matches.html", {
         "offer_matches": offer_matches,
         "need_matches": need_matches,
+        "matches_json": {
+            "offer_matches": {k: [x.json() for x in offer_matches[k]] for k in offer_matches},
+            "need_matches": {k: [x.json() for x in need_matches[k]] for k in need_matches},
+        },
+        "needs_json": [x.resource for x in own_needs],
         "org": organization,
-        "own_needs": sort_resources([n for n in organization.needs.all() if n.has_resource==True and n.resource!="OTHER"]),
+        "own_needs": own_needs,
     })
 
-def get_organization_matches(organization):
+def get_organization_matches(organization, own_needs):
     offer_matches, need_matches = {}, {}
-    needs = [n for n in organization.needs.all() if n.has_resource==True]
-    for need in sort_resources(needs):
+    for need in own_needs:
         need_options = [n.name for n in need.options.all()]
         offers = get_model_matches(organization, need, need_options, Offer)
         if len(offers) > 0:
@@ -387,7 +393,6 @@ def get_model_matches(organization, need, need_options, model):
     exclude(organization=organization).\
     exclude(resource="OTHER").\
     prefetch_related("organization").\
-    prefetch_related("organization__social_media").\
     prefetch_related("images").\
     prefetch_related("options").\
     distinct()

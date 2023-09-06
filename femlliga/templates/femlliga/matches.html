@@ -74,6 +74,7 @@
     {% endfor %}
     </div>
   </div>
+  <div id="app"></div>
 </main>
 {% else %}
 <div class="container text-center pt-4">
@@ -83,3 +84,119 @@
 {% endif %}
 {% endblock %}
 
+{% block js %}
+{{ json_script(matches_json, "matches-data") }}
+{{ json_script(needs_json, "needs-data") }}
+{{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
+<script>
+(function() {
+var matches = JSON.parse(document.getElementById('matches-data').textContent);
+var needs = JSON.parse(document.getElementById('needs-data').textContent);
+var resourceNamesMap = JSON.parse(document.getElementById('resource-names-data').textContent);
+
+var state = {
+    resourceSelected: "",
+    search: "",
+};
+
+function updateState(key, value) {
+    return function() {
+        state[key] = value;
+        m.redraw();
+    };
+}
+
+var Badge = {
+    view: function(vnode) {
+        var resource = vnode.attrs.resource;
+        var type = vnode.attrs.type;
+        var map = type === "need" ? matches.need_matches : matches.offer_matches;
+        return m("span.badge", {
+            class: type === "need" ? "bg-warning" : "bg-success",
+            title: type === "need" ?
+              `Entitats que necessiten el mateix que vosaltres` :
+              `Entitats que ofereixen el que necessiteu`,
+        }, map[resource].length);
+    },
+};
+
+var Sidebar = {
+    view: function() {
+        var resources = needs.filter(x => (x in matches.offer_matches || x in matches.need_matches));
+        return m("ul.nav.nav-pills.flex-column.mb-auto", resources.map(function(resource) {
+            return m("li.nav-item", [
+                m("button.nav-link.w-100.text-start[type=button]", {
+                    onclick: updateState("resourceSelected", resource),
+                    class: state.resourceSelected === resource ? "active" : "",
+                }, [
+                    m("span.float-end", [
+                        resource in matches.offer_matches ? m(Badge, {
+                            resource: resource,
+                            type: "offer",
+                        }) : null,
+                        " ",
+                        resource in matches.need_matches ? m(Badge, {
+                            resource: resource,
+                            type: "need",
+                        }) : null,
+                    ]),
+                    resourceNamesMap[resource],
+                ]),
+            ]);
+        }));
+    },
+};
+
+var Match = {
+    view: function(vnode) {
+        var match = vnode.attrs.match;
+        return m(".row", [
+            m(".divider-2"),
+            m("h3", JSON.stringify(match)),
+        ]);
+    }
+};
+
+var Results = {
+    view: function() {
+        if (!state.resourceSelected) {
+            return m("");
+        }
+        var elements = [
+            m("p", `Heu indicat que necessiteu ${ resourceNamesMap[state.resourceSelected] }. A sota podeu veure quines entitats l'ofereixen per compartir-lo, i quines tenen també aquesta necessitat i amb les que podrieu contactar per buscar una solució comuna.`),
+        ];
+        var l = matches.offer_matches[state.resourceSelected];
+        if (l) {
+            for (var i = 0; i < l.length; i++) {
+                elements.push(m(Match, { match: l[i], type: "offer" }));
+            }
+        }
+        l = matches.need_matches[state.resourceSelected];
+        if (l) {
+            for (var i = 0; i < l.length; i++) {
+                elements.push(m(Match, { match: l[i], type: "need" }));
+            }
+        }
+        return m("div.row.collapse.fade.active.show", [
+            m("div.col-12", elements),
+        ]);
+    },
+};
+
+var Layout = {
+    view: function() {
+        return m("div.row", [
+            m("div.col-md-4.d-md-block.bg-light.sidebar", [
+                m("h1", "Has lligat!"),
+                m("p", "Hem trobat coincidències entre les vostres necessitats i les d'altres entitats, pots clicar a sota per veure'n els detalls"),
+                m(".divider-2"),
+                m(Sidebar),
+            ]),
+            m("div.col-md-8.ms-sm-auto.px-md-4", [m(Results)]),
+        ]);
+    }
+};
+m.mount(document.getElementById("app"), Layout);
+})();
+</script>
+{% endblock %}

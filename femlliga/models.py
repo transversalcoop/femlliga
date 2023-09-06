@@ -80,6 +80,12 @@ class Organization(models.Model):
     def __str__(self):
         return f"(Entitat) {self.name}"
 
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
+
     def type(self):
         for t in ORG_TYPES:
             if t[0] == self.org_type:
@@ -288,6 +294,12 @@ class BaseResource(models.Model):
         options = [(x.name, str(x)) for x in self.options.all()]
         return options
 
+    def json(self):
+        return {
+            "resource": self.resource,
+            "options": [o.name for o in self.options.all()],
+        }
+
 class Need(BaseResource):
     organization = models.ForeignKey(
         Organization,
@@ -299,6 +311,11 @@ class Need(BaseResource):
         constraints = [
             models.UniqueConstraint("organization", "resource", name="unique_organization_need"),
         ]
+
+    def json(self):
+        j = super().json()
+        j["organization"] = self.organization.json()
+        return j
 
 class Offer(BaseResource):
     organization = models.ForeignKey(
@@ -312,6 +329,12 @@ class Offer(BaseResource):
         constraints = [
             models.UniqueConstraint("organization", "resource", name="unique_organization_offer"),
         ]
+
+    def json(self):
+        j = super().json()
+        j["organization"] = self.organization.json()
+        j["charge"] = self.charge
+        return j
 
 class Agreement(models.Model):
     id = models.UUIDField(
