@@ -8,6 +8,7 @@ import networkx as nx
 from io import BytesIO
 from pathlib import Path
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
@@ -84,6 +85,7 @@ class Organization(models.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "href": reverse("view_organization", kwargs={"organization_id": self.id})
         }
 
     def type(self):
@@ -296,7 +298,9 @@ class BaseResource(models.Model):
 
     def json(self):
         return {
+            "id": self.id,
             "resource": self.resource,
+            "comments": self.comments,
             "options": [o.name for o in self.options.all()],
         }
 
@@ -312,9 +316,12 @@ class Need(BaseResource):
             models.UniqueConstraint("organization", "resource", name="unique_organization_need"),
         ]
 
-    def json(self):
+    def json(self, current_organization):
         j = super().json()
         j["organization"] = self.organization.json()
+        j["distance"] = current_organization.distance_text(self.organization)
+        j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "need", self.resource])
+        j["images"] = [i.json() for i in self.images.all()]
         return j
 
 class Offer(BaseResource):
@@ -330,9 +337,12 @@ class Offer(BaseResource):
             models.UniqueConstraint("organization", "resource", name="unique_organization_offer"),
         ]
 
-    def json(self):
+    def json(self, current_organization):
         j = super().json()
         j["organization"] = self.organization.json()
+        j["distance"] = current_organization.distance_text(self.organization)
+        j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "offer", self.resource])
+        j["images"] = [i.json() for i in self.images.all()]
         j["charge"] = self.charge
         return j
 
@@ -389,7 +399,13 @@ class NeedImage(models.Model):
     resource = models.ForeignKey(Need, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to=need_images_directory_path, validators=[LimitFileSize(10)])
 
+    def json(self):
+        return { "url": self.image.url }
+
 class OfferImage(models.Model):
     resource = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to=offer_images_directory_path, validators=[LimitFileSize(10)])
+
+    def json(self):
+        return { "url": self.image.url }
 

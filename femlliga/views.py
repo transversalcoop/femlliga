@@ -362,8 +362,8 @@ def matches(request, organization_id):
         "offer_matches": offer_matches,
         "need_matches": need_matches,
         "matches_json": {
-            "offer_matches": {k: [x.json() for x in offer_matches[k]] for k in offer_matches},
-            "need_matches": {k: [x.json() for x in need_matches[k]] for k in need_matches},
+            "offerMatches": {k: [x.json(organization) for x in offer_matches[k]] for k in offer_matches},
+            "needMatches": {k: [x.json(organization) for x in need_matches[k]] for k in need_matches},
         },
         "needs_json": [x.resource for x in own_needs],
         "org": organization,

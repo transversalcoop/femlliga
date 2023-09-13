@@ -253,6 +253,7 @@ CSP_STYLE_SRC = ("'self'",
 )
 CSP_SCRIPT_SRC = ("'self'",
     "'unsafe-inline'",
+    "'unsafe-eval'",
     "unpkg.com",
     "cdn.jsdelivr.net",
     "www.google.com",

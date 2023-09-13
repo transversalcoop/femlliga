@@ -302,6 +302,10 @@ nav .nav-link.active {
     border-bottom: 2px solid black;
 }
 
+.strong-underline {
+    border-bottom: 2px solid black;
+}
+
 .badge.bg-light, .alert.alert-light {
     border: 1px solid #333;
     color: #333;
@@ -403,3 +407,8 @@ nav .nav-link.active {
     z-index: 1000;
     width: 300px;
 }
+
+.highlight {
+  background-color: yellow;
+}
+
