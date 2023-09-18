@@ -370,17 +370,42 @@ def matches(request, organization_id):
         n for n in organization.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
     ])
     offer_matches, need_matches = get_organization_matches(organization, own_needs)
+    organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
     return render(request, "femlliga/matches.html", {
         "offer_matches": offer_matches,
         "need_matches": need_matches,
         "matches_json": {
-            "offerMatches": {k: [x.json(organization) for x in offer_matches[k]] for k in offer_matches},
-            "needMatches": {k: [x.json(organization) for x in need_matches[k]] for k in need_matches},
+            "offerMatches": {k: [m.json(organization) for m in offer_matches[k]] for k in offer_matches},
+            "needMatches": {k: [m.json(organization) for m in need_matches[k]] for k in need_matches},
         },
+        "organization_matches_json": [
+            {
+                "organization": l[0].organization.json(organization),
+                "matches": [m.json(organization) for m in l],
+            }
+            for l in organization_matches
+        ],
         "needs_json": [x.resource for x in own_needs],
         "org": organization,
         "own_needs": own_needs,
     })
+
+def group_matches_by_organization(organization, offer_matches, need_matches):
+    orgs = {}
+    for k in offer_matches:
+        for m in offer_matches[k]:
+            try:
+                orgs[m.organization.id].append(m)
+            except:
+                orgs[m.organization.id] = [m]
+    for k in need_matches:
+        for m in need_matches[k]:
+            try:
+                orgs[m.organization.id].append(m)
+            except:
+                orgs[m.organization.id] = [m]
+
+    return [orgs[k] for k in sorted(orgs.keys(), key=lambda k: orgs[k][0].organization.distance(organization))]
 
 def get_organization_matches(organization, own_needs):
     offer_matches, need_matches = {}, {}

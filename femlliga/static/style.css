@@ -409,6 +409,13 @@ nav .nav-link.active {
 }
 
 .highlight {
-  background-color: yellow;
+    background-color: yellow;
 }
 
+.nav-link.active .highlight {
+    background-color: greenyellow;
+}
+
+.fs-7 {
+    font-size: 0.85rem !important;
+}

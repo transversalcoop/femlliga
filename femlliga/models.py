@@ -81,12 +81,15 @@ class Organization(models.Model):
     def __str__(self):
         return f"(Entitat) {self.name}"
 
-    def json(self):
-        return {
+    def json(self, other_organization=None):
+        j = {
             "id": self.id,
             "name": self.name,
             "href": reverse("view_organization", kwargs={"organization_id": self.id})
         }
+        if other_organization:
+            j["distance"] = self.distance_text(other_organization)
+        return j
 
     def type(self):
         for t in ORG_TYPES:
@@ -318,6 +321,7 @@ class Need(BaseResource):
 
     def json(self, current_organization):
         j = super().json()
+        j["type"] = "need"
         j["organization"] = self.organization.json()
         j["distance"] = current_organization.distance_text(self.organization)
         j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "need", self.resource])
@@ -339,6 +343,7 @@ class Offer(BaseResource):
 
     def json(self, current_organization):
         j = super().json()
+        j["type"] = "offer"
         j["organization"] = self.organization.json()
         j["distance"] = current_organization.distance_text(self.organization)
         j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "offer", self.resource])
