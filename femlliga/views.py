@@ -101,18 +101,18 @@ def app(request):
         "need_matches": need_matches,
     })
 
-@login_required
 @require_own_organization
+@login_required
 def pre_wizard(request, organization_id):
     return aux_wizard(request, organization_id, "needs", "pre-wizard")
 
-@login_required
 @require_own_organization
+@login_required
 def mid_wizard(request, organization_id):
     return aux_wizard(request, organization_id, "offers", "mid-wizard")
 
-@login_required
 @require_own_organization
+@login_required
 def post_wizard(request, organization_id):
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
@@ -121,8 +121,8 @@ def post_wizard(request, organization_id):
         return redirect("app")
     return render(request, "femlliga/aux-wizard.html", {"org": org, "page": "post-wizard"})
 
-@login_required
 @require_own_organization
+@login_required
 def reset_wizard(request, organization_id):
     if request.method == "POST":
         org = get_object_or_404(Organization, pk=organization_id)
@@ -156,8 +156,8 @@ def view_organization(request, organization_id):
     org = get_object_or_404(Organization, pk=organization_id)
     return render(request, "femlliga/view_organization.html", { "org": org })
 
-@login_required
 @require_own_organization
+@login_required
 def edit_organization(request, organization_id):
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
@@ -220,8 +220,8 @@ def process_organization_post(request, org = None):
         "edit": org != None,
     })
 
-@login_required
 @require_own_organization
+@login_required
 def force_resources_wizard(request, organization_id, resource_type, resource):
     assert_url_param_in_list(resource_type, ["needs", "offers"])
     assert_url_param_in_list(resource, RESOURCES_LIST)
@@ -268,8 +268,8 @@ def render_wizard(request, org, resource, form, resource_type, forced = False, d
         "forced": forced,
     })
 
-@login_required
 @require_own_organization
+@login_required
 def resources_wizard(request, organization_id, resource_type, forced = False):
     assert_url_param_in_list(resource_type, ["needs", "offers"])
     org = get_object_or_404(Organization, pk=organization_id)
@@ -362,8 +362,8 @@ def clean_file(posted_file):
         return posted_file # exif will not work for files other than JPEG
 
 @record_stats("matches")
-@login_required
 @require_own_organization
+@login_required
 def matches(request, organization_id):
     organization = request.user.organizations.first()
     own_needs = sort_resources([
@@ -375,13 +375,13 @@ def matches(request, organization_id):
         "offer_matches": offer_matches,
         "need_matches": need_matches,
         "matches_json": {
-            "offerMatches": {k: [m.json(organization) for m in offer_matches[k]] for k in offer_matches},
-            "needMatches": {k: [m.json(organization) for m in need_matches[k]] for k in need_matches},
+            "offerMatches": {k: [m.json(current_organization=organization) for m in offer_matches[k]] for k in offer_matches},
+            "needMatches": {k: [m.json(current_organization=organization) for m in need_matches[k]] for k in need_matches},
         },
         "organization_matches_json": [
             {
-                "organization": l[0].organization.json(organization),
-                "matches": [m.json(organization) for m in l],
+                "organization": l[0].organization.json(current_organization=organization),
+                "matches": [m.json(current_organization=organization) for m in l],
             }
             for l in organization_matches
         ],
@@ -435,6 +435,17 @@ def get_model_matches(organization, need, need_options, model):
     distinct()
     return sorted(results, key=lambda r: r.organization.distance(need.organization))
 
+@record_stats("search")
+@require_own_organization
+@login_required
+def search(request, organization_id):
+    organization = request.user.organizations.first()
+    organizations = organization_prefetches(Organization.objects.exclude(id=organization_id))
+    organizations = sorted(organizations, key=lambda o: o.distance(organization))
+    return render(request, "femlliga/search.html", {
+        "organizations": [o.json(current_organization=organization, include_children=True) for o in organizations],
+    })
+
 @login_required
 def notifications(request):
     form, saved = NotificationsForm({"notifications_frequency": request.user.notifications_frequency}), False
@@ -447,8 +458,8 @@ def notifications(request):
 
     return render(request, "femlliga/notifications.html", {"form": form, "saved": saved})
 
-@login_required
 @require_own_organization
+@login_required
 def send_message(request, organization_id, organization_to, resource_type, resource):
     assert_url_param_in_list(resource_type, ["need", "offer"])
     assert_url_param_in_list(resource, RESOURCES_LIST)
@@ -491,8 +502,8 @@ def agreements_sent(request, organization_id):
 def agreements_received(request, organization_id):
     return agreements(request, organization_id, lambda o: o.received_agreements.all(), "received")
 
-@login_required
 @require_own_organization
+@login_required
 def agreements(request, organization_id, data_func, view_type):
     organization = get_object_or_404(Organization, pk = organization_id)
     return render(request, f"femlliga/agreements.html", {
@@ -533,8 +544,8 @@ def agreement_connect(request, organization_id, agreement_id):
             messages.success(request, "Has indicat que no s'inicie la comunicació", extra_tags="SHOW_USER")
     return agreement_set(request, organization_id, agreement_id, f)
 
-@login_required
 @require_own_agreement
+@login_required
 def agreement_set(request, organization_id, agreement_id, f):
     if request.method == "POST":
         a = get_object_or_404(Agreement, pk = agreement_id)

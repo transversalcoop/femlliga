@@ -23,6 +23,7 @@ urlpatterns = [
     path('organization/<uuid:organization_id>/resources-wizard/<str:resource_type>/', views.resources_wizard, name='resources-wizard'),
     path('organization/<uuid:organization_id>/resources-wizard/<str:resource_type>/force/<str:resource>/', views.force_resources_wizard, name='force-resources-wizard'),
     path('organization/<uuid:organization_id>/send-message/<uuid:organization_to>/<str:resource_type>/<str:resource>/', views.send_message, name='send_message'),
+    path('organization/<uuid:organization_id>/search/', views.search, name='search'),
     path('organization/<uuid:organization_id>/matches/', views.matches, name='matches'),
     path('organization/<uuid:organization_id>/agreements/sent/', views.agreements_sent, name='agreements_sent'),
     path('organization/<uuid:organization_id>/agreements/received/', views.agreements_received, name='agreements_received'),

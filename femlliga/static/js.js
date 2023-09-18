@@ -65,3 +65,17 @@ function highlightSearch(nom, search) {
     return res;
 }
 
+function addHttp(url) {
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        return "https://" + url;
+    }
+    return url;
+}
+
+function socialMediaUrl(baseUrl, value) {
+    if (value.startsWith("http")) {
+        return value;
+    }
+    return baseUrl + value;
+}
+

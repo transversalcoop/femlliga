@@ -29,7 +29,7 @@
   {{ csrf_input }}
   {{ form_feedback(form) }}
 
-  {{ render_multiple_tags(form, "options", "Indiqueu per favor les opcions que us interessen:", resource.get_options()) }}
+  {{ render_multiple_tags(form, "options", "Indiqueu per favor les opcions que us interessen:", resource.get_options(), show_empty=False) }}
 
   <textarea id="message" name="message" rows="8" {{ input_classes(form, "message") }} required>{{ textarea_value(form, "message") }}</textarea>
   {{ input_feedback(form, "message") }}

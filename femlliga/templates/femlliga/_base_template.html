@@ -32,6 +32,7 @@
     {% set organization = request.user.get_organization() %}
     {% if organization %}
     <li>{{ menu_url("Has lligat?", "matches", [organization.id]) }}</li>
+    <li>{{ menu_url("Cerca", "search", [organization.id]) }}</li>
     <li class="nav-item dropdown">
       {% set pending_sent, pending_received = organization.pending_agreements() %}
       {{ dropdown_menu("Peticions", "agreements_sent", [organization.id], pending=pending_sent or pending_received) }}

@@ -81,14 +81,28 @@ class Organization(models.Model):
     def __str__(self):
         return f"(Entitat) {self.name}"
 
-    def json(self, other_organization=None):
+    def json(self, current_organization=None, include_children=False):
         j = {
             "id": self.id,
             "name": self.name,
+            "description": self.description,
+            "org_type": self.org_type,
             "href": reverse("view_organization", kwargs={"organization_id": self.id})
         }
-        if other_organization:
-            j["distance"] = self.distance_text(other_organization)
+        if current_organization:
+            j["distance"] = self.distance_text(current_organization)
+        if include_children:
+            j["scopes"] = [s.name for s in self.scopes.all()]
+            j["social_media"] = [{"id": sm.id, "media_type": sm.media_type, "value": sm.value} for sm in self.social_media.all()]
+            if current_organization:
+                j["needs"] = [n.json(current_organization=current_organization, include_org=False) for n in
+                        self.needs.filter(has_resource=True)]
+                j["offers"] = [o.json(current_organization=current_organization, include_org=False) for o in
+                        self.offers.filter(has_resource=True)]
+            else:
+                j["needs"] = [n.json(include_org=False) for n in self.needs.filter(has_resource=True)]
+                j["offers"] = [o.json(include_org=False) for o in self.offers.filter(has_resource=True)]
+
         return j
 
     def type(self):
@@ -319,12 +333,14 @@ class Need(BaseResource):
             models.UniqueConstraint("organization", "resource", name="unique_organization_need"),
         ]
 
-    def json(self, current_organization):
+    def json(self, current_organization=None, include_org=True):
         j = super().json()
         j["type"] = "need"
-        j["organization"] = self.organization.json()
-        j["distance"] = current_organization.distance_text(self.organization)
-        j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "need", self.resource])
+        if include_org:
+            j["organization"] = self.organization.json()
+        if current_organization:
+            j["distance"] = current_organization.distance_text(self.organization)
+            j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "need", self.resource])
         j["images"] = [i.json() for i in self.images.all()]
         return j
 
@@ -341,12 +357,14 @@ class Offer(BaseResource):
             models.UniqueConstraint("organization", "resource", name="unique_organization_offer"),
         ]
 
-    def json(self, current_organization):
+    def json(self, current_organization=None, include_org=True):
         j = super().json()
         j["type"] = "offer"
-        j["organization"] = self.organization.json()
-        j["distance"] = current_organization.distance_text(self.organization)
-        j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "offer", self.resource])
+        if include_org:
+            j["organization"] = self.organization.json()
+        if current_organization:
+            j["distance"] = current_organization.distance_text(self.organization)
+            j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "offer", self.resource])
         j["images"] = [i.json() for i in self.images.all()]
         j["charge"] = self.charge
         return j

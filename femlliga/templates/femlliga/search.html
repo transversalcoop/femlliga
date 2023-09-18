@@ -1,0 +1,177 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import images_modal_vue, render_social_media_vue %}
+
+{% block content %}
+<main id="content" class="container-fluid">
+  <div id="app" class="row">
+    <div class="col-md-4 d-md-block bg-light sidebar">
+      <h1>Has lligat!</h1>
+      <p>
+        Podeu cercar les entitats de l'aplicació i veure què necessiten i ofereixen.
+      </p>
+      <input v-model="search" type="text" class="form-control" placeholder="Cerca">
+      <div class="divider-2"></div>
+      <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item" v-for="org in organizations" :key="org.id">
+          <button
+            @click="selectOrganization(org)"
+            class="nav-link w-100 text-start"
+            :class="{active: organizationSelected && organizationSelected.id === org.id}"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-current="page">
+            <span class="float-end">
+              <span class="badge ms-2 bg-success" title="Recursos que ofereixen">${ org.offers.length }</span>
+              <span class="badge ms-2 bg-warning" title="Recursos que necessiten">${ org.needs.length }</span>
+            </span>
+            <span v-html="highlightSearch(org.name, search)"></span>
+            <div class="fs-7 text-body-secondary">A ${ org.distance } de vosaltres </div>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-md-8 ms-sm-auto px-md-4">
+      <div v-if="organizationSelected" class="row mt-3">
+        <div class="col-12">
+          <div>
+            <h2>
+              <a :href="organizationSelected.href" v-html="highlightSearch(organizationSelected.name, search)"></a>
+            </h2>
+            <p>${ organizationSelected.description }</p>
+
+            <div class="row">
+              <div class="col-md-4">
+                <p class="mt-1 mb-0"><strong>Forma jurídica</strong>: ${ orgTypesNamesMap[organizationSelected.org_type] }</p>
+              </div>
+
+              <div class="col-md-4">
+                <p class="mt-1 mb-0"><strong>Àmbits de treball</strong></p>
+                <ul class="mb-0">
+                  <li v-for="s in organizationSelected.scopes">${ scopesNamesMap[s] }</li>
+                </ul>
+              </div>
+
+              <div class="col-md-4" :set="socialMedia=organizationSelected.social_media">
+                {{ render_social_media_vue() }}
+              </div>
+            </div>
+          </div>
+          <div v-for="result in [...organizationSelected.offers, ...organizationSelected.needs]" :key="result" class="row">
+            <div class="divider-2"></div>
+            <h3>
+              <span class="strong-underline">${ matchTypeMap[result.type] }</span>
+              <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+            </h3>
+            <div>
+              <span class="me-3">A ${ result.distance } de vosaltres</span>
+              <a :href="result.message_href" class="text-decoration-none">
+                <i class="bi-send fs-6"></i>
+                Posa't en contacte
+              </a>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <strong class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></strong>
+              <span v-if="result.charge" class="badge bg-light" title="Es demana remuneració a canvi">€</span>
+              <span class="badge bg-light ms-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
+            </div>
+            <p v-if="result.comments"><strong>Observacions:</strong><span class="ms-2" v-html="highlightSearch(result.comments, search)"></span></p>
+
+            <div v-if="result.images.length > 0" class="image-thumbnails">
+              <div v-for="image in result.images" :key="image.url" class="thumbnail">
+                <a data-bs-toggle="modal" href="#images-modal" role="button" @click="setCarouselImages(result.images)">
+                  <img :src="image.url">
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{ images_modal_vue() }}
+  </div>
+</main>
+{% endblock %}
+
+{% block js %}
+{{ json_script(organizations, "organizations-data") }}
+{{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
+{{ json_script(consts.RESOURCE_OPTIONS_DEF_MAP, "option-names-data") }}
+{{ json_script(consts.ORG_TYPES_NAMES_MAP, "org-types-names-data") }}
+{{ json_script(consts.SOCIAL_MEDIA_TYPES_MAP, "social-media-names-data") }}
+{{ json_script(consts.ORG_SCOPES_NAMES_MAP, "scopes-names-data") }}
+<script>
+var organizations = JSON.parse(document.getElementById('organizations-data').textContent);
+var resourceNamesMap = JSON.parse(document.getElementById('resource-names-data').textContent);
+var optionNamesMap = JSON.parse(document.getElementById('option-names-data').textContent);
+var orgTypesNamesMap = JSON.parse(document.getElementById('org-types-names-data').textContent);
+var socialMediaNamesMap = JSON.parse(document.getElementById('social-media-names-data').textContent);
+var scopesNamesMap = JSON.parse(document.getElementById('scopes-names-data').textContent);
+
+function organizationContains(search) {
+  return function(o) {
+    const parts = sanitize(search).split(" ").filter(x => x !== "");
+    const targets = [
+      sanitize(o.name),
+      sanitize(o.description),
+    ];
+    for (var result of [...o.offers, ...o.needs]) {
+      targets.push(sanitize(result.comments));
+      var sresource = sanitize(resourceNamesMap[result.resource]);
+      if (targets.indexOf(sresource) === -1) {
+        targets.push(sresource);
+      }
+      for (var option of result.options) {
+        var soption = sanitize(optionNamesMap[option]);
+        if (targets.indexOf(soption) === -1) {
+          targets.push(soption);
+        }
+      }
+    }
+    for (var part of parts) {
+      if (!targets.some((target) => contains(target, part))) {
+        return false;
+      }
+    }
+    return true;
+  };
+}
+
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      resourceNamesMap: resourceNamesMap,
+      optionNamesMap: optionNamesMap,
+      orgTypesNamesMap: orgTypesNamesMap,
+      socialMediaNamesMap: socialMediaNamesMap,
+      scopesNamesMap: scopesNamesMap,
+      matchTypeMap: { "offer": "Ofereix", "need": "També necessita" },
+      search: "",
+      allOrganizations: organizations,
+      organizationSelected: null,
+      carouselImages: [],
+    };
+  },
+  methods: {
+    addHttp: addHttp,
+    socialMediaUrl, socialMediaUrl,
+    highlightSearch: highlightSearch,
+    selectOrganization(org) {
+      this.organizationSelected = org;
+    },
+    setCarouselImages(images) {
+      this.carouselImages = images;
+    },
+  },
+  computed: {
+    organizations() {
+      return this.allOrganizations.filter(organizationContains(this.search));
+    },
+  },
+}).mount("#app");
+</script>
+{% endblock %}
