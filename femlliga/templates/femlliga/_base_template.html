@@ -64,7 +64,14 @@
         <li><a class="dropdown-item" href="{{ url("notifications") }}">Notificacions</a></li>
         <li><a class="dropdown-item" href="{{ url("page", args=["faq"]) }}">Preguntes freqüents</a></li>
         <li><a class="dropdown-item" href="{{ url("contact") }}">Contacte</a></li>
-        <li><a class="dropdown-item" href="{{ url("account_logout") }}">Surt</a></li>
+        <li>
+          <form method="post" action="{{ url("account_logout") }}">
+            {{ csrf_input }}
+            <button class="dropdown-item invisible-button" type="submit">
+              Surt
+            </button>
+          </form>
+        </li>
       </ul>
     </li>
   {% endif %}

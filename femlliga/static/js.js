@@ -37,7 +37,9 @@ function highlightSearch(nom, search) {
         var part = parts[i];
         if (part.length > 0) {
             var index = sanitize(nom).indexOf(part);
-            segments.push([index, index+part.length]);
+            if (index !== -1) {
+                segments.push([index, index+part.length]);
+            }
         }
     }
 

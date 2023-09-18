@@ -1,7 +1,8 @@
 import os
 import exif
-import uuid
 import json
+import time
+import uuid
 import logging
 import datetime
 import unicodedata
@@ -53,6 +54,16 @@ def require_own_agreement(func):
 
         return func(request, organization_id, agreement_id, *args, **kwargs)
     return decorated
+
+def record_stats(name):
+    def f(func):
+        def decorated(request, organization_id, *args, **kwargs):
+            start = time.time()
+            r = func(request, organization_id, *args, **kwargs)
+            logging.warning(f"Handler {name} took {time.time() - start}")
+            return r
+        return decorated
+    return f
 
 def index(request):
     return render(request, "femlliga/index.html", {"form": ContactForm()})
@@ -350,6 +361,7 @@ def clean_file(posted_file):
         posted_file.name = filename
         return posted_file # exif will not work for files other than JPEG
 
+@record_stats("matches")
 @login_required
 @require_own_organization
 def matches(request, organization_id):
