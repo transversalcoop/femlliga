@@ -163,7 +163,7 @@ Vue.createApp({
     deleteLogo() {
       this.loading = true;
       post(
-        "{{ url('delete_organization_logo', kwargs={'organization_id': org.id}) }}",
+        {% if org %}"{{ url('delete_organization_logo', kwargs={'organization_id': org.id}) }}"{% else %}""{% endif %},
         "{{ csrf_token }}",
         {},
       ).then(response => {
