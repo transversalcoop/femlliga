@@ -25,5 +25,19 @@
       {{ render_social_media(org) }}
     </div>
   </div>
+
+  <div id="citymap" class="map-height mt-2"></div>
 </div>
+{% endblock %}
+
+{% block js %}
+<script>
+var map = L.map('citymap').setView([{{ org.lat }}, {{ org.lng }}], 15);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
+</script>
 {% endblock %}

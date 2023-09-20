@@ -94,14 +94,10 @@ class Organization(models.Model):
         if include_children:
             j["scopes"] = [s.name for s in self.scopes.all()]
             j["social_media"] = [{"id": sm.id, "media_type": sm.media_type, "value": sm.value} for sm in self.social_media.all()]
-            if current_organization:
-                j["needs"] = [n.json(current_organization=current_organization, include_org=False) for n in
-                        self.needs.filter(has_resource=True)]
-                j["offers"] = [o.json(current_organization=current_organization, include_org=False) for o in
-                        self.offers.filter(has_resource=True)]
-            else:
-                j["needs"] = [n.json(include_org=False) for n in self.needs.filter(has_resource=True)]
-                j["offers"] = [o.json(include_org=False) for o in self.offers.filter(has_resource=True)]
+            j["needs"] = [n.json(current_organization=current_organization, include_org=False) for n in
+                    self.needs.all()]
+            j["offers"] = [o.json(current_organization=current_organization, include_org=False) for o in
+                    self.offers.all()]
 
         return j
 

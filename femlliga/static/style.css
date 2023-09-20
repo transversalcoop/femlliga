@@ -419,3 +419,30 @@ nav .nav-link.active {
 .fs-7 {
     font-size: 0.85rem !important;
 }
+
+.map-height {
+    height: 300px;
+}
+
+.card-carousel-triple {
+    width: 33%;
+    margin-right: 1%;
+    position: relative;
+}
+
+.lh-15 {
+    line-height: 1.5em;
+}
+
+.fsm-1 {
+    font-size: 0.875em;
+}
+
+.fsm-2 {
+    font-size: 0.8125em;
+}
+
+.fw-black {
+    font-weight: 900;
+}
+

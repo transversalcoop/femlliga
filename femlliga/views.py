@@ -14,6 +14,7 @@ from functools import cmp_to_key, reduce
 from django.http import Http404
 from django.forms import formset_factory, inlineformset_factory
 from django.contrib import messages
+from django.db.models import Prefetch
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import EmailMessage, mail_managers
 from django.utils import timezone
@@ -81,7 +82,7 @@ def page(request, name):
 
 @login_required
 def app(request):
-    orgs = organization_prefetches(request.user.organizations.all())
+    orgs = organization_prefetches(request.user.organizations.all(), include_missing_resources=True)
     if len(orgs) == 0:
         return redirect("add_organization")
 
@@ -439,7 +440,7 @@ def get_model_matches(organization, need, need_options, model):
 @require_own_organization
 @login_required
 def search(request, organization_id):
-    organization = request.user.organizations.first()
+    organization = organization_prefetches(request.user.organizations.filter(id=organization_id)).first()
     organizations = organization_prefetches(Organization.objects.exclude(id=organization_id))
     organizations = sorted(organizations, key=lambda o: o.distance(organization))
     return render(request, "femlliga/search.html", {
@@ -566,11 +567,15 @@ def get_city_from_coordinates(lat, lng):
     except:
         return "Unknown city"
 
-def organization_prefetches(queryset):
+def organization_prefetches(queryset, include_missing_resources=False):
+    if include_missing_resources:
+        queryset = queryset.prefetch_related("needs").prefetch_related("offers")
+    else:
+        queryset = queryset.\
+            prefetch_related(Prefetch("needs", queryset=Need.objects.filter(has_resource=True))).\
+            prefetch_related(Prefetch("offers", queryset=Offer.objects.filter(has_resource=True)))
     return queryset.\
         prefetch_related("scopes").\
-        prefetch_related("needs").\
-        prefetch_related("offers").\
         prefetch_related("social_media").\
         prefetch_related("needs__options").\
         prefetch_related("offers__options").\
@@ -595,15 +600,15 @@ def report(request):
 
     def offers_needs_orgs(orgs):
         return [
-            count(orgs, lambda x: [r for r in x.offers.all() if r.has_resource==True]),
-            count(orgs, lambda x: [r for r in x.needs.all() if r.has_resource==True]),
+            count(orgs, lambda x: x.offers.all()),
+            count(orgs, lambda x: x.needs.all()),
             len(orgs),
         ]
 
     def offers_charge_orgs(orgs):
         return [
-            count(orgs, lambda x: [r for r in x.offers.all() if r.has_resource==True and r.charge]),
-            count(orgs, lambda x: [r for r in x.offers.all() if r.has_resource==True and not r.charge]),
+            count(orgs, lambda x: [r for r in x.offers.all() if r.charge]),
+            count(orgs, lambda x: [r for r in x.offers.all() if not r.charge]),
         ]
 
     def agreements_orgs(orgs, f):
@@ -640,10 +645,10 @@ def report(request):
         needs, offers = [], []
         for o in organizations:
             for x in o.needs.all():
-                if x.has_resource==True and x.resource==resource:
+                if x.resource==resource:
                     needs.append(x)
             for x in o.offers.all():
-                if x.has_resource==True and x.resource==resource:
+                if x.resource==resource:
                     offers.append(x)
         resource_names.append(resource_name(resource))
         resources_by_resource_type.append([len(offers), len(needs)])
@@ -657,10 +662,10 @@ def report(request):
             needs, offers = [], []
             for o in organizations:
                 for x in o.needs.all():
-                    if x.has_resource == True and x.resource == resource and option[0] in [op.name for op in x.options.all()]:
+                    if x.resource == resource and option[0] in [op.name for op in x.options.all()]:
                         needs.append(x)
                 for x in o.offers.all():
-                    if x.has_resource == True and x.resource == resource and option[0] in [op.name for op in x.options.all()]:
+                    if x.resource == resource and option[0] in [op.name for op in x.options.all()]:
                         offers.append(x)
             resource_options.append("{} - {}".format(resource_name(resource), option_name(option[0])))
             resources_by_resource_option.append([len(offers), len(needs)])
@@ -671,8 +676,8 @@ def report(request):
     agreements_success = list(map(lambda o: o.successful_date, Agreement.objects.filter(agreement_successful=True)))
 
     graph = get_relationships_graph()
-    other_needs = Need.objects.filter(has_resource=True, resource="OTHER").exclude(comments="").exclude(comments=None)
-    other_offers = Offer.objects.filter(has_resource=True, resource="OTHER").exclude(comments="").exclude(comments=None)
+    other_needs = Need.objects.filter(resource="OTHER").exclude(comments="").exclude(comments=None)
+    other_offers = Offer.objects.filter(resource="OTHER").exclude(comments="").exclude(comments=None)
     most_needed = count_word_freqs(" ".join(map(lambda x: x.comments, other_needs)))
     most_offered = count_word_freqs(" ".join(map(lambda x: x.comments, other_offers)))
     return render(request, "femlliga/report.html", {
