@@ -451,3 +451,12 @@ nav .nav-link.active {
     font-weight: 900;
 }
 
+.carousel-padding {
+    padding: 0 120px;
+}
+
+@media (max-width: 768px) {
+    .carousel-padding {
+        padding: 0 20px;
+    }
+}
