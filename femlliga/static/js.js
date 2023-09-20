@@ -79,3 +79,14 @@ function socialMediaUrl(baseUrl, value) {
     return baseUrl + value;
 }
 
+function post(url, csrfToken, body) {
+  return fetch(url, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: {
+      "content-type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+  }).then(response => response.json());
+}
+

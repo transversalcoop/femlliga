@@ -123,6 +123,11 @@ nav a:hover {
     object-fit: cover;
 }
 
+.organization-logo {
+    max-width: 100%;
+    max-height: 200px;
+}
+
 .spacing {
     margin-top: 20px;
 }

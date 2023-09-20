@@ -12,7 +12,7 @@
 </div>
 {% endif %}
 
-<form method="post" action="{{ request.path }}" class="mb-2">
+<form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="mb-2">
     {{ csrf_input }}
     {{ form_feedback(form) }}
 
@@ -20,8 +20,30 @@
     <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="Nom" id="id_name" {{ input_value(form, "name") }} required>
     {{ input_feedback(form, "name") }}
 
-    <div class="mt-3"></div>
-    <label for="id_description">Descripció de l'activitat de l'entitat (opcional)</label>
+    <div id="vuejs">
+      <div v-if="hasLogo" class="row mt-3">
+        <div class="col-6">
+          {% if org and org.logo %}
+            <img class="organization-logo" src="{{ org.logo.url }}" />
+          {% endif %}
+        </div>
+        <div class="col-6">
+          <button class="btn btn-custom" @click.prevent="deleteLogo" :disabled="loading">
+            <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">Esborrant...</span>
+            </div>
+            <span v-else>Esborra el logo</span>
+          </button>
+        </div>
+      </div>
+      <div v-else class="mt-3">
+        <label for="id_logo">Logo de l'entitat (opcional)</label>
+        <input type="file" {{ input_classes(form, "logo") }} name="logo" autocomplete="Logo" id="id_logo" {{ input_value(form, "logo") }}>
+        {{ input_feedback(form, "logo") }}
+      </div>
+    </div>
+
+    <label class="mt-3" for="id_description">Descripció de l'activitat de l'entitat (opcional)</label>
     <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description">{{ textarea_value(form, "description") }}</textarea>
     {{ input_feedback(form, "description") }}
 
@@ -124,5 +146,29 @@ function addSocialMedia(event) {
         }
     }
 }
+
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      hasLogo: {{ js_bool(org and org.logo) }},
+      loading: false,
+    };
+  },
+  methods: {
+    deleteLogo() {
+      this.loading = true;
+      post(
+        "{{ url('delete_organization_logo', kwargs={'organization_id': org.id}) }}",
+        "{{ csrf_token }}",
+        {},
+      ).then(response => {
+        console.log("RESPONSE:", response);
+        this.hasLogo = false;
+        this.loading = false;
+      });
+    },
+  },
+}).mount("#vuejs");
 </script>
 {% endblock %}

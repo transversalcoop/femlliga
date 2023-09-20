@@ -16,6 +16,7 @@ urlpatterns = [
     path('organization/add/', views.add_organization, name='add_organization'),
     path('organization/<uuid:organization_id>/view/', views.view_organization, name='view_organization'),
     path('organization/<uuid:organization_id>/edit/', views.edit_organization, name='edit_organization'),
+    path('organization/<uuid:organization_id>/delete-logo/', views.delete_organization_logo, name='delete_organization_logo'),
     path('organization/<uuid:organization_id>/pre-wizard/', views.pre_wizard, name='pre-wizard'),
     path('organization/<uuid:organization_id>/mid-wizard/', views.mid_wizard, name='mid-wizard'),
     path('organization/<uuid:organization_id>/post-wizard/', views.post_wizard, name='post-wizard'),

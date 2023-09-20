@@ -25,6 +25,11 @@ def format_time(t):
 def path_parent(path):
     return "/".join(path.split("/")[:-2]) + "/"
 
+def js_bool(value):
+    if value:
+        return "true"
+    return "false"
+
 # would be great to use directly allauth.socialaccount.templatetags.socialaccount.provider_login_url, but there is no
 # way to use it directly in jinja2: explanation https://stackoverflow.com/questions/45174765/use-djangos-allauth-with-jinja2
 # and source code https://github.com/pennersr/django-allauth
@@ -85,5 +90,6 @@ def environment(**options):
         "add_http": add_http,
         "settings": settings,
         "json_script": json_script,
+        "js_bool": js_bool,
     })
     return env

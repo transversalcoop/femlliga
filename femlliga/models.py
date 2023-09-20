@@ -18,6 +18,15 @@ from django.contrib.auth.models import AbstractUser
 from .constants import *
 from .utils import date_intervals, clean_form_email
 
+def need_images_directory_path(instance, filename):
+    return str(Path("images/needs") / filename)
+
+def offer_images_directory_path(instance, filename):
+    return str(Path("images/offers") / filename)
+
+def organization_logos_directory_path(instance, filename):
+    return str(Path("images/logos") / filename)
+
 @deconstructible
 class LimitFileSize:
     def __init__(self, MB):
@@ -61,6 +70,7 @@ class Organization(models.Model):
         editable = False,
     )
     name = models.CharField(max_length = 200)
+    logo = models.ImageField(upload_to=organization_logos_directory_path, validators=[LimitFileSize(10)], null=True, blank=True)
     description = models.TextField(blank=True)
     date = models.DateTimeField(auto_now_add=True)
     scopes = models.ManyToManyField(OrganizationScope)
@@ -407,12 +417,6 @@ class ContactDenyList(models.Model):
     def save(self, *args, **kwargs):
         self.email = clean_form_email(self.email)
         super(ContactDenyList, self).save(*args, **kwargs)
-
-def need_images_directory_path(instance, filename):
-    return str(Path("images/needs") / filename)
-
-def offer_images_directory_path(instance, filename):
-    return str(Path("images/offers") / filename)
 
 class NeedImage(models.Model):
     resource = models.ForeignKey(Need, on_delete=models.CASCADE, related_name="images")

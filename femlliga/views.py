@@ -11,7 +11,7 @@ from io import BytesIO
 from pathlib import Path
 from functools import cmp_to_key, reduce
 
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.forms import formset_factory, inlineformset_factory
 from django.contrib import messages
 from django.db.models import Prefetch
@@ -149,6 +149,7 @@ def add_organization(request):
 
     return render(request, "femlliga/add_organization.html", {
         "form": OrganizationForm(),
+        "org": None,
         "social_media_forms": social_media_forms()(),
     })
 
@@ -175,8 +176,17 @@ def edit_organization(request, organization_id):
             "lng": org.lng,
             "address": org.address,
         }),
+        "org": org,
         "social_media_forms": social_media_forms()(instance=org),
     })
+
+@login_required
+@require_own_organization
+def delete_organization_logo(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    if request.method == "POST":
+        org.logo.delete()
+    return JsonResponse({"ok": True})
 
 def social_media_forms():
     return inlineformset_factory(
@@ -187,7 +197,7 @@ def social_media_forms():
     )
 
 def process_organization_post(request, org = None):
-    form = OrganizationForm(request.POST)
+    form = OrganizationForm(request.POST, request.FILES)
     socialmedia_formset = social_media_forms()(request.POST, instance=org)
     if form.is_valid() and socialmedia_formset.is_valid():
         if org is None:
@@ -203,6 +213,9 @@ def process_organization_post(request, org = None):
         org.lng = lng
         org.city = get_city_from_coordinates(lat, lng)
         org.creator = request.user
+        if form.cleaned_data["logo"]:
+            file = clean_file(form.cleaned_data["logo"])
+            org.logo = file
         org.save()
         socialmedia_formset.save()
         for scope in ORG_SCOPES:
@@ -217,6 +230,7 @@ def process_organization_post(request, org = None):
 
     return render(request, "femlliga/add_organization.html", {
         "form": form,
+        "org": org,
         "social_media_forms": socialmedia_formset,
         "edit": org != None,
     })
