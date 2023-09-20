@@ -193,7 +193,7 @@ def social_media_forms():
         Organization,
         SocialMedia,
         fields=("media_type", "value"),
-        extra=len(SOCIAL_MEDIA_TYPES)-1,
+        extra=len(SOCIAL_MEDIA_TYPES),
     )
 
 def process_organization_post(request, org = None):
