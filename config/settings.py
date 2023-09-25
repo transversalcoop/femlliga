@@ -315,6 +315,7 @@ IGNORABLE_404_URLS = [
     re.compile(r'^/apple-touch-icon.*\.png$'),
     re.compile(r'^/favicon\.ico$'),
     re.compile(r'^/robots\.txt$'),
+    re.compile(r'^/.*\.xml$'),
     re.compile(r'^/.*\.php$'),
     re.compile(r'^/.*\.php.bak$'),
 ]
