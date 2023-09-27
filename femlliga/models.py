@@ -217,6 +217,9 @@ class Resource:
     def options(self):
         return RESOURCE_OPTIONS_MAP[self.code]
 
+    def add_image_label(self):
+        return RESOURCE_ADD_IMAGE_LABEL[self.code]
+
 class Table:
     def __init__(self, columns, labels, rows):
         self.columns = columns

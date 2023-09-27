@@ -460,3 +460,7 @@ nav .nav-link.active {
         padding: 0 20px;
     }
 }
+
+.triple-column {
+    columns: 3;
+}

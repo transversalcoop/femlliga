@@ -27,7 +27,7 @@
           Organitzacions
         </button>
       </div>
-      <input v-model="search" type="text" class="form-control" placeholder="Cerca">
+      <input v-model="search" type="text" class="form-control" placeholder="Cerca recursos o organitzacions">
       <div class="divider-2"></div>
       <ul class="nav nav-pills flex-column mb-auto">
         <template v-if="showBy === 'resources'">
@@ -76,21 +76,23 @@
     <div class="col-md-8 ms-sm-auto px-md-4">
       <div v-if="resourceSelected" class="row mt-3">
         <div class="col-12">
-          <p>Heu indicat que necessiteu «${ resourceNamesMap[resourceSelected] }». A sota podeu veure quines entitats l'ofereixen per compartir-lo, i quines tenen també aquesta necessitat i amb les que podrieu contactar per buscar una solució comuna.</p>
+          <p>Heu indicat que necessiteu «${ resourceNamesMap[resourceSelected] }». A sota pots veure quines entitats l'ofereixen per compartir-lo, i quines tenen també aquesta necessitat i amb les que podrieu contactar per buscar una solució comuna.</p>
 
           {{ show_matches_vue("matches.offerMatches[resourceSelected]", "ofereix") }}
           {{ show_matches_vue("matches.needMatches[resourceSelected]", "també necessita") }}
         </div>
       </div>
-
-      <div v-if="organizationSelected" class="row mt-3">
+      <div v-else-if="organizationSelected" class="row mt-3">
         <div class="col-12">
-          <p>A sota podeu veure quins recursos que necessiteu ofereix l'entitat seleccionada, els quals podeu sol·licitar, o quins recursos també necessita aquesta entitat, amb la que podrieu contactar per buscar una solució comuna.</p>
+          <p>A sota pots veure quins recursos que necessiteu ofereix l'entitat seleccionada, els quals podeu sol·licitar, o quins recursos també necessita aquesta entitat, amb la que podrieu contactar per buscar una solució comuna.</p>
 
           {{ show_matches_vue("organizationMatches.filter(m => m.type === 'offer')", "ofereix") }}
           {{ show_matches_vue("organizationMatches.filter(m => m.type === 'need')", "també necessita") }}
         </div>
       </div>
+      <div v-else class="mt-4 text-center fst-italic">
+        <p v-if="showBy === 'resources'">Selecciona un recurs per veure les lligues que heu fet</p>
+        <p v-else>Selecciona una organització per veure les lligues que heu fet amb ella</p>
     </div>
 
     {{ images_modal_vue() }}
@@ -148,7 +150,7 @@ Vue.createApp({
       resourceNamesMap: resourceNamesMap,
       optionNamesMap: optionNamesMap,
       search: "",
-      resourceSelected: "",
+      resourceSelected: "{{ preselected_resource }}",
       organizationSelected: "",
       carouselImages: [],
       showBy: "resources",

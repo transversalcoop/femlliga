@@ -121,9 +121,15 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_select(form, name, label, options = []) %}
+{% macro render_select(form, name, label, options = [], strong_label=False) %}
     {% if form.fields[name] %}
-        <label for="id_{{ name }}">{{ label }}</label>
+        <label for="id_{{ name }}">
+          {% if strong_label %}
+          <strong>{{ label }}</strong>
+          {% else %}
+          {{ label }}
+          {% endif %}
+        </label>
         <select id="id_{{ name }}" name="{{ name }}" {{ input_value(form, name) }} class="form-select {% if form.errors[name] %} is-invalid{% endif %}">
             {% set choices = form.fields[name].choices %}
             {% if len(options) > 0 %}
@@ -144,17 +150,19 @@
 {% macro render_multi_checkboxes(form, name, label, options = []) %}
   {% if form.fields[name] %}
     <div class="{% if form.errors[name] %}is-invalid{% endif %}">
-      <label for="id_{{ name }}">{{ label }}</label>
+      <label for="id_{{ name }}"><strong>{{ label }}</strong></label>
       {% set choices = form.fields[name].choices %}
-      {% for i, choice in enumerate(choices) %}
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="{{ choice[0] }}" id="{{ name }}_{{ i }}" name="{{ name }}"
-               {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}checked{% endif %}>
-        <label class="form-check-label" for="{{ name }}_{{ i }}">
-        {{ choice[1] }}
-        </label>
+      <div class="triple-column">
+        {% for i, choice in enumerate(choices) %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="{{ choice[0] }}" id="{{ name }}_{{ i }}" name="{{ name }}"
+                 {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}checked{% endif %}>
+          <label class="form-check-label" for="{{ name }}_{{ i }}">
+          {{ choice[1] }}
+          </label>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
     </div>
     {{ input_feedback(form, name) }}
   {% endif %}
@@ -228,7 +236,7 @@ function clickOption(element) {
 {% macro render_match_badges(org, resource, offer_matches, need_matches, link=False) %}
   {% if resource.resource in offer_matches %}
     {% set count = len(offer_matches[resource.resource]) %}
-    {% if link %}<a href="{{ url("matches", args=[org.id]) }}" style="text-decoration: none;">{% endif %}
+    {% if link %}<a href="{{ url("matches", args=[org.id]) }}?resource={{ resource.resource }}" style="text-decoration: none;">{% endif %}
     <span class="badge bg-success" title="Hi ha {{ count }} entitats que ofereixen el que necessiteu">
         {{ count }}
     </span>
@@ -236,7 +244,7 @@ function clickOption(element) {
   {% endif %}
   {% if resource.resource in need_matches %}
     {% set count = len(need_matches[resource.resource]) %}
-    {% if link %}<a href="{{ url("matches", args=[org.id]) }}">{% endif %}
+    {% if link %}<a href="{{ url("matches", args=[org.id]) }}?resource={{ resource.resource }}">{% endif %}
     <span class="badge bg-warning" title="Hi ha {{ count }} entitats que necessiten el mateix que vosaltres">{{ count }}</span>
     {% if link %}</a>{% endif %}
   {% endif %}
@@ -287,19 +295,19 @@ function clickOption(element) {
 </div>
 {% endmacro %}
 
-{% macro render_formset_field(form, field, field_name, input_type, label) %}
+{% macro render_formset_field(form, field, field_name, input_type, label, placeholder="") %}
   {% if label %}
     <label for="id_{{ field.html_name }}" style="margin-top: 10px;">{{ label }}</label>
   {% endif %}
-  <input type="{{ input_type }}" {{ input_classes(form, field_name) }} name="{{ field.html_name }}" id="id_{{ field.html_name }}" {{ formset_input_value(field) }}>
+  <input type="{{ input_type }}" {{ input_classes(form, field_name) }} name="{{ field.html_name }}" id="id_{{ field.html_name }}" {{ formset_input_value(field) }} placeholder="{{ placeholder }}">
   {{ input_feedback(form, field_name) }}
 {% endmacro %}
 
-{% macro render_formset_select(form, field, field_name, label) %}
+{% macro render_formset_select(form, field, field_name, label, handler="") %}
   {% if label %}
     <label for="id_{{ field.html_name }}">{{ label }}</label>
   {% endif %}
-  <select id="id_{{ field.html_name }}" name="{{ field.html_name }}" class="form-select {% if form.errors[field_name] %} is-invalid{% endif %}">
+  <select id="id_{{ field.html_name }}" name="{{ field.html_name }}" class="form-select {% if form.errors[field_name] %} is-invalid{% endif %}" {{ handler|safe }}>
       {% for choice in form.fields[field_name].choices %}
       <option value="{{ choice[0] }}"
           {% if field.value() and field.value() == choice[0] %}selected{% endif %}

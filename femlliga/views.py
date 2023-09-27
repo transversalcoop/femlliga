@@ -199,6 +199,7 @@ def social_media_forms():
 def process_organization_post(request, org = None):
     form = OrganizationForm(request.POST, request.FILES)
     socialmedia_formset = social_media_forms()(request.POST, instance=org)
+    new_organization = org is None
     if form.is_valid() and socialmedia_formset.is_valid():
         if org is None:
             org = Organization()
@@ -226,6 +227,8 @@ def process_organization_post(request, org = None):
             else:
                 org.scopes.remove(s)
 
+        if new_organization:
+            return redirect("matches")
         return redirect("app")
 
     return render(request, "femlliga/add_organization.html", {
@@ -386,6 +389,7 @@ def matches(request, organization_id):
     ])
     offer_matches, need_matches = get_organization_matches(organization, own_needs)
     organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
+    preselected_resource = request.GET.get("resource", "")
     return render(request, "femlliga/matches.html", {
         "offer_matches": offer_matches,
         "need_matches": need_matches,
@@ -403,6 +407,7 @@ def matches(request, organization_id):
         "needs_json": [x.resource for x in own_needs],
         "org": organization,
         "own_needs": own_needs,
+        "preselected_resource": preselected_resource,
     })
 
 def group_matches_by_organization(organization, offer_matches, need_matches):
