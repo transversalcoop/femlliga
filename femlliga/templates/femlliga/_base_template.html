@@ -63,7 +63,9 @@
     <li class="nav-item dropstart">
       {{ dropdown_menu("Perfil", "") }}
       <ul class="dropdown-menu" aria-labelledby="agreementsDropdownMenuLink">
+        {% if organization %}
         <li><a class="dropdown-item" href="{{ url("edit_organization", args=[organization.id]) }}">Edita l'entitat</a></li>
+        {% endif %}
         <li><a class="dropdown-item" href="{{ url("notifications") }}">Notificacions</a></li>
         <li><a class="dropdown-item" href="{{ url("contact") }}">Contacte</a></li>
         <li>

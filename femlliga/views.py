@@ -132,7 +132,7 @@ def post_wizard(request, organization_id):
     if request.method == "POST":
         org.resources_set = True
         org.save()
-        return redirect("app")
+        return redirect("matches", organization_id=org.id)
     return render(request, "femlliga/aux-wizard.html", {"org": org, "page": "post-wizard"})
 
 @login_required
@@ -212,7 +212,6 @@ def social_media_forms():
 def process_organization_post(request, org = None):
     form = OrganizationForm(request.POST, request.FILES)
     socialmedia_formset = social_media_forms()(request.POST, instance=org)
-    new_organization = org is None
     if form.is_valid() and socialmedia_formset.is_valid():
         if org is None:
             org = Organization()
@@ -240,8 +239,6 @@ def process_organization_post(request, org = None):
             else:
                 org.scopes.remove(s)
 
-        if new_organization:
-            return redirect("matches")
         return redirect("app")
 
     return render(request, "femlliga/add_organization.html", {

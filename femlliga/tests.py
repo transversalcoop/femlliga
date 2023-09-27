@@ -254,8 +254,21 @@ class IntegrationTests(TestCase):
         self.aux_wizard(offers_url, "OTHER", [], "comentaris de ofereix altres de test", "yes",
             "Has acabat d'introduir la informació de la teua associació", charge = True)
 
-        # app main page
+        # matches page
         response = self.client.post(reverse("post-wizard", args=[o.id]), {"start": "yes"}, follow=True)
+        for s in [
+            "Hem trobat coincidències entre les vostres necessitats",
+            "Local",
+            "Second example organization",
+        ]:
+            self.assertContains(response, s)
+
+        matches = BeautifulSoup(response.content.decode(), "html.parser").find("script", {"id": "matches-data"})
+        for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
+            self.assertNotIn(s, matches)
+
+        # app main page
+        response = self.client.get(reverse("app"))
         should_contain = [
             "Nom entitat de test",
             "Descripció entitat de test",
@@ -285,19 +298,6 @@ class IntegrationTests(TestCase):
             "comentaris de ofereix serveis de test",
         ]:
             self.assertNotContains(response, s)
-
-        # matches page
-        response = self.client.get(reverse("matches", args=[o.id]))
-        for s in [
-            "Hem trobat coincidències entre les vostres necessitats",
-            "Local",
-            "Second example organization",
-        ]:
-            self.assertContains(response, s)
-
-        matches = BeautifulSoup(response.content.decode(), "html.parser").find("script", {"id": "matches-data"})
-        for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
-            self.assertNotIn(s, matches)
 
         # view organization page
         response = self.client.get(reverse("view_organization", args=[o.id]))
