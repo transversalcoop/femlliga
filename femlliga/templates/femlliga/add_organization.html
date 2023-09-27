@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, render_multi_checkboxes, render_formset_field, render_formset_select, render_formset_delete %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, render_multi_checkboxes, render_formset_field, render_formset_select, render_formset_delete_vue %}
 
 {% block content %}
 <div class="container">
@@ -12,7 +12,7 @@
 </div>
 {% endif %}
 
-<form method="post" action="{{ request.path }}" class="mb-2">
+<form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="mb-2">
     {{ csrf_input }}
     {{ form_feedback(form) }}
 
@@ -20,36 +20,60 @@
     <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="Nom" id="id_name" {{ input_value(form, "name") }} required>
     {{ input_feedback(form, "name") }}
 
-    <div class="mt-3"></div>
-    <label for="id_description">Descripció de l'activitat de l'entitat (opcional)</label>
-    <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description">{{ textarea_value(form, "description") }}</textarea>
-    {{ input_feedback(form, "description") }}
-
-    <p class="mt-3 mb-1">
-      Xarxes. Per a les xarxes socials, introdueix el nom d'usuari
-      <a class="btn btn-custom" href="#" onclick="addSocialMedia(event)">
-          <i class="bi-plus-lg"></i> Afegeix
-      </a>
-    </p>
+    {# here because if not vuejs does not render it before it calls document.getElementById... #}
     {{ social_media_forms.management_form }}
-    {% for i, mform in enumerate(social_media_forms) %}
-      {{ form_feedback(mform) }}
-      <div class="row mb-2 social-media-wrapper" id="social-media-wrapper-{{ i }}"
-        {% if not mform.media_type.value() and not mform.value.value() %}style="display: none;"{% endif %}
-      >
-        <div class="col-4">
-          {{ render_formset_select(mform, mform.media_type, "media_type", "") }}
+    <div id="vuejs">
+      <div v-if="hasLogo" class="row mt-3">
+        <div class="col-6">
+          {% if org and org.logo %}
+            <img class="organization-logo" src="{{ org.logo.url }}" />
+          {% endif %}
         </div>
-        <div class="col-4">
-          {{ render_formset_field(mform, mform.value, "value", "text", "") }}
-        </div>
-        <div class="col-4">
-          {{ render_formset_delete(mform, mform.DELETE, "DELETE") }}
-          {{ mform.id }}
-          {{ mform.organization }}
+        <div class="col-6">
+          <button class="btn btn-custom" @click.prevent="deleteLogo" :disabled="loading">
+            <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">Esborrant...</span>
+            </div>
+            <span v-else>Esborra el logo</span>
+          </button>
         </div>
       </div>
-    {% endfor %}
+      <div v-else class="mt-3">
+        <label for="id_logo">Logo de l'entitat (opcional)</label>
+        <input type="file" {{ input_classes(form, "logo") }} name="logo" autocomplete="Logo" id="id_logo" {{ input_value(form, "logo") }}>
+        {{ input_feedback(form, "logo") }}
+      </div>
+
+      <label class="mt-3" for="id_description">Descripció de l'activitat de l'entitat (opcional)</label>
+      <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description">{{ textarea_value(form, "description") }}</textarea>
+      {{ input_feedback(form, "description") }}
+
+      <p class="mt-3 mb-1">
+        Xarxes. Per a les xarxes socials, introdueix el nom d'usuari
+        <a v-if="socialMediasAddIndex < totalSocialMedias" @click="addSocialMedia" class="btn btn-custom" href="#">
+          <i class="bi-plus-lg"></i> Afegeix
+        </a>
+      </p>
+      {% for i, mform in enumerate(social_media_forms) %}
+        {{ form_feedback(mform) }}
+        <div
+          class="row mb-2 social-media-wrapper {% if not mform.media_type.value() and not mform.value.value() %}d-none{% endif %}"
+          id="social-media-wrapper-{{ i }}"
+        >
+          <div class="col-4">
+            {{ render_formset_select(mform, mform.media_type, "media_type", "") }}
+          </div>
+          <div class="col-4">
+            {{ render_formset_field(mform, mform.value, "value", "text", "") }}
+          </div>
+          <div class="col-4">
+            {{ render_formset_delete_vue(mform.DELETE, "deleteSocialMedia(" + str(i) + ")") }}
+            {{ mform.id }}
+            {{ mform.organization }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
 
     <div class="mt-3"></div>
     {{ render_select(form, "org_type", "Forma jurídica") }}
@@ -124,5 +148,40 @@ function addSocialMedia(event) {
         }
     }
 }
+
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      hasLogo: {{ js_bool(org and org.logo) }},
+      loading: false,
+      socialMediasAddIndex: +document.getElementById("id_social_media-INITIAL_FORMS").value,
+      totalSocialMedias: +document.getElementById("id_social_media-TOTAL_FORMS").value,
+    };
+  },
+  methods: {
+    deleteLogo() {
+      this.loading = true;
+      post(
+        {% if org %}"{{ url('delete_organization_logo', kwargs={'organization_id': org.id}) }}"{% else %}""{% endif %},
+        "{{ csrf_token }}",
+        {},
+      ).then(response => {
+        console.log("RESPONSE:", response);
+        this.hasLogo = false;
+        this.loading = false;
+      });
+    },
+    addSocialMedia() {
+      var el = document.getElementById(`social-media-wrapper-${this.socialMediasAddIndex}`);
+      el.classList.remove("d-none");
+      this.socialMediasAddIndex++;
+    },
+    deleteSocialMedia(i) {
+      document.getElementById(`id_social_media-${i}-DELETE`).value = "on";
+      document.getElementById(`social-media-wrapper-${i}`).classList.add("d-none");
+    },
+  },
+}).mount("#vuejs");
 </script>
 {% endblock %}

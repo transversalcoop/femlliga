@@ -1,13 +1,18 @@
 from django.urls import reverse
+from django.conf import settings
 from django.utils import timezone
+from django.utils.html import json_script
 from django.templatetags.static import static
 
-from jinja2 import Environment
-from femlliga.models import *
-from allauth.socialaccount import providers
-
 import bleach
+
+from jinja2 import Environment
+from allauth.utils import get_request_param
+from allauth.socialaccount.adapter import get_adapter
+
 import femlliga.constants
+
+from femlliga.models import *
 
 def add_http(url):
     if not url.startswith("http://") and not url.startswith("https://"):
@@ -20,16 +25,27 @@ def format_time(t):
 def path_parent(path):
     return "/".join(path.split("/")[:-2]) + "/"
 
+def js_bool(value):
+    if value:
+        return "true"
+    return "false"
+
+# would be great to use directly allauth.socialaccount.templatetags.socialaccount.provider_login_url, but there is no
+# way to use it directly in jinja2: explanation https://stackoverflow.com/questions/45174765/use-djangos-allauth-with-jinja2
+# and source code https://github.com/pennersr/django-allauth
 def provider_login_url(request, provider_id, **kwargs):
-    provider = providers.registry.by_id(provider_id)
+    provider = get_adapter(request).get_provider(request, provider_id)
     query = kwargs
-    if 'next' not in query:
-       next_ = request.GET.get('next')
-       if next_:
-           query['next'] = next_
+    process = query.get("process", None)
+    if "next" not in query:
+        next = get_request_param(request, "next")
+        if next:
+            query["next"] = next
+        elif process == "redirect":
+            query["next"] = request.get_full_path()
     else:
-        if not query['next']:
-           del query['next']
+        if not query["next"]:
+            del query["next"]
 
     return provider.get_login_url(request, **query)
 
@@ -72,5 +88,8 @@ def environment(**options):
         "provider_login_url": provider_login_url,
         "clean": clean,
         "add_http": add_http,
+        "settings": settings,
+        "json_script": json_script,
+        "js_bool": js_bool,
     })
     return env

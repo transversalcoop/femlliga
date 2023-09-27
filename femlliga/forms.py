@@ -29,7 +29,7 @@ class OrganizationForm(forms.ModelForm):
     )
     class Meta:
         model = Organization
-        fields = ["name", "description", "org_type", "lat", "lng", "address"]
+        fields = ["name", "logo", "description", "org_type", "lat", "lng", "address"]
 
     def clean(self):
         super().clean()

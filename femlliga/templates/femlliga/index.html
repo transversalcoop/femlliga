@@ -4,15 +4,15 @@
 
 {% macro collaboration_example(image, heading, text, alternatives, active=False, mobile=False) %}
 <div class="carousel-item{% if active %} active{% endif %}">
-  <div class="card" {% if not mobile %}style="width: 33%; margin-right: 1%; position: relative;"{% endif %}>
+  <div class="card {% if not mobile %}card-carousel-triple{% endif %}">
     <img src="{{ static("decorations/quote.svg") }}" class="example-quote" alt="">
 
     <img src="{{ static("home-images/"+image) }}" class="card-img-top pt-4 ps-4 pe-4" alt="">
     <div class="card-body">
-      <p class="text-center text-muted" style="font-size: 0.875em;">{{ text }}</p>
+      <p class="text-center text-muted fsm-1">{{ text }}</p>
       <div class="divider-1"></div>
-      <h3 class="text-center" style="line-height: 1.5em;">{{ heading }}</h3>
-      <p class="text-center text-muted" style="font-size: 0.8125em;">{{ alternatives }}</p>
+      <h3 class="text-center lh-15">{{ heading }}</h3>
+      <p class="text-center text-muted fsm-2">{{ alternatives }}</p>
     </div>
   </div>
 </div>
@@ -22,7 +22,7 @@
 
 {% macro initial_block_text() %}
       <p>{{ consts.APP_NAME }} és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.</p>
-      <div style="text-align: center; margin-top: 20px;">
+      <div class="mt-3 text-center">
         <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
           Inscriu la teua entitat
         </a>
@@ -47,7 +47,7 @@
 <div class="container d-block d-md-none">
   <div style="background-color: #f4f4f4;">
     <img src="{{ static("home-images/gent-portada-mobile.png") }}" style="max-width: 100%" alt="Persones diverses">
-    <div style="padding: 7px;">
+    <div class="p-2">
       <em>Fer lliga: unir-se, fer causa comuna, acordar, amistar-se, anar a l’una, fer pinya…</em>
       <h1 class="app-title app-title-mobile">Fem lliga!</h1>
       <div style="background-image: url('{{ static("decorations/cross.svg") }}'); background-repeat: repeat-x; height: 20px; margin-bottom: 20px; margin-right: -500px;">
@@ -58,19 +58,20 @@
 </div>
 
 <div class="container" style="margin: 100px auto;">
-  <h2 style="font-weight: 900;" class="text-center">Què pots trobar dins de l'aplicació?</h2>
+  <h2 class="fw-black text-center">Què pots trobar dins de l'aplicació?</h2>
   <div class="divider-1"></div>
   <p class="text-center">
     A sota podeu veure captures de com es veu l'aplicació per dins, com és el procés d'alta, la pàgina de la vostra organització, i el procés de fer lliga amb altres entitats.
   </p>
   <div class="container">
-    <div class="row" style="margin-top: 20px;">
+    <div class="row mt-3">
       <div id="carousel-screenshots" class="carousel slide" data-bs-ride="carousel">
-        <div style="padding: 0 120px;">
-          <div class="carousel-inner" style="overflow: hidden; padding: 0 0 30px 0;">
+        <div class="carousel-padding">
+          <div class="carousel-inner overflow-hidden" style=" padding: 0 0 30px 0;">
             {% for i in range(1, 7) %}
             <div class="carousel-item{% if i == 1 %} active{% endif %}">
-              <img src="{{ static("screenshots-carousel/"+str(i)+".png") }}" class="d-block w-100" alt="">
+              <img src="{{ static("screenshots-carousel/"+str(i)+".png") }}" class="d-none d-md-block w-100" alt="">
+              <img src="{{ static("screenshots-carousel/"+str(i)+"_mobil.png") }}" class="d-block d-md-none w-100" alt="">
             </div>
             {% endfor %}
           </div>
@@ -90,7 +91,7 @@
 </div>
 
 <div class="container" style="margin: 100px auto;">
-    <h2 style="font-weight: 900;" class="text-center">Entre totes, associacions amb més impacte!</h2>
+    <h2 class="fw-black text-center">Entre totes, associacions amb més impacte!</h2>
     <div class="divider-1"></div>
     <p class="text-center">
         De forma semblant a les famoses aplicacions digitals de cites, us proposem recollir informació amb la qual filtrar els perfils que més poden interessar a la teua associació. Els col·lectius amb més probabilitats de ser compatibles a l'hora de <strong>compartir recursos</strong> podem entrar en contacte entre nosaltres.
@@ -114,19 +115,19 @@
     </div>
 
     <div class="row">
-        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta" style="padding: 16px 0;">
+        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta py-3">
             <div class="vinyeta-inner">
                 <span class="big-number">02.</span>
                 <p class="vinyeta-text">Decideixen inscriure la seua Associació en <em>Fem lliga</em>. Contesten el formulari i posen en comú les seues peticions com per exemple el projector.</p>
             </div>
         </div>
-        <div class="col-xl-4 col-md-6 col-xs-12 text-center vinyeta-groc" style="padding: 16px 0;">
+        <div class="col-xl-4 col-md-6 col-xs-12 text-center vinyeta-groc py-3">
             <div class="vinyeta-inner">
-                <span style="font-weight: 900; font-size: 2.6em;">CONNECTANT</span>
-                <span style="font-weight: 900; font-size: 5em; line-height: 1em;">EL<br>TEIXIT SOCIAL</p>
+                <span class="fw-black" style=" font-size: 2.6em;">CONNECTANT</span>
+                <span class="fw-black" style=" font-size: 5em; line-height: 1em;">EL<br>TEIXIT SOCIAL</p>
             </div>
         </div>
-        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta" style="padding: 16px 0;">
+        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta py-3">
             <div class="vinyeta-inner">
                 <span class="big-number">03.</span>
                 <p class="vinyeta-text">Per la seua banda, Llúcia va donar d’alta el seu col·lectiu ja que fa setmanes buscaven espai. A més, la seua assemblea va decidir oferir un projector per si algú el necessitava.</p>
@@ -153,7 +154,7 @@
 <div class="container">
     <div class="row" style="margin-top: 80px; margin-bottom: 50px;">
         <div class="col-12">
-            <h2 style="font-weight: 900; font-size: 4.4em; color: #000; text-align: center;">Com començar?</h2>
+            <h2 class="fw-black" style=" font-size: 4.4em; color: #000; text-align: center;">Com començar?</h2>
             <div class="divider-1"></div>
         </div>
     </div>
@@ -165,9 +166,9 @@
 
         <div class="col-xl-4 col-md-6 col-xs-12 vinyeta-menut">
             <div class="vinyeta-inner text-center" style="padding: 50px 0;">
-                <h3 class="vinyeta-text" style="margin-bottom: 20px;">Què podeu oferir?</h3>
-                <p class="vinyeta-text" style="margin-bottom: 20px;">Respon un curt qüestionari sobre aquelles qüestions que el teu col·lectiu voldria compartir.</p>
-                <a type="button" class="btn btn-custom" href="{{ url("account_signup") }}" style="font-weight: bold; padding: 12px 20px;">
+                <h3 class="vinyeta-text mb-3">Què podeu oferir?</h3>
+                <p class="vinyeta-text mb-3">Respon un curt qüestionari sobre aquelles qüestions que el teu col·lectiu voldria compartir.</p>
+                <a type="button" class="btn btn-custom fw-bold" href="{{ url("account_signup") }}" style=" padding: 12px 20px;">
                   Comenceu a fer lliga
                 </a>
             </div>
@@ -175,9 +176,9 @@
 
         <div class="col-xl-4 col-md-6 col-xs-12 vinyeta-menut">
             <div class="vinyeta-inner text-center" style="padding: 50px 0;">
-                <h3 class="vinyeta-text" style="margin-bottom: 20px;">Quines necessitats teniu?</h3>
-                <p class="vinyeta-text" style="margin-bottom: 20px;">Respon un curt qüestionari sobre aquelles qüestions que el teu col·lectiu necessita.</p>
-                <a type="button" class="btn btn-custom" href="{{ url("account_signup") }}" style="font-weight: bold; padding: 12px 20px;">
+                <h3 class="vinyeta-text mb-3">Quines necessitats teniu?</h3>
+                <p class="vinyeta-text mb-3">Respon un curt qüestionari sobre aquelles qüestions que el teu col·lectiu necessita.</p>
+                <a type="button" class="btn btn-custom fw-bold" href="{{ url("account_signup") }}" style=" padding: 12px 20px;">
                   Comenceu a fer lliga
                 </a>
             </div>
@@ -186,7 +187,7 @@
 </div>
 
 <div class="container" style="margin-top: 100px; margin-bottom: 20px;">
-    <h2 style="font-weight: 900;" class="text-center">Cooperar, intercanviar, fer lliga per a què?</h2>
+    <h2 class="fw-black text-center">Cooperar, intercanviar, fer lliga per a què?</h2>
     <div class="divider-1"></div>
     <p class="text-center">
       Sovint a les nostres organitzacions ens costa trobar solucions als problemes i cobrir les necessitats que ens sorgeixen. Disposem d'escassos recursos i molt poc temps. Aquesta ferramenta ens facilita el <strong>treball en xarxa</strong> amb altres entitats per resoldre aquests problemes i incrementar el nostre impacte i la nostra projecció.
@@ -209,10 +210,10 @@
 
 <section class="d-none d-lg-block" style="background-color: transparent; background-image: linear-gradient(180deg, white 20%, #ffce1c 100%); padding-bottom: 100px;">
   <div class="container">
-    <div class="row" style="margin-top: 20px;">
+    <div class="row mt-3">
       <div id="carouselExamples" class="carousel carousel-triple slide" data-bs-ride="carousel">
         <div style="padding: 0 120px;">
-          <div class="carousel-inner" style="overflow: hidden; padding: 0 0 30px 0;">
+          <div class="carousel-inner overflow-hidden" style=" padding: 0 0 30px 0;">
             {{ carousel_examples() }}
           </div>
 
@@ -232,10 +233,10 @@
 
 <section class="d-block d-lg-none" style="background-color: transparent; background-image: linear-gradient(180deg, white 20%, #ffce1c 100%); padding-bottom: 100px;">
   <div class="container">
-    <div class="row" style="margin-top: 20px;">
+    <div class="row mt-3">
       <div id="carouselExamplesMobile" class="carousel carousel-triple slide" data-bs-ride="carousel">
-        <div style="">
-          <div class="carousel-inner" style="overflow: hidden;">
+        <div>
+          <div class="carousel-inner overflow-hidden">
             {{ carousel_examples(mobile=True) }}
           </div>
 

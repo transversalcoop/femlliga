@@ -22,6 +22,11 @@
     </head>
 
     <body>
+      {% if settings.STAGING_ENVIRONMENT_NAME %}
+      <div class="staging-bow">
+        {{ settings.STAGING_ENVIRONMENT_NAME }}
+      </div>
+      {% endif %}
       <div class="skippy visually-hidden-focusable overflow-hidden">
         <div class="container-xl">
           <a class="d-inline-flex p-2 m-1" href="#content">Salta al contingut principal</a>
@@ -83,6 +88,8 @@
       </wrapper>
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+      <script src="{{ static('js.js') }}"></script>
 
 {% block js %}{% endblock %}
     </body>

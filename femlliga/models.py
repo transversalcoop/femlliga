@@ -8,6 +8,7 @@ import networkx as nx
 from io import BytesIO
 from pathlib import Path
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
@@ -16,6 +17,15 @@ from django.contrib.auth.models import AbstractUser
 
 from .constants import *
 from .utils import date_intervals, clean_form_email
+
+def need_images_directory_path(instance, filename):
+    return str(Path("images/needs") / filename)
+
+def offer_images_directory_path(instance, filename):
+    return str(Path("images/offers") / filename)
+
+def organization_logos_directory_path(instance, filename):
+    return str(Path("images/logos") / filename)
 
 @deconstructible
 class LimitFileSize:
@@ -60,6 +70,7 @@ class Organization(models.Model):
         editable = False,
     )
     name = models.CharField(max_length = 200)
+    logo = models.ImageField(upload_to=organization_logos_directory_path, validators=[LimitFileSize(10)], null=True, blank=True)
     description = models.TextField(blank=True)
     date = models.DateTimeField(auto_now_add=True)
     scopes = models.ManyToManyField(OrganizationScope)
@@ -79,6 +90,26 @@ class Organization(models.Model):
 
     def __str__(self):
         return f"(Entitat) {self.name}"
+
+    def json(self, current_organization=None, include_children=False):
+        j = {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "org_type": self.org_type,
+            "href": reverse("view_organization", kwargs={"organization_id": self.id})
+        }
+        if current_organization:
+            j["distance"] = self.distance_text(current_organization)
+        if include_children:
+            j["scopes"] = [s.name for s in self.scopes.all()]
+            j["social_media"] = [{"id": sm.id, "media_type": sm.media_type, "value": sm.value} for sm in self.social_media.all()]
+            j["needs"] = [n.json(current_organization=current_organization, include_org=False) for n in
+                    self.needs.all()]
+            j["offers"] = [o.json(current_organization=current_organization, include_org=False) for o in
+                    self.offers.all()]
+
+        return j
 
     def type(self):
         for t in ORG_TYPES:
@@ -288,6 +319,14 @@ class BaseResource(models.Model):
         options = [(x.name, str(x)) for x in self.options.all()]
         return options
 
+    def json(self):
+        return {
+            "id": self.id,
+            "resource": self.resource,
+            "comments": self.comments,
+            "options": [o.name for o in self.options.all()],
+        }
+
 class Need(BaseResource):
     organization = models.ForeignKey(
         Organization,
@@ -299,6 +338,17 @@ class Need(BaseResource):
         constraints = [
             models.UniqueConstraint("organization", "resource", name="unique_organization_need"),
         ]
+
+    def json(self, current_organization=None, include_org=True):
+        j = super().json()
+        j["type"] = "need"
+        if include_org:
+            j["organization"] = self.organization.json()
+        if current_organization:
+            j["distance"] = current_organization.distance_text(self.organization)
+            j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "need", self.resource])
+        j["images"] = [i.json() for i in self.images.all()]
+        return j
 
 class Offer(BaseResource):
     organization = models.ForeignKey(
@@ -312,6 +362,18 @@ class Offer(BaseResource):
         constraints = [
             models.UniqueConstraint("organization", "resource", name="unique_organization_offer"),
         ]
+
+    def json(self, current_organization=None, include_org=True):
+        j = super().json()
+        j["type"] = "offer"
+        if include_org:
+            j["organization"] = self.organization.json()
+        if current_organization:
+            j["distance"] = current_organization.distance_text(self.organization)
+            j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "offer", self.resource])
+        j["images"] = [i.json() for i in self.images.all()]
+        j["charge"] = self.charge
+        return j
 
 class Agreement(models.Model):
     id = models.UUIDField(
@@ -356,17 +418,17 @@ class ContactDenyList(models.Model):
         self.email = clean_form_email(self.email)
         super(ContactDenyList, self).save(*args, **kwargs)
 
-def need_images_directory_path(instance, filename):
-    return str(Path("images/needs") / filename)
-
-def offer_images_directory_path(instance, filename):
-    return str(Path("images/offers") / filename)
-
 class NeedImage(models.Model):
     resource = models.ForeignKey(Need, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to=need_images_directory_path, validators=[LimitFileSize(10)])
 
+    def json(self):
+        return { "url": self.image.url }
+
 class OfferImage(models.Model):
     resource = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to=offer_images_directory_path, validators=[LimitFileSize(10)])
+
+    def json(self):
+        return { "url": self.image.url }
 

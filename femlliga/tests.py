@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 
+from bs4 import BeautifulSoup
 from allauth.account.models import EmailAddress
 
 from .models import *
@@ -78,6 +79,7 @@ class SmokeTests(TestCase):
             ("page", "és una xarxa on les organitzacions", ["faq"]),
             ("page", "Avís legal", ["legal"]),
             ("contact", "Si tens qualsevol pregunta o suggerència", []),
+            ("account_login", "Inicia sessió", []),
         ]
         for x in URLS:
             self.aux_get(x[0], x[1], args=x[2])
@@ -129,6 +131,7 @@ class SmokeTests(TestCase):
     def aux_get(self, url, contains=None, args=[], status_code=200):
         full_url = reverse(url, args=args)
         response = self.client.get(full_url)
+
         self.assertEqual(response.status_code, status_code, msg=url)
         if isinstance(contains, str):
             self.assertContains(response, contains, msg_prefix=url)
@@ -288,12 +291,13 @@ class IntegrationTests(TestCase):
         for s in [
             "Hem trobat coincidències entre les vostres necessitats",
             "Local",
-            "Posa't en contacte amb Second example organization",
+            "Second example organization",
         ]:
             self.assertContains(response, s)
 
-        for s in ["Servei", "Formació", "Equipaments", "Altres"]:
-            self.assertNotContains(response, s)
+        matches = BeautifulSoup(response.content.decode(), "html.parser").find("script", {"id": "matches-data"})
+        for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
+            self.assertNotIn(s, matches)
 
         # view organization page
         response = self.client.get(reverse("view_organization", args=[o.id]))

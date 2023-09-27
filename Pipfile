@@ -24,6 +24,7 @@ exif = "*"
 django-axes = "*"
 django-recaptcha = "*"
 typing-extensions = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 

@@ -1,7 +1,8 @@
 import os
 import exif
-import uuid
 import json
+import time
+import uuid
 import logging
 import datetime
 import unicodedata
@@ -10,9 +11,10 @@ from io import BytesIO
 from pathlib import Path
 from functools import cmp_to_key, reduce
 
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.forms import formset_factory, inlineformset_factory
 from django.contrib import messages
+from django.db.models import Prefetch
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import EmailMessage, mail_managers
 from django.utils import timezone
@@ -54,6 +56,16 @@ def require_own_agreement(func):
         return func(request, organization_id, agreement_id, *args, **kwargs)
     return decorated
 
+def record_stats(name):
+    def f(func):
+        def decorated(request, organization_id, *args, **kwargs):
+            start = time.time()
+            r = func(request, organization_id, *args, **kwargs)
+            logging.warning(f"Handler {name} took {time.time() - start}")
+            return r
+        return decorated
+    return f
+
 def index(request):
     return render(request, "femlliga/index.html", {"form": ContactForm()})
 
@@ -70,7 +82,7 @@ def page(request, name):
 
 @login_required
 def app(request):
-    orgs = organization_prefetches(request.user.organizations.all())
+    orgs = organization_prefetches(request.user.organizations.all(), include_missing_resources=True)
     if len(orgs) == 0:
         return redirect("add_organization")
 
@@ -78,7 +90,10 @@ def app(request):
     if not org.resources_set:
         return redirect("pre-wizard", organization_id=org.id)
 
-    offer_matches, need_matches = get_organization_matches(org)
+    own_needs = sort_resources([
+        n for n in org.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
+    ])
+    offer_matches, need_matches = get_organization_matches(org, own_needs)
     return render(request, "femlliga/app.html", {
         "org": org,
         "needs": [n for n in org.needs.all() if n.has_resource],
@@ -134,6 +149,7 @@ def add_organization(request):
 
     return render(request, "femlliga/add_organization.html", {
         "form": OrganizationForm(),
+        "org": None,
         "social_media_forms": social_media_forms()(),
     })
 
@@ -160,19 +176,28 @@ def edit_organization(request, organization_id):
             "lng": org.lng,
             "address": org.address,
         }),
+        "org": org,
         "social_media_forms": social_media_forms()(instance=org),
     })
+
+@login_required
+@require_own_organization
+def delete_organization_logo(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    if request.method == "POST":
+        org.logo.delete()
+    return JsonResponse({"ok": True})
 
 def social_media_forms():
     return inlineformset_factory(
         Organization,
         SocialMedia,
         fields=("media_type", "value"),
-        extra=len(SOCIAL_MEDIA_TYPES)-1,
+        extra=len(SOCIAL_MEDIA_TYPES),
     )
 
 def process_organization_post(request, org = None):
-    form = OrganizationForm(request.POST)
+    form = OrganizationForm(request.POST, request.FILES)
     socialmedia_formset = social_media_forms()(request.POST, instance=org)
     if form.is_valid() and socialmedia_formset.is_valid():
         if org is None:
@@ -188,6 +213,9 @@ def process_organization_post(request, org = None):
         org.lng = lng
         org.city = get_city_from_coordinates(lat, lng)
         org.creator = request.user
+        if form.cleaned_data["logo"]:
+            file = clean_file(form.cleaned_data["logo"])
+            org.logo = file
         org.save()
         socialmedia_formset.save()
         for scope in ORG_SCOPES:
@@ -202,6 +230,7 @@ def process_organization_post(request, org = None):
 
     return render(request, "femlliga/add_organization.html", {
         "form": form,
+        "org": org,
         "social_media_forms": socialmedia_formset,
         "edit": org != None,
     })
@@ -349,24 +378,53 @@ def clean_file(posted_file):
 
 @login_required
 @require_own_organization
+@record_stats("matches")
 def matches(request, organization_id):
-    orgs = organization_prefetches(request.user.organizations.all())
-    if len(orgs) == 0:
-        return redirect("add_organization")
-
-    organization = orgs[0]
-    offer_matches, need_matches = get_organization_matches(organization)
+    organization = request.user.organizations.first()
+    own_needs = sort_resources([
+        n for n in organization.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
+    ])
+    offer_matches, need_matches = get_organization_matches(organization, own_needs)
+    organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
     return render(request, "femlliga/matches.html", {
         "offer_matches": offer_matches,
         "need_matches": need_matches,
+        "matches_json": {
+            "offerMatches": {k: [m.json(current_organization=organization) for m in offer_matches[k]] for k in offer_matches},
+            "needMatches": {k: [m.json(current_organization=organization) for m in need_matches[k]] for k in need_matches},
+        },
+        "organization_matches_json": [
+            {
+                "organization": l[0].organization.json(current_organization=organization),
+                "matches": [m.json(current_organization=organization) for m in l],
+            }
+            for l in organization_matches
+        ],
+        "needs_json": [x.resource for x in own_needs],
         "org": organization,
-        "own_needs": sort_resources([n for n in organization.needs.all() if n.has_resource==True and n.resource!="OTHER"]),
+        "own_needs": own_needs,
     })
 
-def get_organization_matches(organization):
+def group_matches_by_organization(organization, offer_matches, need_matches):
+    orgs = {}
+    for k in offer_matches:
+        for m in offer_matches[k]:
+            try:
+                orgs[m.organization.id].append(m)
+            except:
+                orgs[m.organization.id] = [m]
+    for k in need_matches:
+        for m in need_matches[k]:
+            try:
+                orgs[m.organization.id].append(m)
+            except:
+                orgs[m.organization.id] = [m]
+
+    return [orgs[k] for k in sorted(orgs.keys(), key=lambda k: orgs[k][0].organization.distance(organization))]
+
+def get_organization_matches(organization, own_needs):
     offer_matches, need_matches = {}, {}
-    needs = [n for n in organization.needs.all() if n.has_resource==True]
-    for need in sort_resources(needs):
+    for need in own_needs:
         need_options = [n.name for n in need.options.all()]
         offers = get_model_matches(organization, need, need_options, Offer)
         if len(offers) > 0:
@@ -387,11 +445,21 @@ def get_model_matches(organization, need, need_options, model):
     exclude(organization=organization).\
     exclude(resource="OTHER").\
     prefetch_related("organization").\
-    prefetch_related("organization__social_media").\
     prefetch_related("images").\
     prefetch_related("options").\
     distinct()
     return sorted(results, key=lambda r: r.organization.distance(need.organization))
+
+@login_required
+@require_own_organization
+@record_stats("search")
+def search(request, organization_id):
+    organization = organization_prefetches(request.user.organizations.filter(id=organization_id)).first()
+    organizations = organization_prefetches(Organization.objects.exclude(id=organization_id))
+    organizations = sorted(organizations, key=lambda o: o.distance(organization))
+    return render(request, "femlliga/search.html", {
+        "organizations": [o.json(current_organization=organization, include_children=True) for o in organizations],
+    })
 
 @login_required
 def notifications(request):
@@ -513,11 +581,15 @@ def get_city_from_coordinates(lat, lng):
     except:
         return "Unknown city"
 
-def organization_prefetches(queryset):
+def organization_prefetches(queryset, include_missing_resources=False):
+    if include_missing_resources:
+        queryset = queryset.prefetch_related("needs").prefetch_related("offers")
+    else:
+        queryset = queryset.\
+            prefetch_related(Prefetch("needs", queryset=Need.objects.filter(has_resource=True))).\
+            prefetch_related(Prefetch("offers", queryset=Offer.objects.filter(has_resource=True)))
     return queryset.\
         prefetch_related("scopes").\
-        prefetch_related("needs").\
-        prefetch_related("offers").\
         prefetch_related("social_media").\
         prefetch_related("needs__options").\
         prefetch_related("offers__options").\
@@ -542,15 +614,15 @@ def report(request):
 
     def offers_needs_orgs(orgs):
         return [
-            count(orgs, lambda x: [r for r in x.offers.all() if r.has_resource==True]),
-            count(orgs, lambda x: [r for r in x.needs.all() if r.has_resource==True]),
+            count(orgs, lambda x: x.offers.all()),
+            count(orgs, lambda x: x.needs.all()),
             len(orgs),
         ]
 
     def offers_charge_orgs(orgs):
         return [
-            count(orgs, lambda x: [r for r in x.offers.all() if r.has_resource==True and r.charge]),
-            count(orgs, lambda x: [r for r in x.offers.all() if r.has_resource==True and not r.charge]),
+            count(orgs, lambda x: [r for r in x.offers.all() if r.charge]),
+            count(orgs, lambda x: [r for r in x.offers.all() if not r.charge]),
         ]
 
     def agreements_orgs(orgs, f):
@@ -587,10 +659,10 @@ def report(request):
         needs, offers = [], []
         for o in organizations:
             for x in o.needs.all():
-                if x.has_resource==True and x.resource==resource:
+                if x.resource==resource:
                     needs.append(x)
             for x in o.offers.all():
-                if x.has_resource==True and x.resource==resource:
+                if x.resource==resource:
                     offers.append(x)
         resource_names.append(resource_name(resource))
         resources_by_resource_type.append([len(offers), len(needs)])
@@ -604,10 +676,10 @@ def report(request):
             needs, offers = [], []
             for o in organizations:
                 for x in o.needs.all():
-                    if x.has_resource == True and x.resource == resource and option[0] in [op.name for op in x.options.all()]:
+                    if x.resource == resource and option[0] in [op.name for op in x.options.all()]:
                         needs.append(x)
                 for x in o.offers.all():
-                    if x.has_resource == True and x.resource == resource and option[0] in [op.name for op in x.options.all()]:
+                    if x.resource == resource and option[0] in [op.name for op in x.options.all()]:
                         offers.append(x)
             resource_options.append("{} - {}".format(resource_name(resource), option_name(option[0])))
             resources_by_resource_option.append([len(offers), len(needs)])
@@ -618,8 +690,8 @@ def report(request):
     agreements_success = list(map(lambda o: o.successful_date, Agreement.objects.filter(agreement_successful=True)))
 
     graph = get_relationships_graph()
-    other_needs = Need.objects.filter(has_resource=True, resource="OTHER").exclude(comments="").exclude(comments=None)
-    other_offers = Offer.objects.filter(has_resource=True, resource="OTHER").exclude(comments="").exclude(comments=None)
+    other_needs = Need.objects.filter(resource="OTHER").exclude(comments="").exclude(comments=None)
+    other_offers = Offer.objects.filter(resource="OTHER").exclude(comments="").exclude(comments=None)
     most_needed = count_word_freqs(" ".join(map(lambda x: x.comments, other_needs)))
     most_offered = count_word_freqs(" ".join(map(lambda x: x.comments, other_offers)))
     return render(request, "femlliga/report.html", {

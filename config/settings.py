@@ -34,6 +34,8 @@ ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(",")))
 allowed_csrf = os.getenv("DJANGO_ALLOWED_CSRF", "http://localhost")
 CSRF_TRUSTED_ORIGINS = list(map(str.strip, allowed_csrf.split(",")))
 
+STAGING_ENVIRONMENT_NAME = os.getenv("DJANGO_STAGING_ENVIRONMENT_NAME", "")
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -67,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'femlliga.middleware.middleware.SessionTimeoutMiddleware',
     'femlliga.middleware.middleware.TimezoneMiddleware',
@@ -251,6 +254,7 @@ CSP_STYLE_SRC = ("'self'",
 )
 CSP_SCRIPT_SRC = ("'self'",
     "'unsafe-inline'",
+    "'unsafe-eval'",
     "unpkg.com",
     "cdn.jsdelivr.net",
     "www.google.com",
@@ -311,6 +315,7 @@ IGNORABLE_404_URLS = [
     re.compile(r'^/apple-touch-icon.*\.png$'),
     re.compile(r'^/favicon\.ico$'),
     re.compile(r'^/robots\.txt$'),
+    re.compile(r'^/.*\.xml$'),
     re.compile(r'^/.*\.php$'),
     re.compile(r'^/.*\.php.bak$'),
 ]

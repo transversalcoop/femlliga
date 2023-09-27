@@ -27,6 +27,7 @@
         "DJANGO_SECURE_SSL_REDIRECT=false",
         "DJANGO_ADMINS=root:root@localhost",
         "DJANGO_MANAGERS=root:root@localhost",
+        "DJANGO_STAGING_ENVIRONMENT_NAME=dev",
       ]
     }
   }

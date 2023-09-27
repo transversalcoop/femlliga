@@ -32,6 +32,7 @@
     {% set organization = request.user.get_organization() %}
     {% if organization %}
     <li>{{ menu_url("Has lligat?", "matches", [organization.id]) }}</li>
+    <li>{{ menu_url("Cerca", "search", [organization.id]) }}</li>
     <li class="nav-item dropdown">
       {% set pending_sent, pending_received = organization.pending_agreements() %}
       {{ dropdown_menu("Peticions", "agreements_sent", [organization.id], pending=pending_sent or pending_received) }}
@@ -64,7 +65,14 @@
         <li><a class="dropdown-item" href="{{ url("notifications") }}">Notificacions</a></li>
         <li><a class="dropdown-item" href="{{ url("page", args=["faq"]) }}">Preguntes freqüents</a></li>
         <li><a class="dropdown-item" href="{{ url("contact") }}">Contacte</a></li>
-        <li><a class="dropdown-item" href="{{ url("account_logout") }}">Surt</a></li>
+        <li>
+          <form method="post" action="{{ url("account_logout") }}">
+            {{ csrf_input }}
+            <button class="dropdown-item invisible-button" type="submit">
+              Surt
+            </button>
+          </form>
+        </li>
       </ul>
     </li>
   {% endif %}
