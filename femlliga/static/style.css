@@ -464,3 +464,7 @@ nav .nav-link.active {
 .triple-column {
     columns: 3;
 }
+
+.landing-container {
+    margin: 100px auto;
+}

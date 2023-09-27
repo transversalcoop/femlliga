@@ -57,7 +57,77 @@
   </div>
 </div>
 
-<div class="container" style="margin: 100px auto;">
+<div class="container landing-container">
+  <h2 class="fw-black text-center">Vols saber si podries fer lliga?</h2>
+  <div class="divider-1"></div>
+  <p>
+    Selecciona el tipus de recurs que t'interessa i podràs veure amb quantes entitats el podries intercanviar.
+  </p>
+  <div id="vueapp">
+    <div class="multi-select">
+      <span
+        v-for="(resourceName, resource) in resourceNamesMap"
+        :key="resource"
+      >
+        <button
+          v-if="resource !== 'OTHER'"
+          class="btn multi-select-choice"
+          :class="{selected: resourceSelected === resource}"
+          type="button"
+          role="switch"
+          @click="selectResource(resource);"
+        >
+          ${ resourceName }
+        </button>
+      </span>
+    </div>
+    <div v-if="resourceSelected !== ''">
+      <p>${ resourceOptionsQuestionMap[resourceSelected] }</p>
+      <div class="multi-select">
+        <button
+          v-for="[option, optionName] of resourceOptionsMap[resourceSelected]"
+          :key="resource"
+          class="btn multi-select-choice"
+          :class="{selected: optionSelected === option}"
+          type="button"
+          role="switch"
+          @click="selectOption(option);"
+        >
+          ${ optionName }
+        </button>
+      </div>
+    </div>
+    <div v-if="resourceSelected !== '' && optionSelected !== ''" class="text-center mb-3">
+      <button class="btn btn-custom" @click="checkMatches" :disabled="loading">
+        Comprova amb quantes entitats fas lliga
+        <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">Carregant...</span>
+        </div>
+      </button>
+    </div>
+    <div v-if="matches">
+      <p v-if="matches.offers === 0 && matches.needs === 0">
+        Actualment cap entitat ofereix ni necessita el mateix que vosaltres, però si us inscriviu altres entitats us podran trobar en el futur.
+      </p>
+      <p v-else-if="matches.offers === 0 && matches.needs !== 0">
+        Hi ha <strong>${ matches.needs }</strong> entitats que necessiten el mateix que vosaltres. Si us inscriviu podreu contactar amb elles i buscar una solució en comú.
+      </p>
+      <p v-else-if="matches.offers !== 0 && matches.needs === 0">
+        Hi ha <strong>${ matches.offers }</strong> entitats que ofereixen el que necessiteu. Si us inscriviu podreu contactar amb elles i sol·licitar la seua ajuda.
+      </p>
+      <p v-else>
+        Hi ha <strong>${ matches.offers }</strong> entitats que ofereixen el que necessiteu i <strong>${ matches.needs }</strong> entitats que necessiten el mateix que vosaltres. Si us inscriviu podreu contactar amb elles i col·laborar.
+      </p>
+      <div class="text-center">
+        <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
+          Inscriu la teua entitat
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container landing-container">
   <h2 class="fw-black text-center">Què pots trobar dins de l'aplicació?</h2>
   <div class="divider-1"></div>
   <p class="text-center">
@@ -90,7 +160,7 @@
   </div>
 </div>
 
-<div class="container" style="margin: 100px auto;">
+<div class="container landing-container">
     <h2 class="fw-black text-center">Entre totes, associacions amb més impacte!</h2>
     <div class="divider-1"></div>
     <p class="text-center">
@@ -257,7 +327,15 @@
 {% endblock %}
 
 {% block js %}
+{{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
+{{ json_script(consts.RESOURCE_OPTIONS_MAP , "resource-options-data") }}
+{{ json_script(consts.RESOURCE_OPTIONS_QUESTION_MAP , "resource-options-question-data") }}
+{{ json_script(consts.RESOURCE_OPTIONS_DEF_MAP, "option-names-data") }}
 <script>
+var resourceNamesMap = JSON.parse(document.getElementById('resource-names-data').textContent);
+var resourceOptionsMap = JSON.parse(document.getElementById('resource-options-data').textContent);
+var resourceOptionsQuestionMap = JSON.parse(document.getElementById('resource-options-question-data').textContent);
+var optionNamesMap = JSON.parse(document.getElementById('option-names-data').textContent);
 var items = document.querySelectorAll('.carousel-triple .carousel-item');
 
 items.forEach((el) => {
@@ -271,6 +349,47 @@ items.forEach((el) => {
     el.appendChild(cloneChild.children[0]);
     next = next.nextElementSibling;
   }
-})
+});
+
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      resourceSelected: "",
+      optionSelected: "",
+      loading: false,
+      matches: undefined,
+      resourceNamesMap: resourceNamesMap,
+      resourceOptionsMap: resourceOptionsMap,
+      resourceOptionsQuestionMap: resourceOptionsQuestionMap,
+      optionNamesMap: optionNamesMap,
+    };
+  },
+  methods: {
+    selectResource(resource) {
+      this.matches = undefined;
+      this.optionSelected = "";
+      this.resourceSelected = resource;
+    },
+    selectOption(option) {
+      this.matches = undefined;
+      this.optionSelected = option;
+    },
+    checkMatches() {
+      this.loading = true;
+      post(
+        "{{ url('check_matches') }}",
+        "{{ csrf_token }}",
+        { resource: this.resourceSelected, option: this.optionSelected },
+      ).then(response => {
+        this.matches = response;
+        this.loading = false;
+      }).catch(err => {
+        this.matches = undefined;
+        this.loading = false;
+      });
+    },
+  },
+}).mount("#vueapp");
 </script>
 {% endblock %}

@@ -8,6 +8,7 @@ urlpatterns = [
     # no login required
     path('', views.index, name='index'),
     path('contact/', views.contact, name='contact'),
+    path('check-matches/', views.check_matches, name='check_matches'),
     path('page/<slug:name>/', views.page, name='page'),
 
     # login required

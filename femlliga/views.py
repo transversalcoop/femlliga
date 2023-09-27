@@ -80,6 +80,19 @@ def page(request, name):
             raise
     return render(request, "femlliga/page.html", { "page": page })
 
+def check_matches(request):
+    if request.method != "POST":
+        return JsonResponse({})
+
+    # required when request comes from Javascript's fetch(...) API
+    post = json.loads(request.body.decode("utf-8"))
+    resource = post.get("resource", "")
+    option = post.get("option", "")
+
+    needs = Need.objects.filter(resource=resource, has_resource=True, options__name__in=[option]).count()
+    offers = Offer.objects.filter(resource=resource, has_resource=True, options__name__in=[option]).count()
+    return JsonResponse({ "needs": needs, "offers": offers })
+
 @login_required
 def app(request):
     orgs = organization_prefetches(request.user.organizations.all(), include_missing_resources=True)

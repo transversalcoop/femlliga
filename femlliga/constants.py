@@ -221,3 +221,10 @@ RESOURCE_ADD_IMAGE_LABEL = {
     "OTHER": "Afegeix imatge del que oferiu",
 }
 
+RESOURCE_OPTIONS_QUESTION_MAP = {
+    "PLACE": "Quan necessitarieu fer servir el local?",
+    "SERVICE": "Quins serveis concrets necessiteu?",
+    "TRAINING": "De quins temes us interessa formar-vos?",
+    "EQUIPMENT": "Quina d'aquestes coses necessiteu?",
+}
+
