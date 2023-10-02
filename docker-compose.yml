@@ -28,6 +28,8 @@
         "DJANGO_ADMINS=root:root@localhost",
         "DJANGO_MANAGERS=root:root@localhost",
         "DJANGO_STAGING_ENVIRONMENT_NAME=dev",
+        "DJANGO_CONTACT_PHONE=643 015 716",
+        "DJANGO_CONTACT_EMAIL=contacte@femlliga.org",
       ]
     }
   }

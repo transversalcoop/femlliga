@@ -36,6 +36,9 @@ CSRF_TRUSTED_ORIGINS = list(map(str.strip, allowed_csrf.split(",")))
 
 STAGING_ENVIRONMENT_NAME = os.getenv("DJANGO_STAGING_ENVIRONMENT_NAME", "")
 
+CONTACT_PHONE = os.getenv("DJANGO_CONTACT_PHONE", "")
+CONTACT_EMAIL = os.getenv("DJANGO_CONTACT_EMAIL", "")
+
 # Application definition
 
 INSTALLED_APPS = [

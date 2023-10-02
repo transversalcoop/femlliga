@@ -491,6 +491,9 @@ def notifications(request):
 @login_required
 @require_own_organization
 def send_message(request, organization_id, organization_to, resource_type, resource):
+    if request.method != "POST":
+        return JsonResponse({})
+
     assert_url_param_in_list(resource_type, ["need", "offer"])
     assert_url_param_in_list(resource, RESOURCES_LIST)
     organization = get_object_or_404(Organization, pk = organization_id)
@@ -499,47 +502,34 @@ def send_message(request, organization_id, organization_to, resource_type, resou
     if resource_type == "need":
         model = Need
     r = get_object_or_404(model, organization=other, resource = resource)
-    if request.method == "POST":
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            a = Agreement(
-                solicitor=organization,
-                solicitee=other,
-                message=form.cleaned_data["message"],
-                resource=resource,
-                resource_type=resource_type,
-            )
-            a.save()
-            for option in form.cleaned_data["options"]:
-                ro = ResourceOption(name=option)
-                ro.save()
-                a.options.add(ro)
-            return render(request, "femlliga/message-sent.html", { "org": organization, "other": other })
-    else:
-        form = MessageForm()
-
-    return render(request, "femlliga/send-message.html", {
-        "org": organization,
-        "other": other,
-        "form": form,
-        "resource": r,
-        "resource_type": resource_type,
-    })
-
-def agreements_sent(request, organization_id):
-    return agreements(request, organization_id, lambda o: o.sent_agreements.all(), "sent")
-
-def agreements_received(request, organization_id):
-    return agreements(request, organization_id, lambda o: o.received_agreements.all(), "received")
+    post = json.loads(request.body.decode("utf-8"))
+    form = MessageForm(post)
+    if form.is_valid():
+        a = Agreement(
+            solicitor=organization,
+            solicitee=other,
+            message=form.cleaned_data["message"],
+            resource=resource,
+            resource_type=resource_type,
+        )
+        a.save()
+        for option in form.cleaned_data["options"]:
+            ro = ResourceOption(name=option)
+            ro.save()
+            a.options.add(ro)
+        return JsonResponse({"ok": True})
+    return JsonResponse({"ok": False})
 
 @login_required
 @require_own_organization
-def agreements(request, organization_id, data_func, view_type):
+def agreements(request, organization_id):
     organization = get_object_or_404(Organization, pk = organization_id)
     return render(request, f"femlliga/agreements.html", {
         "org": organization,
-        "agreements": sort_agreements(data_func(organization)),
-        "view_type": view_type,
+        "agreements": {
+            "sent": sort_agreements(organization.sent_agreements.all()),
+            "received": sort_agreements(organization.received_agreements.all()),
+        },
     })
 
 def agreement_successful(request, organization_id, agreement_id):

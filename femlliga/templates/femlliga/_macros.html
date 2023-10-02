@@ -36,7 +36,6 @@
 
 {% macro resource_details(resource, match_type) %}
   <div style="margin-bottom: 10px;">
-    <strong class="me-2">{{ resource }}</strong>
     {% if resource.charge %}
       <span class="badge bg-light" title="Es demana remuneració a canvi">€</span>
     {% endif %}
@@ -233,28 +232,11 @@ function clickOption(element) {
     </select>
 {% endmacro %}
 
-{% macro render_match_badges(org, resource, offer_matches, need_matches, link=False) %}
-  {% if resource.resource in offer_matches %}
-    {% set count = len(offer_matches[resource.resource]) %}
-    {% if link %}<a href="{{ url("matches", args=[org.id]) }}?resource={{ resource.resource }}" style="text-decoration: none;">{% endif %}
-    <span class="badge bg-success" title="Hi ha {{ count }} entitats que ofereixen el que necessiteu">
-        {{ count }}
-    </span>
-    {% if link %}</a>{% endif %}
-  {% endif %}
-  {% if resource.resource in need_matches %}
-    {% set count = len(need_matches[resource.resource]) %}
-    {% if link %}<a href="{{ url("matches", args=[org.id]) }}?resource={{ resource.resource }}">{% endif %}
-    <span class="badge bg-warning" title="Hi ha {{ count }} entitats que necessiten el mateix que vosaltres">{{ count }}</span>
-    {% if link %}</a>{% endif %}
-  {% endif %}
-{% endmacro %}
-
 {% macro social_media_url(base_url, value) %}{% if value.startswith("http") %}{{ value }}{% else %}{{ base_url }}{{ value }}{% endif %}{% endmacro %}
 
 {% macro render_social_media(org) %}
   {% if len(org.social_media.all()) > 0 %}
-    <p class="mt-1 mb-0"><strong>Xarxes socials</strong></p>
+    <p class="mt-1 mb-0"><strong>Xarxes socials i contacte</strong></p>
     <ul class="mb-0">
     {% for m in sort_social_media(org.social_media.all()) %}
       <li>
@@ -359,4 +341,47 @@ function clickOption(element) {
     </div>
   </div>
 </div>
+{% endmacro %}
+
+{% macro organization_info(org) %}
+  {% if org.description %}
+  <p>{{ org.description }}</p>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-md-6">
+      <p class="mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
+      <p class="mb-0"><strong>Àmbits de treball</strong></p>
+      <ul>
+        {% for scope in org.scopes.all() %}
+          <li>{{ scope }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="col-md-6">
+      {{ render_social_media(org) }}
+    </div>
+  </div>
+
+  <div id="citymap" class="map-height mt-2"></div>
+{% endmacro %}
+
+{% macro organization_map_js(org) %}
+var map = L.map('citymap').setView([{{ org.lat }}, {{ org.lng }}], 15);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
+{% endmacro %}
+
+{% macro info_tooltip(title, pos="right", class="") %}
+<span class="css-tooltip {{ class }}">
+  <i class="bi-info-circle"></i>
+  <span class="tooltiptext{% if pos=='left' %} tooltiptextleft{% elif pos=='mid' %} tooltiptextmid{% endif %}">
+    {{ title }}.
+  </span>
+</span>
 {% endmacro %}

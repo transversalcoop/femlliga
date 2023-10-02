@@ -27,8 +27,7 @@ urlpatterns = [
     path('organization/<uuid:organization_id>/send-message/<uuid:organization_to>/<str:resource_type>/<str:resource>/', views.send_message, name='send_message'),
     path('organization/<uuid:organization_id>/search/', views.search, name='search'),
     path('organization/<uuid:organization_id>/matches/', views.matches, name='matches'),
-    path('organization/<uuid:organization_id>/agreements/sent/', views.agreements_sent, name='agreements_sent'),
-    path('organization/<uuid:organization_id>/agreements/received/', views.agreements_received, name='agreements_received'),
+    path('organization/<uuid:organization_id>/agreements/', views.agreements, name='agreements'),
     path('organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/connect/', views.agreement_connect, name='agreement_connect'),
     path('organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/successful/', views.agreement_successful, name='agreement_successful'),
 
