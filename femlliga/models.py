@@ -406,6 +406,22 @@ class Agreement(models.Model):
         options = [str(x) for x in self.options.all()]
         return ", ".join(options)
 
+    def json(self, organization_id):
+        return {
+            "id": self.id,
+            "solicitor": self.solicitor.json(),
+            "solicitee": self.solicitee.json(),
+            "date": self.date,
+            "message": self.message,
+            "options": [o.name for o in self.options.all()],
+            "resource": self.resource,
+            "resource_type": self.resource_type,
+            "communication_accepted": self.communication_accepted,
+            "agreement_successful": self.agreement_successful,
+            "href_connect": reverse("agreement_connect", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
+            "href_successful": reverse("agreement_successful", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
+        }
+
 class Contact(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     email = models.EmailField()

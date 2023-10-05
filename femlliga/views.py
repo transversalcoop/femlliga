@@ -400,6 +400,10 @@ def matches(request, organization_id):
     offer_matches, need_matches = get_organization_matches(organization, own_needs)
     organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
     preselected_resource = request.GET.get("resource", "")
+    organization_names_map_json = {}
+    for l in organization_matches:
+        org = l[0].organization
+        organization_names_map_json[str(org.id)] = org.name
     return render(request, "femlliga/matches.html", {
         "offer_matches": offer_matches,
         "need_matches": need_matches,
@@ -414,6 +418,7 @@ def matches(request, organization_id):
             }
             for l in organization_matches
         ],
+        "organization_names_map_json": organization_names_map_json,
         "needs_json": [x.resource for x in own_needs],
         "org": organization,
         "own_needs": own_needs,
@@ -524,27 +529,66 @@ def send_message(request, organization_id, organization_to, resource_type, resou
 @require_own_organization
 def agreements(request, organization_id):
     organization = get_object_or_404(Organization, pk = organization_id)
+    sent = sort_agreements(organization.sent_agreements.all())
+    received = sort_agreements(organization.received_agreements.all())
+    agreements_by_organization = group_agreements_by_organizations(sent + received, organization)
+    organization_names_map_json = {}
+    for agreements in agreements_by_organization:
+        org = agreement_other_organization(agreements[0], organization_id)
+        organization_names_map_json[str(org.id)] = org.name
     return render(request, f"femlliga/agreements.html", {
         "org": organization,
-        "agreements": {
-            "sent": sort_agreements(organization.sent_agreements.all()),
-            "received": sort_agreements(organization.received_agreements.all()),
-        },
+        "agreements": { "sent": sent, "received": received },
+        "agreements_json": { "sent": group_by_resource_json(sent, organization_id), "received": group_by_resource_json(received, organization_id) },
+        "organizations_json": [
+            {
+                "organization": agreement_other_organization(l[0], organization_id).json(current_organization=organization),
+                "agreements": [a.json(organization_id) for a in l]
+            }
+            for l in agreements_by_organization
+        ],
+        "organization_names_map_json": organization_names_map_json,
+        "requested_resources_json": { "sent": requested_resources(sent), "received": requested_resources(received) },
     })
+
+def requested_resources(agreements):
+    return sorted(set([a.resource for a in agreements]))
+
+def group_by_resource_json(l, organization_id):
+    m = {}
+    for x in l:
+        try:
+            m[x.resource].append(x.json(organization_id))
+        except:
+            m[x.resource] = [x.json(organization_id)]
+    return m
+
+def group_agreements_by_organizations(agreements, organization):
+    orgs = {}
+    for a in agreements:
+        try:
+            orgs[agreement_other_organization(a, organization.id).id].append(a)
+        except:
+            orgs[agreement_other_organization(a, organization.id).id] = [a]
+
+    return [orgs[k] for k in sorted(orgs.keys(), key=lambda k: agreement_other_organization(orgs[k][0], organization.id).distance(organization))]
+
+def agreement_other_organization(agreement, organization_id):
+    if agreement.solicitor.id == organization_id:
+        return agreement.solicitee
+    return agreement.solicitor
 
 def agreement_successful(request, organization_id, agreement_id):
     def f(a, post):
         a.agreement_successful = post["successful"] == "yes"
         a.successful_date = timezone.now()
-        if a.agreement_successful:
-            messages.success(request, "CELEBRATION", extra_tags="SHOW_USER")
-            messages.success(request, "Has indicat que s'ha arribat a un acord", extra_tags="SHOW_USER")
-        else:
-            messages.success(request, "Has indicat que no s'ha arribat a un acord", extra_tags="SHOW_USER")
     return agreement_set(request, organization_id, agreement_id, f)
 
 def agreement_connect(request, organization_id, agreement_id):
     def f(a, post):
+        organization = Organization.objects.get(pk = organization_id)
+        if organization != a.solicitee:
+            return # user owns organization; only solicitee organization should be able to accept
         a.communication_accepted = post["connect"] == "yes"
         a.communication_date = timezone.now()
         if a.communication_accepted:
@@ -557,23 +601,19 @@ def agreement_connect(request, organization_id, agreement_id):
             msg = EmailMessage(subject=subject, body=body, from_email=FROM_EMAIL, to=to_list)
             msg.content_subtype = "html"
             msg.send()
-
-            messages.success(request, "CELEBRATION", extra_tags="SHOW_USER")
-            messages.success(request, "S'ha iniciat la comunicació", extra_tags="SHOW_USER")
-        else:
-            messages.success(request, "Has indicat que no s'inicie la comunicació", extra_tags="SHOW_USER")
     return agreement_set(request, organization_id, agreement_id, f)
 
 @login_required
 @require_own_agreement
 def agreement_set(request, organization_id, agreement_id, f):
-    if request.method == "POST":
-        a = get_object_or_404(Agreement, pk = agreement_id)
-        f(a, request.POST)
-        a.save()
-        if request.POST["return_url"] == "sent":
-            return redirect("agreements_sent", organization_id=organization_id)
-        return redirect("agreements_received", organization_id=organization_id)
+    if request.method != "POST":
+        return JsonResponse({})
+
+    a = get_object_or_404(Agreement, pk = agreement_id)
+    post = json.loads(request.body.decode("utf-8"))
+    f(a, post)
+    a.save()
+    return JsonResponse({"ok": True})
 
 def get_city_from_coordinates(lat, lng):
     """Nominatim also accepts a search option that gives coordinates given a place's name"""

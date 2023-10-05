@@ -528,6 +528,15 @@ nav .nav-link.active {
     width: 12em;
 }
 
+.matches-count.agreements-count {
+    width: 90%;
+}
+
+.matches-count.agreements-count span {
+    width: 18em;
+    margin-left: -9em;
+}
+
 .css-tooltip {
   position: relative;
   display: inline-block;
@@ -575,4 +584,10 @@ nav .nav-link.active {
 .css-tooltip:hover .tooltiptext {
   opacity: 1;
   visibility: visible;
+}
+
+.quoted-message {
+    margin-left: 20px;
+    padding-left: 10px;
+    border-left: 1px solid gray;
 }
