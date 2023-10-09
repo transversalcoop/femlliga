@@ -32,7 +32,7 @@ from config.settings import MEDIA_ROOT
 from .models import *
 from .constants import *
 from .forms import *
-from .utils import clean_form_email
+from .utils import clean_form_email, get_next_resource, get_resource_index, get_json_body
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
@@ -84,8 +84,7 @@ def check_matches(request):
     if request.method != "POST":
         return JsonResponse({})
 
-    # required when request comes from Javascript's fetch(...) API
-    post = json.loads(request.body.decode("utf-8"))
+    post = get_json_body(request)
     resource = post.get("resource", "")
     option = post.get("option", "")
 
@@ -118,11 +117,17 @@ def app(request):
 @login_required
 @require_own_organization
 def pre_wizard(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    if not org.needs_not_set():
+        return redirect("mid-wizard", organization_id=org.id)
     return aux_wizard(request, organization_id, "needs", "pre-wizard")
 
 @login_required
 @require_own_organization
 def mid_wizard(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    if not org.offers_not_set():
+        return redirect("post-wizard", organization_id=org.id)
     return aux_wizard(request, organization_id, "offers", "mid-wizard")
 
 @login_required
@@ -148,7 +153,8 @@ def aux_wizard(request, organization_id, resource_type, page):
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
         if request.POST["start"] == "yes":
-            return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type)
+            first_not_set = org.first_resource_not_set(resource_type)
+            return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type, resource=first_not_set)
         else:
             org.resources_set = True
             org.save()
@@ -250,11 +256,11 @@ def process_organization_post(request, org = None):
 
 @login_required
 @require_own_organization
-def force_resources_wizard(request, organization_id, resource_type, resource):
+def edit_resources_wizard(request, organization_id, resource_type, resource):
     assert_url_param_in_list(resource_type, ["needs", "offers"])
     assert_url_param_in_list(resource, RESOURCES_LIST)
     if request.method == "POST":
-        return resources_wizard(request, organization_id, resource_type, forced = True)
+        return resources_wizard(request, organization_id, resource_type, resource, editing = True)
 
     org = get_object_or_404(Organization, pk=organization_id)
     model, imagemodel = get_resources_models(resource_type)
@@ -275,14 +281,14 @@ def force_resources_wizard(request, organization_id, resource_type, resource):
         r = None
         form = ResourceForm()
 
-    return render_wizard(request, org, resource, form, resource_type, forced = True, db_resource = r)
+    return render_wizard(request, org, resource, form, resource_type, editing = True, db_resource = r)
 
 def get_resources_models(resource_type):
     if resource_type == "offers":
         return Offer, OfferImage
     return Need, NeedImage
 
-def render_wizard(request, org, resource, form, resource_type, forced = False, db_resource = None):
+def render_wizard(request, org, resource, form, resource_type, editing = False, db_resource = None):
     model, imagemodel = get_resources_models(resource_type)
     return render(request, "femlliga/resources-wizard.html", {
         "org": org,
@@ -292,20 +298,19 @@ def render_wizard(request, org, resource, form, resource_type, forced = False, d
         "resource_type": resource_type,
         "imageforms": inlineformset_factory(model, imagemodel, fields=("image",), extra=6)(),
         "total": len(RESOURCES) * 2,
-        "count": len(org.needs.all()) + len(org.offers.all()) + 1,
-        "forced": forced,
+        "count": get_resource_index(resource_type, resource),
+        "editing": editing,
     })
 
 @login_required
 @require_own_organization
-def resources_wizard(request, organization_id, resource_type, forced = False):
+def resources_wizard(request, organization_id, resource_type, resource, editing = False):
     assert_url_param_in_list(resource_type, ["needs", "offers"])
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
         model, imagemodel = get_resources_models(resource_type)
         form = ResourceForm(request.POST)
         if form.is_valid():
-            resource = form.cleaned_data["resource"]
             try:
                 m = model.objects.get(resource = resource, organization = org)
             except Exception as ex:
@@ -343,25 +348,25 @@ def resources_wizard(request, organization_id, resource_type, forced = False):
                         image.delete()
                     except Exception as ex:
                         raise
-            return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type)
-        else:
-            return render_wizard(request, org, form.cleaned_data["resource"], form, resource_type, forced = forced)
 
+            return redirect_resource_set(org, resource_type, resource)
+        else:
+            return render_wizard(request, org, resource, form, resource_type, editing = editing)
+
+    return render_wizard(request, org, resource, ResourceForm(), resource_type)
+
+def redirect_resource_set(org, resource_type, resource):
     if org.resources_set:
         return redirect("app")
 
-    resources = list(map(lambda n: n.resource, org.needs.all()))
-    if resource_type == "offers":
-        resources = list(map(lambda n: n.resource, org.offers.all()))
+    next_resource = get_next_resource(resource)
+    if next_resource is None:
+        if resource_type == "needs":
+            return redirect("mid-wizard", organization_id=org.id)
+        else:
+            return redirect("post-wizard", organization_id=org.id)
 
-    for resource in RESOURCES:
-        if resource[0] not in resources:
-            return render_wizard(request, org, resource[0], ResourceForm(), resource_type)
-
-    if resource_type == "needs" and not org.resources_set:
-        return redirect("mid-wizard", organization_id=org.id)
-
-    return redirect("post-wizard", organization_id=org.id)
+    return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type, resource=next_resource)
 
 def clean_files(FILES):
     for key in FILES:
@@ -507,7 +512,7 @@ def send_message(request, organization_id, organization_to, resource_type, resou
     if resource_type == "need":
         model = Need
     r = get_object_or_404(model, organization=other, resource = resource)
-    post = json.loads(request.body.decode("utf-8"))
+    post = get_json_body(request)
     form = MessageForm(post)
     if form.is_valid():
         a = Agreement(
@@ -610,7 +615,7 @@ def agreement_set(request, organization_id, agreement_id, f):
         return JsonResponse({})
 
     a = get_object_or_404(Agreement, pk = agreement_id)
-    post = json.loads(request.body.decode("utf-8"))
+    post = get_json_body(request)
     f(a, post)
     a.save()
     return JsonResponse({"ok": True})

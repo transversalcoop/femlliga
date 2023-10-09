@@ -70,9 +70,9 @@
 
 <div class="container mb-4">
   {% if org.needs_not_set() or org.offers_not_set() %}
-  <div class="alert alert-primary" role="alert" style="margin-top: 20px;">
+  <div class="alert alert-primary mt-3" role="alert">
     Pareix que encara no heu completat el procés d'alta. Voleu fer-ho ara?
-    <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" style="float: right;">
+    <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" class="float-end">
         {{ csrf_input }}
         <button class="btn btn-sm btn-custom">Completa l'alta</button>
     </form>

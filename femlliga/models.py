@@ -117,6 +117,11 @@ class Organization(models.Model):
                 return t[1]
         return ""
 
+    def first_resource_not_set(self, resource_type):
+        if resource_type == "needs":
+            return self.needs_not_set()[0].code
+        return self.offers_not_set()[0].code
+
     def needs_not_set(self):
         return self.aux_not_set(self.needs.all())
 

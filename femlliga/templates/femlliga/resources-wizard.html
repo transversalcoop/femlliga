@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-{% if not forced %}
+{% if not editing %}
 <div class="progress" style="margin-top: 20px;">
   {% set percent = count / total * 100 %}
   <div class="progress-bar bg-success" role="progressbar" style="width: {{ percent }}%" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">{{ count }} / {{ total }}</div>
@@ -79,7 +79,7 @@
           {{ resource.answer_yes(resource_type) }}
         </button>
       </div>
-      {% if forced %}
+      {% if editing %}
       <div class="col-12 d-grid" style="margin-top: 15px;">
         <a href="{{ url("app") }}" class="btn btn-lg btn-light text-dark">Torna sense fer canvis</a>
       </div>
