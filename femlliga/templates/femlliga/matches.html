@@ -175,7 +175,7 @@
         ></textarea>
       </div>
     </div>
-    <button @click="sendMessage(result.message_href)" class="btn btn-custom mt-2" :disabled="!messageFormOk(messagesOpen[result.message_href])">
+    <button @click="sendMessage(result.message_href)" class="btn btn-custom mt-2" :disabled="!messageFormOk(messagesOpen[result.message_href])" v-if="!messagesOpen[result.message_href] || (!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error)">
       <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
         Enviant
         <div class="spinner-border spinner-border-sm" role="status">

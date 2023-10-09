@@ -30,6 +30,8 @@
         "DJANGO_STAGING_ENVIRONMENT_NAME=dev",
         "DJANGO_CONTACT_PHONE=643 015 716",
         "DJANGO_CONTACT_EMAIL=contacte@femlliga.org",
+        "DJANGO_CONTACT_SOCIAL=femlliga",
+        "DJANGO_CONTACT_LINKS=https://links.transversalcoop.org/@femlliga/",
       ]
     }
   }
