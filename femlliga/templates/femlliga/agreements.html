@@ -7,7 +7,7 @@
 <main id="content" class="container-fluid">
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
-      <h1>Peticions enviades i rebudes</h1>
+      <h1>Peticions</h1>
       <div class="btn-group w-100 mb-2" role="group" aria-label="Basic example">
         <button
           type="button"
@@ -37,7 +37,7 @@
             <button
               @click="selectOrganization(x.organization)"
               class="nav-link w-100 text-start"
-              :class="{active: organizationSelected === x.organization.id}"
+              :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
               type="button"
               role="tab"
               aria-selected="false"
@@ -62,28 +62,26 @@
           <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
           <div v-if="requestTypeSelected === 'sent'">
             <div class="matches-count agreements-count"><span>${ agreements.sent[resourceSelected].length } peticions enviades</span></div>
-            {{ show_agreements_vue("agreements.sent[resourceSelected]", "sent") }}
+            {{ show_agreements_vue("agreements.sent[resourceSelected]") }}
           </div>
           <div v-else>
             <div class="matches-count agreements-count"><span>${ agreements.received[resourceSelected].length } peticions rebudes</span></div>
-            {{ show_agreements_vue("agreements.received[resourceSelected]", "received") }}
+            {{ show_agreements_vue("agreements.received[resourceSelected]") }}
           </div>
         </div>
       </div>
       <div v-else-if="organizationSelected" class="row mt-3">
         <div class="col-12">
-          <h2 class="match-resource-title">${ organizationsNamesMap[organizationSelected] }</h2>
+          <h2 class="match-resource-title">${ organizationSelected.name }</h2>
           <div class="matches-count agreements-count"><span>${ organizationRequests.length } peticions</span></div>
-          {{ show_agreements_vue("organizationRequests.filter(a => agreementSent(a))", "sent") }}
-          {{ show_agreements_vue("organizationRequests.filter(a => !agreementSent(a))", "received") }}
+          {{ show_agreements_vue("organizationRequests") }}
         </div>
       </div>
       <div v-else class="row mt-3">
         <div class="col-12">
           <h2 class="match-resource-title">Totes les peticions</h2>
-          <div class="matches-count agreements-count"><span>${ concatenateAgreements(agreements.sent).length + concatenateAgreements(agreements.received).length } peticions enviades o rebudes</span></div>
-          {{ show_agreements_vue("concatenateAgreements(agreements.sent)", "sent") }}
-          {{ show_agreements_vue("concatenateAgreements(agreements.received)", "received") }}
+          <div class="matches-count agreements-count"><span>${ concatenatedAgreements.length } peticions enviades o rebudes</span></div>
+          {{ show_agreements_vue("concatenatedAgreements") }}
         </div>
       </div>
     </div>
@@ -118,23 +116,20 @@
 </li>
 {% endmacro %}
 
-{% macro show_agreements_vue(agreements, request_type) %}
+{% macro show_agreements_vue(agreements) %}
 <div v-for="result in {{ agreements }}" :key="result" class="row match-box">
-  {% if request_type == "sent" %}
-  <h3>
+  <h3 v-if="agreementSent(result)">
     <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
     <span v-if="result.resource_type === 'need'" class="strong-underline me-2">a buscar conjuntament amb</span>
     <span v-else class="strong-underline me-2">sol·licitat a</span>
     <a :href="result.solicitee.href" v-html="highlightSearch(result.solicitee.name, search)"></a>
   </h3>
-  {% else %}
-  <h3>
+  <h3 v-else>
     <a :href="result.solicitor.href" v-html="highlightSearch(result.solicitor.name, search)"></a>
     <span v-if="result.resource_type === 'need'" class="strong-underline ms-2">ens demana buscar conjuntament</span>
     <span v-else class="strong-underline ms-2">ens sol·licita</span>
     <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
   </h3>
-  {% endif %}
   <div class="mb-2">
     <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
     <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
@@ -144,22 +139,22 @@
     <div v-if="result.communication_accepted === null">
       <i class="bi-hourglass-split text-muted fs-4"></i>
       Encara no s'ha acceptat ni declinat la comunicació.
-      {% if request_type == "received" %}
-      <div v-if="!agreementsLoading[result.id]">
-        <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2">
-          Inicia la comunicació
-        </button>
-        <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2">
-          Declina la comunicació
-        </button>
-        {{ info_tooltip("Per favor, indiqueu si accepteu la comunicació o no. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la comunicació no us obliga a arribar a cap acord.") }}
-      </div>
-      <div v-else>
-        <div class="spinner-border spinner-border-sm" role="status">
-          <span class="visually-hidden">Actualitzant...</span>
+      <div v-if="!agreementSent(result)">
+        <div v-if="!agreementsLoading[result.id]">
+          <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2">
+            Inicia la comunicació
+          </button>
+          <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2">
+            Declina la comunicació
+          </button>
+          {{ info_tooltip("Per favor, indiqueu si accepteu la comunicació o no. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la comunicació no us obliga a arribar a cap acord.") }}
+        </div>
+        <div v-else>
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Actualitzant...</span>
+          </div>
         </div>
       </div>
-      {% endif %}
     </div>
     <div v-else-if="result.communication_accepted === false">
       <i class="bi-x-lg text-danger fs-4"></i>
@@ -200,15 +195,15 @@
 
 {% block js %}
 {{ json_script(agreements_json, "agreements-data") }}
+{{ json_script(concatenated_agreements_json, "concatenated-agreements-data") }}
 {{ json_script(organizations_json, "organizations-data") }}
-{{ json_script(organization_names_map_json, "organizations-names-data") }}
 {{ json_script(requested_resources_json, "requested-resources-data") }}
 {{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
 {{ json_script(consts.RESOURCE_OPTIONS_DEF_MAP, "option-names-data") }}
 <script>
 var agreements = JSON.parse(document.getElementById('agreements-data').textContent);
+var concatenatedAgreements = JSON.parse(document.getElementById('concatenated-agreements-data').textContent);
 var organizations = JSON.parse(document.getElementById('organizations-data').textContent);
-var organizationsNamesMap = JSON.parse(document.getElementById('organizations-names-data').textContent);
 var requestedResources = JSON.parse(document.getElementById('requested-resources-data').textContent);
 var resourceNamesMap = JSON.parse(document.getElementById('resource-names-data').textContent);
 var optionNamesMap = JSON.parse(document.getElementById('option-names-data').textContent);
@@ -240,8 +235,8 @@ Vue.createApp({
     return {
       organizationID: "{{ org.id }}",
       allAgreements: agreements,
+      allConcatenatedAgreements: concatenatedAgreements,
       allOrganizations: organizations,
-      organizationsNamesMap: organizationsNamesMap,
       resourceNamesMap: resourceNamesMap,
       optionNamesMap: optionNamesMap,
       requestedResources: requestedResources,
@@ -249,7 +244,7 @@ Vue.createApp({
       search: "",
       resourceSelected: "",
       requestTypeSelected: "",
-      organizationSelected: "",
+      organizationSelected: null,
       agreementsLoading: {},
     };
   },
@@ -260,14 +255,14 @@ Vue.createApp({
       this.selectResource("", "");
     },
     selectResource(resource, requestType) {
-      this.organizationSelected = "";
+      this.organizationSelected = null;
       this.resourceSelected = resource;
       this.requestTypeSelected = requestType;
     },
     selectOrganization(org) {
       this.resourceSelected = "";
       this.requestTypeSelected = "";
-      this.organizationSelected = org.id;
+      this.organizationSelected = org;
     },
     filterAgreements(agreements) {
       var m = {};
@@ -275,13 +270,6 @@ Vue.createApp({
         m[k] = agreements[k].filter(agreementContains(this.search));
       }
       return m;
-    },
-    concatenateAgreements(agreements) {
-      var l = [];
-      Object.keys(agreements).forEach((k) => {
-        l = [...l, ...agreements[k]];
-      });
-      return l;
     },
     extractSelectedOptions(optionsMap) {
       return Object.keys(optionsMap).map(k => {
@@ -324,6 +312,9 @@ Vue.createApp({
         received: this.filterAgreements(this.allAgreements.received),
       };
     },
+    concatenatedAgreements() {
+      return this.allConcatenatedAgreements.filter(agreementContains(this.search));
+    },
     organizationsWithRequests() {
       return this.allOrganizations.map(o => {
         return {
@@ -333,7 +324,7 @@ Vue.createApp({
       }).filter(o => o.agreements.length > 0);
     },
     organizationRequests() {
-      var org = this.allOrganizations.find(o => o.organization.id === this.organizationSelected);
+      var org = this.allOrganizations.find(o => o.organization.id === this.organizationSelected.id);
       return org ? org.agreements.filter(agreementContains(this.search)) : [];
     },
   },

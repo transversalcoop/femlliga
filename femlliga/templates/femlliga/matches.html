@@ -1,13 +1,19 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import render_select_raw, resource_details, organization_link, images_modal_vue, info_tooltip %}
+{% from 'femlliga/_macros.html' import render_select_raw, resource_details, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, show_matches_vue %}
 
 {% block content %}
-{% if len(offer_matches) > 0 or len(need_matches) > 0 %}
+{% if len(matches_json.offerMatches) > 0 or len(matches_json.needMatches) > 0 %}
 <main id="content" class="container-fluid">
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
-      <h1>Has lligat!</h1>
+      <h1>
+        {% if page_type == "matches" %}
+        Has lligat!
+        {% else %}
+        Cerca
+        {% endif %}
+      </h1>
       <div class="btn-group w-100 mb-2" role="group" aria-label="Basic example">
         <button
           type="button"
@@ -27,17 +33,24 @@
       <input v-model="search" type="text" class="form-control" placeholder="Cerca recursos o organitzacions">
       <ul class="nav nav-pills flex-column mb-auto mt-2">
         <template v-if="showBy === 'resources'">
+          {% if page_type == "matches" %}
           <h2 class="resource-matches-title">Ofereixen</h2>
           {{ match_filter_row_vue("offer", "Entitats que ofereixen el que necessiteu") }}
           <h2 class="resource-matches-title">També necessiten</h2>
           {{ match_filter_row_vue("need", "Entitats que necessiten el mateix que vosaltres") }}
+          {% else %}
+          <h2 class="resource-matches-title">Ofereixen</h2>
+          {{ match_filter_row_vue("offer", "Entitats que ofereixen recursos") }}
+          <h2 class="resource-matches-title">Necessiten</h2>
+          {{ match_filter_row_vue("need", "Entitats que necessiten recursos") }}
+          {% endif %}
         </template>
         <template v-else>
           <li class="nav-item" v-for="x in organizationsWithMatches" :key="x.organization.id">
             <button
               @click="selectOrganization(x.organization)"
               class="nav-link w-100 text-start"
-              :class="{active: organizationSelected === x.organization.id}"
+              :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
               type="button"
               role="tab"
               aria-selected="false"
@@ -73,7 +86,7 @@
       </div>
       <div v-else-if="organizationSelected" class="row mt-3">
         <div class="col-12">
-          <h2 class="match-resource-title">${ organizationsNamesMap[organizationSelected] }</h2>
+          <h2 class="match-resource-title">${ organizationSelected.name }</h2>
           <div class="matches-count agreements-count"><span>${ organizationMatches.length } resultats</span></div>
           {{ show_matches_vue("organizationMatches.filter(m => m.type === 'offer')", "ofereix") }}
           {{ show_matches_vue("organizationMatches.filter(m => m.type === 'need')", "també necessita") }}
@@ -100,112 +113,15 @@
 {% endif %}
 {% endblock %}
 
-{% macro match_filter_row_vue(match_type, title) %}
-<template v-for="resource in matched_needs" :key="resource">
-  <li v-if="resource in matches.{{ match_type }}Matches" class="nav-item">
-    <button
-      @click="selectResource(resource, '{{ match_type }}')"
-      class="nav-link w-100 text-start"
-      :class="{active: resourceSelected === resource && matchTypeSelected === '{{ match_type }}'}"
-      type="button"
-      role="tab"
-      aria-selected="false"
-      aria-current="page">
-      <span
-        v-if="resource in matches.{{ match_type }}Matches"
-        class="float-end badge ms-2 bg-light"
-        title="{{ title }}">
-        ${ matches.{{ match_type }}Matches[resource].length }
-      </span>
-      ${ resourceNamesMap[resource] }
-    </button>
-  </li>
-</template>
-{% endmacro %}
-
-
-{% macro show_matches_vue(matches, match_name) %}
-<div v-for="result in {{ matches }}" :key="result" class="row match-box">
-  <h3>
-    <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
-    <span class="strong-underline ms-2">{{ match_name }}</span>
-    <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
-  </h3>
-  <div>
-    <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } de vosaltres</span>
-  </div>
-  <div class="mb-2">
-    <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
-    <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
-  </div>
-  <p v-if="result.comments" class="mb-0"><strong>Observacions:</strong><span class="ms-2" v-html="highlightSearch(result.comments, search)"></span></p>
-
-  <div v-if="result.images.length > 0" class="image-thumbnails">
-    <div v-for="image in result.images" :key="image.url" class="thumbnail">
-      <a data-bs-toggle="modal" href="#images-modal" role="button" @click="setCarouselImages(result.images)">
-        <img :src="image.url">
-      </a>
-    </div>
-  </div>
-  <div>
-    <div v-if="messagesOpen[result.message_href]">
-      <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
-        S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
-      </div>
-      <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
-        Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb {{ settings.CONTACT_EMAIL }}.
-      </div>
-      <div v-else>
-        <p class="mt-2 mb-0">Quines opcions vos interessen concretament?</p>
-        <div class="multi-select p-0">
-          <button
-            v-for="option in result.options"
-            :key="option"
-            @click="toggleMessageOption(result.message_href, option)"
-            class="btn multi-select-choice"
-            :class="{selected: messagesOpen[result.message_href].options[option]}"
-          >
-            ${ optionNamesMap[option] }
-          </button>
-        </div>
-        <textarea
-          v-model="messagesOpen[result.message_href].message"
-          placeholder="Escriu ací el missatge que els arribarà si necessites fer qualsevol aclariment"
-          class="form-control"
-        ></textarea>
-      </div>
-    </div>
-    <button @click="sendMessage(result.message_href)" class="btn btn-custom mt-2" :disabled="!messageFormOk(messagesOpen[result.message_href])" v-if="!messagesOpen[result.message_href] || (!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error)">
-      <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
-        Enviant
-        <div class="spinner-border spinner-border-sm" role="status">
-          <span class="visually-hidden">Enviant...</span>
-        </div>
-      </span>
-      <span v-else>
-        <i class="bi-send fs-6 me-2"></i>
-        <span v-if="messagesOpen[result.message_href]">
-          Envia el missatge
-          {{ info_tooltip("Se li enviarà un missatge a ${ result.organization.name }, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic") }}
-        </span>
-        <span v-else>Contacta</span>
-      </span>
-    </button>
-  </div>
-</div>
-{% endmacro %}
-
 {% block js %}
 {{ json_script(matches_json, "matches-data") }}
 {{ json_script(organization_matches_json, "organization-matches-data") }}
-{{ json_script(organization_names_map_json, "organizations-names-data") }}
 {{ json_script(needs_json, "needs-data") }}
 {{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
 {{ json_script(consts.RESOURCE_OPTIONS_DEF_MAP, "option-names-data") }}
 <script>
 var matches = JSON.parse(document.getElementById('matches-data').textContent);
 var organizationMatches = JSON.parse(document.getElementById('organization-matches-data').textContent);
-var organizationsNamesMap = JSON.parse(document.getElementById('organizations-names-data').textContent);
 var needs = JSON.parse(document.getElementById('needs-data').textContent);
 var resourceNamesMap = JSON.parse(document.getElementById('resource-names-data').textContent);
 var optionNamesMap = JSON.parse(document.getElementById('option-names-data').textContent);
@@ -237,13 +153,12 @@ Vue.createApp({
       needs: needs,
       allMatches: matches,
       allOrganizationMatches: organizationMatches,
-      organizationsNamesMap: organizationsNamesMap,
       resourceNamesMap: resourceNamesMap,
       optionNamesMap: optionNamesMap,
       search: "",
-      resourceSelected: "{{ preselected_resource }}",
+      resourceSelected: "",
       matchTypeSelected: "",
-      organizationSelected: "",
+      organizationSelected: null,
       carouselImages: [],
       showBy: "resources",
       messagesOpen: {},
@@ -256,14 +171,14 @@ Vue.createApp({
       this.selectResource("", "");
     },
     selectResource(resource, matchType) {
-      this.organizationSelected = "";
+      this.organizationSelected = null;
       this.resourceSelected = resource;
       this.matchTypeSelected = matchType;
     },
     selectOrganization(org) {
       this.resourceSelected = "";
       this.matchTypeSelected = "";
-      this.organizationSelected = org.id;
+      this.organizationSelected = org;
     },
     setCarouselImages(images) {
       this.carouselImages = images;
@@ -342,7 +257,7 @@ Vue.createApp({
       }).filter(o => o.matches.length > 0);
     },
     organizationMatches() {
-      var org = this.allOrganizationMatches.find(o => o.organization.id === this.organizationSelected);
+      var org = this.allOrganizationMatches.find(o => o.organization.id === this.organizationSelected.id);
       return org ? org.matches.filter(matchContains(this.search)) : [];
     },
   },

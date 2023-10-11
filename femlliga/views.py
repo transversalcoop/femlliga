@@ -403,15 +403,12 @@ def matches(request, organization_id):
         n for n in organization.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
     ])
     offer_matches, need_matches = get_organization_matches(organization, own_needs)
+    needs_json = [x.resource for x in own_needs]
+    return render_matches_page(request, "matches", organization, offer_matches, need_matches, needs_json)
+
+def render_matches_page(request, page_type, organization, offer_matches, need_matches, needs_json):
     organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
-    preselected_resource = request.GET.get("resource", "")
-    organization_names_map_json = {}
-    for l in organization_matches:
-        org = l[0].organization
-        organization_names_map_json[str(org.id)] = org.name
     return render(request, "femlliga/matches.html", {
-        "offer_matches": offer_matches,
-        "need_matches": need_matches,
         "matches_json": {
             "offerMatches": {k: [m.json(current_organization=organization) for m in offer_matches[k]] for k in offer_matches},
             "needMatches": {k: [m.json(current_organization=organization) for m in need_matches[k]] for k in need_matches},
@@ -423,11 +420,8 @@ def matches(request, organization_id):
             }
             for l in organization_matches
         ],
-        "organization_names_map_json": organization_names_map_json,
-        "needs_json": [x.resource for x in own_needs],
-        "org": organization,
-        "own_needs": own_needs,
-        "preselected_resource": preselected_resource,
+        "needs_json": needs_json,
+        "page_type": page_type,
     })
 
 def group_matches_by_organization(organization, offer_matches, need_matches):
@@ -451,40 +445,60 @@ def get_organization_matches(organization, own_needs):
     offer_matches, need_matches = {}, {}
     for need in own_needs:
         need_options = [n.name for n in need.options.all()]
-        offers = get_model_matches(organization, need, need_options, Offer)
+        offers = get_model_matches(organization, need.resource, Offer, need_options = need_options, include_other=False)
         if len(offers) > 0:
             offer_matches[need.resource] = offers
 
-        needs = get_model_matches(organization, need, need_options, Need)
+        needs = get_model_matches(organization, need.resource, Need, need_options = need_options, include_other=False)
         if len(needs) > 0:
             need_matches[need.resource] = needs
 
     return offer_matches, need_matches
 
-def get_model_matches(organization, need, need_options, model):
-    results = model.objects.filter(
-        resource = need.resource,
-        has_resource = True,
-        options__name__in = need_options,
-    ).\
+def get_model_matches(organization, resource, model, need_options = None, include_other=True):
+    if need_options is None:
+        queryset = model.objects.filter(
+            resource = resource,
+            has_resource = True,
+        )
+    else:
+        queryset = model.objects.filter(
+            resource = resource,
+            has_resource = True,
+            options__name__in = need_options,
+        )
+
+    if not include_other:
+        queryset = queryset.exclude(resource="OTHER")
+
+    results = queryset.\
     exclude(organization=organization).\
-    exclude(resource="OTHER").\
     prefetch_related("organization").\
     prefetch_related("images").\
     prefetch_related("options").\
     distinct()
-    return sorted(results, key=lambda r: r.organization.distance(need.organization))
+    return sorted(results, key=lambda r: r.organization.distance(organization))
+
+def get_all_resources(organization):
+    offer_matches, need_matches = {}, {}
+    for resource in RESOURCES:
+        offers = get_model_matches(organization, resource[0], Offer)
+        if len(offers) > 0:
+            offer_matches[resource[0]] = offers
+
+        needs = get_model_matches(organization, resource[0], Need)
+        if len(needs) > 0:
+            need_matches[resource[0]] = needs
+
+    return offer_matches, need_matches
 
 @login_required
 @require_own_organization
 @record_stats("search")
 def search(request, organization_id):
     organization = organization_prefetches(request.user.organizations.filter(id=organization_id)).first()
-    organizations = organization_prefetches(Organization.objects.exclude(id=organization_id))
-    organizations = sorted(organizations, key=lambda o: o.distance(organization))
-    return render(request, "femlliga/search.html", {
-        "organizations": [o.json(current_organization=organization, include_children=True) for o in organizations],
-    })
+    offer_matches, need_matches = get_all_resources(organization)
+    return render_matches_page(request, "search", organization, offer_matches, need_matches, [x[0] for x in RESOURCES])
 
 @login_required
 def notifications(request):
@@ -536,7 +550,7 @@ def agreements(request, organization_id):
     organization = get_object_or_404(Organization, pk = organization_id)
     sent = sort_agreements(organization.sent_agreements.all())
     received = sort_agreements(organization.received_agreements.all())
-    agreements_by_organization = group_agreements_by_organizations(sent + received, organization)
+    agreements_by_organization = group_agreements_by_organizations(sort_agreements(sent + received), organization)
     organization_names_map_json = {}
     for agreements in agreements_by_organization:
         org = agreement_other_organization(agreements[0], organization_id)
@@ -544,7 +558,11 @@ def agreements(request, organization_id):
     return render(request, f"femlliga/agreements.html", {
         "org": organization,
         "agreements": { "sent": sent, "received": received },
-        "agreements_json": { "sent": group_by_resource_json(sent, organization_id), "received": group_by_resource_json(received, organization_id) },
+        "agreements_json": {
+            "sent": group_agreements_by_resource_json(sent, organization_id),
+            "received": group_agreements_by_resource_json(received, organization_id),
+        },
+        "concatenated_agreements_json": [a.json(organization_id) for a in sort_agreements(sent+received)],
         "organizations_json": [
             {
                 "organization": agreement_other_organization(l[0], organization_id).json(current_organization=organization),
@@ -559,7 +577,7 @@ def agreements(request, organization_id):
 def requested_resources(agreements):
     return sorted(set([a.resource for a in agreements]))
 
-def group_by_resource_json(l, organization_id):
+def group_agreements_by_resource_json(l, organization_id):
     m = {}
     for x in l:
         try:
