@@ -1,48 +1,43 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import resource_details, render_match_badges, render_social_media %}
+{% from 'femlliga/_macros.html' import resource_details, organization_info, organization_map_js %}
 
 {% macro resources(name, resource_type, data, missing, description) %}
     <div class="col-lg-6">
-        <h2 style="margin: 10px 0; background-color: #ffce1c; font-size: 2.5em; text-align: left; padding: 0 20px; line-height: 1em;">
+        <h2 class="resources-title">
             {{ name }}
         {% if len(missing) > 0 %}
-            <span style="float: right;">
-                <a class="dropdown-toogle btn btn-custom" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#" style="background-color: #f4f4f4; margin-top: -5px;" title="Afegeix">
-                  <i class="bi-plus-lg"></i> <span class="d-none d-md-inline">Afegeix</span>
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="afegeix{{ resource_type }}">
-                    {% for resource in missing %}
-                    <li>
-                        <a class="dropdown-item" href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.code]) }}">{{ resource }}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </span>
+          <span class="float-end">
+            <a class="dropdown-toogle btn btn-sm btn-custom btn-custom-sm" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#" style="background-color: #f4f4f4; margin-top: -5px;" title="Afegeix">
+              <i class="bi-plus-lg"></i> <span class="d-none d-md-inline">Afegeix</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="afegeix{{ resource_type }}">
+              {% for resource in missing %}
+              <li>
+                <a class="dropdown-item" href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.code]) }}">{{ resource }}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </span>
         {% endif %}
         </h2>
         <div style="padding: 20px; background-color: #f4f4f4;">
         {% for i, resource in enumerate(data) %}
-            {% if i != 0 %}
-              <hr class="separator-yellow">
-            {% endif %}
-            <div class="edit-row">
-                <span class="edit d-md-none d-block" style="float: right; position: relative; z-index: 1;">
-                    <a href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.resource]) }}" title="Edita">
-                        <i class="bi-pencil-square edit" style="font-size: 1.5rem;"></i>
-                    </a>
-                </span>
-                <p style="margin: 10px 0 0 0; position: relative;">
-                    <i class="{{ resource_icon(resource.resource) }}" style="font-size: 1.5em;"></i>
-                    <span style="font-weight: bold; font-size: 1.5em; margin-right: 5px;">{{ resource }}</span>
-                    <span style="font-size: 1.125em; position: absolute; margin: 3px 0 0 5px;">
-                    {% if resource_type == "needs" %}
-                    {{ render_match_badges(org, resource, offer_matches, need_matches, True) }}
-                    {% endif %}
-                    </span>
-                </p>
-                {{ resource_details(resource, resource_type) }}
-            </div>
+          {% if i != 0 %}
+            <hr class="separator-yellow">
+          {% endif %}
+          <div class="edit-row">
+            <span class="edit d-md-none d-block" style="float: right; position: relative; z-index: 1;">
+              <a href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.resource]) }}" title="Edita">
+                <i class="bi-pencil-square edit" style="font-size: 1.5rem;"></i>
+              </a>
+            </span>
+            <p style="margin: 10px 0 0 0; position: relative;">
+                <i class="{{ resource_icon(resource.resource) }}" style="font-size: 1.5em;"></i>
+                <span style="font-weight: bold; font-size: 1.5em; margin-right: 5px;">{{ resource }}</span>
+            </p>
+            {{ resource_details(resource, resource_type) }}
+          </div>
         {% endfor %}
         </div>
     </div>
@@ -51,27 +46,14 @@
 {% block content %}
 <section style="background-color: transparent; background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);">
   <div class="container">
-    <div class="row" style="padding-top: 3.5rem;">
+    <div class="row edit-row" style="padding-top: 3.5rem;">
       <div class="col-md-6">
-        <div class="edit-row">
-          <span class="edit d-md-none d-block" style="float: right;">
-            <a href="{{ url("edit_organization", args=[org.id]) }}" style="color: black;" title="Edita">
-              <i class="bi-pencil-square edit" style="font-size: 1.5rem; margin-top: 10px;"></i>
-            </a>
-          </span>
-          <h1 style="font-size: 2.5em; margin: 0;">{{ org.name }}</h1>
-          <p class="mt-1 mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
-          <p class="mt-1 mb-0"><strong>Àmbits de treball</strong></p>
-          <ul class="mb-0">
-            {% for scope in org.scopes.all() %}
-              <li>{{ scope }}</li>
-            {% endfor %}
-          </ul>
-          {% if org.description %}
-          <p class="mt-1 mb-1"><strong>Descripció</strong>: {{ org.description }}</p>
-          {% endif %}
-          {{ render_social_media(org) }}
-        </div>
+        <span class="edit d-md-none d-block" style="float: right;">
+          <a href="{{ url("edit_organization", args=[org.id]) }}" style="color: black;" title="Edita">
+            <i class="bi-pencil-square edit" style="font-size: 1.5rem; margin-top: 10px;"></i>
+          </a>
+        </span>
+        <h1 style="font-size: 2.5em; margin: 0;">{{ org.name }}</h1>
       </div>
       <div class="col-md-6">
         {% if org.logo %}
@@ -79,43 +61,33 @@
           <img src="{{ org.logo.url }}" class="organization-logo" />
         </div>
         {% endif %}
-        <p style="font-size: 1.25em;">Quina <strong>lliga</strong> has fet</p>
-        <div class="divider-1" style="margin: 17px 30px; width: 100px;"></div>
-        <p>
-          <span class="badge bg-success" style="font-size: 1.125em;">1</span>
-          Nombre d'entitats que ofereixen alguna de les vostres necessitats
-        </p>
-        <p>
-          <span class="badge bg-warning" style="font-size: 1.125em;">1</span>
-          Nombre d'entitats que necessiten el mateix que vosaltres
-        </p>
-  <p class="mt-4 mb-4">
-    A continuació podeu consultar les necessitats que té la vostra {{ org_type_name(org.org_type) }} i el que pot oferir. Aquest llistat s'ha generat a partir de les vostres respostes.
-    <br>
-    El podeu editar (<i class="bi-pencil-square"></i>) i introduir qualsevol canvi quan ho considereu oportú.
-  </p>
       </div>
     </div>
+
+    {{ organization_info(org) }}
   </div>
 </section>
 
 <div class="container mb-4">
   {% if org.needs_not_set() or org.offers_not_set() %}
-  <div class="alert alert-primary" role="alert" style="margin-top: 20px;">
+  <div class="alert alert-primary mt-3" role="alert">
     Pareix que encara no heu completat el procés d'alta. Voleu fer-ho ara?
-    <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" style="float: right;">
+    <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" class="float-end">
         {{ csrf_input }}
         <button class="btn btn-sm btn-custom">Completa l'alta</button>
     </form>
   </div>
   {% endif %}
 
-
   <div class="row">
-      {{ resources("Què necessiteu?", "needs", sort_resources(needs), org.needs_missing(), ) }}
-      {{ resources("Què oferiu?", "offers", sort_resources(offers), org.offers_missing()) }}
+    {{ resources("Què necessiteu?", "needs", sort_resources(needs), org.needs_missing(), ) }}
+    {{ resources("Què oferiu?", "offers", sort_resources(offers), org.offers_missing()) }}
   </div>
-
 </div>
 {% endblock %}
 
+{% block js %}
+<script>
+{{ organization_map_js(org) }}
+</script>
+{% endblock %}

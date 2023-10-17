@@ -117,6 +117,11 @@ class Organization(models.Model):
                 return t[1]
         return ""
 
+    def first_resource_not_set(self, resource_type):
+        if resource_type == "needs":
+            return self.needs_not_set()[0].code
+        return self.offers_not_set()[0].code
+
     def needs_not_set(self):
         return self.aux_not_set(self.needs.all())
 
@@ -216,6 +221,9 @@ class Resource:
 
     def options(self):
         return RESOURCE_OPTIONS_MAP[self.code]
+
+    def add_image_label(self):
+        return RESOURCE_ADD_IMAGE_LABEL[self.code]
 
 class Table:
     def __init__(self, columns, labels, rows):
@@ -402,6 +410,22 @@ class Agreement(models.Model):
     def render_options(self):
         options = [str(x) for x in self.options.all()]
         return ", ".join(options)
+
+    def json(self, organization_id):
+        return {
+            "id": self.id,
+            "solicitor": self.solicitor.json(),
+            "solicitee": self.solicitee.json(),
+            "date": self.date,
+            "message": self.message,
+            "options": [o.name for o in self.options.all()],
+            "resource": self.resource,
+            "resource_type": self.resource_type,
+            "communication_accepted": self.communication_accepted,
+            "agreement_successful": self.agreement_successful,
+            "href_connect": reverse("agreement_connect", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
+            "href_successful": reverse("agreement_successful", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
+        }
 
 class Contact(models.Model):
     date = models.DateTimeField(auto_now_add=True)

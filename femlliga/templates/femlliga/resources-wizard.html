@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-{% if not forced %}
+{% if not editing %}
 <div class="progress" style="margin-top: 20px;">
   {% set percent = count / total * 100 %}
   <div class="progress-bar bg-success" role="progressbar" style="width: {{ percent }}%" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">{{ count }} / {{ total }}</div>
@@ -42,7 +42,7 @@
 
     {% if db_resource %}
         {% for image in db_resource.images.all() %}
-        <div class="d-flex align-items-center">
+        <div class="d-flex mt-2 align-items-center">
             <div class="thumbnail"><img src="{{ image.image.url }}"></div>
             <div class="form-check" style="display: inline-block; margin-left: 20px;">
                 {% set name = "delete-image-%d" % (image.id,) %}
@@ -64,7 +64,7 @@
       {% endfor %}
 
       <a class="btn btn-custom mt-3" href="#" onclick="addImage(event)">
-          <i class="bi-plus-lg"></i> Afegeix imatge
+        <i class="bi-plus-lg"></i> {{ resource.add_image_label() }}
       </a>
     {% endif %}
 
@@ -79,7 +79,7 @@
           {{ resource.answer_yes(resource_type) }}
         </button>
       </div>
-      {% if forced %}
+      {% if editing %}
       <div class="col-12 d-grid" style="margin-top: 15px;">
         <a href="{{ url("app") }}" class="btn btn-lg btn-light text-dark">Torna sense fer canvis</a>
       </div>

@@ -1,117 +1,334 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import show_messages, organization_link %}
-
-{% macro render_form(a, value, action, class, button_text) %}
-  <form method="POST" action="{{ url("agreement_" + action, args=[org.id, a.id]) }}" class="row" style="width: 100%;">
-    {{ csrf_input }}
-    <input type="hidden" name="return_url" value="{{ view_type }}">
-    <input type="hidden" name="{{ action }}" value="{{ value }}">
-    <button type="submit" class="btn btn-sm btn-{{ class }}" style="width: 100%;">{{ button_text }}</button>
-  </form>
-{% endmacro %}
+{% from 'femlliga/_macros.html' import organization_link, info_tooltip  %}
 
 {% block content %}
-<div class="container">
-{{ show_messages(messages) }}
-{% if view_type == "sent" %}
-<h1>Peticions de col·laboració enviades</h1>
-{% else %}
-<h1>Peticions de col·laboració rebudes</h1>
-{% endif %}
-
-{% if len(agreements) == 0 %}
-{% if view_type == "sent" %}
-<p>Encara no has enviat cap petició de col·laboració. Pots fer-ho des de la pàgina de <a href="{{ url("matches", args=[org.id]) }}">coincidències</a>.</p>
-{% else %}
-<p>Encara no has rebut cap petició de col·laboració.</p>
-{% endif %}
-{% endif %}
-
-{% for a in agreements %}
-  <hr>
-  <div class="row">
-    <div class="col-10">
-    <h2>
-      <a data-bs-toggle="collapse" href="#showDetails{{ a.id }}" role="button" aria-expanded="false" aria-controls="showDetails{{ a.id }}">
-        <i class="bi-chevron-down" style="font-size: 1.5rem;"></i>
-      </a>
-      {% if view_type == "sent" %}
-        {% if a.resource_type == "need" %}
-          Buscar {{ resource_name(a.resource) }} conjuntament amb {{ organization_link(a.solicitee) }}
-        {% else %}
-          {{ resource_name(a.resource) }} sol·licitat a {{ organization_link(a.solicitee) }}
-        {% endif %}
-      {% else %}
-        {% if a.resource_type == "need" %}
-          {{ organization_link(a.solicitor) }} ens demana buscar conjuntament {{ resource_name(a.resource) }}
-        {% else %}
-          {{ organization_link(a.solicitor) }} ens sol·licita {{ resource_name(a.resource) }}
-        {% endif %}
-      {% endif %}
-    </h2>
-    {% for option in a.options.all() %}
-      <span class="badge bg-light">{{ option }}</span>
-    {% endfor %}
-    {% if a.communication_accepted == None %}
-      <p>
-        <i class="bi-hourglass-split text-muted" style="font-size: 1.5rem;"></i>
-        {% if view_type == "sent" %}
-          {{ organization_link(a.solicitee) }} encara no ha acceptat ni declinat la comunicació. Si l'accepten, s'iniciarà una cadena de correus electrònics en la que podreu concretar els detalls de la possible col·laboració.
-        {% else %}
-          {{ organization_link(a.solicitor) }} ha sol·licitat una comunicació. Per favor, indiqueu si accepteu o no. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la comunicació no us obliga a arribar a cap acord.
-        {% endif %}
-      </p>
-    {% elif a.communication_accepted == False %}
-      <p>
-        <i class="bi-x-lg text-danger" style="font-size: 1.5rem;"></i>
-        Es va rebutjar la comunicació
-      </p>
-    {% else %}
-      {% if a.agreement_successful == None %}
-        <p>
-          <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
-          <i class="bi-hourglass-split text-muted" style="font-size: 1.5rem;"></i>
-          {% if view_type == "sent" %}
-            {{ organization_link(a.solicitee) }} va acceptar la comunicació.
-          {% else %}
-            Vau acceptar la comunicació.
-          {% endif %}
-          Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. Aquesta informació es farà servir només a nivell estadístic.
-        </p>
-      {% elif a.agreement_successful == False %}
-        <p>
-          <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
-          <i class="bi-x-lg text-danger" style="font-size: 1.5rem;"></i>
-          Es va iniciar una comunicació, però aquesta no va acabar en acord.
-        </p>
-      {% else %}
-        <p>
-          <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
-          <i class="bi-check2 text-success" style="font-size: 1.5rem;"></i>
-          Es va iniciar una comunicació i es va arribar a un acord.
-        </p>
-      {% endif %}
-    {% endif %}
+{% if len(agreements.sent) > 0 or len(agreements.received) > 0 %}
+<main id="content" class="container-fluid">
+  <div id="app" class="row">
+    <div class="col-md-4 d-md-block bg-light sidebar">
+      <h1>Peticions enviades i rebudes</h1>
+      <div class="btn-group w-100 mb-2" role="group" aria-label="Basic example">
+        <button
+          type="button"
+          class="btn"
+          @click="setShowBy('resources')"
+          :class="{'btn-warning': showBy === 'resources', 'btn-light': showBy !== 'resources'}">
+          Recursos
+        </button>
+        <button
+          type="button"
+          class="btn"
+          @click="setShowBy('organizations')"
+          :class="{'btn-warning': showBy === 'organizations', 'btn-light': showBy !== 'organizations'}">
+          Organitzacions
+        </button>
+      </div>
+      <input v-model="search" type="text" class="form-control" placeholder="Cerca recursos o organitzacions">
+      <ul class="nav nav-pills flex-column mb-auto mt-2">
+        <template v-if="showBy === 'resources'">
+          <h2 class="resource-matches-title">Enviades</h2>
+          {{ request_filter_row_vue("sent", "Peticions enviades") }}
+          <h2 class="resource-matches-title">Rebudes</h2>
+          {{ request_filter_row_vue("received", "Peticions rebudes") }}
+        </template>
+        <template v-else>
+          <li class="nav-item" v-for="x in organizationsWithRequests" :key="x.organization.id">
+            <button
+              @click="selectOrganization(x.organization)"
+              class="nav-link w-100 text-start"
+              :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-current="page">
+              <span class="float-end">
+                <span
+                  class="badge ms-2 bg-light"
+                  title="Peticions">
+                  ${ x.agreements.length }
+                </span>
+              </span>
+              <span v-html="highlightSearch(x.organization.name, search)"></span>
+            </button>
+          </li>
+        </template>
+      </ul>
     </div>
-    <div class="col-2">
-      {% if a.communication_accepted == True and a.agreement_successful == None %}
-        {{ render_form(a, "yes", "successful", "success", "S'ha fet acord") }}
-        <div style="height: 10px;"></div>
-        {{ render_form(a, "no", "successful", "danger", "No s'ha aconseguit acord") }}
-      {% endif %}
-      {% if a.communication_accepted == None and view_type == "received" %}
-        {{ render_form(a, "yes", "connect", "success", "Inicia la comunicació") }}
-        <div style="height: 10px;"></div>
-        {{ render_form(a, "no", "connect", "danger", "Declina la comunicació") }}
-      {% endif %}
+
+    <div class="col-md-8 ms-sm-auto px-md-4">
+      <div v-if="resourceSelected" class="row mt-3">
+        <div class="col-12">
+          <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
+          <div v-if="requestTypeSelected === 'sent'">
+            <div class="matches-count agreements-count"><span>${ agreements.sent[resourceSelected].length } peticions enviades</span></div>
+            {{ show_agreements_vue("agreements.sent[resourceSelected]") }}
+          </div>
+          <div v-else>
+            <div class="matches-count agreements-count"><span>${ agreements.received[resourceSelected].length } peticions rebudes</span></div>
+            {{ show_agreements_vue("agreements.received[resourceSelected]") }}
+          </div>
+        </div>
+      </div>
+      <div v-else-if="organizationSelected" class="row mt-3">
+        <div class="col-12">
+          <h2 class="match-resource-title">${ organizationSelected.name }</h2>
+          <div class="matches-count agreements-count"><span>${ organizationRequests.length } peticions</span></div>
+          {{ show_agreements_vue("organizationRequests") }}
+        </div>
+      </div>
+      <div v-else class="row mt-3">
+        <div class="col-12">
+          <h2 class="match-resource-title">Totes les peticions</h2>
+          <div class="matches-count agreements-count"><span>${ concatenatedAgreements.length } peticions enviades o rebudes</span></div>
+          {{ show_agreements_vue("concatenatedAgreements") }}
+        </div>
+      </div>
     </div>
   </div>
-  <div class="collapse" id="showDetails{{ a.id }}" style="margin-left: 20px;">
-      <p>Missatge que es va enviar el {{ format_time(a.date) }}:</p>
-      <pre style="margin-left: 20px; padding-left: 10px; border-left: 1px solid gray;">{{ a.message }}</pre>
-  </div>
-{% endfor %}
+</main>
+{% else %}
+<div class="container text-center pt-4">
+  <h1>Encara no heu enviat ni rebut peticions</h1>
+  <p>En podeu enviar des de la pàgina de «Has lligat?» o des de la pàgina de «Cerca».</p>
 </div>
+{% endif %}
+{% endblock %}
+
+{% macro request_filter_row_vue(request_type, title) %}
+<li v-for="resource in requestedResources.{{ request_type }}" :key="resource" class="nav-item">
+  <button
+    @click="selectResource(resource, '{{ request_type }}')"
+    class="nav-link w-100 text-start"
+    :class="{active: resourceSelected === resource && requestTypeSelected === '{{ request_type }}'}"
+    type="button"
+    role="tab"
+    aria-selected="false"
+    aria-current="page">
+    <span
+      v-if="resource in agreements.{{ request_type }}"
+      class="float-end badge ms-2 bg-light"
+      title="{{ title }}">
+      ${ agreements.{{ request_type }}[resource].length }
+    </span>
+    ${ resourceNamesMap[resource] }
+  </button>
+</li>
+{% endmacro %}
+
+{% macro show_agreements_vue(agreements) %}
+<div v-for="result in {{ agreements }}" :key="result" class="row match-box">
+  <h3 v-if="agreementSent(result)">
+    <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+    <span v-if="result.resource_type === 'need'" class="strong-underline me-2">a buscar conjuntament amb</span>
+    <span v-else class="strong-underline me-2">sol·licitat a</span>
+    <a :href="result.solicitee.href" v-html="highlightSearch(result.solicitee.name, search)"></a>
+  </h3>
+  <h3 v-else>
+    <a :href="result.solicitor.href" v-html="highlightSearch(result.solicitor.name, search)"></a>
+    <span v-if="result.resource_type === 'need'" class="strong-underline ms-2">ens demana buscar conjuntament</span>
+    <span v-else class="strong-underline ms-2">ens sol·licita</span>
+    <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+  </h3>
+  <div class="mb-2">
+    <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
+    <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
+    <p>Missatge que es va enviar el ${ new Date(result.date).toLocaleString() }:</p>
+    <pre class="quoted-message">${ result.message }</pre>
+
+    <div v-if="result.communication_accepted === null">
+      <i class="bi-hourglass-split text-muted fs-4"></i>
+      Encara no s'ha acceptat ni declinat la comunicació.
+      <div v-if="!agreementSent(result)">
+        <div v-if="!agreementsLoading[result.id]">
+          <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2">
+            Inicia la comunicació
+          </button>
+          <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2">
+            Declina la comunicació
+          </button>
+          {{ info_tooltip("Per favor, indiqueu si accepteu la comunicació o no. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la comunicació no us obliga a arribar a cap acord.") }}
+        </div>
+        <div v-else>
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Actualitzant...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else-if="result.communication_accepted === false">
+      <i class="bi-x-lg text-danger fs-4"></i>
+      Es va declinar la comunicació.
+    </div>
+    <div v-else-if="result.communication_accepted === true">
+      <i class="bi-check2 text-success fs-4"></i>
+      Es va iniciar la comunicació.
+      <div v-if="result.agreement_successful === null">
+        <div v-if="!agreementsLoading[result.id]">
+          <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2">
+            S'ha fet acord
+          </button>
+          <button @click="updateAgreement(result, 'successful', 'no')" class="btn btn-sm btn-danger me-2">
+            No s'ha aconseguit acord
+          </button>
+          {{ info_tooltip("Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. Aquesta informació es farà servir només a nivell estadístic") }}
+        </div>
+        <div v-else>
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Actualitzant...</span>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="result.agreement_successful === false">
+        <i class="bi-x-lg text-danger fs-4"></i>
+        No es va arribar a un acord.
+      </div>
+      <div v-else-if="result.agreement_successful === true">
+        <i class="bi-check2 text-success fs-4"></i>
+        Es va arribar a un acord.
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endmacro %}
+
+{% block js %}
+{{ json_script(agreements_json, "agreements-data") }}
+{{ json_script(concatenated_agreements_json, "concatenated-agreements-data") }}
+{{ json_script(organizations_json, "organizations-data") }}
+{{ json_script(requested_resources_json, "requested-resources-data") }}
+{{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
+{{ json_script(consts.RESOURCE_OPTIONS_DEF_MAP, "option-names-data") }}
+<script>
+var agreements = JSON.parse(document.getElementById('agreements-data').textContent);
+var concatenatedAgreements = JSON.parse(document.getElementById('concatenated-agreements-data').textContent);
+var organizations = JSON.parse(document.getElementById('organizations-data').textContent);
+var requestedResources = JSON.parse(document.getElementById('requested-resources-data').textContent);
+var resourceNamesMap = JSON.parse(document.getElementById('resource-names-data').textContent);
+var optionNamesMap = JSON.parse(document.getElementById('option-names-data').textContent);
+
+function agreementContains(search) {
+  return function(m) {
+    const parts = sanitize(search).split(" ").filter(x => x !== "");
+    const targets = [
+      sanitize(m.solicitor.name),
+      sanitize(m.solicitee.name),
+      sanitize(m.message),
+      sanitize(resourceNamesMap[m.resource]),
+    ];
+    for (var option of m.options) {
+      targets.push(sanitize(optionNamesMap[option]));
+    }
+    for (var part of parts) {
+      if (!targets.some((target) => contains(target, part))) {
+        return false;
+      }
+    }
+    return true;
+  };
+}
+
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      organizationID: "{{ org.id }}",
+      allAgreements: agreements,
+      allConcatenatedAgreements: concatenatedAgreements,
+      allOrganizations: organizations,
+      resourceNamesMap: resourceNamesMap,
+      optionNamesMap: optionNamesMap,
+      requestedResources: requestedResources,
+      showBy: "resources",
+      search: "",
+      resourceSelected: "",
+      requestTypeSelected: "",
+      organizationSelected: null,
+      agreementsLoading: {},
+    };
+  },
+  methods: {
+    highlightSearch: highlightSearch,
+    setShowBy(x) {
+      this.showBy = x;
+      this.selectResource("", "");
+    },
+    selectResource(resource, requestType) {
+      this.organizationSelected = null;
+      this.resourceSelected = resource;
+      this.requestTypeSelected = requestType;
+    },
+    selectOrganization(org) {
+      this.resourceSelected = "";
+      this.requestTypeSelected = "";
+      this.organizationSelected = org;
+    },
+    filterAgreements(agreements) {
+      var m = {};
+      for (var k in agreements) {
+        m[k] = agreements[k].filter(agreementContains(this.search));
+      }
+      return m;
+    },
+    extractSelectedOptions(optionsMap) {
+      return Object.keys(optionsMap).map(k => {
+        if (optionsMap[k]) {
+          return k;
+        }
+        return "";
+      }).filter(v => v);
+    },
+    updateAgreement(agreement, field, value) {
+      var href = field === "connect" ? agreement.href_connect : agreement.href_successful;
+      this.agreementsLoading[agreement.id] = true;
+      post(
+        href,
+        "{{ csrf_token }}",
+        { [field]: value },
+      ).then(response => {
+        if (!response.ok) {
+          throw "Bad response";
+        }
+        if (field === "connect") {
+          agreement.communication_accepted = value === "yes";
+        } else {
+          agreement.agreement_successful = value === "yes";
+        }
+        this.agreementsLoading[agreement.id] = false;
+      }).catch(err => {
+        agreement.error = true;
+        this.agreementsLoading[agreement.id] = false;
+      });
+    },
+    agreementSent(a) {
+      return a.solicitor.id === this.organizationID;
+    },
+  },
+  computed: {
+    agreements() {
+      return {
+        sent: this.filterAgreements(this.allAgreements.sent),
+        received: this.filterAgreements(this.allAgreements.received),
+      };
+    },
+    concatenatedAgreements() {
+      return this.allConcatenatedAgreements.filter(agreementContains(this.search));
+    },
+    organizationsWithRequests() {
+      return this.allOrganizations.map(o => {
+        return {
+          organization: o.organization,
+          agreements: o.agreements.filter(agreementContains(this.search)),
+        };
+      }).filter(o => o.agreements.length > 0);
+    },
+    organizationRequests() {
+      var org = this.allOrganizations.find(o => o.organization.id === this.organizationSelected.id);
+      return org ? org.agreements.filter(agreementContains(this.search)) : [];
+    },
+  },
+}).mount("#app");
+</script>
 {% endblock %}
 

@@ -12,18 +12,25 @@
 </div>
 {% endif %}
 
+{% if form.errors %}
+<div class="alert alert-warning mt-2" role="alert">
+  Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo.
+</div>
+{% endif %}
 <form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="mb-2">
     {{ csrf_input }}
     {{ form_feedback(form) }}
 
-    <label for="id_name">Nom de l'entitat</label>
-    <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="Nom" id="id_name" {{ input_value(form, "name") }} required>
-    {{ input_feedback(form, "name") }}
+    <div class="py-3">
+      <label for="id_name"><strong>Nom de l'entitat</strong></label>
+      <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="Nom" id="id_name" {{ input_value(form, "name") }} required>
+      {{ input_feedback(form, "name") }}
+    </div>
 
     {# here because if not vuejs does not render it before it calls document.getElementById... #}
     {{ social_media_forms.management_form }}
     <div id="vuejs">
-      <div v-if="hasLogo" class="row mt-3">
+      <div v-if="hasLogo" class="row py-3">
         <div class="col-6">
           {% if org and org.logo %}
             <img class="organization-logo" src="{{ org.logo.url }}" />
@@ -34,60 +41,66 @@
             <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
               <span class="visually-hidden">Esborrant...</span>
             </div>
-            <span v-else>Esborra el logo</span>
+            <span v-else>Esborra la imatge</span>
           </button>
         </div>
       </div>
-      <div v-else class="mt-3">
-        <label for="id_logo">Logo de l'entitat (opcional)</label>
+      <div v-else class="py-3">
+        <label for="id_logo"><strong>Logo o imatge de l'entitat</strong> (opcional)</label>
         <input type="file" {{ input_classes(form, "logo") }} name="logo" autocomplete="Logo" id="id_logo" {{ input_value(form, "logo") }}>
         {{ input_feedback(form, "logo") }}
       </div>
 
-      <label class="mt-3" for="id_description">Descripció de l'activitat de l'entitat (opcional)</label>
-      <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description">{{ textarea_value(form, "description") }}</textarea>
-      {{ input_feedback(form, "description") }}
+      <div class="py-3">
+        <label for="id_description"><strong>Descripció de l'activitat de l'entitat</strong> (opcional)</label>
+        <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description">{{ textarea_value(form, "description") }}</textarea>
+        {{ input_feedback(form, "description") }}
+      </div>
 
-      <p class="mt-3 mb-1">
-        Xarxes. Per a les xarxes socials, introdueix el nom d'usuari
-        <a v-if="socialMediasAddIndex < totalSocialMedias" @click="addSocialMedia" class="btn btn-custom" href="#">
-          <i class="bi-plus-lg"></i> Afegeix
-        </a>
-      </p>
-      {% for i, mform in enumerate(social_media_forms) %}
-        {{ form_feedback(mform) }}
-        <div
-          class="row mb-2 social-media-wrapper {% if not mform.media_type.value() and not mform.value.value() %}d-none{% endif %}"
-          id="social-media-wrapper-{{ i }}"
-        >
-          <div class="col-4">
-            {{ render_formset_select(mform, mform.media_type, "media_type", "") }}
+      <div class="py-3">
+        <p class="mb-1"><strong>Xarxes socials i contacte</strong></p>
+        {% for i, mform in enumerate(social_media_forms) %}
+          {{ form_feedback(mform) }}
+          <div
+            class="row mb-2 social-media-wrapper {% if not mform.media_type.value() and not mform.value.value() %}d-none{% endif %}"
+            id="social-media-wrapper-{{ i }}"
+          >
+            <div class="col-4">
+              {{ render_formset_select(mform, mform.media_type, "media_type", "", handler='@change="setMediaType($event)"') }}
+            </div>
+            <div class="col-4">
+              {{ render_formset_field(mform, mform.value, "value", "text", "", placeholder=media_type_placeholder(mform.media_type.value())) }}
+            </div>
+            <div class="col-4">
+              {{ render_formset_delete_vue(mform.DELETE, "deleteSocialMedia(" + str(i) + ")") }}
+              {{ mform.id }}
+              {{ mform.organization }}
+            </div>
           </div>
-          <div class="col-4">
-            {{ render_formset_field(mform, mform.value, "value", "text", "") }}
-          </div>
-          <div class="col-4">
-            {{ render_formset_delete_vue(mform.DELETE, "deleteSocialMedia(" + str(i) + ")") }}
-            {{ mform.id }}
-            {{ mform.organization }}
-          </div>
+        {% endfor %}
+        <div>
+          <a v-if="socialMediasAddIndex < totalSocialMedias" @click.prevent="addSocialMedia" class="btn btn-custom" href="#">
+            <i class="bi-plus-lg"></i> Afegeix xarxa social
+          </a>
         </div>
-      {% endfor %}
+      </div>
     </div>
 
-    <div class="mt-3"></div>
-    {{ render_select(form, "org_type", "Forma jurídica") }}
+    <div class="py-3">
+      {{ render_select(form, "org_type", "Forma jurídica", strong_label=True) }}
+    </div>
 
-    <div class="mt-3"></div>
-    {{ render_multi_checkboxes(form, "scopes", "Àmbits") }}
+    <div class="py-3">
+      {{ render_multi_checkboxes(form, "scopes", "Àmbits") }}
+    </div>
 
-    <div class="mt-3"></div>
-    <label for="id_name">Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça aproximada (carrer, codi postal, ciutat):</label>
-    <input type="text" {{ input_classes(form, "address") }} name="address" autocomplete="Adreça" id="id_address" {{ input_value(form, "address") }}>
-    <div class="spacing"></div>
+    <div class="py-3">
+      <label for="id_name"><strong>Ubicació</strong>. Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça aproximada:</label>
+      <input type="text" {{ input_classes(form, "address") }} name="address" autocomplete="Adreça" id="id_address" {{ input_value(form, "address") }} placeholder="Nom del carrer, número, codi postal, població, país">
+    </div>
 
     {% if form.errors.lat or form.errors.lng or form.errors.address %}
-    <div class="invalid-feedback" style="display: block;">
+    <div class="invalid-feedback d-block">
       <ul><li>És necessari indicar la posició o l'adreça de l'entitat</li></ul>
     </div>
     {% endif %}
@@ -108,7 +121,9 @@
 {% endblock %}
 
 {% block js %}
+{{ json_script(consts.SOCIAL_MEDIA_TYPES_PLACEHOLDERS , "media-types-placeholders-data") }}
 <script>
+var mediaTypesPlaceholdersMap = JSON.parse(document.getElementById('media-types-placeholders-data').textContent);
 var map = L.map('citymap').setView([39.98606316571185, -0.03754693138659535], 15);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -157,6 +172,7 @@ Vue.createApp({
       loading: false,
       socialMediasAddIndex: +document.getElementById("id_social_media-INITIAL_FORMS").value,
       totalSocialMedias: +document.getElementById("id_social_media-TOTAL_FORMS").value,
+      mediaTypesPlaceholdersMap: mediaTypesPlaceholdersMap,
     };
   },
   methods: {
@@ -180,6 +196,13 @@ Vue.createApp({
     deleteSocialMedia(i) {
       document.getElementById(`id_social_media-${i}-DELETE`).value = "on";
       document.getElementById(`social-media-wrapper-${i}`).classList.add("d-none");
+    },
+    mediaTypePlaceholder(mediaType) {
+      var p = this.mediaTypesPlaceholdersMap[mediaType];
+      return p || "";
+    },
+    setMediaType(e) {
+      document.getElementById(e.target.id.replace("media_type", "value")).placeholder = this.mediaTypePlaceholder(e.target.value);
     },
   },
 }).mount("#vuejs");

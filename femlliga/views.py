@@ -32,7 +32,7 @@ from config.settings import MEDIA_ROOT
 from .models import *
 from .constants import *
 from .forms import *
-from .utils import clean_form_email
+from .utils import clean_form_email, get_next_resource, get_resource_index, get_json_body
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
@@ -80,6 +80,18 @@ def page(request, name):
             raise
     return render(request, "femlliga/page.html", { "page": page })
 
+def check_matches(request):
+    if request.method != "POST":
+        return JsonResponse({})
+
+    post = get_json_body(request)
+    resource = post.get("resource", "")
+    option = post.get("option", "")
+
+    needs = Need.objects.filter(resource=resource, has_resource=True, options__name__in=[option]).count()
+    offers = Offer.objects.filter(resource=resource, has_resource=True, options__name__in=[option]).count()
+    return JsonResponse({ "needs": needs, "offers": offers })
+
 @login_required
 def app(request):
     orgs = organization_prefetches(request.user.organizations.all(), include_missing_resources=True)
@@ -105,11 +117,17 @@ def app(request):
 @login_required
 @require_own_organization
 def pre_wizard(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    if not org.needs_not_set():
+        return redirect("mid-wizard", organization_id=org.id)
     return aux_wizard(request, organization_id, "needs", "pre-wizard")
 
 @login_required
 @require_own_organization
 def mid_wizard(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    if not org.offers_not_set():
+        return redirect("post-wizard", organization_id=org.id)
     return aux_wizard(request, organization_id, "offers", "mid-wizard")
 
 @login_required
@@ -119,7 +137,7 @@ def post_wizard(request, organization_id):
     if request.method == "POST":
         org.resources_set = True
         org.save()
-        return redirect("app")
+        return redirect("matches", organization_id=org.id)
     return render(request, "femlliga/aux-wizard.html", {"org": org, "page": "post-wizard"})
 
 @login_required
@@ -135,7 +153,8 @@ def aux_wizard(request, organization_id, resource_type, page):
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
         if request.POST["start"] == "yes":
-            return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type)
+            first_not_set = org.first_resource_not_set(resource_type)
+            return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type, resource=first_not_set)
         else:
             org.resources_set = True
             org.save()
@@ -237,11 +256,11 @@ def process_organization_post(request, org = None):
 
 @login_required
 @require_own_organization
-def force_resources_wizard(request, organization_id, resource_type, resource):
+def edit_resources_wizard(request, organization_id, resource_type, resource):
     assert_url_param_in_list(resource_type, ["needs", "offers"])
     assert_url_param_in_list(resource, RESOURCES_LIST)
     if request.method == "POST":
-        return resources_wizard(request, organization_id, resource_type, forced = True)
+        return resources_wizard(request, organization_id, resource_type, resource, editing = True)
 
     org = get_object_or_404(Organization, pk=organization_id)
     model, imagemodel = get_resources_models(resource_type)
@@ -262,14 +281,14 @@ def force_resources_wizard(request, organization_id, resource_type, resource):
         r = None
         form = ResourceForm()
 
-    return render_wizard(request, org, resource, form, resource_type, forced = True, db_resource = r)
+    return render_wizard(request, org, resource, form, resource_type, editing = True, db_resource = r)
 
 def get_resources_models(resource_type):
     if resource_type == "offers":
         return Offer, OfferImage
     return Need, NeedImage
 
-def render_wizard(request, org, resource, form, resource_type, forced = False, db_resource = None):
+def render_wizard(request, org, resource, form, resource_type, editing = False, db_resource = None):
     model, imagemodel = get_resources_models(resource_type)
     return render(request, "femlliga/resources-wizard.html", {
         "org": org,
@@ -279,20 +298,19 @@ def render_wizard(request, org, resource, form, resource_type, forced = False, d
         "resource_type": resource_type,
         "imageforms": inlineformset_factory(model, imagemodel, fields=("image",), extra=6)(),
         "total": len(RESOURCES) * 2,
-        "count": len(org.needs.all()) + len(org.offers.all()) + 1,
-        "forced": forced,
+        "count": get_resource_index(resource_type, resource),
+        "editing": editing,
     })
 
 @login_required
 @require_own_organization
-def resources_wizard(request, organization_id, resource_type, forced = False):
+def resources_wizard(request, organization_id, resource_type, resource, editing = False):
     assert_url_param_in_list(resource_type, ["needs", "offers"])
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
         model, imagemodel = get_resources_models(resource_type)
         form = ResourceForm(request.POST)
         if form.is_valid():
-            resource = form.cleaned_data["resource"]
             try:
                 m = model.objects.get(resource = resource, organization = org)
             except Exception as ex:
@@ -330,25 +348,25 @@ def resources_wizard(request, organization_id, resource_type, forced = False):
                         image.delete()
                     except Exception as ex:
                         raise
-            return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type)
-        else:
-            return render_wizard(request, org, form.cleaned_data["resource"], form, resource_type, forced = forced)
 
+            return redirect_resource_set(org, resource_type, resource)
+        else:
+            return render_wizard(request, org, resource, form, resource_type, editing = editing)
+
+    return render_wizard(request, org, resource, ResourceForm(), resource_type)
+
+def redirect_resource_set(org, resource_type, resource):
     if org.resources_set:
         return redirect("app")
 
-    resources = list(map(lambda n: n.resource, org.needs.all()))
-    if resource_type == "offers":
-        resources = list(map(lambda n: n.resource, org.offers.all()))
+    next_resource = get_next_resource(resource)
+    if next_resource is None:
+        if resource_type == "needs":
+            return redirect("mid-wizard", organization_id=org.id)
+        else:
+            return redirect("post-wizard", organization_id=org.id)
 
-    for resource in RESOURCES:
-        if resource[0] not in resources:
-            return render_wizard(request, org, resource[0], ResourceForm(), resource_type)
-
-    if resource_type == "needs" and not org.resources_set:
-        return redirect("mid-wizard", organization_id=org.id)
-
-    return redirect("post-wizard", organization_id=org.id)
+    return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type, resource=next_resource)
 
 def clean_files(FILES):
     for key in FILES:
@@ -385,10 +403,12 @@ def matches(request, organization_id):
         n for n in organization.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
     ])
     offer_matches, need_matches = get_organization_matches(organization, own_needs)
+    needs_json = [x.resource for x in own_needs]
+    return render_matches_page(request, "matches", organization, offer_matches, need_matches, needs_json)
+
+def render_matches_page(request, page_type, organization, offer_matches, need_matches, needs_json):
     organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
     return render(request, "femlliga/matches.html", {
-        "offer_matches": offer_matches,
-        "need_matches": need_matches,
         "matches_json": {
             "offerMatches": {k: [m.json(current_organization=organization) for m in offer_matches[k]] for k in offer_matches},
             "needMatches": {k: [m.json(current_organization=organization) for m in need_matches[k]] for k in need_matches},
@@ -400,9 +420,8 @@ def matches(request, organization_id):
             }
             for l in organization_matches
         ],
-        "needs_json": [x.resource for x in own_needs],
-        "org": organization,
-        "own_needs": own_needs,
+        "needs_json": needs_json,
+        "page_type": page_type,
     })
 
 def group_matches_by_organization(organization, offer_matches, need_matches):
@@ -426,40 +445,60 @@ def get_organization_matches(organization, own_needs):
     offer_matches, need_matches = {}, {}
     for need in own_needs:
         need_options = [n.name for n in need.options.all()]
-        offers = get_model_matches(organization, need, need_options, Offer)
+        offers = get_model_matches(organization, need.resource, Offer, need_options = need_options, include_other=False)
         if len(offers) > 0:
             offer_matches[need.resource] = offers
 
-        needs = get_model_matches(organization, need, need_options, Need)
+        needs = get_model_matches(organization, need.resource, Need, need_options = need_options, include_other=False)
         if len(needs) > 0:
             need_matches[need.resource] = needs
 
     return offer_matches, need_matches
 
-def get_model_matches(organization, need, need_options, model):
-    results = model.objects.filter(
-        resource = need.resource,
-        has_resource = True,
-        options__name__in = need_options,
-    ).\
+def get_model_matches(organization, resource, model, need_options = None, include_other=True):
+    if need_options is None:
+        queryset = model.objects.filter(
+            resource = resource,
+            has_resource = True,
+        )
+    else:
+        queryset = model.objects.filter(
+            resource = resource,
+            has_resource = True,
+            options__name__in = need_options,
+        )
+
+    if not include_other:
+        queryset = queryset.exclude(resource="OTHER")
+
+    results = queryset.\
     exclude(organization=organization).\
-    exclude(resource="OTHER").\
     prefetch_related("organization").\
     prefetch_related("images").\
     prefetch_related("options").\
     distinct()
-    return sorted(results, key=lambda r: r.organization.distance(need.organization))
+    return sorted(results, key=lambda r: r.organization.distance(organization))
+
+def get_all_resources(organization):
+    offer_matches, need_matches = {}, {}
+    for resource in RESOURCES:
+        offers = get_model_matches(organization, resource[0], Offer)
+        if len(offers) > 0:
+            offer_matches[resource[0]] = offers
+
+        needs = get_model_matches(organization, resource[0], Need)
+        if len(needs) > 0:
+            need_matches[resource[0]] = needs
+
+    return offer_matches, need_matches
 
 @login_required
 @require_own_organization
 @record_stats("search")
 def search(request, organization_id):
     organization = organization_prefetches(request.user.organizations.filter(id=organization_id)).first()
-    organizations = organization_prefetches(Organization.objects.exclude(id=organization_id))
-    organizations = sorted(organizations, key=lambda o: o.distance(organization))
-    return render(request, "femlliga/search.html", {
-        "organizations": [o.json(current_organization=organization, include_children=True) for o in organizations],
-    })
+    offer_matches, need_matches = get_all_resources(organization)
+    return render_matches_page(request, "search", organization, offer_matches, need_matches, [x[0] for x in RESOURCES])
 
 @login_required
 def notifications(request):
@@ -476,6 +515,9 @@ def notifications(request):
 @login_required
 @require_own_organization
 def send_message(request, organization_id, organization_to, resource_type, resource):
+    if request.method != "POST":
+        return JsonResponse({})
+
     assert_url_param_in_list(resource_type, ["need", "offer"])
     assert_url_param_in_list(resource, RESOURCES_LIST)
     organization = get_object_or_404(Organization, pk = organization_id)
@@ -484,62 +526,92 @@ def send_message(request, organization_id, organization_to, resource_type, resou
     if resource_type == "need":
         model = Need
     r = get_object_or_404(model, organization=other, resource = resource)
-    if request.method == "POST":
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            a = Agreement(
-                solicitor=organization,
-                solicitee=other,
-                message=form.cleaned_data["message"],
-                resource=resource,
-                resource_type=resource_type,
-            )
-            a.save()
-            for option in form.cleaned_data["options"]:
-                ro = ResourceOption(name=option)
-                ro.save()
-                a.options.add(ro)
-            return render(request, "femlliga/message-sent.html", { "org": organization, "other": other })
-    else:
-        form = MessageForm()
-
-    return render(request, "femlliga/send-message.html", {
-        "org": organization,
-        "other": other,
-        "form": form,
-        "resource": r,
-        "resource_type": resource_type,
-    })
-
-def agreements_sent(request, organization_id):
-    return agreements(request, organization_id, lambda o: o.sent_agreements.all(), "sent")
-
-def agreements_received(request, organization_id):
-    return agreements(request, organization_id, lambda o: o.received_agreements.all(), "received")
+    post = get_json_body(request)
+    form = MessageForm(post)
+    if form.is_valid():
+        a = Agreement(
+            solicitor=organization,
+            solicitee=other,
+            message=form.cleaned_data["message"],
+            resource=resource,
+            resource_type=resource_type,
+        )
+        a.save()
+        for option in form.cleaned_data["options"]:
+            ro = ResourceOption(name=option)
+            ro.save()
+            a.options.add(ro)
+        return JsonResponse({"ok": True})
+    return JsonResponse({"ok": False})
 
 @login_required
 @require_own_organization
-def agreements(request, organization_id, data_func, view_type):
+def agreements(request, organization_id):
     organization = get_object_or_404(Organization, pk = organization_id)
+    sent = sort_agreements(organization.sent_agreements.all())
+    received = sort_agreements(organization.received_agreements.all())
+    agreements_by_organization = group_agreements_by_organizations(sort_agreements(sent + received), organization)
+    organization_names_map_json = {}
+    for agreements in agreements_by_organization:
+        org = agreement_other_organization(agreements[0], organization_id)
+        organization_names_map_json[str(org.id)] = org.name
     return render(request, f"femlliga/agreements.html", {
         "org": organization,
-        "agreements": sort_agreements(data_func(organization)),
-        "view_type": view_type,
+        "agreements": { "sent": sent, "received": received },
+        "agreements_json": {
+            "sent": group_agreements_by_resource_json(sent, organization_id),
+            "received": group_agreements_by_resource_json(received, organization_id),
+        },
+        "concatenated_agreements_json": [a.json(organization_id) for a in sort_agreements(sent+received)],
+        "organizations_json": [
+            {
+                "organization": agreement_other_organization(l[0], organization_id).json(current_organization=organization),
+                "agreements": [a.json(organization_id) for a in l]
+            }
+            for l in agreements_by_organization
+        ],
+        "organization_names_map_json": organization_names_map_json,
+        "requested_resources_json": { "sent": requested_resources(sent), "received": requested_resources(received) },
     })
+
+def requested_resources(agreements):
+    return sorted(set([a.resource for a in agreements]))
+
+def group_agreements_by_resource_json(l, organization_id):
+    m = {}
+    for x in l:
+        try:
+            m[x.resource].append(x.json(organization_id))
+        except:
+            m[x.resource] = [x.json(organization_id)]
+    return m
+
+def group_agreements_by_organizations(agreements, organization):
+    orgs = {}
+    for a in agreements:
+        try:
+            orgs[agreement_other_organization(a, organization.id).id].append(a)
+        except:
+            orgs[agreement_other_organization(a, organization.id).id] = [a]
+
+    return [orgs[k] for k in sorted(orgs.keys(), key=lambda k: agreement_other_organization(orgs[k][0], organization.id).distance(organization))]
+
+def agreement_other_organization(agreement, organization_id):
+    if agreement.solicitor.id == organization_id:
+        return agreement.solicitee
+    return agreement.solicitor
 
 def agreement_successful(request, organization_id, agreement_id):
     def f(a, post):
         a.agreement_successful = post["successful"] == "yes"
         a.successful_date = timezone.now()
-        if a.agreement_successful:
-            messages.success(request, "CELEBRATION", extra_tags="SHOW_USER")
-            messages.success(request, "Has indicat que s'ha arribat a un acord", extra_tags="SHOW_USER")
-        else:
-            messages.success(request, "Has indicat que no s'ha arribat a un acord", extra_tags="SHOW_USER")
     return agreement_set(request, organization_id, agreement_id, f)
 
 def agreement_connect(request, organization_id, agreement_id):
     def f(a, post):
+        organization = Organization.objects.get(pk = organization_id)
+        if organization != a.solicitee:
+            return # user owns organization; only solicitee organization should be able to accept
         a.communication_accepted = post["connect"] == "yes"
         a.communication_date = timezone.now()
         if a.communication_accepted:
@@ -552,23 +624,19 @@ def agreement_connect(request, organization_id, agreement_id):
             msg = EmailMessage(subject=subject, body=body, from_email=FROM_EMAIL, to=to_list)
             msg.content_subtype = "html"
             msg.send()
-
-            messages.success(request, "CELEBRATION", extra_tags="SHOW_USER")
-            messages.success(request, "S'ha iniciat la comunicació", extra_tags="SHOW_USER")
-        else:
-            messages.success(request, "Has indicat que no s'inicie la comunicació", extra_tags="SHOW_USER")
     return agreement_set(request, organization_id, agreement_id, f)
 
 @login_required
 @require_own_agreement
 def agreement_set(request, organization_id, agreement_id, f):
-    if request.method == "POST":
-        a = get_object_or_404(Agreement, pk = agreement_id)
-        f(a, request.POST)
-        a.save()
-        if request.POST["return_url"] == "sent":
-            return redirect("agreements_sent", organization_id=organization_id)
-        return redirect("agreements_received", organization_id=organization_id)
+    if request.method != "POST":
+        return JsonResponse({})
+
+    a = get_object_or_404(Agreement, pk = agreement_id)
+    post = get_json_body(request)
+    f(a, post)
+    a.save()
+    return JsonResponse({"ok": True})
 
 def get_city_from_coordinates(lat, lng):
     """Nominatim also accepts a search option that gives coordinates given a place's name"""

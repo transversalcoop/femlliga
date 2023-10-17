@@ -55,24 +55,26 @@
           <div class="py-3 my-4 container">
             <div class="row" style="color: #4b4b4b; font-size: 0.9em;">
               <div class="col-lg-4">
-                <p style="font-weight: bold; text-transform: uppercase;">Informació</p>
+                <p class="fw-bold">INFORMACIÓ</p>
                 <ul style="list-style: none; padding: 0;">
-                  <li style="margin-bottom: 6px;"><a href="{{ url("page", args=["legal"]) }}">Avís legal</a></li>
-                  <li style="margin-bottom: 6px;"><a href="{{ url("page", args=["accessibility"]) }}">Accessibilitat</a></li>
-                  <li style="margin-bottom: 6px;"><a href="{{ url("page", args=["privacy"]) }}">Política de protecció de dades</a></li>
-                  <li style="margin-bottom: 6px;"><a href="{{ url("page", args=["faq"]) }}">Preguntes freqüents</a></li>
-                  <li style="margin-bottom: 6px;"><a href="{{ url("contact") }}">Contacte</a></li>
+                  <li class="mb-1"><a href="{{ url("page", args=["legal"]) }}">Avís legal</a></li>
+                  <li class="mb-1"><a href="{{ url("page", args=["accessibility"]) }}">Accessibilitat</a></li>
+                  <li class="mb-1"><a href="{{ url("page", args=["privacy"]) }}">Política de protecció de dades</a></li>
+                  <li class="mb-1"><a href="{{ url("page", args=["faq"]) }}">Preguntes freqüents</a></li>
+                  <li class="mb-1"><a href="{{ url("contact") }}">Contacte</a></li>
                 </ul>
               </div>
               <div class="col-lg-4">
-                <p style="font-weight: bold; text-transform: uppercase;">Contacte</p>
-                <p style="margin: 0;">Tlf: 643 015 716</p>
-                <p>Correu electrònic: contacte@femlliga.org</p>
+                <p class="fw-bold">CONTACTE</p>
+                <p class="m-0">Tlf: {{ settings.CONTACT_PHONE }}</p>
+                <p class="m-0">Correu electrònic: {{ settings.CONTACT_EMAIL }}</p>
+                <p class="m-0"><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/{{ settings.CONTACT_SOCIAL }}/">Instagram</a></p>
+                <p><a target="_blank" rel="noopener noreferrer" href="{{ settings.CONTACT_LINKS }}">Enllaços</a></p>
                 <p>Les imatges emprades pertanyen a <a target="_blank" rel="noopener noreferrer" href="https://www.freepik.com">pikisuperstar - www.freepik.com</a></p>
                 <p>Web creada amb <a target="_blank" rel="noopener noreferrer" href="https://github.com/transversalcoop/femlliga">programari lliure</a></p>
               </div>
               <div class="col-lg-4">
-                <p style="margin: 0;">Un projecte desenvolupat per </p>
+                <p class="m-0">Un projecte desenvolupat per </p>
                 <a target="_blank" rel="noopener noreferrer" href="https://transversalcoop.org">
                   <img src="{{ static("transversal.png") }}" style="height: 58px;" alt="Logo de la Cooperativa Transversal">
                 </a>

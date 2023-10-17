@@ -1,43 +1,63 @@
-{% macro space() %}
-<tr><td style="line-height: 20px;" height="20px"></td></tr>
-{% endmacro %}
-
-<table align="center">
-  <tbody>
-    <tr>
-      <td valign="top" align="center">
-        <table style="font-size: 16px; width: 600px; max-width: 600px !important;">
-          <tbody>
-            <tr>
-              <td style="font-family: 'Open Sans', sans-serif;">
-                <img src="https://{{ current_site.domain }}/static/email-banner.png">
-              </td>
-            </tr>
-            <tr>
-              <td style="font-family: 'Open Sans', sans-serif;">
-                Hola!
-              </td>
-            </tr>
+<head>
+<link
+href="https://fonts.googleapis.com/css2?family=Poppins&amp;display=swap"
+  rel="stylesheet">
+<style>
+table { border: none; }
+</style>
+</head>
+<body style="background-color: #ededed;">
+  <table align="center" style="padding: 50px 0;">
+    <tbody>
+      <tr>
+        <td valign="top" align="center">
+          <table border="0" rules="none" cellspacing="0" cellpadding="0" style="font-size: 16px; width: 680px; max-width: 680px !important; background-color: white;">
+            <tbody>
+              <tr style="margin: 0; padding: 0;">
+                <td style="font-family: 'Poppins', sans-serif; padding: 0; margin: 0;">
+                  <img src="https://{{ current_site.domain }}/static/email/banner.png" alt="Banner Fem lliga" class="" width="680" height="227">
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 20px;"></td>
+              </tr>
+              <tr>
+                <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+                  Hola!
+                </td>
+              </tr>
 {% block content %}
 {% endblock %}
-            {{ space() }}
-            <tr><td style="border-top: 1px solid gray;"><td></tr>
-            {{ space() }}
-            <tr>
-              <td style="font-family: 'Open Sans', sans-serif;">
-                Gràcies per fer servir {{ current_site.name }}
-              <td>
-            </tr>
-            <tr>
-              <td style="font-family: 'Open Sans', sans-serif;">
-                {{ current_site.domain }}
-              </td>
-            </tr>
+              <tr>
+                <td style="font-family: 'Poppins', sans-serif; padding: 20px 20px 50px 20px;">
+                  Gràcies per fer servir {{ current_site.name }}
+                <td>
+              </tr>
 {% block final_note %}
 {% endblock %}
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </tbody>
-</table>
+              <tr style="background-color: #ffce1c;">
+                <td style="text-align: center; font-family: 'Poppins', sans-serif; font-size: 12px; background-color: #ffce1c; padding: 4px 0 6px 0;">
+                  <img style="height: 16px; margin: 0 3px -4px 0;" src="https://{{ current_site.domain }}/static/email/insta_icon.png">
+                    <span style="margin-right: 20px;">
+                      <a style="color: black; text-decoration: none;" href="https://instagram.com/{{ settings.CONTACT_SOCIAL }}">@{{ settings.CONTACT_SOCIAL }}</a>
+                    </span>
+                    <img style="height: 16px; margin: 0 3px -4px 0;" src="https://{{ current_site.domain }}/static/email/web_icon.png">
+                    <span style="margin-right: 20px;">
+                      <a style="color: black; text-decoration: none;" href="https://{{ current_site.domain }}">{{ current_site.domain }}</a>
+                    </span>
+                    <img style="height: 16px; margin: 0 3px -4px 0;" src="https://{{ current_site.domain }}/static/email/telf_icon.png">
+                    <span style="margin-right: 20px;">
+                      {{ settings.CONTACT_PHONE }}
+                    </span>
+                    <img style="height: 16px; margin: 0 3px -4px 0;" src="https://{{ current_site.domain }}/static/email/mail_icon.png">
+                    <span style="margin-right: 20px;">
+                      <a style="color: black; text-decoration: none;" href="mailto:{{ settings.CONTACT_EMAIL }}">{{ settings.CONTACT_EMAIL }}</a>
+                    </span>
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>

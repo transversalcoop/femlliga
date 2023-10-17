@@ -93,12 +93,11 @@ class SmokeTests(TestCase):
             ("pre-wizard", [org.id]),
             ("mid-wizard", [org.id]),
             ("reset-wizard", [org.id]),
-            ("resources-wizard", [org.id, "needs"]),
+            ("resources-wizard", [org.id, "needs", "PLACE"]),
             ("force-resources-wizard", [org.id, "needs", "PLACE"]),
             ("send_message", [org.id, org2.id, "offer", "SERVICE"]),
             ("matches", [org.id]),
-            ("agreements_sent", [org.id]),
-            ("agreements_received", [org.id]),
+            ("agreements", [org.id]),
             ("agreement_connect", [org.id, org.id]),
             ("agreement_successful", [org.id, org.id]),
             ("uploads", ["path"]),
@@ -114,10 +113,8 @@ class SmokeTests(TestCase):
         URLS = [
             ("app", "Example organization", []),
             ("force-resources-wizard", "Esteu buscant un local", [org.id, "needs", "PLACE"]),
-            ("send_message", ["Sol·licita Servei a", "Second example org"], [org.id, org2.id, "offer", "SERVICE"]),
             ("matches", "Has lligat!", [org.id]),
-            ("agreements_sent", "Encara no has enviat cap petició", [org.id]),
-            ("agreements_received", "Encara no has rebut", [org.id]),
+            ("agreements", "Encara no heu enviat ni rebut peticions", [org.id]),
         ]
         for x in URLS:
             self.aux_get(x[0], x[1], args=x[2])
@@ -218,19 +215,23 @@ class IntegrationTests(TestCase):
         response = self.client.post(reverse("pre-wizard", args=[o.id]), {"start": "yes"}, follow=True)
         self.assertContains(response, "Esteu buscant un local on poder desenvolupar")
 
-        needs_url = reverse("resources-wizard", args=[o.id, "needs"])
+        needs_url = reverse("resources-wizard", args=[o.id, "needs", "PLACE"])
         self.aux_wizard(needs_url, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"], "comentaris de necessita local de test", "yes",
             "Voleu rebre formació en algun d&#39;aquests temes")
 
+        needs_url = reverse("resources-wizard", args=[o.id, "needs", "TRAINING"])
         self.aux_wizard(needs_url, "TRAINING", ["TRAINING_DIGITAL"], "comentaris de necessita formació de test", "yes",
             "Esteu buscant algú que us proporcione aquests serveis")
 
+        needs_url = reverse("resources-wizard", args=[o.id, "needs", "SERVICE"])
         self.aux_wizard(needs_url, "SERVICE", ["AGENCY"], "comentaris de necessita servei de test", "yes",
             "Necessiteu alguna d&#39;aquestes coses")
 
+        needs_url = reverse("resources-wizard", args=[o.id, "needs", "EQUIPMENT"])
         self.aux_wizard(needs_url, "EQUIPMENT", [], "comentaris de necessita material de test", "no",
             "Podeu indicar qualsevol altra necessitat que tingueu")
 
+        needs_url = reverse("resources-wizard", args=[o.id, "needs", "OTHER"])
         self.aux_wizard(needs_url, "OTHER", [], "comentaris de necessita altres de test", "no",
             "Ja vas per la meitat")
 
@@ -238,24 +239,41 @@ class IntegrationTests(TestCase):
         response = self.client.post(reverse("mid-wizard", args=[o.id]), {"start": "yes"}, follow=True)
         self.assertContains(response, "Teniu un local que estigueu disposats a compartir amb altres entitats")
 
-        offers_url = reverse("resources-wizard", args=[o.id, "offers"])
+        offers_url = reverse("resources-wizard", args=[o.id, "offers", "PLACE"])
         self.aux_wizard(offers_url, "PLACE", [], "comentaris de ofereix local de test", "no",
             "Oferiu formació en algun d&#39;aquests temes")
 
+        offers_url = reverse("resources-wizard", args=[o.id, "offers", "TRAINING"])
         self.aux_wizard(offers_url, "TRAINING", ["TRAINING_DIGITAL"], "comentaris de ofereix formació de test", "yes",
             "Oferiu algun d&#39;aquests serveis per a altres entitats")
 
+        offers_url = reverse("resources-wizard", args=[o.id, "offers", "SERVICE"])
         self.aux_wizard(offers_url, "SERVICE", [], "comentaris de ofereix serveis de test", "no",
             "Teniu alguna d&#39;aquestes coses que pugueu compartir", charge = True)
 
+        offers_url = reverse("resources-wizard", args=[o.id, "offers", "EQUIPMENT"])
         self.aux_wizard(offers_url, "EQUIPMENT", [], "comentaris de ofereix material de test", "yes",
             "Podeu indicar qualsevol altre servei o material que oferiu", charge = True)
 
+        offers_url = reverse("resources-wizard", args=[o.id, "offers", "OTHER"])
         self.aux_wizard(offers_url, "OTHER", [], "comentaris de ofereix altres de test", "yes",
             "Has acabat d'introduir la informació de la teua associació", charge = True)
 
-        # app main page
+        # matches page
         response = self.client.post(reverse("post-wizard", args=[o.id]), {"start": "yes"}, follow=True)
+        for s in [
+            "Has lligat!",
+            "Local",
+            "Second example organization",
+        ]:
+            self.assertContains(response, s)
+
+        matches = BeautifulSoup(response.content.decode(), "html.parser").find("script", {"id": "matches-data"})
+        for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
+            self.assertNotIn(s, matches)
+
+        # app main page
+        response = self.client.get(reverse("app"))
         should_contain = [
             "Nom entitat de test",
             "Descripció entitat de test",
@@ -286,19 +304,6 @@ class IntegrationTests(TestCase):
         ]:
             self.assertNotContains(response, s)
 
-        # matches page
-        response = self.client.get(reverse("matches", args=[o.id]))
-        for s in [
-            "Hem trobat coincidències entre les vostres necessitats",
-            "Local",
-            "Second example organization",
-        ]:
-            self.assertContains(response, s)
-
-        matches = BeautifulSoup(response.content.decode(), "html.parser").find("script", {"id": "matches-data"})
-        for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
-            self.assertNotIn(s, matches)
-
         # view organization page
         response = self.client.get(reverse("view_organization", args=[o.id]))
         for s in should_contain[:6]:
@@ -307,21 +312,18 @@ class IntegrationTests(TestCase):
         # send message
         o2 = Organization.objects.get(name="Second example organization")
         send_message_url = reverse("send_message", args=[o.id, o2.id, "offer", "PLACE"])
-        response = self.client.get(send_message_url)
-        for s in ["que podrà acceptar o rebutjar la comunicació", "Detalls del que s'està sol·licitant"]:
-            self.assertContains(response, s)
-
+        test_msg_1 =  "missatge de test per al primer missatge"
         response = self.client.post(send_message_url, {
             "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
-            "message": "missatge de test per al primer missatge",
+            "message": test_msg_1,
         }, follow=True)
-        self.assertContains(response, "S'ha enviat el missatge correctament.")
+        self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 1)
 
         # check received
         self.client.login(email="test2@example.com", password=PASS_FOR_TESTS)
-        response = self.client.get(reverse("agreements_received", args=[o2.id]))
-        for s in ["Peticions de col·laboració rebudes", "ens sol·licita Local"]:
+        response = self.client.get(reverse("agreements", args=[o2.id]))
+        for s in ["Peticions enviades i rebudes", test_msg_1]:
             self.assertContains(response, s)
 
         a = Agreement.objects.get(solicitor=o, solicitee=o2)
@@ -329,20 +331,20 @@ class IntegrationTests(TestCase):
             "return_url": "received",
             "connect": "yes",
         }, follow=True)
-        save_response(response)
-        self.assertContains(response, "S&#39;ha iniciat la comunicació")
+        self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 2)
 
         # check sent
         self.client.login(email="test3@example.com", password=PASS_FOR_TESTS)
-        response = self.client.get(reverse("agreements_sent", args=[o.id]))
-        for s in ["Peticions de col·laboració enviades", "Local sol·licitat a", "va acceptar la comunicació"]:
+        response = self.client.get(reverse("agreements", args=[o.id]))
+        save_response(response)
+        for s in [test_msg_1, '"communication_accepted": true']:
             self.assertContains(response, s)
 
         response = self.client.post(reverse("agreement_successful", args=[o.id, a.id]), {
             "return_url": "sent",
             "successful": "yes",
         }, follow=True)
-        self.assertContains(response, "Has indicat que s&#39;ha arribat a un acord")
+        self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 2)
 

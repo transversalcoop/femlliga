@@ -77,6 +77,10 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     background-color: #FFCE1C;
 }
 
+.btn-custom-sm {
+    padding: 0.25rem 0.5rem;
+}
+
 nav a {
     color: black;
 }
@@ -459,4 +463,131 @@ nav .nav-link.active {
     .carousel-padding {
         padding: 0 20px;
     }
+}
+
+.triple-column {
+    columns: 3;
+}
+
+.landing-container {
+    margin: 100px auto;
+}
+
+#djDebug #djDebugToolbarHandle {
+    top: 60px !important;
+}
+
+.resources-title {
+    margin: 10px 0;
+    background-color: #ffce1c;
+    font-size: 2.5em;
+    text-align: left;
+    padding: 0 5px 0 20px;
+    line-height: 1em;
+}
+
+.resource-matches-title {
+    margin: 10px 0;
+    background-color: #ffce1c;
+    font-size: 1.75em;
+    text-align: left;
+    padding: 0 5px 0 20px;
+    line-height: 1em;
+}
+
+.match-box {
+    padding: 0.5rem;
+    border: 1px solid black;
+    margin-bottom: 1rem;
+}
+
+.match-resource-title {
+    text-align: center;
+    text-transform: uppercase;
+    margin-top: 0;
+}
+
+.matches-count {
+    border-top: 1px solid #ccc;
+    height: 2em;
+    line-height: 1.8em;
+    margin: 1rem auto;
+    position: relative;
+    width: 70%;
+}
+
+.matches-count span {
+    background-color: #ffffff;
+    color: #9A9A9A;
+    font-style: italic;
+    left: 50%;
+    margin-left: -6em;
+    position: absolute;
+    text-align: center;
+    top: -50%;
+    width: 12em;
+}
+
+.matches-count.agreements-count {
+    width: 90%;
+}
+
+.matches-count.agreements-count span {
+    width: 18em;
+    margin-left: -9em;
+}
+
+.css-tooltip {
+  position: relative;
+  display: inline-block;
+  white-space: normal;
+}
+
+.css-tooltip .tooltiptext {
+  font-size: 1rem;
+  font-weight: normal;
+  font-style: normal;
+  visibility: hidden;
+  width: 240px;
+  top: 100%;
+  left: 50%;
+  margin-left: -230px;
+  background-color: black;
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  padding: 10px;
+  word-wrap: break-word;
+  z-index: 100;
+
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.css-tooltip .tooltiptext.tooltiptextleft {
+  margin-left: -20px;
+  left: 100%;
+}
+
+.css-tooltip .tooltiptext.tooltiptextmid {
+  margin-left: -120px;
+  left: 100%;
+}
+
+.css-tooltip a {
+  color: white;
+  text-decoration: underline;
+}
+
+.css-tooltip:hover .tooltiptext {
+  opacity: 1;
+  visibility: visible;
+}
+
+.quoted-message {
+    margin-left: 20px;
+    padding-left: 10px;
+    border-left: 1px solid gray;
 }

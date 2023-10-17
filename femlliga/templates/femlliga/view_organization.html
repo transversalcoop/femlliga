@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import render_social_media %}
+{% from 'femlliga/_macros.html' import organization_info, organization_map_js %}
 
 {% block content %}
 <div class="container">
@@ -14,39 +14,13 @@
       {% endif %}
     </div>
   </div>
-  <p>{{ org.description }}</p>
 
-  <div class="row">
-    <div class="col-md-4">
-      <p class="mt-1 mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
-    </div>
-
-    <div class="col-md-4">
-      <p class="mt-1 mb-0"><strong>Àmbits de treball</strong></p>
-      <ul class="mb-0">
-        {% for scope in org.scopes.all() %}
-          <li>{{ scope }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="col-md-4">
-      {{ render_social_media(org) }}
-    </div>
-  </div>
-
-  <div id="citymap" class="map-height mt-2"></div>
+  {{ organization_info(org) }}
 </div>
 {% endblock %}
 
 {% block js %}
 <script>
-var map = L.map('citymap').setView([{{ org.lat }}, {{ org.lng }}], 15);
-
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
+{{ organization_map_js(org) }}
 </script>
 {% endblock %}

@@ -23,6 +23,15 @@ for mt in SOCIAL_MEDIA_TYPES:
     SOCIAL_MEDIA_TYPES_MAP[mt[0]] = mt[1]
     SOCIAL_MEDIA_TYPES_ORDER.append(mt[0])
 
+SOCIAL_MEDIA_TYPES_PLACEHOLDERS = {
+    "EMAIL": "correu@example.com",
+    "WEBSITE": "example.com",
+    "FACEBOOK": "Nom d'usuari",
+    "INSTAGRAM": "Nom d'usuari",
+    "TWITTER": "Nom d'usuari",
+    "LINKEDIN": "Nom d'usuari",
+}
+
 ORG_SCOPES = [
     ("EQUALITY", "Dona/Igualtat/Feminismes"),
     ("EDUCATION", "Educació"),
@@ -202,5 +211,20 @@ RESOURCE_OFFER_ACTIONS = {
     "TRAINING": ("No oferim formació", "Sí que oferim formació"),
     "EQUIPMENT": ("No en tenim cap", "Sí que en tenim alguna"),
     "OTHER": ("No oferim altres coses", "Sí que oferim altres coses"),
+}
+
+RESOURCE_ADD_IMAGE_LABEL = {
+    "PLACE": "Afegeix imatge del local",
+    "SERVICE": "Afegeix imatge del servei",
+    "TRAINING": "Afegeix imatge de la formació",
+    "EQUIPMENT": "Afegeix imatge d'aquestes coses",
+    "OTHER": "Afegeix imatge del que oferiu",
+}
+
+RESOURCE_OPTIONS_QUESTION_MAP = {
+    "PLACE": "Quan necessitarieu fer servir el local?",
+    "SERVICE": "Quins serveis concrets necessiteu?",
+    "TRAINING": "De quins temes us interessa formar-vos?",
+    "EQUIPMENT": "Quina d'aquestes coses necessiteu?",
 }
 

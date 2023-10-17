@@ -36,7 +36,6 @@
 
 {% macro resource_details(resource, match_type) %}
   <div style="margin-bottom: 10px;">
-    <strong class="me-2">{{ resource }}</strong>
     {% if resource.charge %}
       <span class="badge bg-light" title="Es demana remuneració a canvi">€</span>
     {% endif %}
@@ -121,9 +120,15 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_select(form, name, label, options = []) %}
+{% macro render_select(form, name, label, options = [], strong_label=False) %}
     {% if form.fields[name] %}
-        <label for="id_{{ name }}">{{ label }}</label>
+        <label for="id_{{ name }}">
+          {% if strong_label %}
+          <strong>{{ label }}</strong>
+          {% else %}
+          {{ label }}
+          {% endif %}
+        </label>
         <select id="id_{{ name }}" name="{{ name }}" {{ input_value(form, name) }} class="form-select {% if form.errors[name] %} is-invalid{% endif %}">
             {% set choices = form.fields[name].choices %}
             {% if len(options) > 0 %}
@@ -144,17 +149,19 @@
 {% macro render_multi_checkboxes(form, name, label, options = []) %}
   {% if form.fields[name] %}
     <div class="{% if form.errors[name] %}is-invalid{% endif %}">
-      <label for="id_{{ name }}">{{ label }}</label>
+      <label for="id_{{ name }}"><strong>{{ label }}</strong></label>
       {% set choices = form.fields[name].choices %}
-      {% for i, choice in enumerate(choices) %}
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="{{ choice[0] }}" id="{{ name }}_{{ i }}" name="{{ name }}"
-               {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}checked{% endif %}>
-        <label class="form-check-label" for="{{ name }}_{{ i }}">
-        {{ choice[1] }}
-        </label>
+      <div class="triple-column">
+        {% for i, choice in enumerate(choices) %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="{{ choice[0] }}" id="{{ name }}_{{ i }}" name="{{ name }}"
+                 {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}checked{% endif %}>
+          <label class="form-check-label" for="{{ name }}_{{ i }}">
+          {{ choice[1] }}
+          </label>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
     </div>
     {{ input_feedback(form, name) }}
   {% endif %}
@@ -225,28 +232,11 @@ function clickOption(element) {
     </select>
 {% endmacro %}
 
-{% macro render_match_badges(org, resource, offer_matches, need_matches, link=False) %}
-  {% if resource.resource in offer_matches %}
-    {% set count = len(offer_matches[resource.resource]) %}
-    {% if link %}<a href="{{ url("matches", args=[org.id]) }}" style="text-decoration: none;">{% endif %}
-    <span class="badge bg-success" title="Hi ha {{ count }} entitats que ofereixen el que necessiteu">
-        {{ count }}
-    </span>
-    {% if link %}</a>{% endif %}
-  {% endif %}
-  {% if resource.resource in need_matches %}
-    {% set count = len(need_matches[resource.resource]) %}
-    {% if link %}<a href="{{ url("matches", args=[org.id]) }}">{% endif %}
-    <span class="badge bg-warning" title="Hi ha {{ count }} entitats que necessiten el mateix que vosaltres">{{ count }}</span>
-    {% if link %}</a>{% endif %}
-  {% endif %}
-{% endmacro %}
-
 {% macro social_media_url(base_url, value) %}{% if value.startswith("http") %}{{ value }}{% else %}{{ base_url }}{{ value }}{% endif %}{% endmacro %}
 
 {% macro render_social_media(org) %}
   {% if len(org.social_media.all()) > 0 %}
-    <p class="mt-1 mb-0"><strong>Xarxes socials</strong></p>
+    <p class="mt-1 mb-0"><strong>Xarxes socials i contacte</strong></p>
     <ul class="mb-0">
     {% for m in sort_social_media(org.social_media.all()) %}
       <li>
@@ -287,19 +277,19 @@ function clickOption(element) {
 </div>
 {% endmacro %}
 
-{% macro render_formset_field(form, field, field_name, input_type, label) %}
+{% macro render_formset_field(form, field, field_name, input_type, label, placeholder="") %}
   {% if label %}
     <label for="id_{{ field.html_name }}" style="margin-top: 10px;">{{ label }}</label>
   {% endif %}
-  <input type="{{ input_type }}" {{ input_classes(form, field_name) }} name="{{ field.html_name }}" id="id_{{ field.html_name }}" {{ formset_input_value(field) }}>
+  <input type="{{ input_type }}" {{ input_classes(form, field_name) }} name="{{ field.html_name }}" id="id_{{ field.html_name }}" {{ formset_input_value(field) }} placeholder="{{ placeholder }}">
   {{ input_feedback(form, field_name) }}
 {% endmacro %}
 
-{% macro render_formset_select(form, field, field_name, label) %}
+{% macro render_formset_select(form, field, field_name, label, handler="") %}
   {% if label %}
     <label for="id_{{ field.html_name }}">{{ label }}</label>
   {% endif %}
-  <select id="id_{{ field.html_name }}" name="{{ field.html_name }}" class="form-select {% if form.errors[field_name] %} is-invalid{% endif %}">
+  <select id="id_{{ field.html_name }}" name="{{ field.html_name }}" class="form-select {% if form.errors[field_name] %} is-invalid{% endif %}" {{ handler|safe }}>
       {% for choice in form.fields[field_name].choices %}
       <option value="{{ choice[0] }}"
           {% if field.value() and field.value() == choice[0] %}selected{% endif %}
@@ -351,4 +341,141 @@ function clickOption(element) {
     </div>
   </div>
 </div>
+{% endmacro %}
+
+{% macro match_filter_row_vue(match_type, title) %}
+<template v-for="resource in matched_needs" :key="resource">
+  <li v-if="resource in matches.{{ match_type }}Matches" class="nav-item">
+    <button
+      @click="selectResource(resource, '{{ match_type }}')"
+      class="nav-link w-100 text-start"
+      :class="{active: resourceSelected === resource && matchTypeSelected === '{{ match_type }}'}"
+      type="button"
+      role="tab"
+      aria-selected="false"
+      aria-current="page">
+      <span
+        v-if="resource in matches.{{ match_type }}Matches"
+        class="float-end badge ms-2 bg-light"
+        title="{{ title }}">
+        ${ matches.{{ match_type }}Matches[resource].length }
+      </span>
+      ${ resourceNamesMap[resource] }
+    </button>
+  </li>
+</template>
+{% endmacro %}
+
+{% macro show_matches_vue(matches, match_name) %}
+<div v-for="result in {{ matches }}" :key="result" class="row match-box">
+  <h3>
+    <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
+    <span class="strong-underline ms-2">{{ match_name }}</span>
+    <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+  </h3>
+  <div>
+    <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } de vosaltres</span>
+  </div>
+  <div class="mb-2">
+    <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
+    <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
+  </div>
+  <p v-if="result.comments" class="mb-0"><strong>Observacions:</strong><span class="ms-2" v-html="highlightSearch(result.comments, search)"></span></p>
+
+  <div v-if="result.images.length > 0" class="image-thumbnails">
+    <div v-for="image in result.images" :key="image.url" class="thumbnail">
+      <a data-bs-toggle="modal" href="#images-modal" role="button" @click="setCarouselImages(result.images)">
+        <img :src="image.url">
+      </a>
+    </div>
+  </div>
+  <div>
+    <div v-if="messagesOpen[result.message_href]">
+      <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
+        S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
+      </div>
+      <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
+        Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb {{ settings.CONTACT_EMAIL }}.
+      </div>
+      <div v-else>
+        <p class="mt-2 mb-0">Quines opcions vos interessen concretament?</p>
+        <div class="multi-select p-0">
+          <button
+            v-for="option in result.options"
+            :key="option"
+            @click="toggleMessageOption(result.message_href, option)"
+            class="btn multi-select-choice"
+            :class="{selected: messagesOpen[result.message_href].options[option]}"
+          >
+            ${ optionNamesMap[option] }
+          </button>
+        </div>
+        <textarea
+          v-model="messagesOpen[result.message_href].message"
+          placeholder="Escriu ací el missatge que els arribarà si necessites fer qualsevol aclariment"
+          class="form-control"
+        ></textarea>
+      </div>
+    </div>
+    <button @click="sendMessage(result.message_href)" class="btn btn-custom mt-2" :disabled="!messageFormOk(messagesOpen[result.message_href])" v-if="!messagesOpen[result.message_href] || (!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error)">
+      <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
+        Enviant
+        <div class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">Enviant...</span>
+        </div>
+      </span>
+      <span v-else>
+        <i class="bi-send fs-6 me-2"></i>
+        <span v-if="messagesOpen[result.message_href]">
+          Envia el missatge
+          {{ info_tooltip("Se li enviarà un missatge a ${ result.organization.name }, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic") }}
+        </span>
+        <span v-else>Contacta</span>
+      </span>
+    </button>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro organization_info(org) %}
+  {% if org.description %}
+  <p>{{ org.description }}</p>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-md-6">
+      <p class="mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
+      <p class="mb-0"><strong>Àmbits de treball</strong></p>
+      <ul>
+        {% for scope in org.scopes.all() %}
+          <li>{{ scope }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="col-md-6">
+      {{ render_social_media(org) }}
+    </div>
+  </div>
+
+  <div id="citymap" class="map-height mt-2"></div>
+{% endmacro %}
+
+{% macro organization_map_js(org) %}
+var map = L.map('citymap').setView([{{ org.lat }}, {{ org.lng }}], 15);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
+{% endmacro %}
+
+{% macro info_tooltip(title, pos="right", class="") %}
+<span class="css-tooltip {{ class }}">
+  <i class="bi-info-circle"></i>
+  <span class="tooltiptext{% if pos=='left' %} tooltiptextleft{% elif pos=='mid' %} tooltiptextmid{% endif %}">
+    {{ title }}.
+  </span>
+</span>
 {% endmacro %}

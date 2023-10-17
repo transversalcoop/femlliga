@@ -30,6 +30,12 @@ def js_bool(value):
         return "true"
     return "false"
 
+def media_type_placeholder(media_type):
+    try:
+        return SOCIAL_MEDIA_TYPES_PLACEHOLDERS[media_type]
+    except:
+        return ""
+
 # would be great to use directly allauth.socialaccount.templatetags.socialaccount.provider_login_url, but there is no
 # way to use it directly in jinja2: explanation https://stackoverflow.com/questions/45174765/use-djangos-allauth-with-jinja2
 # and source code https://github.com/pennersr/django-allauth
@@ -91,5 +97,6 @@ def environment(**options):
         "settings": settings,
         "json_script": json_script,
         "js_bool": js_bool,
+        "media_type_placeholder": media_type_placeholder,
     })
     return env

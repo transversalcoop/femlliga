@@ -1,3 +1,4 @@
+import json
 import unicodedata
 
 from datetime import datetime, timedelta
@@ -7,7 +8,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 
-from femlliga.constants import FROM_EMAIL
+from femlliga.constants import FROM_EMAIL, RESOURCES
 
 def get_users_to_notify():
     users = get_user_model().objects.exclude(notifications_frequency="NEVER")
@@ -52,4 +53,26 @@ def add_one_month(t):
 
 def clean_form_email(s):
     return unicodedata.normalize("NFKC", s.strip()).casefold()
+
+def get_next_resource(resource):
+    try:
+        for i in range(len(RESOURCES)):
+            if resource == RESOURCES[i][0]:
+                return RESOURCES[i+1][0]
+    except:
+        return None
+
+def get_resource_index(resource_type, resource):
+    for i in range(len(RESOURCES)):
+        if resource == RESOURCES[i][0]:
+            if resource_type == "needs":
+                return i+1
+            return i+6
+    return 0
+
+def get_json_body(request):
+    try:
+        return json.loads(request.body.decode("utf-8")) # request from Javascript's fetch API
+    except:
+        return request.POST # request from Django, or test
 
