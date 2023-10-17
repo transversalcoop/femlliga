@@ -27,13 +27,16 @@ h1, h2, h3, h4, h5, h6 {
 a {
     text-decoration: underline;
     color: #212529;
-    -moz-transition:color .2s ease-in;
-    -o-transition:color .2s ease-in;
-    -webkit-transition:color .2s ease-in;
+    transition: all .2s ease-in;
 }
 
 a:hover {
     color: #FFCE1C;
+}
+
+.organization-main-page a:hover {
+    color: #212529;
+    font-weight: bold;
 }
 
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {

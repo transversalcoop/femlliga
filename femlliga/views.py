@@ -501,16 +501,23 @@ def search(request, organization_id):
     return render_matches_page(request, "search", organization, offer_matches, need_matches, [x[0] for x in RESOURCES])
 
 @login_required
-def notifications(request):
-    form, saved = NotificationsForm({"notifications_frequency": request.user.notifications_frequency}), False
+def profile(request):
+    form = ProfileForm({
+        "notifications_frequency": request.user.notifications_frequency,
+        "accept_communications_automatically": request.user.accept_communications_automatically,
+    })
     if request.method == "POST":
-        form = NotificationsForm(request.POST)
+        form = ProfileForm(request.POST)
         if form.is_valid():
             request.user.notifications_frequency = form.cleaned_data["notifications_frequency"]
+            request.user.accept_communications_automatically = form.cleaned_data["accept_communications_automatically"]
             request.user.save()
-            saved = True
+            messages.info(request, "La configuració s'ha desat correctament", extra_tags="show")
+            return redirect("profile")
 
-    return render(request, "femlliga/notifications.html", {"form": form, "saved": saved})
+    return render(request, "femlliga/profile.html", {
+        "form": form,
+    })
 
 @login_required
 @require_own_organization
@@ -541,6 +548,10 @@ def send_message(request, organization_id, organization_to, resource_type, resou
             ro = ResourceOption(name=option)
             ro.save()
             a.options.add(ro)
+
+        if other.creator.accept_communications_automatically:
+            do_agreement_connect(request, a, True)
+
         return JsonResponse({"ok": True})
     return JsonResponse({"ok": False})
 
@@ -601,42 +612,50 @@ def agreement_other_organization(agreement, organization_id):
         return agreement.solicitee
     return agreement.solicitor
 
-def agreement_successful(request, organization_id, agreement_id):
-    def f(a, post):
-        a.agreement_successful = post["successful"] == "yes"
-        a.successful_date = timezone.now()
-    return agreement_set(request, organization_id, agreement_id, f)
-
-def agreement_connect(request, organization_id, agreement_id):
-    def f(a, post):
-        organization = Organization.objects.get(pk = organization_id)
-        if organization != a.solicitee:
-            return # user owns organization; only solicitee organization should be able to accept
-        a.communication_accepted = post["connect"] == "yes"
-        a.communication_date = timezone.now()
-        if a.communication_accepted:
-            subject = f"Comunicació iniciada per compartir {resource_name(a.resource)}"
-            body = render_to_string("email/agreement_connect.html", {
-                "a": a,
-                "current_site": get_current_site(request),
-            })
-            to_list = [a.solicitor.creator.email, a.solicitee.creator.email]
-            msg = EmailMessage(subject=subject, body=body, from_email=FROM_EMAIL, to=to_list)
-            msg.content_subtype = "html"
-            msg.send()
-    return agreement_set(request, organization_id, agreement_id, f)
-
 @login_required
 @require_own_agreement
-def agreement_set(request, organization_id, agreement_id, f):
+def agreement_successful(request, organization_id, agreement_id):
     if request.method != "POST":
         return JsonResponse({})
 
     a = get_object_or_404(Agreement, pk = agreement_id)
     post = get_json_body(request)
-    f(a, post)
+    a.agreement_successful = post["successful"] == "yes"
+    a.successful_date = timezone.now()
     a.save()
+
     return JsonResponse({"ok": True})
+
+@login_required
+@require_own_agreement
+def agreement_connect(request, organization_id, agreement_id):
+    if request.method != "POST":
+        return JsonResponse({})
+
+    a = get_object_or_404(Agreement, pk = agreement_id)
+    organization = get_object_or_404(Organization, pk = organization_id)
+    post = get_json_body(request)
+    if organization != a.solicitee:
+        return # user owns organization; only solicitee organization should be able to accept
+
+    do_agreement_connect(request, a, post["connect"] == "yes")
+
+    return JsonResponse({"ok": True})
+
+def do_agreement_connect(request, a, communication_accepted):
+    a.communication_accepted = communication_accepted
+    a.communication_date = timezone.now()
+    a.save()
+    if a.communication_accepted:
+        subject = f"Comunicació iniciada per compartir {resource_name(a.resource)}"
+        body = render_to_string("email/agreement_connect.html", {
+            "a": a,
+            "current_site": get_current_site(request),
+        })
+        to_list = [a.solicitor.creator.email, a.solicitee.creator.email]
+        msg = EmailMessage(subject=subject, body=body, from_email=FROM_EMAIL, to=to_list)
+        msg.content_subtype = "html"
+        msg.send()
 
 def get_city_from_coordinates(lat, lng):
     """Nominatim also accepts a search option that gives coordinates given a place's name"""

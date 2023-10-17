@@ -42,6 +42,7 @@ class LimitFileSize:
 
 class CustomUser(AbstractUser):
     notifications_frequency = models.CharField(max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY")
+    accept_communications_automatically = models.BooleanField(default=True)
     last_notification_date = models.DateTimeField(auto_now_add=True)
 
     def get_organization(self):
@@ -422,7 +423,9 @@ class Agreement(models.Model):
             "resource": self.resource,
             "resource_type": self.resource_type,
             "communication_accepted": self.communication_accepted,
+            "communication_date": self.communication_date,
             "agreement_successful": self.agreement_successful,
+            "successful_date": self.successful_date,
             "href_connect": reverse("agreement_connect", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
             "href_successful": reverse("agreement_successful", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
         }

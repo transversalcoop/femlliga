@@ -311,6 +311,8 @@ class IntegrationTests(TestCase):
 
         # send message
         o2 = Organization.objects.get(name="Second example organization")
+        o2.creator.accept_communications_automatically = False
+        o2.creator.save()
         send_message_url = reverse("send_message", args=[o.id, o2.id, "offer", "PLACE"])
         test_msg_1 =  "missatge de test per al primer missatge"
         response = self.client.post(send_message_url, {

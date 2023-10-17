@@ -16,10 +16,10 @@ def http_get(url):
     f.close()
     return res
 
-class NotificationsForm(forms.ModelForm):
+class ProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ["notifications_frequency"]
+        fields = ["notifications_frequency", "accept_communications_automatically"]
 
 class OrganizationForm(forms.ModelForm):
     scopes = forms.MultipleChoiceField(

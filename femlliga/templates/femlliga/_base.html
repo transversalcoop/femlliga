@@ -49,6 +49,18 @@
       </header>
       <wrapper class="d-flex flex-column">
         <main id="content">
+          {% if messages %}
+          <div class="container">
+            {% for message in messages %}
+            {% if "show" in message.tags %}
+            <div class="alert alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}success{% else %}info{% endif %} mt-2">
+              {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<i class="bi bi-check-lg fs-1 align-middle pb-2"></i>{% endif %}
+              <span>{{ message }}</span>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
 {% block content %}{% endblock %}
         </main>
         <footer class="border-top">

@@ -71,36 +71,43 @@
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
-      <div v-if="resourceSelected" class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
-          <div v-if="matchTypeSelected === 'offer'">
-            <div class="matches-count"><span>${ matches.offerMatches[resourceSelected].length } resultats</span></div>
-            {{ show_matches_vue("matches.offerMatches[resourceSelected]", "ofereix") }}
+      <div v-if="initialLoading" class="mt-4 text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Carregant...</span>
+        </div>
+      </div>
+      <template v-else>
+        <div v-if="resourceSelected" class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
+            <div v-if="matchTypeSelected === 'offer'">
+              <div class="matches-count"><span>${ matches.offerMatches[resourceSelected].length } resultats</span></div>
+              {{ show_matches_vue("matches.offerMatches[resourceSelected]", "ofereix") }}
+            </div>
+            <div v-else>
+              <div class="matches-count"><span>${ matches.needMatches[resourceSelected].length } resultats</span></div>
+              {{ show_matches_vue("matches.needMatches[resourceSelected]", "també necessita") }}
+            </div>
           </div>
-          <div v-else>
-            <div class="matches-count"><span>${ matches.needMatches[resourceSelected].length } resultats</span></div>
-            {{ show_matches_vue("matches.needMatches[resourceSelected]", "també necessita") }}
+        </div>
+        <div v-else-if="organizationSelected" class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">${ organizationSelected.name }</h2>
+            <div class="matches-count agreements-count"><span>${ organizationMatches.length } resultats</span></div>
+            {{ show_matches_vue("organizationMatches.filter(m => m.type === 'offer')", "ofereix") }}
+            {{ show_matches_vue("organizationMatches.filter(m => m.type === 'need')", "també necessita") }}
+          </div>
+        </div>
+        <div v-else class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">Tot</h2>
+            <div class="matches-count"><span>${ concatenateMatches(matches.offerMatches).length + concatenateMatches(matches.needMatches).length } resultats</span></div>
+            {{ show_matches_vue("concatenateMatches(matches.offerMatches)", "ofereix") }}
+            {{ show_matches_vue("concatenateMatches(matches.needMatches)", "també necessita") }}
           </div>
         </div>
       </div>
-      <div v-else-if="organizationSelected" class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">${ organizationSelected.name }</h2>
-          <div class="matches-count agreements-count"><span>${ organizationMatches.length } resultats</span></div>
-          {{ show_matches_vue("organizationMatches.filter(m => m.type === 'offer')", "ofereix") }}
-          {{ show_matches_vue("organizationMatches.filter(m => m.type === 'need')", "també necessita") }}
-        </div>
-      </div>
-      <div v-else class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">Tot</h2>
-          <div class="matches-count"><span>${ concatenateMatches(matches.offerMatches).length + concatenateMatches(matches.needMatches).length } resultats</span></div>
-          {{ show_matches_vue("concatenateMatches(matches.offerMatches)", "ofereix") }}
-          {{ show_matches_vue("concatenateMatches(matches.needMatches)", "també necessita") }}
-        </div>
-      </div>
-    </div>
+    </template>
 
     {{ images_modal_vue() }}
   </div>

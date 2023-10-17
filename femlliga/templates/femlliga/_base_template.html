@@ -11,16 +11,6 @@
 <a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" style="" href="{{ url(href, args=args) }}">{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
 {% endmacro %}
 
-{% macro dropdown_menu(icon, href, args=[]) %}
-<a
-  class="nav-link dropdown-toogle {% if href and parent(request.path) == parent(url(href, args=args)) %} active{% endif %}"
-  role="button"
-  data-bs-toggle="dropdown"
-  aria-expanded="false"
-  href="#">
-  <i class="{{ icon }}"></i>
-</a>
-{% endmacro %}
 
 {% block primary_navigation %}
   <ul class="navbar-nav me-auto mb-lg-0">
@@ -44,12 +34,20 @@
     <li>{{ menu_url("Entra", "account_login") }}</li>
   {% else %}
     <li class="nav-item dropstart">
-      {{ dropdown_menu("bi-person-circle", "") }}
-      <ul class="dropdown-menu" aria-labelledby="agreementsDropdownMenuLink">
+      <a
+        class="nav-link dropdown-toogle {% if href and parent(request.path) == parent(url(href, args=args)) %} active{% endif %}"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        aria-label="Expandeix el menú del perfil"
+        href="#">
+        <i class="bi-person-circle"></i>
+      </a>
+      <ul class="dropdown-menu">
         {% if organization %}
         <li><a class="dropdown-item" href="{{ url("app") }}">Entitat</a></li>
         {% endif %}
-        <li><a class="dropdown-item" href="{{ url("notifications") }}">Notificacions</a></li>
+        <li><a class="dropdown-item" href="{{ url("profile") }}">Perfil</a></li>
         <li>
           <form method="post" action="{{ url("account_logout") }}">
             {{ csrf_input }}
