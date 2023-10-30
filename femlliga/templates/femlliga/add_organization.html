@@ -19,7 +19,7 @@
   Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo.
 </div>
 {% endif %}
-<form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="mb-2">
+<form method="post" enctype="multipart/form-data" class="mb-2">
     {{ csrf_input }}
     {{ form_feedback(form) }}
 

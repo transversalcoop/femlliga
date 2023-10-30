@@ -13,7 +13,7 @@
 
 <h1>{{ resource.question(resource_type) }}</h1>
 
-<form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="mb-1">
+<form method="post" enctype="multipart/form-data" class="mb-1">
     {{ csrf_input }}
     {{ form_feedback(form) }}
 
