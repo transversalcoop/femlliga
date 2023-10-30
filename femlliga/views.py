@@ -408,21 +408,59 @@ def matches(request, organization_id):
 
 def render_matches_page(request, page_type, organization, offer_matches, need_matches, needs_json):
     organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
+    agreement_declined_map = get_last_agreement_declined_map(organization)
     return render(request, "femlliga/matches.html", {
         "matches_json": {
-            "offerMatches": {k: [m.json(current_organization=organization) for m in offer_matches[k]] for k in offer_matches},
-            "needMatches": {k: [m.json(current_organization=organization) for m in need_matches[k]] for k in need_matches},
+            "offerMatches": {
+                k: [m.json(
+                    current_organization=organization,
+                    agreement_declined_map=agreement_declined_map,
+                ) for m in offer_matches[k]] for k in offer_matches
+            },
+            "needMatches": {
+                k: [m.json(
+                    current_organization=organization,
+                    agreement_declined_map=agreement_declined_map,
+                ) for m in need_matches[k]] for k in need_matches
+            },
         },
         "organization_matches_json": [
             {
                 "organization": l[0].organization.json(current_organization=organization),
-                "matches": [m.json(current_organization=organization) for m in l],
+                "matches": [m.json(
+                    current_organization=organization,
+                    agreement_declined_map=agreement_declined_map,
+                ) for m in l],
             }
             for l in organization_matches
         ],
         "needs_json": needs_json,
         "page_type": page_type,
     })
+
+def get_last_agreement_declined_map(organization):
+    l = list(Agreement.objects.filter(solicitor=organization).exclude(communication_accepted=None))
+    return {
+        "need": get_last_agreement_declined_map_resource(list(filter(lambda x: x.resource_type=="need", l))),
+        "offer": get_last_agreement_declined_map_resource(list(filter(lambda x: x.resource_type=="offer", l))),
+    }
+
+def get_last_agreement_declined_map_resource(l):
+    return {
+        k[0]: get_last_agreement_declined_map_organization(list(filter(lambda x: x.resource==k[0], l))) for k in RESOURCES
+    }
+
+def get_last_agreement_declined_map_organization(l):
+    org_ids = set([x.solicitee.id for x in l])
+    return {
+        id: get_last_agreement_declined(list(filter(lambda x: x.solicitee.id==id, l))) for id in org_ids
+    }
+
+def get_last_agreement_declined(l):
+    ll = list(sorted(l, key=lambda x: x.communication_date, reverse=True))
+    if len(ll) > 0:
+        return not ll[0].communication_accepted
+    return False
 
 def group_matches_by_organization(organization, offer_matches, need_matches):
     orgs = {}
