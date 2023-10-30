@@ -436,6 +436,10 @@ nav .nav-link.active {
     height: 300px;
 }
 
+.map-height-big {
+    height: 700px;
+}
+
 .card-carousel-triple {
     width: 33%;
     margin-right: 1%;
@@ -594,3 +598,4 @@ nav .nav-link.active {
     padding-left: 10px;
     border-left: 1px solid gray;
 }
+

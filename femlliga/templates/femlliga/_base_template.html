@@ -2,13 +2,12 @@
 
 {% macro pending_dot() %}
 <span
-  class="position-absolute bg-danger rounded-circle"
-  style="padding: 4px;"
+  class="position-absolute bg-danger rounded-circle p-1"
   title="Teniu peticions pendents d'atendre">
 </span>
 {% endmacro %}
 {% macro menu_url(name, href, args=[], pending=False) %}
-<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" style="" href="{{ url(href, args=args) }}">{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
+<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}">{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
 {% endmacro %}
 
 

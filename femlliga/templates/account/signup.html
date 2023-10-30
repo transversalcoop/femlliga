@@ -7,41 +7,41 @@
 {% block content %}
 <div class="container">
 <h2>Registre</h2>
-<div class="alert alert-primary" role="alert" style="margin-top: 20px;">
-    Per inscriure una entitat, primer heu de crear un compte. Si ja el teniu creat, podeu iniciar sessió.
+<div class="alert alert-primary mt-3" role="alert">
+  Per inscriure una entitat, primer heu de crear un compte. Si ja el teniu creat, podeu iniciar sessió.
 </div>
 
 <form method="post" class="mb-4">
-    {{ csrf_input }}
-    {{ form_feedback(form) }}
-    <label for="id_email">Correu electrònic</label>
-    <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="email" required id="id_email" {{ input_value(form, "email") }}>
-    {{ input_feedback(form, "email") }}
+  {{ csrf_input }}
+  {{ form_feedback(form) }}
+  <label for="id_email">Correu electrònic</label>
+  <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="email" required id="id_email" {{ input_value(form, "email") }}>
+  {{ input_feedback(form, "email") }}
 
-    <label for="id_password1">Contrasenya</label>
-    <div class="input-group">
-      <input type="password" {{ input_classes(form, "password1") }} name="password1" autocomplete="contrasenya-actual" required="" id="id_password1">
-      {{ toggle_password_button() }}
-      {{ input_feedback(form, "password1") }}
-    </div>
+  <label for="id_password1">Contrasenya</label>
+  <div class="input-group">
+    <input type="password" {{ input_classes(form, "password1") }} name="password1" autocomplete="contrasenya-actual" required="" id="id_password1">
+    {{ toggle_password_button() }}
+    {{ input_feedback(form, "password1") }}
+  </div>
 
-    <label for="id_password2">Contrasenya (de nou)</label>
-    <div class="input-group">
-      <input type="password" {{ input_classes(form, "password2") }} name="password2" autocomplete="contrasenya-de-nou" required="" id="id_password2">
-      {{ toggle_password_button() }}
-      {{ input_feedback(form, "password2") }}
-    </div>
+  <label for="id_password2">Contrasenya (de nou)</label>
+  <div class="input-group">
+    <input type="password" {{ input_classes(form, "password2") }} name="password2" autocomplete="contrasenya-de-nou" required="" id="id_password2">
+    {{ toggle_password_button() }}
+    {{ input_feedback(form, "password2") }}
+  </div>
 
-    <div class="mt-2"></div>
-    {{ form.captcha }}
+  <div class="mt-2"></div>
+  {{ form.captcha }}
 
-    <p class="mt-2">En registrar-te, acceptes la <a target="_blank" rel="noopener noreferrer" href="{{ url("page", args=["privacy"]) }}">política de protecció de dades</a>.</p>
+  <p class="mt-2">En registrar-te, acceptes la <a target="_blank" rel="noopener noreferrer" href="{{ url("page", args=["privacy"]) }}">política de protecció de dades</a>.</p>
 
-    <div style="margin-top: 10px;">
-        <button type="submit" class="btn btn-custom">Registra't</button>
-        <a class="btn btn-light" href="{{ url("account_login") }}">Inicia sessió</a>
-        <a class="btn btn-light" href="{{ provider_login_url(request, "google") }}"><img alt="Logo de Google" src="{{ static("google_logo.png") }}"> Registra't amb un compte de Google</a>
-    </div>
+  <div class="mt-2">
+    <button type="submit" class="btn btn-custom">Registra't</button>
+    <a class="btn btn-light" href="{{ url("account_login") }}">Inicia sessió</a>
+    <a class="btn btn-light" href="{{ provider_login_url(request, "google") }}"><img alt="Logo de Google" src="{{ static("google_logo.png") }}"> Registra't amb un compte de Google</a>
+  </div>
 </form>
 
 </div>

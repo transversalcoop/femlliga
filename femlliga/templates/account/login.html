@@ -8,28 +8,28 @@
 <div class="container">
 <h2>Inicia sessió</h2>
 <form method="post" class="mb-2">
-    {{ csrf_input }}
-    {{ form_feedback(form) }}
-    <label for="id_login">Correu electrònic</label>
-    <input type="email" {{ input_classes(form, "login") }} name="login" autocomplete="email" required id="id_login" {{ input_value(form, "login") }}>
-    {{ input_feedback(form, "login") }}
+  {{ csrf_input }}
+  {{ form_feedback(form) }}
+  <label for="id_login">Correu electrònic</label>
+  <input type="email" {{ input_classes(form, "login") }} name="login" autocomplete="email" required id="id_login" {{ input_value(form, "login") }}>
+  {{ input_feedback(form, "login") }}
 
-    <label for="id_password">Contrasenya</label>
-    <div class="input-group">
-      <input type="password" {{ input_classes(form, "password") }} name="password" autocomplete="current-password" required="" id="id_password">
-      {{ toggle_password_button() }}
-      {{ input_feedback(form, "password") }}
-    </div>
+  <label for="id_password">Contrasenya</label>
+  <div class="input-group">
+    <input type="password" {{ input_classes(form, "password") }} name="password" autocomplete="current-password" required="" id="id_password">
+    {{ toggle_password_button() }}
+    {{ input_feedback(form, "password") }}
+  </div>
 
-    <div class="mt-2"></div>
-    {{ form.captcha }}
+  <div class="mt-2"></div>
+  {{ form.captcha }}
 
-    <div style="margin-top: 10px;">
-        <button type="submit" class="btn btn-custom">Entra</button>
-        <a class="btn btn-light" href="{{ url("account_signup") }}">Registra't</a>
-        <a class="btn btn-light" href="{{ url("account_reset_password") }}">He oblidat la contrasenya</a>
-        <a class="btn btn-light" href="{{ provider_login_url(request, "google") }}"><img alt="Logo de Google" src="{{ static("google_logo.png") }}"> Entra amb un compte de Google</a>
-    </div>
+  <div class="mt-2">
+    <button type="submit" class="btn btn-custom">Entra</button>
+    <a class="btn btn-light" href="{{ url("account_signup") }}">Registra't</a>
+    <a class="btn btn-light" href="{{ url("account_reset_password") }}">He oblidat la contrasenya</a>
+    <a class="btn btn-light" href="{{ provider_login_url(request, "google") }}"><img alt="Logo de Google" src="{{ static("google_logo.png") }}"> Entra amb un compte de Google</a>
+  </div>
 </form>
 
 </div>
