@@ -15,7 +15,7 @@
     {% else %}
       compartir
     {% endif %}
-    {{ resource_name(a.resource) }} ({{ a.render_options() }}), amb aquest missatge:
+    {{ resource_name(a.resource) }}{% if a.options.count() > 0 %} ({{ a.render_options() }}){% endif %}, amb aquest missatge:
   </td>
 </tr>
 <tr>

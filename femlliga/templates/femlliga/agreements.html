@@ -143,7 +143,7 @@
     <p>Missatge que es va enviar el ${ formatDateTime(result.date) }:</p>
     <pre class="quoted-message">${ result.message }</pre>
 
-    <div v-if="result.communication_accepted === null">
+    <div v-if="result.communication_accepted === null && communicationsResolved[result.id] === undefined">
       <i class="bi-hourglass-split text-muted fs-4"></i>
       Encara no s'ha acceptat ni declinat la comunicació.
       <div v-if="!agreementSent(result)">
@@ -163,14 +163,14 @@
         </div>
       </div>
     </div>
-    <div v-else-if="result.communication_accepted === false">
+    <div v-else-if="result.communication_accepted === false || communicationsResolved[result.id] === false">
       <i class="bi-x-lg text-danger fs-4"></i>
       Es va declinar la comunicació <span v-if="result.communication_date">(${ formatDateTime(result.communication_date) })</span>
     </div>
-    <div v-else-if="result.communication_accepted === true">
+    <div v-else-if="result.communication_accepted === true || communicationsResolved[result.id] === true">
       <i class="bi-check2 text-success fs-4"></i>
       Es va iniciar la comunicació <span v-if="result.communication_date">(${ formatDateTime(result.communication_date) })</span>
-      <div v-if="result.agreement_successful === null">
+      <div v-if="result.agreement_successful === null && agreementsResolved[result.id] === undefined">
         <div v-if="!agreementsLoading[result.id]">
           <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2">
             S'ha fet acord
@@ -186,11 +186,11 @@
           </div>
         </div>
       </div>
-      <div v-else-if="result.agreement_successful === false">
+      <div v-else-if="result.agreement_successful === false || agreementsResolved[result.id] === false">
         <i class="bi-x-lg text-danger fs-4"></i>
         No es va arribar a un acord <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
       </div>
-      <div v-else-if="result.agreement_successful === true">
+      <div v-else-if="result.agreement_successful === true || agreementsResolved[result.id] === true">
         <i class="bi-check2 text-success fs-4"></i>
         Es va arribar a un acord <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
       </div>
@@ -254,6 +254,8 @@ Vue.createApp({
       requestTypeSelected: "",
       organizationSelected: null,
       agreementsLoading: {},
+      communicationsResolved: {},
+      agreementsResolved: {},
     };
   },
   methods: {
@@ -300,13 +302,12 @@ Vue.createApp({
           throw "Bad response";
         }
         if (field === "connect") {
-          agreement.communication_accepted = value === "yes";
+          this.communicationsResolved[agreement.id] = value === "yes";
         } else {
-          agreement.agreement_successful = value === "yes";
+          this.agreementsResolved[agreement.id] = value === "yes";
         }
         this.agreementsLoading[agreement.id] = false;
       }).catch(err => {
-        agreement.error = true;
         this.agreementsLoading[agreement.id] = false;
       });
     },

@@ -174,7 +174,7 @@
         ></textarea>
       </div>
     </div>
-    <button @click="sendMessage(result.message_href)" class="btn btn-custom mt-2" :disabled="!messageFormOk(messagesOpen[result.message_href])" v-if="!messagesOpen[result.message_href] || (!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error)">
+    <button @click="sendMessage(result.message_href)" class="btn btn-custom mt-2" :disabled="!messageFormOk(result)" v-if="!messagesOpen[result.message_href] || (!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error)">
       <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
         Enviant
         <div class="spinner-border spinner-border-sm" role="status">
@@ -312,9 +312,13 @@ Vue.createApp({
     toggleMessageOption(key, option) {
       this.messagesOpen[key].options[option] = !this.messagesOpen[key].options[option];
     },
-    messageFormOk(values) {
+    messageFormOk(result) {
+      var values = this.messagesOpen[result.message_href];
       if (!values) {
         return true;
+      }
+      if (result.resource === "OTHER") {
+          return values.message;
       }
       var selectedOptions = Object.keys(values.options).map(k => values.options[k]).filter(v => v);
       return values.message && this.extractSelectedOptions(values.options).length > 0;

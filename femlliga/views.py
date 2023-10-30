@@ -439,7 +439,7 @@ def render_matches_page(request, page_type, organization, offer_matches, need_ma
     })
 
 def get_last_agreement_declined_map(organization):
-    l = list(Agreement.objects.filter(solicitor=organization).exclude(communication_accepted=None))
+    l = list(Agreement.objects.prefetch_related("solicitee").filter(solicitor=organization).exclude(communication_accepted=None))
     return {
         "need": get_last_agreement_declined_map_resource(list(filter(lambda x: x.resource_type=="need", l))),
         "offer": get_last_agreement_declined_map_resource(list(filter(lambda x: x.resource_type=="offer", l))),
@@ -572,7 +572,7 @@ def send_message(request, organization_id, organization_to, resource_type, resou
         model = Need
     r = get_object_or_404(model, organization=other, resource = resource)
     post = get_json_body(request)
-    form = MessageForm(post)
+    form = MessageForm(post, resource=resource)
     if form.is_valid():
         a = Agreement(
             solicitor=organization,
