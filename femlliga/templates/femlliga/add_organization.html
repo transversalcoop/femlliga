@@ -1,6 +1,8 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, render_multi_checkboxes, render_formset_field, render_formset_select, render_formset_delete_vue %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, render_multi_checkboxes, render_formset_field, render_formset_select, render_formset_delete_vue, leaflet_css, leaflet_js, vue_js %}
+
+{% block css %}{{ leaflet_css() }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -121,6 +123,8 @@
 {% endblock %}
 
 {% block js %}
+{{ leaflet_js() }}
+{{ vue_js() }}
 {{ json_script(consts.SOCIAL_MEDIA_TYPES_PLACEHOLDERS , "media-types-placeholders-data") }}
 <script>
 var mediaTypesPlaceholdersMap = JSON.parse(document.getElementById('media-types-placeholders-data').textContent);

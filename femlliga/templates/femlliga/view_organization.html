@@ -1,6 +1,8 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import organization_info, organization_map_js %}
+{% from 'femlliga/_macros.html' import organization_info, organization_map_js, leaflet_css, leaflet_js %}
+
+{% block css %}{{ leaflet_css() }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -20,6 +22,7 @@
 {% endblock %}
 
 {% block js %}
+{{ leaflet_js() }}
 <script>
 {{ organization_map_js(org) }}
 </script>

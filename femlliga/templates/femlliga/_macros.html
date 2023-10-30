@@ -1,3 +1,15 @@
+{% macro leaflet_css() %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+{% endmacro %}
+
+{% macro leaflet_js() %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+{% endmacro %}
+
+{% macro vue_js() %}
+<script src="https://unpkg.com/vue@3/dist/vue.global{% if not settings.DEBUG %}.prod{% endif %}.js"></script>
+{% endmacro %}
+
 {% macro page_heading(heading, subheading) %}
 <section style="background-color: transparent; background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);">
   <div style="padding-top: 100px;" class="container">

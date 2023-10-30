@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, render_select %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, render_select, vue_js %}
 
 {% macro collaboration_example(image, heading, text, alternatives, active=False, mobile=False) %}
 <div class="carousel-item{% if active %} active{% endif %}">
@@ -327,6 +327,7 @@
 {% endblock %}
 
 {% block js %}
+{{ vue_js() }}
 {{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
 {{ json_script(consts.RESOURCE_OPTIONS_MAP , "resource-options-data") }}
 {{ json_script(consts.RESOURCE_OPTIONS_QUESTION_MAP , "resource-options-question-data") }}

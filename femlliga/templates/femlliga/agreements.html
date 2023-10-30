@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import organization_link, info_tooltip  %}
+{% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js %}
 
 {% block content %}
 {% if len(agreements.sent) > 0 or len(agreements.received) > 0 %}
@@ -201,6 +201,7 @@
 {% endmacro %}
 
 {% block js %}
+{{ vue_js() }}
 {{ json_script(agreements_json, "agreements-data") }}
 {{ json_script(concatenated_agreements_json, "concatenated-agreements-data") }}
 {{ json_script(organizations_json, "organizations-data") }}

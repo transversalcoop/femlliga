@@ -1,5 +1,7 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import leaflet_css, leaflet_js %}
+
 {% macro plot(data) %}
 <div style="text-align: center;">
     <img src="data:image/png;base64,{{ data }}"/>
@@ -35,6 +37,8 @@
 </table>
 {{ plot(table.plot()) }}
 {% endmacro %}
+
+{% block css %}{{ leaflet_css() }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -136,6 +140,7 @@
 {% endblock %}
 
 {% block js %}
+{{ leaflet_js() }}
 <script>
 var orgs = {{ orgs_json|safe }};
 var lat = 0, lng = 0;

@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import render_select_raw, resource_details, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, show_matches_vue %}
+{% from 'femlliga/_macros.html' import render_select_raw, resource_details, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, show_matches_vue, vue_js %}
 
 {% block content %}
 {% if len(matches_json.offerMatches) > 0 or len(matches_json.needMatches) > 0 %}
@@ -121,6 +121,7 @@
 {% endblock %}
 
 {% block js %}
+{{ vue_js() }}
 {{ json_script(matches_json, "matches-data") }}
 {{ json_script(organization_matches_json, "organization-matches-data") }}
 {{ json_script(needs_json, "needs-data") }}
