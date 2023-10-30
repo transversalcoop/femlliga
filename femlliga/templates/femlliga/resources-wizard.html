@@ -58,9 +58,9 @@
     {% if resource_type == "offers" %}
       {{ imageforms.management_form }}
       {% for i, imageform in enumerate(imageforms) %}
-          <div id="add-image-{{ i }}" style="display: none;">
-            {{ render_formset_field(imageform, imageform.image, "image", "file", "Imatge") }}
-          </div>
+        <div id="add-image-{{ i }}" {% if not imageform.errors["image"] %}class="d-none"{% endif %}>
+          {{ render_formset_field(imageform, imageform.image, "image", "file", "Imatge") }}
+        </div>
       {% endfor %}
 
       <a class="btn btn-custom mt-3" onclick="addImage(event)">
@@ -92,8 +92,8 @@
 function addImage(event) {
     for (let i = 0; i < 6; i++) {
         var element = document.getElementById("add-image-" + i);
-        if (element.style.display == "none") {
-            element.style.display = "block";
+        if (element.classList.contains("d-none")) {
+            element.classList.toggle("d-none");
             if (i === 5) {
                 event.target.style.display = "none";
             }

@@ -171,10 +171,13 @@ class IntegrationTests(TestCase):
             "options": options,
             "comments": comments,
             "has_resource": has_resource,
+            "images-TOTAL_FORMS": 6,
+            "images-INITIAL_FORMS": 0,
         }
         if charge:
             params["charge"] = "on"
         response = self.client.post(url, params, follow=True)
+        save_response(response)
         self.assertContains(response, contains)
 
     @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)

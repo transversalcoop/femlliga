@@ -288,15 +288,17 @@ def get_resources_models(resource_type):
         return Offer, OfferImage
     return Need, NeedImage
 
-def render_wizard(request, org, resource, form, resource_type, editing = False, db_resource = None):
+def render_wizard(request, org, resource, form, resource_type, editing = False, db_resource = None, imageforms=None):
     model, imagemodel = get_resources_models(resource_type)
+    if not imageforms:
+        imageforms = inlineformset_factory(model, imagemodel, fields=("image",), extra=6)()
     return render(request, "femlliga/resources-wizard.html", {
         "org": org,
         "resource": Resource.resource(resource),
         "db_resource": db_resource,
         "form": form,
         "resource_type": resource_type,
-        "imageforms": inlineformset_factory(model, imagemodel, fields=("image",), extra=6)(),
+        "imageforms": imageforms,
         "total": len(RESOURCES) * 2,
         "count": get_resource_index(resource_type, resource),
         "editing": editing,
@@ -309,17 +311,21 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
         model, imagemodel = get_resources_models(resource_type)
+        try:
+            m = model.objects.get(resource = resource, organization = org)
+        except Exception as ex:
+            m = model(resource = resource, organization = org)
+            m.save()
+
+        ImageFormSet = inlineformset_factory(model, imagemodel, fields=("image",))
+        imageformset = ImageFormSet(request.POST, clean_files(request.FILES), instance = m)
+
         form = ResourceForm(request.POST)
-        if form.is_valid():
-            try:
-                m = model.objects.get(resource = resource, organization = org)
-            except Exception as ex:
-                m = model(resource = resource, organization = org)
-                m.save()
-
-            ImageFormSet = inlineformset_factory(model, imagemodel, fields=("image",))
-            imageformset = ImageFormSet(request.POST, clean_files(request.FILES), instance = m)
-
+        if resource_type == "needs":
+            forms_valid = form.is_valid()
+        else:
+            forms_valid = form.is_valid() and imageformset.is_valid()
+        if forms_valid:
             for option, _ in Resource.resource(resource).options():
                 ro = ResourceOption(name=option)
                 ro.save()
@@ -332,26 +338,26 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
             m.has_resource = form.cleaned_data["has_resource"] == "yes"
             m.charge = form.cleaned_data["charge"]
             m.save()
-            if imageformset.is_valid():
+            if resource_type == "offers":
                 imageformset.save()
-            for name in request.POST:
-                if name.startswith("delete-image-"):
-                    name = name.removeprefix("delete-image-")
-                    try:
-                        image_id = int(name)
-                        image = imagemodel.objects.get(pk = image_id)
-                        if image.resource.organization != org:
-                            continue
-                        f = Path(image.image.path)
-                        if f.is_file():
-                            f.unlink()
-                        image.delete()
-                    except Exception as ex:
-                        raise
+                for name in request.POST:
+                    if name.startswith("delete-image-"):
+                        name = name.removeprefix("delete-image-")
+                        try:
+                            image_id = int(name)
+                            image = imagemodel.objects.get(pk = image_id)
+                            if image.resource.organization != org:
+                                continue
+                            f = Path(image.image.path)
+                            if f.is_file():
+                                f.unlink()
+                            image.delete()
+                        except Exception as ex:
+                            raise
 
             return redirect_resource_set(org, resource_type, resource)
         else:
-            return render_wizard(request, org, resource, form, resource_type, editing = editing)
+            return render_wizard(request, org, resource, form, resource_type, editing = editing, db_resource=m, imageforms=imageformset)
 
     return render_wizard(request, org, resource, ResourceForm(), resource_type)
 
