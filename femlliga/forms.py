@@ -84,7 +84,7 @@ class MessageForm(forms.Form):
 
     def clean(self):
         super().clean()
-        if self.resource == "OTHER":
+        if self.resource.options.count() == 0:
             return self.cleaned_data
 
         if len(self.cleaned_data.get("options", [])) == 0:

@@ -5,9 +5,9 @@
 {% macro collaboration_example(image, heading, text, alternatives, active=False, mobile=False) %}
 <div class="carousel-item{% if active %} active{% endif %}">
   <div class="card {% if not mobile %}card-carousel-triple{% endif %}">
-    <img src="{{ static("decorations/quote.svg") }}" class="example-quote" alt="">
+    <img src="{{ static("decorations/quote.svg") }}" class="example-quote" alt="" loading="lazy">
 
-    <img src="{{ static("home-images/"+image) }}" class="card-img-top pt-4 ps-4 pe-4" alt="">
+    <img src="{{ static("home-images/"+image) }}" class="card-img-top pt-4 ps-4 pe-4" alt="" loading="lazy">
     <div class="card-body">
       <p class="text-center text-muted fsm-1">{{ text }}</p>
       <div class="divider-1"></div>
@@ -46,7 +46,7 @@
 <!-- mobile initial block -->
 <div class="container d-block d-md-none">
   <div style="background-color: #f4f4f4;">
-    <img src="{{ static("home-images/gent-portada-mobile.png") }}" style="max-width: 100%" alt="Persones diverses">
+    <img src="{{ static("home-images/gent-portada-mobile.png") }}" style="max-width: 100%" alt="Persones diverses" loading="lazy">
     <div class="p-2">
       <em>Fer lliga: unir-se, fer causa comuna, acordar, amistar-se, anar a l’una, fer pinya…</em>
       <h1 class="app-title app-title-mobile">Fem lliga!</h1>
@@ -140,8 +140,8 @@
           <div class="carousel-inner overflow-hidden" style=" padding: 0 0 30px 0;">
             {% for i in range(1, 7) %}
             <div class="carousel-item{% if i == 1 %} active{% endif %}">
-              <img src="{{ static("screenshots-carousel/"+str(i)+".png") }}" class="d-none d-md-block w-100" alt="">
-              <img src="{{ static("screenshots-carousel/"+str(i)+"_mobil.png") }}" class="d-block d-md-none w-100" alt="">
+              <img src="{{ static("screenshots-carousel/"+str(i)+".png") }}" class="d-none d-md-block w-100" alt="" loading="lazy">
+              <img src="{{ static("screenshots-carousel/"+str(i)+"_mobil.png") }}" class="d-block d-md-none w-100" alt="" loading="lazy">
             </div>
             {% endfor %}
           </div>
@@ -171,7 +171,7 @@
 <div class="container">
     <div class="row">
         <div class="col-xl-4 col-md-6 col-xs-12 text-center">
-            <img src="{{ static("home-images/vinyeta-1-circuit.png") }}" alt="Dona Núria">
+            <img src="{{ static("home-images/vinyeta-1-circuit.png") }}" alt="Dona Núria" loading="lazy">
         </div>
         <div class="col-xl-4 col-md-6 col-xs-12 vinyeta">
             <div class="vinyeta-inner">
@@ -180,7 +180,7 @@
             </div>
         </div>
         <div class="col-xl-4 col-md-6 col-xs-12 text-center">
-            <img src="{{ static("home-images/vinyeta-2-circuit-projector.png") }}" alt="Projector i pantalla">
+            <img src="{{ static("home-images/vinyeta-2-circuit-projector.png") }}" alt="Projector i pantalla" loading="lazy">
         </div>
     </div>
 
@@ -207,7 +207,7 @@
 
     <div class="row">
         <div class="col-xl-4 col-md-6 col-xs-12 text-center">
-            <img src="{{ static("home-images/vinyeta-6.png") }}" alt="Dona Núria">
+            <img src="{{ static("home-images/vinyeta-6.png") }}" alt="Dona Núria" loading="lazy">
         </div>
         <div class="col-xl-4 col-md-6 col-xs-12 vinyeta">
             <div class="vinyeta-inner">
@@ -216,7 +216,7 @@
             </div>
         </div>
         <div class="col-xl-4 col-md-6 col-xs-12 text-center">
-            <img src="{{ static("home-images/vinyeta-7.png") }}" alt="Projector i pantalla">
+            <img src="{{ static("home-images/vinyeta-7.png") }}" alt="Projector i pantalla" loading="lazy">
         </div>
     </div>
 </div>

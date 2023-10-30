@@ -572,7 +572,7 @@ def send_message(request, organization_id, organization_to, resource_type, resou
         model = Need
     r = get_object_or_404(model, organization=other, resource = resource)
     post = get_json_body(request)
-    form = MessageForm(post, resource=resource)
+    form = MessageForm(post, resource=r)
     if form.is_valid():
         a = Agreement(
             solicitor=organization,
