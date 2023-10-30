@@ -2,6 +2,20 @@
 
 {% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_multiple_tags, render_formset_field %}
 
+{% block title %}
+{% if editing %}
+Edita
+{% else %}
+Alta
+{% endif %}
+{% if resource_type == "need" %}
+necessitat
+{% else %}
+oferiment
+{% endif %}
+{{ resource }}
+{% endblock %}
+
 {% block content %}
 <div class="container">
 {% if not editing %}

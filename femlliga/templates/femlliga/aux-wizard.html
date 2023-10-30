@@ -1,5 +1,15 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% block title %}
+{% if page == "pre-wizard" %}
+Alta
+{% elif page == "mid-wizard" %}
+Meitat d'alta completada
+{% else %}
+Alta completada
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="container">
 {% if page == "pre-wizard" %}

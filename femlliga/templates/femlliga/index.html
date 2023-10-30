@@ -2,33 +2,9 @@
 
 {% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, render_select, vue_js %}
 
-{% macro collaboration_example(image, heading, text, alternatives, active=False, mobile=False) %}
-<div class="carousel-item{% if active %} active{% endif %}">
-  <div class="card {% if not mobile %}card-carousel-triple{% endif %}">
-    <img src="{{ static("decorations/quote.svg") }}" class="example-quote" alt="" loading="lazy">
-
-    <img src="{{ static("home-images/"+image) }}" class="card-img-top pt-4 ps-4 pe-4" alt="" loading="lazy">
-    <div class="card-body">
-      <p class="text-center text-muted fsm-1">{{ text }}</p>
-      <div class="divider-1"></div>
-      <h3 class="text-center lh-15">{{ heading }}</h3>
-      <p class="text-center text-muted fsm-2">{{ alternatives }}</p>
-    </div>
-  </div>
-</div>
-{% endmacro %}
+{% block title %}Portada{% endblock %}
 
 {% block content %}
-
-{% macro initial_block_text() %}
-      <p>{{ consts.APP_NAME }} és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.</p>
-      <div class="mt-3 text-center">
-        <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
-          Inscriu la teua entitat
-        </a>
-      </div>
-{% endmacro %}
-
 <!-- desktop initial block -->
 <div class="container d-none d-md-block">
   <div class="row d-flex flex-md-row-reverse welcome-block">
@@ -264,20 +240,6 @@
     </p>
 </div>
 
-{% macro carousel_examples(mobile=False) %}
-{{ collaboration_example("exemples-legal.png", "Us desborden les qüestions legals?", "Segur que teniu dubtes a l'hora de saber si cal contractar una assegurança per a alguna activitat o si heu de complir amb la Llei de Transparència,", "O per exemple fiscals i comptables?", active=True, mobile=mobile) }}
-
-{{ collaboration_example("exemples-llibreta.png", "Voleu aprendre a redactar projectes? Fem lliga!", "Quantes vegades us hauria anat bé que us orientaren quan us poseu davant la paperassa per a demanar recursos econòmics a l'administració?", "Per exemple per a demanar una subvenció", active=False, mobile=mobile) }}
-
-{{ collaboration_example("exemples-equip-de-so.png", "Busqueu un equip de so? Fem lliga!", "Resulta que voleu fer un acte en el carrer i us aniria molt bé un equip de so perquè s'escolte a les persones participants.", "Microfonia, altaveus, una taula de mescles.", mobile=mobile) }}
-
-{{ collaboration_example("exemples-persones.png", "Busqueu un espai? Fem lliga!", "Amb aquesta xarxa social podeu contactar amb altres associacions que estan disposades a compartir la seua seu.", "Per a un acte puntual? de forma periòdica o permanent?", mobile=mobile) }}
-
-{{ collaboration_example("exemples-projector.png", "Necessiteu un projector? Fem lliga!", "Entre les associacions fàcilment fareu lliga amb alguna que us el pot deixar. Contacteu i concreteu les condicions!", "O algun altre recurs audiovisual? Un equip de so potser?", mobile=mobile) }}
-
-{{ collaboration_example("exemples-formacio.png", "Voleu formar-vos? Fem lliga!", "Us agradria ensenyar com funcionen les xarxes socials? Voleu compartir algun altre coneixement? Segur que trobeu amb qui compartir-lo.", "Per exemple en pàgines web? o en com millorar el funcionament de la vostra assemblea?", mobile=mobile) }}
-{% endmacro %}
-
 <section class="d-none d-lg-block" style="background-color: transparent; background-image: linear-gradient(180deg, white 20%, #ffce1c 100%); padding-bottom: 100px;">
   <div class="container">
     <div class="row mt-3">
@@ -323,8 +285,46 @@
     </div>
   </div>
 </section>
-
 {% endblock %}
+
+{% macro initial_block_text() %}
+      <p>{{ consts.APP_NAME }} és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.</p>
+      <div class="mt-3 text-center">
+        <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
+          Inscriu la teua entitat
+        </a>
+      </div>
+{% endmacro %}
+
+{% macro collaboration_example(image, heading, text, alternatives, active=False, mobile=False) %}
+<div class="carousel-item{% if active %} active{% endif %}">
+  <div class="card {% if not mobile %}card-carousel-triple{% endif %}">
+    <img src="{{ static("decorations/quote.svg") }}" class="example-quote" alt="" loading="lazy">
+
+    <img src="{{ static("home-images/"+image) }}" class="card-img-top pt-4 ps-4 pe-4" alt="" loading="lazy">
+    <div class="card-body">
+      <p class="text-center text-muted fsm-1">{{ text }}</p>
+      <div class="divider-1"></div>
+      <h3 class="text-center lh-15">{{ heading }}</h3>
+      <p class="text-center text-muted fsm-2">{{ alternatives }}</p>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro carousel_examples(mobile=False) %}
+{{ collaboration_example("exemples-legal.png", "Us desborden les qüestions legals?", "Segur que teniu dubtes a l'hora de saber si cal contractar una assegurança per a alguna activitat o si heu de complir amb la Llei de Transparència,", "O per exemple fiscals i comptables?", active=True, mobile=mobile) }}
+
+{{ collaboration_example("exemples-llibreta.png", "Voleu aprendre a redactar projectes? Fem lliga!", "Quantes vegades us hauria anat bé que us orientaren quan us poseu davant la paperassa per a demanar recursos econòmics a l'administració?", "Per exemple per a demanar una subvenció", active=False, mobile=mobile) }}
+
+{{ collaboration_example("exemples-equip-de-so.png", "Busqueu un equip de so? Fem lliga!", "Resulta que voleu fer un acte en el carrer i us aniria molt bé un equip de so perquè s'escolte a les persones participants.", "Microfonia, altaveus, una taula de mescles.", mobile=mobile) }}
+
+{{ collaboration_example("exemples-persones.png", "Busqueu un espai? Fem lliga!", "Amb aquesta xarxa social podeu contactar amb altres associacions que estan disposades a compartir la seua seu.", "Per a un acte puntual? de forma periòdica o permanent?", mobile=mobile) }}
+
+{{ collaboration_example("exemples-projector.png", "Necessiteu un projector? Fem lliga!", "Entre les associacions fàcilment fareu lliga amb alguna que us el pot deixar. Contacteu i concreteu les condicions!", "O algun altre recurs audiovisual? Un equip de so potser?", mobile=mobile) }}
+
+{{ collaboration_example("exemples-formacio.png", "Voleu formar-vos? Fem lliga!", "Us agradria ensenyar com funcionen les xarxes socials? Voleu compartir algun altre coneixement? Segur que trobeu amb qui compartir-lo.", "Per exemple en pàgines web? o en com millorar el funcionament de la vostra assemblea?", mobile=mobile) }}
+{% endmacro %}
 
 {% block js %}
 {{ vue_js() }}

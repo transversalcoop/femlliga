@@ -2,6 +2,14 @@
 
 {% from 'femlliga/_macros.html' import render_select_raw, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, vue_js %}
 
+{% block title %}
+{% if page_type == "matches" %}
+Has lligat!
+{% else %}
+Cerca
+{% endif %}
+{% endblock %}
+
 {% block content %}
 {% if len(matches_json.offerMatches) > 0 or len(matches_json.needMatches) > 0 %}
 <main id="content" class="container-fluid">

@@ -2,6 +2,8 @@
 
 {% from 'femlliga/_macros.html' import page_heading %}
 
+{% block title %}{{ page.heading }}{% endblock %}
+
 {% block content %}
 {{ page_heading(page.heading, page.subheading) }}
 

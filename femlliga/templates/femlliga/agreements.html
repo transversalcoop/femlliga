@@ -2,6 +2,8 @@
 
 {% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js %}
 
+{% block title %}Peticions{% endblock %}
+
 {% block content %}
 {% if len(agreements.sent) > 0 or len(agreements.received) > 0 %}
 <main id="content" class="container-fluid">

@@ -4,6 +4,14 @@
 
 {% block css %}{{ leaflet_css() }}{% endblock %}
 
+{% block title %}
+{% if edit %}
+Edita l'entitat
+{% else %}
+Crea una entitat
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="container">
 {% if edit %}

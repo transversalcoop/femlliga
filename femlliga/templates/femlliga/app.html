@@ -2,6 +2,8 @@
 
 {% from 'femlliga/_macros.html' import resource_details, organization_info, organization_map_js, leaflet_css, leaflet_js %}
 
+{% block title %}Entitat{% endblock %}
+
 {% macro resources(name, resource_type, data, missing, description) %}
     <div class="col-lg-6">
         <h2 class="resources-title">

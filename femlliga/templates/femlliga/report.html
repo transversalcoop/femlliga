@@ -2,6 +2,8 @@
 
 {% from 'femlliga/_macros.html' import leaflet_css, leaflet_js %}
 
+{% block title %}Informe{% endblock %}
+
 {% macro plot(data) %}
 <div style="text-align: center;">
     <img src="data:image/png;base64,{{ data }}"/>
