@@ -1,5 +1,6 @@
 function sanitize(s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
 function contains(a, b) { return a.indexOf(b) !== -1; }
+function formatDateTime(s) { return new Date(s).toLocaleString(); }
 
 function segmentsHaveOverlap(segments) {
     for (var i = 0; i < segments.length-1; i++) {

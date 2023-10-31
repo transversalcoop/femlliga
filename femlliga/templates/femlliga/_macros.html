@@ -1,3 +1,15 @@
+{% macro leaflet_css() %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+{% endmacro %}
+
+{% macro leaflet_js() %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+{% endmacro %}
+
+{% macro vue_js() %}
+<script src="https://unpkg.com/vue@3/dist/vue.global{% if not settings.DEBUG %}.prod{% endif %}.js"></script>
+{% endmacro %}
+
 {% macro page_heading(heading, subheading) %}
 <section style="background-color: transparent; background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);">
   <div style="padding-top: 100px;" class="container">
@@ -8,7 +20,7 @@
   <div class="divider-1"></div>
   <h3 style="font-weight: 700; color: gray; font-size: 1.125em;" class="text-center">{{ subheading }}</h3>
   <div>
-    <img src="{{ static("decorations/heading-bird.png") }}" alt="" style="margin: 30px 0 30px 250px;">
+    <img src="{{ static("decorations/heading-bird.png") }}" alt="" style="margin: 30px 0 30px 250px;" loading="lazy">
   </div>
 </div>
 {% endmacro %}
@@ -51,7 +63,7 @@
     {% for image in resource.images.all() %}
     <div class="thumbnail">
       <a data-bs-toggle="modal" href="#carouselModal{{ match_type }}{{ resource.id }}" role="button">
-        <img src="{{ image.image.url }}/">
+        <img src="{{ image.image.url }}/" loading="lazy">
       </a>
     </div>
     {% endfor %}
@@ -68,7 +80,7 @@
             <div class="carousel-inner">
               {% for i, image in enumerate(resource.images.all()) %}
               <div class="carousel-item text-center{% if i == 0 %} active{% endif %}">
-                <img src="{{ image.image.url }}/" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;">
+                <img src="{{ image.image.url }}/" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;" loading="lazy">
               </div>
               {% endfor %}
             </div>
@@ -325,7 +337,7 @@ function clickOption(element) {
               :key="image.url"
               class="carousel-item text-center"
               :class="{active: index === 0}">
-              <img :src="image.url" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;">
+              <img :src="image.url" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;" loading="lazy">
             </div>
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#carousel-images" data-bs-slide="prev">
@@ -364,77 +376,6 @@ function clickOption(element) {
     </button>
   </li>
 </template>
-{% endmacro %}
-
-{% macro show_matches_vue(matches, match_name) %}
-<div v-for="result in {{ matches }}" :key="result" class="row match-box">
-  <h3>
-    <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
-    <span class="strong-underline ms-2">{{ match_name }}</span>
-    <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
-  </h3>
-  <div>
-    <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } de vosaltres</span>
-  </div>
-  <div class="mb-2">
-    <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
-    <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
-  </div>
-  <p v-if="result.comments" class="mb-0"><strong>Observacions:</strong><span class="ms-2" v-html="highlightSearch(result.comments, search)"></span></p>
-
-  <div v-if="result.images.length > 0" class="image-thumbnails">
-    <div v-for="image in result.images" :key="image.url" class="thumbnail">
-      <a data-bs-toggle="modal" href="#images-modal" role="button" @click="setCarouselImages(result.images)">
-        <img :src="image.url">
-      </a>
-    </div>
-  </div>
-  <div>
-    <div v-if="messagesOpen[result.message_href]">
-      <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
-        S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
-      </div>
-      <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
-        Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb {{ settings.CONTACT_EMAIL }}.
-      </div>
-      <div v-else>
-        <p class="mt-2 mb-0">Quines opcions vos interessen concretament?</p>
-        <div class="multi-select p-0">
-          <button
-            v-for="option in result.options"
-            :key="option"
-            @click="toggleMessageOption(result.message_href, option)"
-            class="btn multi-select-choice"
-            :class="{selected: messagesOpen[result.message_href].options[option]}"
-          >
-            ${ optionNamesMap[option] }
-          </button>
-        </div>
-        <textarea
-          v-model="messagesOpen[result.message_href].message"
-          placeholder="Escriu ací el missatge que els arribarà si necessites fer qualsevol aclariment"
-          class="form-control"
-        ></textarea>
-      </div>
-    </div>
-    <button @click="sendMessage(result.message_href)" class="btn btn-custom mt-2" :disabled="!messageFormOk(messagesOpen[result.message_href])" v-if="!messagesOpen[result.message_href] || (!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error)">
-      <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
-        Enviant
-        <div class="spinner-border spinner-border-sm" role="status">
-          <span class="visually-hidden">Enviant...</span>
-        </div>
-      </span>
-      <span v-else>
-        <i class="bi-send fs-6 me-2"></i>
-        <span v-if="messagesOpen[result.message_href]">
-          Envia el missatge
-          {{ info_tooltip("Se li enviarà un missatge a ${ result.organization.name }, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic") }}
-        </span>
-        <span v-else>Contacta</span>
-      </span>
-    </button>
-  </div>
-</div>
 {% endmacro %}
 
 {% macro organization_info(org) %}

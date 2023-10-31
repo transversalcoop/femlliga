@@ -1,6 +1,14 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import render_select_raw, resource_details, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, show_matches_vue %}
+{% from 'femlliga/_macros.html' import render_select_raw, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, vue_js %}
+
+{% block title %}
+{% if page_type == "matches" %}
+Has lligat!
+{% else %}
+Cerca
+{% endif %}
+{% endblock %}
 
 {% block content %}
 {% if len(matches_json.offerMatches) > 0 or len(matches_json.needMatches) > 0 %}
@@ -71,36 +79,43 @@
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
-      <div v-if="resourceSelected" class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
-          <div v-if="matchTypeSelected === 'offer'">
-            <div class="matches-count"><span>${ matches.offerMatches[resourceSelected].length } resultats</span></div>
-            {{ show_matches_vue("matches.offerMatches[resourceSelected]", "ofereix") }}
+      <div v-if="initialLoading" class="mt-4 text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Carregant...</span>
+        </div>
+      </div>
+      <template v-else>
+        <div v-if="resourceSelected" class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
+            <div v-if="matchTypeSelected === 'offer'">
+              <div class="matches-count"><span>${ matches.offerMatches[resourceSelected].length } resultats</span></div>
+              {{ show_matches_vue("matches.offerMatches[resourceSelected]", "ofereix") }}
+            </div>
+            <div v-else>
+              <div class="matches-count"><span>${ matches.needMatches[resourceSelected].length } resultats</span></div>
+              {{ show_matches_vue("matches.needMatches[resourceSelected]", "també necessita") }}
+            </div>
           </div>
-          <div v-else>
-            <div class="matches-count"><span>${ matches.needMatches[resourceSelected].length } resultats</span></div>
-            {{ show_matches_vue("matches.needMatches[resourceSelected]", "també necessita") }}
+        </div>
+        <div v-else-if="organizationSelected" class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">${ organizationSelected.name }</h2>
+            <div class="matches-count agreements-count"><span>${ organizationMatches.length } resultats</span></div>
+            {{ show_matches_vue("organizationMatches.filter(m => m.type === 'offer')", "ofereix") }}
+            {{ show_matches_vue("organizationMatches.filter(m => m.type === 'need')", "també necessita") }}
+          </div>
+        </div>
+        <div v-else class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">Tot</h2>
+            <div class="matches-count"><span>${ concatenateMatches(matches.offerMatches).length + concatenateMatches(matches.needMatches).length } resultats</span></div>
+            {{ show_matches_vue("concatenateMatches(matches.offerMatches)", "ofereix") }}
+            {{ show_matches_vue("concatenateMatches(matches.needMatches)", "també necessita") }}
           </div>
         </div>
       </div>
-      <div v-else-if="organizationSelected" class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">${ organizationSelected.name }</h2>
-          <div class="matches-count agreements-count"><span>${ organizationMatches.length } resultats</span></div>
-          {{ show_matches_vue("organizationMatches.filter(m => m.type === 'offer')", "ofereix") }}
-          {{ show_matches_vue("organizationMatches.filter(m => m.type === 'need')", "també necessita") }}
-        </div>
-      </div>
-      <div v-else class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">Tot</h2>
-          <div class="matches-count"><span>${ concatenateMatches(matches.offerMatches).length + concatenateMatches(matches.needMatches).length } resultats</span></div>
-          {{ show_matches_vue("concatenateMatches(matches.offerMatches)", "ofereix") }}
-          {{ show_matches_vue("concatenateMatches(matches.needMatches)", "també necessita") }}
-        </div>
-      </div>
-    </div>
+    </template>
 
     {{ images_modal_vue() }}
   </div>
@@ -113,7 +128,84 @@
 {% endif %}
 {% endblock %}
 
+{% macro show_matches_vue(matches, match_name) %}
+<div v-for="result in {{ matches }}" :key="result" class="row match-box">
+  <h3>
+    <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
+    <span class="strong-underline ms-2">{{ match_name }}</span>
+    <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+  </h3>
+  <div>
+    <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } de vosaltres</span>
+  </div>
+  <div class="mb-2">
+    <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
+    <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
+  </div>
+  <p v-if="result.comments" class="mb-0"><strong>Observacions:</strong><span class="ms-2" v-html="highlightSearch(result.comments, search)"></span></p>
+
+  <div v-if="result.images.length > 0" class="image-thumbnails">
+    <div v-for="image in result.images" :key="image.url" class="thumbnail">
+      <a data-bs-toggle="modal" href="#images-modal" role="button" @click="setCarouselImages(result.images)">
+        <img :src="image.url" loading="lazy">
+      </a>
+    </div>
+  </div>
+  <div>
+    <div v-if="messagesOpen[result.message_href]">
+      <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
+        S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
+      </div>
+      <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
+        Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb {{ settings.CONTACT_EMAIL }}.
+      </div>
+      <div v-else>
+        <div v-if="result.last_message_declined" class="alert alert-warning mt-2">
+          La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar la comunicació.
+        </div>
+        <div v-if="result.options.length > 0">
+          <p class="mt-2 mb-0">Quines opcions vos interessen concretament?</p>
+          <div class="multi-select p-0">
+            <button
+              v-for="option in result.options"
+              :key="option"
+              @click="toggleMessageOption(result.message_href, option)"
+              class="btn multi-select-choice"
+              :class="{selected: messagesOpen[result.message_href].options[option]}"
+            >
+              ${ optionNamesMap[option] }
+            </button>
+          </div>
+        </div>
+        <textarea
+          v-model="messagesOpen[result.message_href].message"
+          placeholder="Escriu ací el missatge que els arribarà si necessites fer qualsevol aclariment"
+          class="form-control"
+        ></textarea>
+      </div>
+    </div>
+    <button @click="sendMessage(result.message_href)" class="btn btn-custom mt-2" :disabled="!messageFormOk(result)" v-if="!messagesOpen[result.message_href] || (!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error)">
+      <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
+        Enviant
+        <div class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">Enviant...</span>
+        </div>
+      </span>
+      <span v-else>
+        <i class="bi-send fs-6 me-2"></i>
+        <span v-if="messagesOpen[result.message_href]">
+          Envia el missatge
+          {{ info_tooltip("Se li enviarà un missatge a ${ result.organization.name }, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic") }}
+        </span>
+        <span v-else>Contacta</span>
+      </span>
+    </button>
+  </div>
+</div>
+{% endmacro %}
+
 {% block js %}
+{{ vue_js() }}
 {{ json_script(matches_json, "matches-data") }}
 {{ json_script(organization_matches_json, "organization-matches-data") }}
 {{ json_script(needs_json, "needs-data") }}
@@ -230,9 +322,13 @@ Vue.createApp({
     toggleMessageOption(key, option) {
       this.messagesOpen[key].options[option] = !this.messagesOpen[key].options[option];
     },
-    messageFormOk(values) {
+    messageFormOk(result) {
+      var values = this.messagesOpen[result.message_href];
       if (!values) {
         return true;
+      }
+      if (result.options.length === 0) {
+          return values.message;
       }
       var selectedOptions = Object.keys(values.options).map(k => values.options[k]).filter(v => v);
       return values.message && this.extractSelectedOptions(values.options).length > 0;

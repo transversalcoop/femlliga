@@ -1,5 +1,15 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% block title %}
+{% if page == "pre-wizard" %}
+Alta
+{% elif page == "mid-wizard" %}
+Meitat d'alta completada
+{% else %}
+Alta completada
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="container">
 {% if page == "pre-wizard" %}
@@ -27,7 +37,7 @@
 
 <form method="POST" action="{{ url(page, args=[org.id]) }}">
   {{ csrf_input }}
-  <div class="row" style="margin-top: 15px;">
+  <div class="row mt-3">
     {% if page == "post-wizard" %}
       <div class="col-12">
         <button type="submit" class="btn btn-lg btn-success" name="start" value="yes">Endavant!</button>

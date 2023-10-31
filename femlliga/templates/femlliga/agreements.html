@@ -1,6 +1,8 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import organization_link, info_tooltip  %}
+{% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js %}
+
+{% block title %}Peticions{% endblock %}
 
 {% block content %}
 {% if len(agreements.sent) > 0 or len(agreements.received) > 0 %}
@@ -57,33 +59,40 @@
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
-      <div v-if="resourceSelected" class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
-          <div v-if="requestTypeSelected === 'sent'">
-            <div class="matches-count agreements-count"><span>${ agreements.sent[resourceSelected].length } peticions enviades</span></div>
-            {{ show_agreements_vue("agreements.sent[resourceSelected]") }}
+      <div v-if="initialLoading" class="mt-4 text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Carregant...</span>
+        </div>
+      </div>
+      <template v-else>
+        <div v-if="resourceSelected" class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
+            <div v-if="requestTypeSelected === 'sent'">
+              <div class="matches-count agreements-count"><span>${ agreements.sent[resourceSelected].length } peticions enviades</span></div>
+              {{ show_agreements_vue("agreements.sent[resourceSelected]") }}
+            </div>
+            <div v-else>
+              <div class="matches-count agreements-count"><span>${ agreements.received[resourceSelected].length } peticions rebudes</span></div>
+              {{ show_agreements_vue("agreements.received[resourceSelected]") }}
+            </div>
           </div>
-          <div v-else>
-            <div class="matches-count agreements-count"><span>${ agreements.received[resourceSelected].length } peticions rebudes</span></div>
-            {{ show_agreements_vue("agreements.received[resourceSelected]") }}
+        </div>
+        <div v-else-if="organizationSelected" class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">${ organizationSelected.name }</h2>
+            <div class="matches-count agreements-count"><span>${ organizationRequests.length } peticions</span></div>
+            {{ show_agreements_vue("organizationRequests") }}
           </div>
         </div>
-      </div>
-      <div v-else-if="organizationSelected" class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">${ organizationSelected.name }</h2>
-          <div class="matches-count agreements-count"><span>${ organizationRequests.length } peticions</span></div>
-          {{ show_agreements_vue("organizationRequests") }}
+        <div v-else class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">Totes les peticions</h2>
+            <div class="matches-count agreements-count"><span>${ concatenatedAgreements.length } peticions enviades o rebudes</span></div>
+            {{ show_agreements_vue("concatenatedAgreements") }}
+          </div>
         </div>
-      </div>
-      <div v-else class="row mt-3">
-        <div class="col-12">
-          <h2 class="match-resource-title">Totes les peticions</h2>
-          <div class="matches-count agreements-count"><span>${ concatenatedAgreements.length } peticions enviades o rebudes</span></div>
-          {{ show_agreements_vue("concatenatedAgreements") }}
-        </div>
-      </div>
+      </template>
     </div>
   </div>
 </main>
@@ -133,10 +142,10 @@
   <div class="mb-2">
     <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
     <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
-    <p>Missatge que es va enviar el ${ new Date(result.date).toLocaleString() }:</p>
+    <p>Missatge que es va enviar el ${ formatDateTime(result.date) }:</p>
     <pre class="quoted-message">${ result.message }</pre>
 
-    <div v-if="result.communication_accepted === null">
+    <div v-if="result.communication_accepted === null && communicationsResolved[result.id] === undefined">
       <i class="bi-hourglass-split text-muted fs-4"></i>
       Encara no s'ha acceptat ni declinat la comunicació.
       <div v-if="!agreementSent(result)">
@@ -156,14 +165,14 @@
         </div>
       </div>
     </div>
-    <div v-else-if="result.communication_accepted === false">
+    <div v-else-if="result.communication_accepted === false || communicationsResolved[result.id] === false">
       <i class="bi-x-lg text-danger fs-4"></i>
-      Es va declinar la comunicació.
+      Es va declinar la comunicació <span v-if="result.communication_date">(${ formatDateTime(result.communication_date) })</span>
     </div>
-    <div v-else-if="result.communication_accepted === true">
+    <div v-else-if="result.communication_accepted === true || communicationsResolved[result.id] === true">
       <i class="bi-check2 text-success fs-4"></i>
-      Es va iniciar la comunicació.
-      <div v-if="result.agreement_successful === null">
+      Es va iniciar la comunicació <span v-if="result.communication_date">(${ formatDateTime(result.communication_date) })</span>
+      <div v-if="result.agreement_successful === null && agreementsResolved[result.id] === undefined">
         <div v-if="!agreementsLoading[result.id]">
           <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2">
             S'ha fet acord
@@ -179,13 +188,13 @@
           </div>
         </div>
       </div>
-      <div v-else-if="result.agreement_successful === false">
+      <div v-else-if="result.agreement_successful === false || agreementsResolved[result.id] === false">
         <i class="bi-x-lg text-danger fs-4"></i>
-        No es va arribar a un acord.
+        No es va arribar a un acord <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
       </div>
-      <div v-else-if="result.agreement_successful === true">
+      <div v-else-if="result.agreement_successful === true || agreementsResolved[result.id] === true">
         <i class="bi-check2 text-success fs-4"></i>
-        Es va arribar a un acord.
+        Es va arribar a un acord <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
       </div>
     </div>
 
@@ -194,6 +203,7 @@
 {% endmacro %}
 
 {% block js %}
+{{ vue_js() }}
 {{ json_script(agreements_json, "agreements-data") }}
 {{ json_script(concatenated_agreements_json, "concatenated-agreements-data") }}
 {{ json_script(organizations_json, "organizations-data") }}
@@ -246,10 +256,13 @@ Vue.createApp({
       requestTypeSelected: "",
       organizationSelected: null,
       agreementsLoading: {},
+      communicationsResolved: {},
+      agreementsResolved: {},
     };
   },
   methods: {
     highlightSearch: highlightSearch,
+    formatDateTime: formatDateTime,
     setShowBy(x) {
       this.showBy = x;
       this.selectResource("", "");
@@ -291,13 +304,12 @@ Vue.createApp({
           throw "Bad response";
         }
         if (field === "connect") {
-          agreement.communication_accepted = value === "yes";
+          this.communicationsResolved[agreement.id] = value === "yes";
         } else {
-          agreement.agreement_successful = value === "yes";
+          this.agreementsResolved[agreement.id] = value === "yes";
         }
         this.agreementsLoading[agreement.id] = false;
       }).catch(err => {
-        agreement.error = true;
         this.agreementsLoading[agreement.id] = false;
       });
     },

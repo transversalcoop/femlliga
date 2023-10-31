@@ -171,10 +171,13 @@ class IntegrationTests(TestCase):
             "options": options,
             "comments": comments,
             "has_resource": has_resource,
+            "images-TOTAL_FORMS": 6,
+            "images-INITIAL_FORMS": 0,
         }
         if charge:
             params["charge"] = "on"
         response = self.client.post(url, params, follow=True)
+        save_response(response)
         self.assertContains(response, contains)
 
     @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)
@@ -311,6 +314,8 @@ class IntegrationTests(TestCase):
 
         # send message
         o2 = Organization.objects.get(name="Second example organization")
+        o2.creator.accept_communications_automatically = False
+        o2.creator.save()
         send_message_url = reverse("send_message", args=[o.id, o2.id, "offer", "PLACE"])
         test_msg_1 =  "missatge de test per al primer missatge"
         response = self.client.post(send_message_url, {

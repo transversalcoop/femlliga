@@ -42,6 +42,7 @@ class LimitFileSize:
 
 class CustomUser(AbstractUser):
     notifications_frequency = models.CharField(max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY")
+    accept_communications_automatically = models.BooleanField(default=True)
     last_notification_date = models.DateTimeField(auto_now_add=True)
 
     def get_organization(self):
@@ -347,16 +348,24 @@ class Need(BaseResource):
             models.UniqueConstraint("organization", "resource", name="unique_organization_need"),
         ]
 
-    def json(self, current_organization=None, include_org=True):
+    def json(self, current_organization=None, include_org=True, agreement_declined_map=None):
         j = super().json()
         j["type"] = "need"
         if include_org:
             j["organization"] = self.organization.json()
         if current_organization:
             j["distance"] = current_organization.distance_text(self.organization)
+            if agreement_declined_map:
+                j["last_message_declined"] = self.last_message_declined(agreement_declined_map)
             j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "need", self.resource])
         j["images"] = [i.json() for i in self.images.all()]
         return j
+
+    def last_message_declined(self, agreement_declined_map):
+        try:
+            return agreement_declined_map["need"][self.resource][self.organization.id]
+        except:
+            return False
 
 class Offer(BaseResource):
     organization = models.ForeignKey(
@@ -371,17 +380,25 @@ class Offer(BaseResource):
             models.UniqueConstraint("organization", "resource", name="unique_organization_offer"),
         ]
 
-    def json(self, current_organization=None, include_org=True):
+    def json(self, current_organization=None, include_org=True, agreement_declined_map=None):
         j = super().json()
         j["type"] = "offer"
         if include_org:
             j["organization"] = self.organization.json()
         if current_organization:
             j["distance"] = current_organization.distance_text(self.organization)
+            if agreement_declined_map:
+                j["last_message_declined"] = self.last_message_declined(agreement_declined_map)
             j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "offer", self.resource])
         j["images"] = [i.json() for i in self.images.all()]
         j["charge"] = self.charge
         return j
+
+    def last_message_declined(self, agreement_declined_map):
+        try:
+            return agreement_declined_map["offer"][self.resource][self.organization.id]
+        except:
+            return False
 
 class Agreement(models.Model):
     id = models.UUIDField(
@@ -422,7 +439,9 @@ class Agreement(models.Model):
             "resource": self.resource,
             "resource_type": self.resource_type,
             "communication_accepted": self.communication_accepted,
+            "communication_date": self.communication_date,
             "agreement_successful": self.agreement_successful,
+            "successful_date": self.successful_date,
             "href_connect": reverse("agreement_connect", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
             "href_successful": reverse("agreement_successful", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
         }

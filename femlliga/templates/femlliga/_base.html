@@ -7,7 +7,6 @@
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
         <link rel="icon" type="image/x-icon" href="{{ static("favicon.ico") }}">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +16,7 @@
         <link href="{{ static("style.css") }}" rel="stylesheet">
 {% block css %}{% endblock %}
         <title>
-{% block title %}{{ consts.APP_NAME }}{% endblock %}
+{% block title %}{% endblock %} | {{ consts.APP_NAME }}
         </title>
     </head>
 
@@ -49,6 +48,18 @@
       </header>
       <wrapper class="d-flex flex-column">
         <main id="content">
+          {% if messages %}
+          <div class="container">
+            {% for message in messages %}
+            {% if "show" in message.tags %}
+            <div class="alert alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}success{% else %}info{% endif %} mt-2">
+              {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<i class="bi bi-check-lg fs-1 align-middle pb-2"></i>{% endif %}
+              <span>{{ message }}</span>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
 {% block content %}{% endblock %}
         </main>
         <footer class="border-top">
@@ -76,23 +87,20 @@
               <div class="col-lg-4">
                 <p class="m-0">Un projecte desenvolupat per </p>
                 <a target="_blank" rel="noopener noreferrer" href="https://transversalcoop.org">
-                  <img src="{{ static("transversal.png") }}" style="height: 58px;" alt="Logo de la Cooperativa Transversal">
+                  <img src="{{ static("transversal.png") }}" style="height: 58px;" alt="Logo de la Cooperativa Transversal" loading="lazy">
                 </a>
 
                 <p style="margin: 20px 0 0 0;">Amb el suport econòmic de</p>
                 <a target="_blank" rel="noopener noreferrer" href="https://castello.es/">
-                  <img src="{{ static("ajuntament_cs.png") }}" style="height: 85px;" alt="Logo de l'Ajuntament de Castelló">
+                  <img src="{{ static("ajuntament_cs.png") }}" style="height: 85px;" alt="Logo de l'Ajuntament de Castelló" loading="lazy">
                 </a>
               </div>
             </div>
           </div>
         </footer>
       </wrapper>
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-      <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
       <script src="{{ static('js.js') }}"></script>
-
 {% block js %}{% endblock %}
     </body>
 </html>

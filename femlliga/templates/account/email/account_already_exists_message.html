@@ -1,0 +1,10 @@
+{% extends "account/email/base_message.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    Has rebut aquest correu perquè tu o algu altre ha intentat registrar-se fent servir l'adreça de correu {{ email }}. Tanmateix, ja existeix un compte que fa servir aquesta adreça de correu. Si te n'havies oblidat, o vols canviar la contrasenya, per favor fes clic <a href="{{ password_reset_url }}">ací</a>.
+  </td>
+</tr>
+{% endblock %}
+

@@ -16,10 +16,10 @@ def http_get(url):
     f.close()
     return res
 
-class NotificationsForm(forms.ModelForm):
+class ProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ["notifications_frequency"]
+        fields = ["notifications_frequency", "accept_communications_automatically"]
 
 class OrganizationForm(forms.ModelForm):
     scopes = forms.MultipleChoiceField(
@@ -76,10 +76,17 @@ class ImageForm(forms.Form):
 
 class MessageForm(forms.Form):
     message = forms.CharField(min_length=1)
-    options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=True)
+    options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.resource = kwargs.pop('resource') # must be done first, if not super().__init__(...) fails
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         super().clean()
+        if self.resource.options.count() == 0:
+            return self.cleaned_data
+
         if len(self.cleaned_data.get("options", [])) == 0:
             self._errors["options"] = self.error_class(["Cal indicar una opció com a mínim"])
         return self.cleaned_data

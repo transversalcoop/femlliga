@@ -219,6 +219,7 @@ ACCOUNT_FORMS = {
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
+        'EMAIL_AUTHENTICATION': True, # allows register with email and later login with Google
         'SCOPE': [
             'profile',
             'email',

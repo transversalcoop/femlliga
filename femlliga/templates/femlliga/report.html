@@ -1,7 +1,11 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import leaflet_css, leaflet_js %}
+
+{% block title %}Informe{% endblock %}
+
 {% macro plot(data) %}
-<div style="text-align: center;">
+<div class="text-center">
     <img src="data:image/png;base64,{{ data }}"/>
 </div>
 {% endmacro %}
@@ -11,7 +15,7 @@
     <thead>
         <tr>
             {% for i, value in enumerate(table.columns) %}
-            <th {% if i == 0 %}style="width: 50%;"{% endif %}>{{ value }}</th>
+            <th {% if i == 0 %}class="w-50"{% endif %}>{{ value }}</th>
             {% endfor %}
         </tr>
     </thead>
@@ -36,6 +40,8 @@
 {{ plot(table.plot()) }}
 {% endmacro %}
 
+{% block css %}{{ leaflet_css() }}{% endblock %}
+
 {% block content %}
 <div class="container">
 <h1>Informe d'activitat de la plataforma</h1>
@@ -44,7 +50,7 @@
 
 <h3>Mapa d'entitats</h3>
 
-<div id="citymap" style="height: 700px;"></div>
+<div id="citymap" class="map-height-big"></div>
 
 <h3>Graf de relacions entre entitats</h3>
 
@@ -136,6 +142,7 @@
 {% endblock %}
 
 {% block js %}
+{{ leaflet_js() }}
 <script>
 var orgs = {{ orgs_json|safe }};
 var lat = 0, lng = 0;
