@@ -179,6 +179,12 @@ def view_organization(request, organization_id):
 
 @login_required
 @require_own_organization
+def profile(request, organization_id):
+    org = get_object_or_404(Organization, pk=organization_id)
+    return render(request, "femlliga/profile.html", { "org": org })
+
+@login_required
+@require_own_organization
 def edit_organization(request, organization_id):
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
@@ -416,31 +422,36 @@ def render_matches_page(request, page_type, organization, offer_matches, need_ma
     organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
     agreement_declined_map = get_last_agreement_declined_map(organization)
     return render(request, "femlliga/matches.html", {
-        "matches_json": {
-            "offerMatches": {
-                k: [m.json(
-                    current_organization=organization,
-                    agreement_declined_map=agreement_declined_map,
-                ) for m in offer_matches[k]] for k in offer_matches
+        "json_data": {
+            "matches": {
+                "offerMatches": {
+                    k: [m.json(
+                        current_organization=organization,
+                        agreement_declined_map=agreement_declined_map,
+                    ) for m in offer_matches[k]] for k in offer_matches
+                },
+                "needMatches": {
+                    k: [m.json(
+                        current_organization=organization,
+                        agreement_declined_map=agreement_declined_map,
+                    ) for m in need_matches[k]] for k in need_matches
+                },
             },
-            "needMatches": {
-                k: [m.json(
-                    current_organization=organization,
-                    agreement_declined_map=agreement_declined_map,
-                ) for m in need_matches[k]] for k in need_matches
-            },
+            "organization_matches": [
+                {
+                    "organization": l[0].organization.json(current_organization=organization),
+                    "matches": [m.json(
+                        current_organization=organization,
+                        agreement_declined_map=agreement_declined_map,
+                    ) for m in l],
+                }
+                for l in organization_matches
+            ],
+            "needs": needs_json,
+            "resource_names_map": RESOURCE_NAMES_MAP,
+            "option_names_map": RESOURCE_OPTIONS_DEF_MAP,
+            "resource_icons_map": RESOURCE_ICONS_MAP,
         },
-        "organization_matches_json": [
-            {
-                "organization": l[0].organization.json(current_organization=organization),
-                "matches": [m.json(
-                    current_organization=organization,
-                    agreement_declined_map=agreement_declined_map,
-                ) for m in l],
-            }
-            for l in organization_matches
-        ],
-        "needs_json": needs_json,
         "page_type": page_type,
     })
 
@@ -545,21 +556,21 @@ def search(request, organization_id):
     return render_matches_page(request, "search", organization, offer_matches, need_matches, [x[0] for x in RESOURCES])
 
 @login_required
-def profile(request):
-    form = ProfileForm({
+def preferences(request):
+    form = PreferencesForm({
         "notifications_frequency": request.user.notifications_frequency,
         "accept_communications_automatically": request.user.accept_communications_automatically,
     })
     if request.method == "POST":
-        form = ProfileForm(request.POST)
+        form = PreferencesForm(request.POST)
         if form.is_valid():
             request.user.notifications_frequency = form.cleaned_data["notifications_frequency"]
             request.user.accept_communications_automatically = form.cleaned_data["accept_communications_automatically"]
             request.user.save()
             messages.info(request, "La configuració s'ha desat correctament", extra_tags="show")
-            return redirect("profile")
+            return redirect("preferences")
 
-    return render(request, "femlliga/profile.html", {
+    return render(request, "femlliga/preferences.html", {
         "form": form,
     })
 

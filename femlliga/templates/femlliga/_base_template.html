@@ -16,8 +16,9 @@
   {% if not user.is_anonymous %}
     {% set organization = request.user.get_organization() %}
     {% if organization %}
+    <li>{{ menu_url("Entitat", "app") }}</li>
     <li>{{ menu_url("Has lligat?", "matches", [organization.id]) }}</li>
-    <li>{{ menu_url("Cerca", "search", [organization.id]) }}</li>
+    <li>{{ menu_url("Descobreix", "search", [organization.id]) }}</li>
     {% set pending_sent, pending_received = organization.pending_agreements() %}
     <li>{{ menu_url("Peticions", "agreements", [organization.id], pending=pending_sent or pending_received) }}</li>
     {% endif %}
@@ -44,9 +45,9 @@
       </a>
       <ul class="dropdown-menu">
         {% if organization %}
-        <li><a class="dropdown-item" href="{{ url("app") }}">Entitat</a></li>
+        <li><a class="dropdown-item" href="{{ url("profile", args=[organization.id]) }}">Perfil</a></li>
         {% endif %}
-        <li><a class="dropdown-item" href="{{ url("profile") }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{ url("preferences") }}">Preferències</a></li>
         <li>
           <form method="post" action="{{ url("account_logout") }}">
             {{ csrf_input }}

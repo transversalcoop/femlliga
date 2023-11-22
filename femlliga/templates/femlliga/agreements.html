@@ -6,7 +6,7 @@
 
 {% block content %}
 {% if len(agreements.sent) > 0 or len(agreements.received) > 0 %}
-<main id="content" class="container-fluid">
+<div class="container-fluid">
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
       <h1>Peticions enviades i rebudes</h1>
@@ -29,9 +29,9 @@
       <input v-model="search" type="text" class="form-control" placeholder="Cerca recursos o organitzacions">
       <ul class="nav nav-pills flex-column mb-auto mt-2">
         <template v-if="showBy === 'resources'">
-          <h2 class="resource-matches-title">Enviades</h2>
+          <h2 class="resource-matches-title background-yellow">Enviades</h2>
           {{ request_filter_row_vue("sent", "Peticions enviades") }}
-          <h2 class="resource-matches-title">Rebudes</h2>
+          <h2 class="resource-matches-title background-yellow-dark">Rebudes</h2>
           {{ request_filter_row_vue("received", "Peticions rebudes") }}
         </template>
         <template v-else>
@@ -95,7 +95,7 @@
       </template>
     </div>
   </div>
-</main>
+</div>
 {% else %}
 <div class="container text-center pt-4">
   <h1>Encara no heu enviat ni rebut peticions</h1>
@@ -127,36 +127,38 @@
 
 {% macro show_agreements_vue(agreements) %}
 <div v-for="result in {{ agreements }}" :key="result" class="row match-box">
-  <h3 v-if="agreementSent(result)">
+  <h3 v-if="agreementSent(result)" class="mt-2">
+    <span class="me-2">Petició de</span>
     <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
-    <span v-if="result.resource_type === 'need'" class="strong-underline me-2">a buscar conjuntament amb</span>
-    <span v-else class="strong-underline me-2">sol·licitat a</span>
+    <span class="me-2 background-yellow">enviada a</span>
     <a :href="result.solicitee.href" v-html="highlightSearch(result.solicitee.name, search)"></a>
   </h3>
-  <h3 v-else>
+  <h3 v-else class="mt-2">
+    <span class="me-2">Petició de</span>
+    <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+    <span class="me-2 background-yellow-dark">rebuda de</span>
     <a :href="result.solicitor.href" v-html="highlightSearch(result.solicitor.name, search)"></a>
-    <span v-if="result.resource_type === 'need'" class="strong-underline ms-2">ens demana buscar conjuntament</span>
-    <span v-else class="strong-underline ms-2">ens sol·licita</span>
-    <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
   </h3>
   <div class="mb-2">
     <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
     <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
-    <p>Missatge que es va enviar el ${ formatDateTime(result.date) }:</p>
+    <p v-if="agreementSent(result)">Missatge que vau enviar el ${ formatDateTime(result.date) }:</p>
+    <p v-else>Missatge que va enviar ${ result.solicitor.name } el ${ formatDateTime(result.date) }:</p>
     <pre class="quoted-message">${ result.message }</pre>
 
     <div v-if="result.communication_accepted === null && communicationsResolved[result.id] === undefined">
       <i class="bi-hourglass-split text-muted fs-4"></i>
-      Encara no s'ha acceptat ni declinat la comunicació.
+      <span v-if="agreementSent(result)">${ result.solicitee.name } encara no ha acceptat ni declinat la conversa per correu.</span>
+      <span v-else>Encara no heu acceptat ni declinat la conversa per correu.</span>
       <div v-if="!agreementSent(result)">
         <div v-if="!agreementsLoading[result.id]">
           <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2">
-            Inicia la comunicació
+            Inicia la conversa per correu
           </button>
           <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2">
-            Declina la comunicació
+            Declina la conversa per correu
           </button>
-          {{ info_tooltip("Per favor, indiqueu si accepteu la comunicació o no. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la comunicació no us obliga a arribar a cap acord.") }}
+          {{ info_tooltip("Per favor, indiqueu si accepteu iniciar una conversa per correu. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la conversa per correu no us obliga a arribar a cap acord.") }}
         </div>
         <div v-else>
           <div class="spinner-border spinner-border-sm" role="status">
@@ -167,18 +169,22 @@
     </div>
     <div v-else-if="result.communication_accepted === false || communicationsResolved[result.id] === false">
       <i class="bi-x-lg text-danger fs-4"></i>
-      Es va declinar la comunicació <span v-if="result.communication_date">(${ formatDateTime(result.communication_date) })</span>
+      <span v-if="agreementSent(result)">${ result.solicitee.name } va declinar la conversa per correu</span>
+      <span v-else>Vau declinar la conversa per correu</span>
+      <span v-if="result.communication_date" class="ms-2">(${ formatDateTime(result.communication_date) })</span>
     </div>
     <div v-else-if="result.communication_accepted === true || communicationsResolved[result.id] === true">
       <i class="bi-check2 text-success fs-4"></i>
-      Es va iniciar la comunicació <span v-if="result.communication_date">(${ formatDateTime(result.communication_date) })</span>
+      <span v-if="agreementSent(result)">${ result.solicitee.name } va iniciar la conversa per correu</span>
+      <span v-else>Vau iniciar la conversa per correu</span>
+      <span v-if="result.communication_date" class="ms-2">(${ formatDateTime(result.communication_date) })</span>
       <div v-if="result.agreement_successful === null && agreementsResolved[result.id] === undefined">
         <div v-if="!agreementsLoading[result.id]">
           <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2">
-            S'ha fet acord
+            S'ha arribat a un acord
           </button>
           <button @click="updateAgreement(result, 'successful', 'no')" class="btn btn-sm btn-danger me-2">
-            No s'ha aconseguit acord
+            No s'ha arribat a un acord
           </button>
           {{ info_tooltip("Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. Aquesta informació es farà servir només a nivell estadístic") }}
         </div>

@@ -16,7 +16,7 @@ def http_get(url):
     f.close()
     return res
 
-class ProfileForm(forms.ModelForm):
+class PreferencesForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ["notifications_frequency", "accept_communications_automatically"]

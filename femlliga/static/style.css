@@ -330,22 +330,7 @@ nav .nav-link.active {
 
 @media (min-width: 768px) {
     .sidebar {
-        min-height: calc(100vh - 407px - 56px);
-    }
-}
-
-@media (min-width: 992px) {
-    .sidebar {
-        min-height: calc(100vh - 355px - 56px);
-    }
-}
-
-@media (min-width: 1200px) {
-}
-
-@media (min-width: 1400px) {
-    .sidebar {
-        min-height: calc(100vh - 407px - 56px);
+        min-height: 100vh;
     }
 }
 
@@ -495,7 +480,6 @@ nav .nav-link.active {
 
 .resource-matches-title {
     margin: 10px 0;
-    background-color: #ffce1c;
     font-size: 1.75em;
     text-align: left;
     padding: 0 5px 0 20px;
@@ -503,7 +487,6 @@ nav .nav-link.active {
 }
 
 .match-box {
-    padding: 0.5rem;
     border: 1px solid black;
     margin-bottom: 1rem;
 }
@@ -597,5 +580,18 @@ nav .nav-link.active {
     margin-left: 20px;
     padding-left: 10px;
     border-left: 1px solid gray;
+}
+
+.background-gray-light {
+    background-color: #eee;
+}
+
+.background-yellow {
+    background-color: #ffce1c;
+}
+
+.background-yellow-dark {
+    background-color: #80670e;
+    color: white;
 }
 

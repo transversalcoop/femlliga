@@ -91,3 +91,6 @@ function post(url, csrfToken, body) {
   }).then(response => response.json());
 }
 
+function getJsonData() {
+    return JSON.parse(document.getElementById('django-json-data').textContent);
+}

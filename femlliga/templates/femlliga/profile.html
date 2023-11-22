@@ -1,30 +1,41 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import form_feedback, render_select %}
+{% from 'femlliga/_macros.html' import organization_info, organization_map_js, leaflet_css, leaflet_js %}
 
 {% block title %}Perfil{% endblock %}
 
+{% block css %}{{ leaflet_css() }}{% endblock %}
+
 {% block content %}
-<div class="container">
-  <h1>Perfil</h1>
-
-  <form method="post" class="mt-2">
-    {{ csrf_input }}
-    {{ form_feedback(form) }}
-
-    <div class="mt-3">
-      {{ render_select(form, "notifications_frequency", "Configura cada quant de temps vols rebre notificacions. Només te n'enviarem en cas que tingues peticions pendents de respondre.") }}
+<section class="mb-4" style="background-color: transparent; background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);">
+  <div class="container organization-main-page">
+    <div class="row edit-row" style="padding-top: 3.5rem;">
+      <div class="col-md-6">
+        <span class="edit d-md-none d-block" style="float: right;">
+          <a href="{{ url("edit_organization", args=[org.id]) }}" style="color: black;" title="Edita">
+            <i class="bi-pencil-square edit" style="font-size: 1.5rem; margin-top: 10px;"></i>
+          </a>
+        </span>
+        <h1 style="font-size: 2.5em; margin: 0;">{{ org.name }}</h1>
+      </div>
+      <div class="col-md-6">
+        {% if org.logo %}
+        <div class="mb-2">
+          <img src="{{ org.logo.url }}" class="organization-logo" loading="lazy" />
+        </div>
+        {% endif %}
+      </div>
     </div>
 
-    <div class="form-check mt-3">
-      <input class="form-check-input" type="checkbox" id="accept_communications_automatically" name="accept_communications_automatically"
-             {% if form and form.cleaned_data and form.cleaned_data["accept_communications_automatically"] %}checked{% endif %}>
-      <label class="form-check-label" for="accept_communications_automatically">
-        Marca aquest camp si vols acceptar automàticament totes les peticions de comunicació
-      </label>
-    </div>
-
-    <button type="submit" class="btn btn-custom mt-2">Desa</button>
-  </form>
-</div>
+    {{ organization_info(org) }}
+  </div>
+</section>
 {% endblock %}
+
+{% block js %}
+{{ leaflet_js() }}
+<script>
+{{ organization_map_js(org) }}
+</script>
+{% endblock %}
+

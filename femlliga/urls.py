@@ -12,9 +12,10 @@ urlpatterns = [
     path('page/<slug:name>/', views.page, name='page'),
 
     # login required
-    path('profile/', views.profile, name='profile'),
+    path('preferences/', views.preferences, name='preferences'),
     path('app/', views.app, name='app'),
     path('organization/add/', views.add_organization, name='add_organization'),
+    path('organization/<uuid:organization_id>/profile/', views.profile, name='profile'),
     path('organization/<uuid:organization_id>/view/', views.view_organization, name='view_organization'),
     path('organization/<uuid:organization_id>/edit/', views.edit_organization, name='edit_organization'),
     path('organization/<uuid:organization_id>/delete-logo/', views.delete_organization_logo, name='delete_organization_logo'),

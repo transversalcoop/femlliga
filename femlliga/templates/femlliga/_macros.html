@@ -56,7 +56,7 @@
     {% endfor %}
   </div>
   {% if resource.comments %}
-      <p><strong>Observacions:</strong> {{ resource.comments }}</p>
+  <p>{% if resource.resource != "OTHER" %}<strong>Observacions:</strong>{% endif %} {{ resource.comments }}</p>
   {% endif %}
   {% if resource.images.all() %}
   <div class="image-thumbnails">
@@ -372,6 +372,7 @@ function clickOption(element) {
         title="{{ title }}">
         ${ matches.{{ match_type }}Matches[resource].length }
       </span>
+      <i class="me-2" :class="resourceIconsMap[resource]"></i>
       ${ resourceNamesMap[resource] }
     </button>
   </li>
@@ -392,14 +393,14 @@ function clickOption(element) {
           <li>{{ scope }}</li>
         {% endfor %}
       </ul>
+      {{ render_social_media(org) }}
     </div>
 
     <div class="col-md-6">
-      {{ render_social_media(org) }}
+      <div id="citymap" class="map-height"></div>
     </div>
   </div>
 
-  <div id="citymap" class="map-height mt-2"></div>
 {% endmacro %}
 
 {% macro organization_map_js(org) %}
