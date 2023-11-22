@@ -410,50 +410,39 @@ def clean_file(posted_file):
 @require_own_organization
 @record_stats("matches")
 def matches(request, organization_id):
+    # TODO better matches computation, does much more work than needed
     organization = request.user.organizations.first()
     own_needs = sort_resources([
         n for n in organization.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
     ])
-    offer_matches, need_matches = get_organization_matches(organization, own_needs)
-    needs_json = [x.resource for x in own_needs]
-    return render_matches_page(request, "matches", organization, offer_matches, need_matches, needs_json)
-
-def render_matches_page(request, page_type, organization, offer_matches, need_matches, needs_json):
-    organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
+    needs_json = [{
+        "resource": x.resource,
+        "options": [o.name for o in x.options.all()],
+    } for x in own_needs]
     agreement_declined_map = get_last_agreement_declined_map(organization)
-    return render(request, "femlliga/matches.html", {
-        "json_data": {
-            "matches": {
-                "offerMatches": {
-                    k: [m.json(
-                        current_organization=organization,
-                        agreement_declined_map=agreement_declined_map,
-                    ) for m in offer_matches[k]] for k in offer_matches
-                },
-                "needMatches": {
-                    k: [m.json(
-                        current_organization=organization,
-                        agreement_declined_map=agreement_declined_map,
-                    ) for m in need_matches[k]] for k in need_matches
-                },
-            },
-            "organization_matches": [
-                {
-                    "organization": l[0].organization.json(current_organization=organization),
-                    "matches": [m.json(
-                        current_organization=organization,
-                        agreement_declined_map=agreement_declined_map,
-                    ) for m in l],
-                }
-                for l in organization_matches
-            ],
-            "needs": needs_json,
-            "resource_names_map": RESOURCE_NAMES_MAP,
-            "option_names_map": RESOURCE_OPTIONS_DEF_MAP,
-            "resource_icons_map": RESOURCE_ICONS_MAP,
-        },
-        "page_type": page_type,
-    })
+    offer_matches, need_matches = get_organization_matches(organization, own_needs)
+    organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
+    matches = {}
+    for need in needs_json:
+        need = need["resource"]
+        matches[need] = [
+            m.json(current_organization=organization, agreement_declined_map=agreement_declined_map)
+            for l in organization_matches
+            for m in filter(lambda x: x.resource == need, l)
+        ]
+    return render_matches_page(request, "femlliga/matches.html", organization, matches, needs_json)
+
+def render_matches_page(request, template, organization, matches, needs_json, organization_matches=None):
+    json_data = {
+        "matches": matches,
+        "needs": needs_json,
+        "resource_names_map": RESOURCE_NAMES_MAP,
+        "option_names_map": RESOURCE_OPTIONS_DEF_MAP,
+        "resource_icons_map": RESOURCE_ICONS_MAP,
+    }
+    if organization_matches:
+        json_data["organization_matches"] = organization_matches
+    return render(request, template, { "json_data": json_data })
 
 def get_last_agreement_declined_map(organization):
     l = list(Agreement.objects.prefetch_related("solicitee").filter(solicitor=organization).exclude(communication_accepted=None))
@@ -553,7 +542,33 @@ def get_all_resources(organization):
 def search(request, organization_id):
     organization = organization_prefetches(request.user.organizations.filter(id=organization_id)).first()
     offer_matches, need_matches = get_all_resources(organization)
-    return render_matches_page(request, "search", organization, offer_matches, need_matches, [x[0] for x in RESOURCES])
+    organization_matches = group_matches_by_organization(organization, offer_matches, need_matches)
+    agreement_declined_map = get_last_agreement_declined_map(organization)
+    matches = {
+        "offerMatches": {
+            k: [m.json(
+                current_organization=organization,
+                agreement_declined_map=agreement_declined_map,
+            ) for m in offer_matches[k]] for k in offer_matches
+        },
+        "needMatches": {
+            k: [m.json(
+                current_organization=organization,
+                agreement_declined_map=agreement_declined_map,
+            ) for m in need_matches[k]] for k in need_matches
+        },
+    }
+    organization_matches = [
+        {
+            "organization": l[0].organization.json(current_organization=organization),
+            "matches": [m.json(
+                current_organization=organization,
+                agreement_declined_map=agreement_declined_map,
+            ) for m in l],
+        }
+        for l in organization_matches
+    ]
+    return render_matches_page(request, "femlliga/search.html", organization, matches, [x[0] for x in RESOURCES], organization_matches = organization_matches)
 
 @login_required
 def preferences(request):

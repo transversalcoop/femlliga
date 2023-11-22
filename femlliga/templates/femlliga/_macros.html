@@ -356,7 +356,7 @@ function clickOption(element) {
 {% endmacro %}
 
 {% macro match_filter_row_vue(match_type, title) %}
-<template v-for="resource in matched_needs" :key="resource">
+<template v-for="resource of matched_needs" :key="resource">
   <li v-if="resource in matches.{{ match_type }}Matches" class="nav-item">
     <button
       @click="selectResource(resource, '{{ match_type }}')"
@@ -421,3 +421,192 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
   </span>
 </span>
 {% endmacro %}
+
+{% macro show_matches_vue(matches) %}
+<div v-for="result in {{ matches }}" :key="result" class="row match-box">
+  <div class="p-2">
+    <h3 class="mt-0">
+      <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
+      <span v-if="result.type === 'offer'" class="ms-2 background-yellow">ofereix</span>
+      <span v-if="result.type === 'need'" class="ms-2 background-yellow-dark">necessita</span>
+      <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+    </h3>
+    <div>
+      <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } de vosaltres</span>
+    </div>
+    <div class="mb-2">
+      <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
+      <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
+    </div>
+    <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">Observacions:</strong><span v-html="highlightSearch(result.comments, search)"></span></p>
+
+    <div v-if="result.images.length > 0" class="image-thumbnails">
+      <div v-for="image in result.images" :key="image.url" class="thumbnail">
+        <a data-bs-toggle="modal" href="#images-modal" role="button" @click="setCarouselImages(result.images)">
+          <img :src="image.url" loading="lazy">
+        </a>
+      </div>
+    </div>
+
+    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result)" class="btn btn-custom mt-2">
+      <i class="bi-send fs-6 me-2"></i>
+      Contacta
+    </button>
+  </div>
+
+  <div v-if="messagesOpen[result.message_href]" class="background-gray-light p-2">
+    <div>
+      <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
+        S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
+      </div>
+      <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
+        Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb {{ settings.CONTACT_EMAIL }}.
+      </div>
+      <div v-else>
+        <div v-if="result.last_message_declined" class="alert alert-warning mt-2">
+          La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar la comunicació.
+        </div>
+        <div v-if="result.options.length > 0">
+          <p class="mt-1 mb-1 fw-bold">Quines opcions vos interessen concretament?</p>
+          <div class="multi-select p-0 text-start">
+            <button
+              v-for="option in result.options"
+              :key="option"
+              @click="toggleMessageOption(result.message_href, option)"
+              class="btn multi-select-choice"
+              :class="{selected: messagesOpen[result.message_href].options[option]}"
+            >
+              ${ optionNamesMap[option] }
+            </button>
+          </div>
+        </div>
+        <textarea
+          v-model="messagesOpen[result.message_href].message"
+          placeholder="Escriu ací el missatge que els arribarà"
+          class="form-control"
+        ></textarea>
+      </div>
+    </div>
+    <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error">
+      <button @click="sendMessage(result)" class="btn btn-custom mt-2">
+        <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
+          Enviant
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Enviant...</span>
+          </div>
+        </span>
+        <span v-else>
+          <i class="bi-send fs-6 me-2"></i>
+          <span v-if="messagesOpen[result.message_href]">
+            Envia el missatge
+            {{ info_tooltip("Se li enviarà un missatge a ${ result.organization.name }, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic") }}
+          </span>
+        </span>
+      </button>
+      <span v-if="messagesOpen[result.message_href].errorMessage" class="ms-2">
+        ${ messagesOpen[result.message_href].errorMessage }
+      </span>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro match_contains_func_js() %}
+function matchContains(search) {
+  return function(m) {
+    const parts = sanitize(search).split(" ").filter(x => x !== "");
+    const targets = [
+      sanitize(m.organization.name),
+      sanitize(m.comments),
+      sanitize(jsonData.resource_names_map[m.resource]),
+    ];
+    for (var option of m.options) {
+      targets.push(sanitize(jsonData.option_names_map[option]));
+    }
+    for (var part of parts) {
+      if (!targets.some((target) => contains(target, part))) {
+        return false;
+      }
+    }
+    return true;
+  };
+}
+{% endmacro %}
+
+{% macro matches_methods_vue() %}
+    filterMatches(matches) {
+      var m = {};
+      for (var k in matches) {
+        m[k] = matches[k].filter(matchContains(this.search));
+      }
+      return m;
+    },
+    concatenateMatches(matches) {
+      var l = [];
+      Object.keys(matches).forEach((k) => {
+        l = [...l, ...matches[k]];
+      });
+      return l;
+    },
+    extractSelectedOptions(optionsMap) {
+      return Object.keys(optionsMap).map(k => {
+        if (optionsMap[k]) {
+          return k;
+        }
+        return "";
+      }).filter(v => v);
+    },
+    sendMessage(result) {
+      var href = result.message_href;
+      var m = this.messagesOpen[href];
+      if (!this.messagesOpen[href]) {
+        this.messagesOpen[href] = {message: "", options: {}};
+        return;
+      }
+      if (!this.messageFormOk(result)) {
+        var [errMessage, errOptions] = this.messageFormErrors(result);
+        if (errMessage && errOptions) {
+          m.errorMessage = "Cal indicar tant en missatge com les opcions";
+        } else if (errMessage) {
+          m.errorMessage = "Cal indicar el missatge";
+        } else if (errOptions) {
+          m.errorMessage = "Cal indicar les opcions";
+        }
+        return;
+      }
+      this.messagesOpen[href].loading = true;
+      post(
+        href,
+        "{{ csrf_token }}",
+        { message: m.message, options: this.extractSelectedOptions(m.options) },
+      ).then(response => {
+        if (!response.ok) {
+          throw "Bad response";
+        }
+        m.result = true;
+        m.loading = false;
+      }).catch(err => {
+        m.error = true;
+        m.loading = false;
+      });
+    },
+    toggleMessageOption(key, option) {
+      this.messagesOpen[key].options[option] = !this.messagesOpen[key].options[option];
+    },
+    messageFormOk(result) {
+      var [errMessage, errOptions] = this.messageFormErrors(result);
+      return !errMessage && !errOptions;
+    },
+    messageFormErrors(result) {
+      var values = this.messagesOpen[result.message_href];
+      if (!values) {
+        return [false, false];
+      }
+      if (result.options.length === 0) {
+          return [!values.message, false];
+      }
+      var selectedOptions = Object.keys(values.options).map(k => values.options[k]).filter(v => v);
+      return [!values.message, this.extractSelectedOptions(values.options).length === 0];
+    },
+{% endmacro %}
+
