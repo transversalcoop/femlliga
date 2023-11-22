@@ -271,7 +271,7 @@ class IntegrationTests(TestCase):
         ]:
             self.assertContains(response, s)
 
-        matches = BeautifulSoup(response.content.decode(), "html.parser").find("script", {"id": "matches-data"})
+        matches = BeautifulSoup(response.content.decode(), "html.parser").find("script", {"id": "django-json-data"})
         for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
             self.assertNotIn(s, matches)
 
@@ -279,11 +279,6 @@ class IntegrationTests(TestCase):
         response = self.client.get(reverse("app"))
         should_contain = [
             "Nom entitat de test",
-            "Descripció entitat de test",
-            "Instagram",
-            "usuari_instagram_de_test",
-            "Associació",
-            "Dona/Igualtat/Feminismes",
             "Local",
             "Servei",
             "Formació",
@@ -306,6 +301,17 @@ class IntegrationTests(TestCase):
             "comentaris de ofereix serveis de test",
         ]:
             self.assertNotContains(response, s)
+
+        response = self.client.get(reverse("profile", args=[o.id]))
+        should_contain = [
+            "Descripció entitat de test",
+            "Instagram",
+            "usuari_instagram_de_test",
+            "Associació",
+            "Dona/Igualtat/Feminismes",
+        ]
+        for s in should_contain:
+            self.assertContains(response, s)
 
         # view organization page
         response = self.client.get(reverse("view_organization", args=[o.id]))
