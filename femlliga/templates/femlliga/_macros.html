@@ -454,58 +454,60 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     </button>
   </div>
 
-  <div v-if="messagesOpen[result.message_href]" class="background-gray-light p-2">
-    <div>
-      <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
-        S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
-      </div>
-      <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
-        Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb {{ settings.CONTACT_EMAIL }}.
-      </div>
-      <div v-else>
-        <div v-if="result.last_message_declined" class="alert alert-warning mt-2">
-          La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar la comunicació.
+  <div v-if="messagesOpen[result.message_href]" class="col-12">
+    <div class="bg-light my-2 p-2 rounded-3">
+      <div>
+        <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
+          S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
         </div>
-        <div v-if="result.options.length > 0">
-          <p class="mt-1 mb-1 fw-bold">Quines opcions vos interessen concretament?</p>
-          <div class="multi-select p-0 text-start">
-            <button
-              v-for="option in result.options"
-              :key="option"
-              @click="toggleMessageOption(result.message_href, option)"
-              class="btn multi-select-choice"
-              :class="{selected: messagesOpen[result.message_href].options[option]}"
-            >
-              ${ optionNamesMap[option] }
-            </button>
-          </div>
+        <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
+          Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb {{ settings.CONTACT_EMAIL }}.
         </div>
-        <textarea
-          v-model="messagesOpen[result.message_href].message"
-          placeholder="Escriu ací el missatge que els arribarà"
-          class="form-control"
-        ></textarea>
-      </div>
-    </div>
-    <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error">
-      <button @click="sendMessage(result)" class="btn btn-custom mt-2">
-        <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
-          Enviant
-          <div class="spinner-border spinner-border-sm" role="status">
-            <span class="visually-hidden">Enviant...</span>
+        <div v-else>
+          <div v-if="result.last_message_declined" class="alert alert-warning mt-2">
+            La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar la comunicació.
           </div>
-        </span>
-        <span v-else>
-          <i class="bi-send fs-6 me-2"></i>
-          <span v-if="messagesOpen[result.message_href]">
-            Envia el missatge
-            {{ info_tooltip("Se li enviarà un missatge a ${ result.organization.name }, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic") }}
+          <div v-if="result.options.length > 0">
+            <p class="mt-1 mb-1 fw-bold">Quines opcions vos interessen concretament?</p>
+            <div class="multi-select p-0 text-start">
+              <button
+                v-for="option in result.options"
+                :key="option"
+                @click="toggleMessageOption(result.message_href, option)"
+                class="btn multi-select-choice"
+                :class="{selected: messagesOpen[result.message_href].options[option]}"
+              >
+                ${ optionNamesMap[option] }
+              </button>
+            </div>
+          </div>
+          <textarea
+            v-model="messagesOpen[result.message_href].message"
+            placeholder="Escriu ací el missatge que els arribarà"
+            class="form-control"
+          ></textarea>
+        </div>
+      </div>
+      <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error">
+        <button @click="sendMessage(result)" class="btn btn-custom mt-2">
+          <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
+            Enviant
+            <div class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">Enviant...</span>
+            </div>
           </span>
+          <span v-else>
+            <i class="bi-send fs-6 me-2"></i>
+            <span v-if="messagesOpen[result.message_href]">
+              Envia el missatge
+              {{ info_tooltip("Se li enviarà un missatge a ${ result.organization.name }, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic") }}
+            </span>
+          </span>
+        </button>
+        <span v-if="messagesOpen[result.message_href].errorMessage" class="ms-2">
+          ${ messagesOpen[result.message_href].errorMessage }
         </span>
-      </button>
-      <span v-if="messagesOpen[result.message_href].errorMessage" class="ms-2">
-        ${ messagesOpen[result.message_href].errorMessage }
-      </span>
+      </div>
     </div>
   </div>
 </div>
@@ -533,7 +535,7 @@ function matchContains(search) {
 }
 {% endmacro %}
 
-{% macro matches_methods_vue() %}
+{% macro matches_methods_vue(csrf_token) %}
     filterMatches(matches) {
       var m = {};
       for (var k in matches) {

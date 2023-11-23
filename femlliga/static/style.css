@@ -323,11 +323,6 @@ nav .nav-link.active {
     color: #333;
 }
 
-@media (min-width: 576px) {
-    .sidebar {
-    }
-}
-
 @media (min-width: 768px) {
     .sidebar {
         min-height: 100vh;
@@ -406,11 +401,8 @@ nav .nav-link.active {
 }
 
 .highlight {
-    background-color: yellow;
-}
-
-.nav-link.active .highlight {
-    background-color: greenyellow;
+    background-color: #3945B8;
+    color: white;
 }
 
 .fs-7 {
@@ -582,16 +574,12 @@ nav .nav-link.active {
     border-left: 1px solid gray;
 }
 
-.background-gray-light {
-    background-color: #eee;
-}
-
 .background-yellow {
     background-color: #ffce1c;
 }
 
 .background-yellow-dark {
-    background-color: #80670e;
+    background-color: #505000;
     color: white;
 }
 

@@ -155,7 +155,7 @@ Vue.createApp({
     setCarouselImages(images) {
       this.carouselImages = images;
     },
-    {{ matches_methods_vue() }}
+    {{ matches_methods_vue(csrf_token) }}
   },
   computed: {
     matched_needs() {
