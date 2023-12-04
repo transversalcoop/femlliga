@@ -32,7 +32,7 @@ urlpatterns = [
     path('organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/connect/', views.agreement_connect, name='agreement_connect'),
     path('organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/successful/', views.agreement_successful, name='agreement_successful'),
 
-    path('uploads/<path:path>/', views.uploads, name='uploads'),
+    path('uploads/<path:path>', views.uploads, name='uploads'),
 
     # admin required
     path('report/', views.report, name='report'),
