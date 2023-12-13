@@ -3,13 +3,8 @@
 {% block content %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    Us enviem aquest missatge des de {{ consts.APP_NAME }} ja que heu iniciat una col·laboració a través de la nostra plataforma.
-  </td>
-</tr>
-
-<tr>
-  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    Concretament, {{ a.solicitor.name }} va demanar a {{ a.solicitee.name }}
+    Us enviem aquest missatge des de {{ consts.APP_NAME }} ja que
+    {{ a.solicitor.name }} va demanar a {{ a.solicitee.name }}
     {% if a.resource_type == "need" %}
       buscar conjuntament
     {% else %}
@@ -26,13 +21,7 @@
 
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    A partir d'aquest moment podeu seguir comunicant-vos per correu electrònic, simplement fent servir la opció de «Respon a tots» en aquest mateix correu, i concretar els detalls de la vostra col·laboració.
-  </td>
-</tr>
-
-<tr>
-  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    Tant si arribeu a un acord com si no, us agraim si ho indiqueu a l'aplicació. També us agrairem si ens feu arribar qualsevol suggerència sobre com podríem millorar la plataforma.
+    Podeu seguir parlant polsant a <strong>«Respon a tots»</strong> en aquest mateix correu, i concretar els detalls de la vostra col·laboració.
   </td>
 </tr>
 {% endblock %}
