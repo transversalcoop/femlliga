@@ -102,7 +102,11 @@ Vue.createApp({
   methods: {
     highlightSearch: highlightSearch,
     selectResource(resource) {
-      this.resourceSelected = resource;
+      if (this.resourceSelected === resource) {
+        this.resourceSelected = "";
+      } else {
+        this.resourceSelected = resource;
+      }
     },
     setCarouselImages(images) {
       this.carouselImages = images;

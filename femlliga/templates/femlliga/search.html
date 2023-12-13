@@ -144,13 +144,22 @@ Vue.createApp({
     },
     selectResource(resource, matchType) {
       this.organizationSelected = null;
-      this.resourceSelected = resource;
-      this.matchTypeSelected = matchType;
+      if (this.resourceSelected === resource && this.matchTypeSelected === matchType) {
+        this.resourceSelected = "";
+        this.matchTypeSelected = "";
+      } else {
+        this.resourceSelected = resource;
+        this.matchTypeSelected = matchType;
+      }
     },
     selectOrganization(org) {
       this.resourceSelected = "";
       this.matchTypeSelected = "";
-      this.organizationSelected = org;
+      if (this.organizationSelected === org) {
+        this.organizationSelected = "";
+      } else {
+        this.organizationSelected = org;
+      }
     },
     setCarouselImages(images) {
       this.carouselImages = images;

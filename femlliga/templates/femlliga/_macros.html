@@ -456,6 +456,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 
   <div v-if="messagesOpen[result.message_href]" class="col-12">
     <div class="bg-light my-2 p-2 rounded-3">
+      <button type="button" class="btn-close float-end" aria-label="Close" @click="closeMessage(result.message_href)"></button>
       <div>
         <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
           S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
@@ -594,6 +595,9 @@ function matchContains(search) {
     },
     toggleMessageOption(key, option) {
       this.messagesOpen[key].options[option] = !this.messagesOpen[key].options[option];
+    },
+    closeMessage(key) {
+      delete this.messagesOpen[key];
     },
     messageFormOk(result) {
       var [errMessage, errOptions] = this.messageFormErrors(result);

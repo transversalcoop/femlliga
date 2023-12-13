@@ -275,13 +275,22 @@ Vue.createApp({
     },
     selectResource(resource, requestType) {
       this.organizationSelected = null;
-      this.resourceSelected = resource;
-      this.requestTypeSelected = requestType;
+      if (this.resourceSelected === resource && this.requestTypeSelected === requestType) {
+        this.resourceSelected = "";
+        this.requestTypeSelected = "";
+      } else {
+        this.resourceSelected = resource;
+        this.requestTypeSelected = requestType;
+      }
     },
     selectOrganization(org) {
       this.resourceSelected = "";
       this.requestTypeSelected = "";
-      this.organizationSelected = org;
+      if (this.organizationSelected === org) {
+        this.organizationSelected = "";
+      } else {
+        this.organizationSelected = org;
+      }
     },
     filterAgreements(agreements) {
       var m = {};

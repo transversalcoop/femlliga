@@ -75,6 +75,7 @@ ORG_TYPES = [
     ("MUTUALITY", "Mutualitat"),
     ("INSERTION_COMPANY", "Empresa d’inserció"),
     ("SPECIAL_WORK_CENTER", "Centre especial de treball"),
+    ("PUBLIC_PRIVATE_BASED", "Entitat pública de base privada"),
 ]
 
 ORG_TYPES_NAMES_MAP = {}
