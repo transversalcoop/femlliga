@@ -6,6 +6,7 @@ import uuid
 import logging
 import datetime
 import unicodedata
+import networkx as nx
 
 from io import BytesIO
 from pathlib import Path
@@ -14,6 +15,7 @@ from functools import cmp_to_key, reduce
 from django.http import Http404, JsonResponse
 from django.forms import formset_factory, inlineformset_factory
 from django.contrib import messages
+from django.dispatch import receiver
 from django.db.models import Prefetch
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import EmailMessage, mail_managers
@@ -26,7 +28,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.template.loader import render_to_string
 
-import networkx as nx
+from allauth.account.models import EmailAddress
+from allauth.account.signals import email_confirmed
 
 from config.settings import MEDIA_ROOT
 from .models import *
@@ -573,21 +576,42 @@ def search(request, organization_id):
 @login_required
 def preferences(request):
     form = PreferencesForm({
+        "email": request.user.email,
         "notifications_frequency": request.user.notifications_frequency,
         "accept_communications_automatically": request.user.accept_communications_automatically,
     })
     if request.method == "POST":
         form = PreferencesForm(request.POST)
         if form.is_valid():
+            new_email = form.cleaned_data["email"]
+            if new_email != request.user.email:
+                # will send confirmation email and then execute update_user_email function on email_confirmed signal
+                EmailAddress.objects.add_email(request, request.user, new_email, confirm=True)
             request.user.notifications_frequency = form.cleaned_data["notifications_frequency"]
             request.user.accept_communications_automatically = form.cleaned_data["accept_communications_automatically"]
             request.user.save()
-            messages.info(request, "La configuració s'ha desat correctament", extra_tags="show")
+            msg = "La configuració s'ha desat correctament"
+            if new_email != request.user.email:
+                msg += ". S'ha enviat un correu electrònic per confirmar la nova adreça"
+            messages.info(request, msg, extra_tags="show")
             return redirect("preferences")
 
+    other_emails = EmailAddress.objects.filter(user=request.user).exclude(email=request.user.email)
     return render(request, "femlliga/preferences.html", {
         "form": form,
+        "other_emails": ", ".join([e.email for e in other_emails]),
     })
+
+@receiver(email_confirmed)
+def update_user_email(sender, request, email_address, **kwargs):
+    # set new address as primary
+    email_address.set_as_primary()
+    email_address.user.email = email_address.email
+    email_address.user.save()
+    # remove previous addresses
+    stale_addresses = EmailAddress.objects.filter(
+        user = email_address.user,
+    ).exclude(primary = True).delete()
 
 @login_required
 @require_own_organization

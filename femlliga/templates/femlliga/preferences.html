@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import form_feedback, render_select %}
+{% from 'femlliga/_macros.html' import form_feedback, input_classes, input_value, input_feedback, render_select %}
 
 {% block title %}Preferències{% endblock %}
 
@@ -11,6 +11,16 @@
   <form method="post" class="mt-2">
     {{ csrf_input }}
     {{ form_feedback(form) }}
+
+    <label for="id_email">
+      <strong>Adreça de correu electrònic.</strong>
+      Si modifiques l'adreça, el canvi s'aplicarà quan valides la nova adreça
+      {% if other_emails %}
+      (correus pendents de validar: {{ other_emails }})
+      {% endif %}
+    </label>
+    <input type="text" {{ input_classes(form, "email") }} name="email" autocomplete="Nom" id="id_email" {{ input_value(form, "email") }} required>
+    {{ input_feedback(form, "email") }}
 
     <div class="mt-3">
       {{ render_select(form, "notifications_frequency", "Configura cada quant de temps vols rebre notificacions. Només te n'enviarem en cas que tingues peticions pendents de respondre.") }}

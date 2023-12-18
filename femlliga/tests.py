@@ -359,3 +359,13 @@ class IntegrationTests(TestCase):
         self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 2)
 
+    @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)
+    def test_deleted_organizations(self):
+        org1 = self.aux_create_org("test4@example.com")
+        org2 = self.aux_create_org("test5@example.com")
+
+        # TODO implement aux_create_org similar to start of happy path
+        # TODO org1 send message to org2 and viceversa
+        # TODO delete org2
+        # TODO check reverse("agreements", args=[org1.id]) works, and the same for other views that fail
+
