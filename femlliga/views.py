@@ -14,19 +14,20 @@ from functools import cmp_to_key, reduce
 
 from django.http import Http404, JsonResponse
 from django.forms import formset_factory, inlineformset_factory
+from django.utils import timezone
 from django.contrib import messages
 from django.dispatch import receiver
 from django.db.models import Prefetch
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import EmailMessage, mail_managers
-from django.utils import timezone
 from django.utils.cache import patch_response_headers
-from django.core.exceptions import PermissionDenied
 from django.views.static import serve
+from django.core.exceptions import PermissionDenied
+from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.template.loader import render_to_string
 
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
@@ -77,7 +78,7 @@ def page(request, name):
         page = get_object_or_404(Page, name=name)
     except:
         if name in ["faq", "legal", "privacy", "accessibility"]:
-            page = Page(name=name, heading="Títol", subheading="Subtítol", content="<p>Cal definir aquesta pàgina</p>")
+            page = Page(name=name, heading=_("Títol"), subheading=_("Subtítol"), content="<p>Cal definir aquesta pàgina</p>")
             page.save()
         else:
             raise
@@ -590,9 +591,9 @@ def preferences(request):
             request.user.notifications_frequency = form.cleaned_data["notifications_frequency"]
             request.user.accept_communications_automatically = form.cleaned_data["accept_communications_automatically"]
             request.user.save()
-            msg = "La configuració s'ha desat correctament"
+            msg = _("La configuració s'ha desat correctament")
             if new_email != request.user.email:
-                msg += ". S'ha enviat un correu electrònic per confirmar la nova adreça"
+                msg += _(". S'ha enviat un correu electrònic per confirmar la nova adreça")
             messages.info(request, msg, extra_tags="show")
             return redirect("preferences")
 
@@ -741,7 +742,7 @@ def do_agreement_connect(request, a, communication_accepted):
     a.communication_date = timezone.now()
     a.save()
     if a.communication_accepted:
-        subject = f"Comunicació iniciada per compartir {resource_name(a.resource)}"
+        subject = _("Comunicació iniciada per compartir %(resource)s", resource=resource_name(a.resource))
         body = render_to_string("email/agreement_connect.html", {
             "a": a,
             "current_site": get_current_site(request),
@@ -865,7 +866,14 @@ def report(request):
             resource_options.append("{} - {}".format(resource_name(resource), option_name(option[0])))
             resources_by_resource_option.append([len(offers), len(needs)])
 
-    agreements_header = ["Pendents de comunicació", "Comunicació iniciada", "Comunicació rebutjada", "Acord aconseguit", "Acord no aconseguit", "Total"]
+    agreements_header = [
+        _("Pendents de comunicació"),
+        _("Comunicació iniciada"),
+        _("Comunicació rebutjada"),
+        _("Acord aconseguit"),
+        _("Acord no aconseguit"),
+        _("Total"),
+    ]
     agreements_started = list(map(lambda o: o.date, Agreement.objects.all()))
     agreements_comm = list(map(lambda o: o.communication_date, Agreement.objects.filter(communication_accepted=True)))
     agreements_success = list(map(lambda o: o.successful_date, Agreement.objects.filter(agreement_successful=True)))
@@ -877,48 +885,48 @@ def report(request):
     most_offered = count_word_freqs(" ".join(map(lambda x: x.comments, other_offers)))
     return render(request, "femlliga/report.html", {
         "orgs_json": json.dumps(orgs_json),
-        "organizations": Timeline(list(map(lambda o: o.date, organizations)), name="Altes d'entitats"),
+        "organizations": Timeline(list(map(lambda o: o.date, organizations)), name=_("Altes d'entitats")),
 
         "resources_by_org_type": Table(
-            ["Recursos per tipus d'entitat", "Oferiments", "Necessitats", "Entitats"], org_types,
+            [_("Recursos per tipus d'entitat"), _("Oferiments"), _("Necessitats"), _("Entitats")], org_types,
             resources_by_org_type),
         "charge_by_org_type": Table(
-            ["Oferiments que es cobren per tipus d'entitat", "Oferiments cobrant", "Oferiments gratuïts"], org_types,
+            [_("Oferiments que es cobren per tipus d'entitat"), _("Oferiments cobrant"), _("Oferiments gratuïts")], org_types,
             charge_by_org_type),
         "resources_by_org_scope": Table(
-            ["Recursos per àmbit de treball de l'entitat", "Oferiments", "Necessitats", "Entitats"], org_scopes,
+            [_("Recursos per àmbit de treball de l'entitat"), _("Oferiments"), _("Necessitats"), _("Entitats")], org_scopes,
             resources_by_org_scope),
         "resources_by_resource_type": Table(
-            ["Recursos per tipus de recurs", "Oferiments", "Necessitats"], resource_names,
+            [_("Recursos per tipus de recurs"), _("Oferiments"), _("Necessitats")], resource_names,
             resources_by_resource_type),
         "charge_by_resource_type": Table(
-            ["Oferiments que es cobren per tipus de recurs", "Oferiments cobrant", "Oferiments gratuïts"],
+            [_("Oferiments que es cobren per tipus de recurs"), _("Oferiments cobrant"), _("Oferiments gratuïts")],
             resource_names, charge_by_resource_type),
         "resources_by_resource_option": Table(
-            ["Recursos per tipus concret de recurs", "Oferiments", "Necessitats"], resource_options,
+            [_("Recursos per tipus concret de recurs"), _("Oferiments"), _("Necessitats")], resource_options,
             resources_by_resource_option),
 
         "agreements_by_solicitor_type": Table(
-            ["Interaccions per tipus d'entitat sol·licitant"] + agreements_header, org_types,
+            [_("Interaccions per tipus d'entitat sol·licitant")] + agreements_header, org_types,
             agreements_by_solicitor_type),
         "agreements_by_solicitor_scope": Table(
-            ["Interaccions per àmbit de treball de l'entitat sol·licitant"] + agreements_header, org_scopes,
+            [_("Interaccions per àmbit de treball de l'entitat sol·licitant")] + agreements_header, org_scopes,
             agreements_by_solicitor_scope),
 
         "agreements_by_solicitee_type": Table(
-            ["Interaccions per tipus d'entitat sol·licitada"] + agreements_header, org_types,
+            [_("Interaccions per tipus d'entitat sol·licitada")] + agreements_header, org_types,
             agreements_by_solicitee_type),
         "agreements_by_solicitee_scope": Table(
-            ["Interaccions per àmbit de treball de l'entitat sol·licitada"] + agreements_header, org_scopes,
+            [_("Interaccions per àmbit de treball de l'entitat sol·licitada")] + agreements_header, org_scopes,
             agreements_by_solicitee_scope),
 
         "agreements_by_resource_type": Table(
-            ["Interaccions per tipus de recurs"] + agreements_header, resource_names,
+            [_("Interaccions per tipus de recurs")] + agreements_header, resource_names,
             agreements_by_resource_type),
 
-        "agreements_started": Timeline(agreements_started, name="Peticions de col·laboració"),
-        "agreements_comm": Timeline(agreements_comm, name="Comunicació acceptada"),
-        "agreements_success": Timeline(agreements_success, name="Col·laboració exitosa"),
+        "agreements_started": Timeline(agreements_started, name=_("Peticions de col·laboració")),
+        "agreements_comm": Timeline(agreements_comm, name=_("Comunicació acceptada")),
+        "agreements_success": Timeline(agreements_success, name=_("Col·laboració exitosa")),
 
         "graph": graph,
         "other_needs": other_needs,
@@ -990,8 +998,8 @@ def contact(request):
         ).save()
         # send contact to managers
         mail_managers(
-            f"S'ha rebut un contacte a la web de {APP_NAME}",
-            f"Des del correu {email} envien el següent missatge:\n\n{content}",
+            _("S'ha rebut un contacte a la web de %(name)s", name=APP_NAME),
+            _("Des del correu %(email)s envien el següent missatge:\n\n%(content)s", email=email, content=content),
         )
 
         # send confirmation to user
@@ -1000,7 +1008,7 @@ def contact(request):
             "current_site": get_current_site(request),
         })
         msg = EmailMessage(
-            subject=f"El formulari de contacte amb {APP_NAME} s'ha enviat correctament",
+            subject=_("El formulari de contacte amb %(name)s s'ha enviat correctament", name=APP_NAME),
             body=body,
             from_email=FROM_EMAIL,
             to=[email],
@@ -1043,3 +1051,4 @@ def sort_agreements(agreements):
         return a.date < b.date
 
     return sorted(agreements, key=cmp_to_key(f))
+

@@ -25,7 +25,7 @@
 </div>
 {% endmacro %}
 
-{% macro show_password_message() %}Mostra la contrasenya com a text pla. Avís: això deixarà veure la teua contrasenya en la pantalla.{% endmacro %}
+{% macro show_password_message() %}{{ _("Mostra la contrasenya com a text pla. Avís: això deixarà veure la teua contrasenya en la pantalla.") }}{% endmacro %}
 
 {% macro toggle_password_button() %}
 <span class="input-group-text">
@@ -49,14 +49,14 @@
 {% macro resource_details(resource, match_type) %}
   <div style="margin-bottom: 10px;">
     {% if resource.charge %}
-      <span class="badge bg-light" title="Es demana remuneració a canvi">€</span>
+      <span class="badge bg-light" title="{{ _("Es demana remuneració a canvi") }}">€</span>
     {% endif %}
     {% for option in resource.options.all() %}
       <span class="badge bg-light">{{ option }}</span>
     {% endfor %}
   </div>
   {% if resource.comments %}
-  <p>{% if resource.resource != "OTHER" %}<strong>Observacions:</strong>{% endif %} {{ resource.comments }}</p>
+  <p>{% if resource.resource != "OTHER" %}<strong>{{ _("Observacions:") }}</strong>{% endif %} {{ resource.comments }}</p>
   {% endif %}
   {% if resource.images.all() %}
   <div class="image-thumbnails">
@@ -73,7 +73,7 @@
     <div class="modal-dialog modal-fullscreen">
       <div class="modal-content" style="background: none;">
         <div class="modal-header" style="background-color: white;">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
         </div>
         <div class="modal-body" style="background-color: rgba(0, 0, 0, 0.3);">
           <div id="carouselImages{{ match_type }}{{ resource.id }}" class="carousel slide" style="height: 100%;" data-bs-ride="carousel">
@@ -86,11 +86,11 @@
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselImages{{ match_type }}{{ resource.id }}" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
+              <span class="visually-hidden">{{ _("Anterior") }}</span>
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#carouselImages{{ match_type }}{{ resource.id }}" data-bs-slide="next">
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
+              <span class="visually-hidden">{{ _("Següent") }}</span>
             </button>
           </div>
         </div>
@@ -248,7 +248,7 @@ function clickOption(element) {
 
 {% macro render_social_media(org) %}
   {% if len(org.social_media.all()) > 0 %}
-    <p class="mt-1 mb-0"><strong>Xarxes socials i contacte</strong></p>
+    <p class="mt-1 mb-0"><strong>{{ _("Xarxes socials i contacte") }}</strong></p>
     <ul class="mb-0">
     {% for m in sort_social_media(org.social_media.all()) %}
       <li>
@@ -274,7 +274,7 @@ function clickOption(element) {
 
 {% macro render_social_media_vue() %}
 <div v-if="socialMedia.length > 0">
-  <p class="mt-1 mb-0"><strong>Xarxes socials</strong></p>
+  <p class="mt-1 mb-0"><strong>{{ _("Xarxes socials") }}</strong></p>
   <ul class="mb-0">
     <li v-for="m in socialMedia" :key="m.id">
       <span class="me-2">${ socialMediaNamesMap[m.media_type] }</span>
@@ -314,7 +314,7 @@ function clickOption(element) {
 {% endmacro %}
 
 {% macro render_formset_delete_vue(field, deleteFunc) %}
-<button class="btn btn-custom" @click.prevent="{{ deleteFunc }}">Esborra</button>
+<button class="btn btn-custom" @click.prevent="{{ deleteFunc }}">{{ _("Esborra") }}</button>
 <input type="hidden" id="id_{{ field.html_name }}" name="{{ field.html_name }}" value="">
 {% endmacro %}
 
@@ -327,7 +327,7 @@ function clickOption(element) {
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content bg-transparent">
       <div class="modal-header bg-white">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
       </div>
       <div class="modal-body bg-black bg-opacity-25">
         <div id="carousel-images" class="carousel slide" style="height: 100%;" data-bs-ride="carousel">
@@ -342,11 +342,11 @@ function clickOption(element) {
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#carousel-images" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
+            <span class="visually-hidden">{{ _("Anterior") }}</span>
           </button>
           <button class="carousel-control-next" type="button" data-bs-target="#carousel-images" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
+            <span class="visually-hidden">{{ _("Següent") }}</span>
           </button>
         </div>
       </div>
@@ -386,8 +386,8 @@ function clickOption(element) {
 
   <div class="row">
     <div class="col-md-6">
-      <p class="mb-0"><strong>Forma jurídica</strong>: {{ org_type_name(org.org_type) }}</p>
-      <p class="mb-0"><strong>Àmbits de treball</strong></p>
+      <p class="mb-0"><strong>{{ _("Forma jurídica") }}</strong>: {{ org_type_name(org.org_type) }}</p>
+      <p class="mb-0"><strong>{{ _("Àmbits de treball") }}</strong></p>
       <ul>
         {% for scope in org.scopes.all() %}
           <li>{{ scope }}</li>
@@ -432,13 +432,13 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
     </h3>
     <div>
-      <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } de vosaltres</span>
+      <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } {{ _("de vosaltres") }}</span>
     </div>
     <div class="mb-2">
-      <span v-if="result.charge" class="badge bg-light me-2" title="Es demana remuneració a canvi">€</span>
+      <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Es demana remuneració a canvi") }}">€</span>
       <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
     </div>
-    <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">Observacions:</strong><span v-html="highlightSearch(result.comments, search)"></span></p>
+    <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">{{ _("Observacions:") }}</strong><span v-html="highlightSearch(result.comments, search)"></span></p>
 
     <div v-if="result.images.length > 0" class="image-thumbnails">
       <div v-for="image in result.images" :key="image.url" class="thumbnail">
@@ -450,7 +450,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 
     <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result)" class="btn btn-custom mt-2">
       <i class="bi-send fs-6 me-2"></i>
-      Contacta
+      {{ _("Contacta") }}
     </button>
   </div>
 
@@ -459,17 +459,17 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       <button type="button" class="btn-close float-end" aria-label="Close" @click="closeMessage(result.message_href)"></button>
       <div>
         <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
-          S'ha enviat el missatge correctament. ${ result.organization.name } podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.
+          {{ _("S'ha enviat el missatge correctament.") }} ${ result.organization.name } {{ _("podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.") }}
         </div>
         <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
-          Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb {{ settings.CONTACT_EMAIL }}.
+          {{ _("Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb") }} {{ settings.CONTACT_EMAIL }}.
         </div>
         <div v-else>
           <div v-if="result.last_message_declined" class="alert alert-warning mt-2">
-            La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar la comunicació.
+            {{ _("La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar la comunicació.") }}
           </div>
           <div v-if="result.options.length > 0">
-            <p class="mt-1 mb-1 fw-bold">Quines opcions vos interessen concretament?</p>
+            <p class="mt-1 mb-1 fw-bold">{{ _("Quines opcions vos interessen concretament?") }}</p>
             <div class="multi-select p-0 text-start">
               <button
                 v-for="option in result.options"
@@ -484,7 +484,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
           </div>
           <textarea
             v-model="messagesOpen[result.message_href].message"
-            placeholder="Escriu ací el missatge que els arribarà"
+            placeholder="{{ _("Escriu ací el missatge que els arribarà") }}"
             class="form-control"
           ></textarea>
         </div>
@@ -494,14 +494,14 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
           <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
             Enviant
             <div class="spinner-border spinner-border-sm" role="status">
-              <span class="visually-hidden">Enviant...</span>
+              <span class="visually-hidden">{{ _("Enviant...") }}</span>
             </div>
           </span>
           <span v-else>
             <i class="bi-send fs-6 me-2"></i>
             <span v-if="messagesOpen[result.message_href]">
-              Envia el missatge
-              {{ info_tooltip("Se li enviarà un missatge a ${ result.organization.name }, que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic") }}
+              {{ _("Envia el missatge") }}
+              {{ info_tooltip(_("Se li enviarà un missatge a ") + "${ result.organization.name }" + _(", que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic")) }}
             </span>
           </span>
         </button>
@@ -569,11 +569,11 @@ function matchContains(search) {
       if (!this.messageFormOk(result)) {
         var [errMessage, errOptions] = this.messageFormErrors(result);
         if (errMessage && errOptions) {
-          m.errorMessage = "Cal indicar tant en missatge com les opcions";
+          m.errorMessage = "{{ _("Cal indicar tant en missatge com les opcions") }}";
         } else if (errMessage) {
-          m.errorMessage = "Cal indicar el missatge";
+          m.errorMessage = "{{ _("Cal indicar el missatge") }}";
         } else if (errOptions) {
-          m.errorMessage = "Cal indicar les opcions";
+          m.errorMessage = "{{ _("Cal indicar les opcions") }}";
         }
         return;
       }

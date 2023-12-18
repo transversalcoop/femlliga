@@ -4,8 +4,9 @@ import time
 from django.conf import settings
 from django.utils import timezone
 from django.contrib import messages
-from django.contrib.auth.views import redirect_to_login
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.views import redirect_to_login
 
 class TimezoneMiddleware:
     def __init__(self, get_response):
@@ -34,7 +35,7 @@ class SessionTimeoutMiddleware:
 
         if session_is_expired:
             request.session.flush()
-            messages.success(request, "S'ha tancat la sessió per inactivitat")
+            messages.success(request, _("S'ha tancat la sessió per inactivitat"))
             return redirect_to_login(next=request.path, login_url="/admin/login/")
 
         grace_period = 1

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="{{ get_current_language() }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,7 +29,7 @@
       {% endif %}
       <div class="skippy visually-hidden-focusable overflow-hidden">
         <div class="container-xl">
-          <a class="d-inline-flex p-2 m-1" href="#content">Salta al contingut principal</a>
+          <a class="d-inline-flex p-2 m-1" href="#content">{{ _("Salta al contingut principal") }}</a>
         </div>
       </div>
       <header class="navbar navbar-expand-md bd-navbar" style="background-color: #FFCE1C;">
@@ -67,33 +67,33 @@
           <div class="py-3 my-4 container">
             <div class="row" style="color: #4b4b4b; font-size: 0.9em;">
               <div class="col-lg-4">
-                <p class="fw-bold">INFORMACIÓ</p>
+                <p class="fw-bold">{{ _("INFORMACIÓ") }}</p>
                 <ul style="list-style: none; padding: 0;">
-                  <li class="mb-1"><a href="{{ url("page", args=["legal"]) }}">Avís legal</a></li>
-                  <li class="mb-1"><a href="{{ url("page", args=["accessibility"]) }}">Accessibilitat</a></li>
-                  <li class="mb-1"><a href="{{ url("page", args=["privacy"]) }}">Política de protecció de dades</a></li>
-                  <li class="mb-1"><a href="{{ url("page", args=["faq"]) }}">Preguntes freqüents</a></li>
-                  <li class="mb-1"><a href="{{ url("contact") }}">Contacte</a></li>
+                  <li class="mb-1"><a href="{{ url("page", args=["legal"]) }}">{{ _("Avís legal") }}</a></li>
+                  <li class="mb-1"><a href="{{ url("page", args=["accessibility"]) }}">{{ _("Accessibilitat") }}</a></li>
+                  <li class="mb-1"><a href="{{ url("page", args=["privacy"]) }}">{{ _("Política de protecció de dades") }}</a></li>
+                  <li class="mb-1"><a href="{{ url("page", args=["faq"]) }}">{{ _("Preguntes freqüents") }}</a></li>
+                  <li class="mb-1"><a href="{{ url("contact") }}">{{ _("Contacte") }}</a></li>
                 </ul>
               </div>
               <div class="col-lg-4">
-                <p class="fw-bold">CONTACTE</p>
+                <p class="fw-bold">{{ _("CONTACTE") }}</p>
                 <p class="m-0">Tlf: {{ settings.CONTACT_PHONE }}</p>
-                <p class="m-0">Correu electrònic: {{ settings.CONTACT_EMAIL }}</p>
+                <p class="m-0">{{ _("Correu electrònic:") }} {{ settings.CONTACT_EMAIL }}</p>
                 <p class="m-0"><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/{{ settings.CONTACT_SOCIAL }}/">Instagram</a></p>
-                <p><a target="_blank" rel="noopener noreferrer" href="{{ settings.CONTACT_LINKS }}">Enllaços</a></p>
-                <p>Les imatges emprades pertanyen a <a target="_blank" rel="noopener noreferrer" href="https://www.freepik.com">pikisuperstar - www.freepik.com</a></p>
-                <p>Web creada amb <a target="_blank" rel="noopener noreferrer" href="https://github.com/transversalcoop/femlliga">programari lliure</a></p>
+                <p><a target="_blank" rel="noopener noreferrer" href="{{ settings.CONTACT_LINKS }}">{{ _("Enllaços") }}</a></p>
+                <p>{{ _("Les imatges emprades pertanyen a") }} <a target="_blank" rel="noopener noreferrer" href="https://www.freepik.com">pikisuperstar - www.freepik.com</a></p>
+                <p>{{ _("Web creada amb <a target='_blank' rel='noopener noreferrer' href='https://github.com/transversalcoop/femlliga'>programari lliure</a>") }}</p>
               </div>
               <div class="col-lg-4">
-                <p class="m-0">Un projecte desenvolupat per </p>
+                <p class="m-0">{{ _("Un projecte desenvolupat per") }}</p>
                 <a target="_blank" rel="noopener noreferrer" href="https://transversalcoop.org">
-                  <img src="{{ static("transversal.png") }}" style="height: 58px;" alt="Logo de la Cooperativa Transversal" loading="lazy">
+                  <img src="{{ static("transversal.png") }}" style="height: 58px;" alt="{{ _("Logo de la Cooperativa Transversal") }}" loading="lazy">
                 </a>
 
-                <p style="margin: 20px 0 0 0;">Amb el suport econòmic de</p>
+                <p style="margin: 20px 0 0 0;">{{ _("Amb el suport econòmic de") }}</p>
                 <a target="_blank" rel="noopener noreferrer" href="https://castello.es/">
-                  <img src="{{ static("ajuntament_cs.png") }}" style="height: 85px;" alt="Logo de l'Ajuntament de Castelló" loading="lazy">
+                  <img src="{{ static("ajuntament_cs.png") }}" style="height: 85px;" alt="{{ _("Logo de l'Ajuntament de Castelló") }}" loading="lazy">
                 </a>
               </div>
             </div>

@@ -1,10 +1,11 @@
+import bleach
+
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
 from django.utils.html import json_script
 from django.templatetags.static import static
-
-import bleach
+from django.utils.translation import gettext, ngettext, get_language
 
 from jinja2 import Environment
 from allauth.utils import get_request_param
@@ -13,6 +14,12 @@ from allauth.socialaccount.adapter import get_adapter
 import femlliga.constants
 
 from femlliga.models import *
+
+def get_current_language():
+    lang = get_language()
+    if lang in ["ca", "es"]:
+        return lang
+    return "ca"
 
 def add_http(url):
     if not url.startswith("http://") and not url.startswith("https://"):
@@ -73,7 +80,8 @@ def clean(s, style=False):
     })
 
 def environment(**options):
-    env = Environment(**options)
+    env = Environment(extensions=["jinja2.ext.i18n"], **options)
+    env.install_gettext_callables(gettext=gettext, ngettext=ngettext, newstyle=True)
     env.globals.update({
         "len": len,
         "str": str,
@@ -98,5 +106,6 @@ def environment(**options):
         "json_script": json_script,
         "js_bool": js_bool,
         "media_type_placeholder": media_type_placeholder,
+        "get_current_language": get_current_language,
     })
     return env

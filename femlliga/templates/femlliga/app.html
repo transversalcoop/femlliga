@@ -16,7 +16,9 @@
             <ul class="dropdown-menu" aria-labelledby="afegeix{{ resource_type }}">
               {% for resource in missing %}
               <li>
-                <a class="dropdown-item" href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.code]) }}">{{ resource }}</a>
+                <a class="dropdown-item" href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.code]) }}">
+                  {{ resource }}
+                </a>
               </li>
               {% endfor %}
             </ul>

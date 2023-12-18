@@ -10,8 +10,8 @@ from pathlib import Path
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django.contrib.auth.models import AbstractUser
 
@@ -189,7 +189,7 @@ class Resource:
         self.name = values[1]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     @classmethod
     def resource(cls, code):
@@ -310,7 +310,7 @@ class ResourceOption(models.Model):
     name = models.CharField(max_length=100, choices=RESOURCE_OPTIONS, primary_key = True)
 
     def __str__(self):
-        return RESOURCE_OPTIONS_DEF_MAP[self.name]
+        return str(RESOURCE_OPTIONS_DEF_MAP[self.name])
 
 class BaseResource(models.Model):
     resource = models.CharField(max_length=100, choices=RESOURCES)

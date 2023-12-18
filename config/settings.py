@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'debug_toolbar',
     'axes',
-    'captcha',
+    'django_recaptcha',
 
     'femlliga',
 ]
@@ -68,6 +68,7 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -164,7 +165,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'ca'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
@@ -172,6 +173,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+LANGUAGES = [
+    ('ca', 'Català'),
+    ('es', 'Castellano'),
+    ('en-us', 'English'),
+]
+
+LOCALE_PATHS = ['locale']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -350,4 +358,4 @@ if recaptcha_public != "" and recaptcha_private != "":
     RECAPTCHA_PUBLIC_KEY = recaptcha_public
     RECAPTCHA_PRIVATE_KEY = recaptcha_private
 else:
-    SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+    SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']

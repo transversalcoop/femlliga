@@ -4,7 +4,7 @@ import urllib
 import django.forms as forms
 from django.utils.translation import gettext_lazy as _
 
-from captcha.fields import ReCaptchaField
+from django_recaptcha.fields import ReCaptchaField
 from allauth.account.forms import LoginForm, SignupForm
 
 from .models import CustomUser, Organization, Contact, Resource
@@ -49,7 +49,7 @@ class OrganizationForm(forms.ModelForm):
             except:
                 pass
         else:
-            self._errors["address"] = self.error_class(["Cal indicar la posició o l'adreça"])
+            self._errors["address"] = self.error_class([_("Cal indicar la posició o l'adreça")])
 
         return self.cleaned_data
 
@@ -68,7 +68,7 @@ class ResourceForm(forms.Form):
         missing_comments = not self.cleaned_data["comments"]
         if has_resource and missing_options and missing_comments:
             self._errors["options"] = self.error_class([
-                "Cal indicar una opció com a mínim, o indicar en comentaris altres opcions que us interessarien",
+                _("Cal indicar una opció com a mínim, o indicar en comentaris altres opcions que us interessarien"),
             ])
         return self.cleaned_data
 
@@ -89,7 +89,7 @@ class MessageForm(forms.Form):
             return self.cleaned_data
 
         if len(self.cleaned_data.get("options", [])) == 0:
-            self._errors["options"] = self.error_class(["Cal indicar una opció com a mínim"])
+            self._errors["options"] = self.error_class([_("Cal indicar una opció com a mínim")])
         return self.cleaned_data
 
 class ContactForm(forms.ModelForm):
