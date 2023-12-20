@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-12-18 14:46+0000\n"
-"PO-Revision-Date: 2023-12-18 15:47+0100\n"
+"POT-Creation-Date: 2023-12-20 12:07+0000\n"
+"PO-Revision-Date: 2023-12-20 13:09+0100\n"
 "Last-Translator: \n"
 "Language: ca\n"
 "Language-Team: ca <LL@li.org>\n"
@@ -23,420 +23,421 @@ msgstr ""
 msgid "Fem lliga!"
 msgstr "Fem lliga!"
 
-#: femlliga/constants.py:7
+#: femlliga/constants.py:12
 msgid "Diàriament"
 msgstr "Diàriament"
 
-#: femlliga/constants.py:8
+#: femlliga/constants.py:13
 msgid "Setmanalment"
 msgstr "Setmanalment"
 
-#: femlliga/constants.py:9
+#: femlliga/constants.py:14
 msgid "Mai"
 msgstr "Mai"
 
-#: femlliga/constants.py:13
+#: femlliga/constants.py:18 femlliga/templates/account/login.html:13
+#: femlliga/templates/account/signup.html:17
 msgid "Correu electrònic"
 msgstr "Correu electrònic"
 
-#: femlliga/constants.py:14
+#: femlliga/constants.py:19
 msgid "Lloc web"
 msgstr "Lloc web"
 
-#: femlliga/constants.py:15
+#: femlliga/constants.py:20
 msgid "Facebook"
 msgstr "Facebook"
 
-#: femlliga/constants.py:16
+#: femlliga/constants.py:21
 msgid "Instagram"
 msgstr "Instagram"
 
-#: femlliga/constants.py:17
+#: femlliga/constants.py:22
 msgid "Twitter"
 msgstr "Twitter"
 
-#: femlliga/constants.py:18
+#: femlliga/constants.py:23
 msgid "Linkedin"
 msgstr "Linkedin"
 
-#: femlliga/constants.py:19
+#: femlliga/constants.py:24
 msgid "Whatsapp"
 msgstr "Whatsapp"
 
-#: femlliga/constants.py:29
+#: femlliga/constants.py:34
 msgid "correu@example.com"
 msgstr "correu@example.com"
 
-#: femlliga/constants.py:30
+#: femlliga/constants.py:35
 msgid "example.com"
 msgstr "example.com"
 
-#: femlliga/constants.py:31 femlliga/constants.py:32 femlliga/constants.py:33
-#: femlliga/constants.py:34
+#: femlliga/constants.py:36 femlliga/constants.py:37 femlliga/constants.py:38
+#: femlliga/constants.py:39
 msgid "Nom d'usuari"
 msgstr "Nom d'usuari"
 
-#: femlliga/constants.py:38
+#: femlliga/constants.py:43
 msgid "Dona/Igualtat/Feminismes"
 msgstr "Dona/Igualtat/Feminismes"
 
-#: femlliga/constants.py:39
+#: femlliga/constants.py:44
 msgid "Educació"
 msgstr "Educació"
 
-#: femlliga/constants.py:40
+#: femlliga/constants.py:45
 msgid "Persones majors"
 msgstr "Persones majors"
 
-#: femlliga/constants.py:41
+#: femlliga/constants.py:46
 msgid "Veïnal"
 msgstr "Veïnal"
 
-#: femlliga/constants.py:42
+#: femlliga/constants.py:47
 msgid "Activitat física i esportiva"
 msgstr "Activitat física i esportiva"
 
-#: femlliga/constants.py:43
+#: femlliga/constants.py:48
 msgid "Cultura, patrimoni, territori, llengua..."
 msgstr "Cultura, patrimoni, territori, llengua..."
 
-#: femlliga/constants.py:44
+#: femlliga/constants.py:49
 msgid "Infància, adolescència i joventut"
 msgstr "Infància, adolescència i joventut"
 
-#: femlliga/constants.py:45
+#: femlliga/constants.py:50
 msgid "Benestar social"
 msgstr "Benestar social"
 
-#: femlliga/constants.py:46
+#: femlliga/constants.py:51
 msgid "Cooperació i sensibilització"
 msgstr "Cooperació i sensibilització"
 
-#: femlliga/constants.py:47
+#: femlliga/constants.py:52
 msgid "Medi ambient i mobilitat sostenible"
 msgstr "Medi ambient i mobilitat sostenible"
 
-#: femlliga/constants.py:48
+#: femlliga/constants.py:53
 msgid "Festa i tradicions"
 msgstr "Festa i tradicions"
 
-#: femlliga/constants.py:49
+#: femlliga/constants.py:54
 msgid "Religiosa"
 msgstr "Religiosa"
 
-#: femlliga/constants.py:50
+#: femlliga/constants.py:55
 msgid "Participació ciutadana i dinamització comunitària"
 msgstr "Participació ciutadana i dinamització comunitària"
 
-#: femlliga/constants.py:51
+#: femlliga/constants.py:56
 msgid "Disseny i comunicació"
 msgstr "Disseny i comunicació"
 
-#: femlliga/constants.py:52
+#: femlliga/constants.py:57
 msgid "Formació i recerca"
 msgstr "Formació i recerca"
 
-#: femlliga/constants.py:53
+#: femlliga/constants.py:58
 msgid "Habitatge i gestió de l’entorn"
 msgstr "Habitatge i gestió de l’entorn"
 
-#: femlliga/constants.py:54
+#: femlliga/constants.py:59
 msgid "Alimentació, restauració i hosteleria"
 msgstr "Alimentació, restauració i hosteleria"
 
-#: femlliga/constants.py:55
+#: femlliga/constants.py:60
 msgid "Logística i subministraments"
 msgstr "Logística i subministraments"
 
-#: femlliga/constants.py:56
+#: femlliga/constants.py:61
 msgid "Finançament i Moneda Social"
 msgstr "Finançament i Moneda Social"
 
-#: femlliga/constants.py:57
+#: femlliga/constants.py:62
 msgid "Producció"
 msgstr "Producció"
 
-#: femlliga/constants.py:58
+#: femlliga/constants.py:63
 msgid "Comerç"
 msgstr "Comerç"
 
-#: femlliga/constants.py:59
+#: femlliga/constants.py:64
 msgid "Salut i Cures"
 msgstr "Salut i Cures"
 
-#: femlliga/constants.py:60
+#: femlliga/constants.py:65
 msgid "Tecnologia i electrònica"
 msgstr "Tecnologia i electrònica"
 
-#: femlliga/constants.py:61
+#: femlliga/constants.py:66
 msgid "Textil"
 msgstr "Textil"
 
-#: femlliga/constants.py:62 femlliga/templates/femlliga/_base.html:73
+#: femlliga/constants.py:67 femlliga/templates/femlliga/_base.html:73
 msgid "Accessibilitat"
 msgstr "Accessibilitat"
 
-#: femlliga/constants.py:63
+#: femlliga/constants.py:68
 msgid "Diversitat funcional"
 msgstr "Diversitat funcional"
 
-#: femlliga/constants.py:64 femlliga/constants.py:92
+#: femlliga/constants.py:69 femlliga/constants.py:97
 msgid "Altres"
 msgstr "Altres"
 
-#: femlliga/constants.py:72
+#: femlliga/constants.py:77
 msgid "Associació"
 msgstr "Associació"
 
-#: femlliga/constants.py:73
+#: femlliga/constants.py:78
 msgid "Cooperativa"
 msgstr "Cooperativa"
 
-#: femlliga/constants.py:74
+#: femlliga/constants.py:79
 msgid "Cooperativa sense ànim de lucre"
 msgstr "Cooperativa sense ànim de lucre"
 
-#: femlliga/constants.py:75
+#: femlliga/constants.py:80
 msgid "Fundació"
 msgstr "Fundació"
 
-#: femlliga/constants.py:76
+#: femlliga/constants.py:81
 msgid "Societat laboral"
 msgstr "Societat laboral"
 
-#: femlliga/constants.py:77
+#: femlliga/constants.py:82
 msgid "Mutualitat"
 msgstr "Mutualitat"
 
-#: femlliga/constants.py:78
+#: femlliga/constants.py:83
 msgid "Empresa d’inserció"
 msgstr "Empresa d’inserció"
 
-#: femlliga/constants.py:79
+#: femlliga/constants.py:84
 msgid "Centre especial de treball"
 msgstr "Centre especial de treball"
 
-#: femlliga/constants.py:80
+#: femlliga/constants.py:85
 msgid "Entitat pública de base privada"
 msgstr "Entitat pública de base privada"
 
-#: femlliga/constants.py:88
+#: femlliga/constants.py:93
 msgid "Local"
 msgstr "Local"
 
-#: femlliga/constants.py:89
+#: femlliga/constants.py:94
 msgid "Formació"
 msgstr "Formació"
 
-#: femlliga/constants.py:90
+#: femlliga/constants.py:95
 msgid "Servei"
 msgstr "Servei"
 
-#: femlliga/constants.py:91
+#: femlliga/constants.py:96
 msgid "Equipaments"
 msgstr "Equipaments"
 
-#: femlliga/constants.py:110
+#: femlliga/constants.py:115
 msgid "Ús diari"
 msgstr "Ús diari"
 
-#: femlliga/constants.py:111
+#: femlliga/constants.py:116
 msgid "Ús puntual"
 msgstr "Ús puntual"
 
-#: femlliga/constants.py:112
+#: femlliga/constants.py:117
 msgid "Puntualment per a reunions"
 msgstr "Puntualment per a reunions"
 
-#: femlliga/constants.py:113
+#: femlliga/constants.py:118
 msgid "Puntualment per a actes"
 msgstr "Puntualment per a actes"
 
-#: femlliga/constants.py:116
+#: femlliga/constants.py:121
 msgid "Digitalització"
 msgstr "Digitalització"
 
-#: femlliga/constants.py:117
+#: femlliga/constants.py:122
 msgid "Relacions amb l'administració"
 msgstr "Relacions amb l'administració"
 
-#: femlliga/constants.py:118
+#: femlliga/constants.py:123
 msgid "Igualtat"
 msgstr "Igualtat"
 
-#: femlliga/constants.py:119
+#: femlliga/constants.py:124
 msgid "Estalvi energètic"
 msgstr "Estalvi energètic"
 
-#: femlliga/constants.py:120
+#: femlliga/constants.py:125
 msgid "Memòria històrica"
 msgstr "Memòria històrica"
 
-#: femlliga/constants.py:123
+#: femlliga/constants.py:128
 msgid "Gestió de la comunicació (web, xarxes socials, etc.)"
 msgstr "Gestió de la comunicació (web, xarxes socials, etc.)"
 
-#: femlliga/constants.py:124
+#: femlliga/constants.py:129
 msgid "Assegurança"
 msgstr "Assegurança"
 
-#: femlliga/constants.py:125
+#: femlliga/constants.py:130
 msgid "Gestoria"
 msgstr "Gestoria"
 
-#: femlliga/constants.py:126
+#: femlliga/constants.py:131
 msgid "Redacció de projectes"
 msgstr "Redacció de projectes"
 
-#: femlliga/constants.py:127
+#: femlliga/constants.py:132
 msgid "Relacions digitals amb l'administració"
 msgstr "Relacions digitals amb l'administració"
 
-#: femlliga/constants.py:130
+#: femlliga/constants.py:135
 msgid "Equip de so per a xerrades"
 msgstr "Equip de so per a xerrades"
 
-#: femlliga/constants.py:131
+#: femlliga/constants.py:136
 msgid "Equip de so per a concerts"
 msgstr "Equip de so per a concerts"
 
-#: femlliga/constants.py:132
+#: femlliga/constants.py:137
 msgid "Projector"
 msgstr "Projector"
 
-#: femlliga/constants.py:133
+#: femlliga/constants.py:138
 msgid "Vehicle"
 msgstr "Vehicle"
 
-#: femlliga/constants.py:134
+#: femlliga/constants.py:139
 msgid "Escenari"
 msgstr "Escenari"
 
-#: femlliga/constants.py:135
+#: femlliga/constants.py:140
 msgid "Cadires i taules"
 msgstr "Cadires i taules"
 
-#: femlliga/constants.py:136
+#: femlliga/constants.py:141
 msgid "Plats, gots i coberts"
 msgstr "Plats, gots i coberts"
 
-#: femlliga/constants.py:137
+#: femlliga/constants.py:142
 msgid "Material de cuina"
 msgstr "Material de cuina"
 
-#: femlliga/constants.py:138
+#: femlliga/constants.py:143
 msgid "Material d'acampada"
 msgstr "Material d'acampada"
 
-#: femlliga/constants.py:144
+#: femlliga/constants.py:149
 msgid "local per a ús diari"
 msgstr "local per a ús diari"
 
-#: femlliga/constants.py:145
+#: femlliga/constants.py:150
 msgid "local per a ús puntual"
 msgstr "local per a ús puntual"
 
-#: femlliga/constants.py:146
+#: femlliga/constants.py:151
 msgid "local per fer servir puntualment per a reunions"
 msgstr "local per fer servir puntualment per a reunions"
 
-#: femlliga/constants.py:147
+#: femlliga/constants.py:152
 msgid "local per fer servir puntualment per a actes"
 msgstr "local per fer servir puntualment per a actes"
 
-#: femlliga/constants.py:148
+#: femlliga/constants.py:153
 msgid "formació en digitalització"
 msgstr "formació en digitalització"
 
-#: femlliga/constants.py:149
+#: femlliga/constants.py:154
 msgid "formació en relacions amb l'administració"
 msgstr "formació en relacions amb l'administració"
 
-#: femlliga/constants.py:150
+#: femlliga/constants.py:155
 msgid "formació en igualtat"
 msgstr "formació en igualtat"
 
-#: femlliga/constants.py:151
+#: femlliga/constants.py:156
 msgid "formació en estalvi energètic"
 msgstr "formació en estalvi energètic"
 
-#: femlliga/constants.py:152
+#: femlliga/constants.py:157
 msgid "formació en memòria històrica"
 msgstr "formació en memòria històrica"
 
-#: femlliga/constants.py:153
+#: femlliga/constants.py:158
 msgid "ajuda amb la gestió de la comunicació (web, xarxes socials, etc.)"
 msgstr "ajuda amb la gestió de la comunicació (web, xarxes socials, etc.)"
 
-#: femlliga/constants.py:154
+#: femlliga/constants.py:159
 msgid "servei d'assegurança"
 msgstr "servei d'assegurança"
 
-#: femlliga/constants.py:155
+#: femlliga/constants.py:160
 msgid "servei de gestoria"
 msgstr "servei de gestoria"
 
-#: femlliga/constants.py:156
+#: femlliga/constants.py:161
 msgid "ajuda amb la redacció de projectes"
 msgstr "ajuda amb la redacció de projectes"
 
-#: femlliga/constants.py:157
+#: femlliga/constants.py:162
 msgid "ajuda amb les relacions digitals amb l'administració"
 msgstr "ajuda amb les relacions digitals amb l'administració"
 
-#: femlliga/constants.py:158
+#: femlliga/constants.py:163
 msgid "equip de so per a xerrades"
 msgstr "equip de so per a xerrades"
 
-#: femlliga/constants.py:159
+#: femlliga/constants.py:164
 msgid "equip de so per a concerts"
 msgstr "equip de so per a concerts"
 
-#: femlliga/constants.py:160
+#: femlliga/constants.py:165
 msgid "projector"
 msgstr "projector"
 
-#: femlliga/constants.py:161
+#: femlliga/constants.py:166
 msgid "vehicle"
 msgstr "vehicle"
 
-#: femlliga/constants.py:162
+#: femlliga/constants.py:167
 msgid "escenari"
 msgstr "escenari"
 
-#: femlliga/constants.py:163
+#: femlliga/constants.py:168
 msgid "cadires i taules"
 msgstr "cadires i taules"
 
-#: femlliga/constants.py:164
+#: femlliga/constants.py:169
 msgid "plats, gots i coberts"
 msgstr "plats, gots i coberts"
 
-#: femlliga/constants.py:165
+#: femlliga/constants.py:170
 msgid "material de cuina"
 msgstr "material de cuina"
 
-#: femlliga/constants.py:166
+#: femlliga/constants.py:171
 msgid "material d'acampada"
 msgstr "material d'acampada"
 
-#: femlliga/constants.py:182
+#: femlliga/constants.py:187
 msgid "Esteu buscant un local on poder desenvolupar la vostra activitat?"
 msgstr "Esteu buscant un local on poder desenvolupar la vostra activitat?"
 
-#: femlliga/constants.py:183
+#: femlliga/constants.py:188
 msgid "Esteu buscant algú que us proporcione aquests serveis?"
 msgstr "Esteu buscant algú que us proporcione aquests serveis?"
 
-#: femlliga/constants.py:184
+#: femlliga/constants.py:189
 msgid "Voleu rebre formació en algun d'aquests temes?"
 msgstr "Voleu rebre formació en algun d'aquests temes?"
 
-#: femlliga/constants.py:185
+#: femlliga/constants.py:190
 msgid "Necessiteu alguna d'aquestes coses?"
 msgstr "Necessiteu alguna d'aquestes coses?"
 
-#: femlliga/constants.py:186
+#: femlliga/constants.py:191
 msgid ""
 "Podeu indicar qualsevol altra necessitat que tingueu. Tindrem en compte les "
 "vostres suggerències per incloure-les a l'aplicació."
@@ -444,43 +445,43 @@ msgstr ""
 "Podeu indicar qualsevol altra necessitat que tingueu. Tindrem en compte les "
 "vostres suggerències per incloure-les a l'aplicació."
 
-#: femlliga/constants.py:190 femlliga/constants.py:191
+#: femlliga/constants.py:195 femlliga/constants.py:196
 msgid "No n'estem buscant"
 msgstr "No n'estem buscant"
 
-#: femlliga/constants.py:190 femlliga/constants.py:191
+#: femlliga/constants.py:195 femlliga/constants.py:196
 msgid "Sí que n'estem buscant"
 msgstr "Sí que n'estem buscant"
 
-#: femlliga/constants.py:192
+#: femlliga/constants.py:197
 msgid "No volem formació"
 msgstr "No volem formació"
 
-#: femlliga/constants.py:192
+#: femlliga/constants.py:197
 msgid "Sí que volem formació"
 msgstr "Sí que volem formació"
 
-#: femlliga/constants.py:193
+#: femlliga/constants.py:198
 msgid "No en necessitem"
 msgstr "No en necessitem"
 
-#: femlliga/constants.py:193
+#: femlliga/constants.py:198
 msgid "Sí que en necessitem"
 msgstr "Sí que en necessitem"
 
-#: femlliga/constants.py:194
+#: femlliga/constants.py:199
 msgid "No tenim altres necessitats"
 msgstr "No tenim altres necessitats"
 
-#: femlliga/constants.py:194
+#: femlliga/constants.py:199
 msgid "Sí que tenim altres necessitats"
 msgstr "Sí que tenim altres necessitats"
 
-#: femlliga/constants.py:198
+#: femlliga/constants.py:203
 msgid "Teniu un local que estigueu disposats a compartir amb altres entitats?"
 msgstr "Teniu un local que estigueu disposats a compartir amb altres entitats?"
 
-#: femlliga/constants.py:199
+#: femlliga/constants.py:204
 msgid ""
 "Oferiu algun d'aquests serveis per a altres entitats, o podeu recomanar-ne "
 "proveïdors?"
@@ -488,15 +489,15 @@ msgstr ""
 "Oferiu algun d'aquests serveis per a altres entitats, o podeu recomanar-ne "
 "proveïdors?"
 
-#: femlliga/constants.py:200
+#: femlliga/constants.py:205
 msgid "Oferiu formació en algun d'aquests temes?"
 msgstr "Oferiu formació en algun d'aquests temes?"
 
-#: femlliga/constants.py:201
+#: femlliga/constants.py:206
 msgid "Teniu alguna d'aquestes coses que pugueu compartir?"
 msgstr "Teniu alguna d'aquestes coses que pugueu compartir?"
 
-#: femlliga/constants.py:202
+#: femlliga/constants.py:207
 msgid ""
 "Podeu indicar qualsevol altre servei o material que oferiu. Tindrem en compte "
 "les vostres suggerències per incloure-les a l'aplicació."
@@ -504,79 +505,79 @@ msgstr ""
 "Podeu indicar qualsevol altre servei o material que oferiu. Tindrem en compte "
 "les vostres suggerències per incloure-les a l'aplicació."
 
-#: femlliga/constants.py:206
+#: femlliga/constants.py:211
 msgid "No en tenim"
 msgstr "No en tenim"
 
-#: femlliga/constants.py:206
+#: femlliga/constants.py:211
 msgid "Sí que en tenim"
 msgstr "Sí que en tenim"
 
-#: femlliga/constants.py:207
+#: femlliga/constants.py:212
 msgid "No oferim serveis"
 msgstr "No oferim serveis"
 
-#: femlliga/constants.py:207
+#: femlliga/constants.py:212
 msgid "Sí que oferim serveis"
 msgstr "Sí que oferim serveis"
 
-#: femlliga/constants.py:208
+#: femlliga/constants.py:213
 msgid "No oferim formació"
 msgstr "No oferim formació"
 
-#: femlliga/constants.py:208
+#: femlliga/constants.py:213
 msgid "Sí que oferim formació"
 msgstr "Sí que oferim formació"
 
-#: femlliga/constants.py:209
+#: femlliga/constants.py:214
 msgid "No en tenim cap"
 msgstr "No en tenim cap"
 
-#: femlliga/constants.py:209
+#: femlliga/constants.py:214
 msgid "Sí que en tenim alguna"
 msgstr "Sí que en tenim alguna"
 
-#: femlliga/constants.py:210
+#: femlliga/constants.py:215
 msgid "No oferim altres coses"
 msgstr "No oferim altres coses"
 
-#: femlliga/constants.py:210
+#: femlliga/constants.py:215
 msgid "Sí que oferim altres coses"
 msgstr "Sí que oferim altres coses"
 
-#: femlliga/constants.py:214
+#: femlliga/constants.py:219
 msgid "Afegeix imatge del local"
 msgstr "Afegeix imatge del local"
 
-#: femlliga/constants.py:215
+#: femlliga/constants.py:220
 msgid "Afegeix imatge del servei"
 msgstr "Afegeix imatge del servei"
 
-#: femlliga/constants.py:216
+#: femlliga/constants.py:221
 msgid "Afegeix imatge de la formació"
 msgstr "Afegeix imatge de la formació"
 
-#: femlliga/constants.py:217
+#: femlliga/constants.py:222
 msgid "Afegeix imatge d'aquestes coses"
 msgstr "Afegeix imatge d'aquestes coses"
 
-#: femlliga/constants.py:218
+#: femlliga/constants.py:223
 msgid "Afegeix imatge del que oferiu"
 msgstr "Afegeix imatge del que oferiu"
 
-#: femlliga/constants.py:222
+#: femlliga/constants.py:227
 msgid "Quan necessitarieu fer servir el local?"
 msgstr "Quan necessitarieu fer servir el local?"
 
-#: femlliga/constants.py:223
+#: femlliga/constants.py:228
 msgid "Quins serveis concrets necessiteu?"
 msgstr "Quins serveis concrets necessiteu?"
 
-#: femlliga/constants.py:224
+#: femlliga/constants.py:229
 msgid "De quins temes us interessa formar-vos?"
 msgstr "De quins temes us interessa formar-vos?"
 
-#: femlliga/constants.py:225
+#: femlliga/constants.py:230
 msgid "Quina d'aquestes coses necessiteu?"
 msgstr "Quina d'aquestes coses necessiteu?"
 
@@ -596,139 +597,153 @@ msgstr ""
 msgid "Cal indicar una opció com a mínim"
 msgstr "Cal indicar una opció com a mínim"
 
-#: femlliga/views.py:81
+#: femlliga/models.py:39
+#, python-format
+msgid "L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB."
+msgstr "L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB."
+
+#: femlliga/models.py:44
+msgid "Idioma configurat al navegador"
+msgstr "Idioma configurat al navegador"
+
+#: femlliga/views.py:85
 msgid "Títol"
 msgstr "Títol"
 
-#: femlliga/views.py:81
+#: femlliga/views.py:86
 msgid "Subtítol"
 msgstr "Subtítol"
 
-#: femlliga/views.py:594
+#: femlliga/views.py:87
+msgid "<p>Cal definir aquesta pàgina</p>"
+msgstr "<p>Cal definir aquesta pàgina</p>"
+
+#: femlliga/views.py:602
 msgid "La configuració s'ha desat correctament"
 msgstr "La configuració s'ha desat correctament"
 
-#: femlliga/views.py:596
+#: femlliga/views.py:604
 msgid ". S'ha enviat un correu electrònic per confirmar la nova adreça"
 msgstr ". S'ha enviat un correu electrònic per confirmar la nova adreça"
 
-#: femlliga/views.py:745
+#: femlliga/views.py:753
 #, python-format
 msgid "Comunicació iniciada per compartir %(resource)s"
 msgstr "Comunicació iniciada per compartir %(resource)s"
 
-#: femlliga/views.py:870
+#: femlliga/views.py:878
 msgid "Pendents de comunicació"
 msgstr "Pendents de comunicació"
 
-#: femlliga/views.py:871
+#: femlliga/views.py:879
 msgid "Comunicació iniciada"
 msgstr "Comunicació iniciada"
 
-#: femlliga/views.py:872
+#: femlliga/views.py:880
 msgid "Comunicació rebutjada"
 msgstr "Comunicació rebutjada"
 
-#: femlliga/views.py:873
+#: femlliga/views.py:881
 msgid "Acord aconseguit"
 msgstr "Acord aconseguit"
 
-#: femlliga/views.py:874
+#: femlliga/views.py:882
 msgid "Acord no aconseguit"
 msgstr "Acord no aconseguit"
 
-#: femlliga/views.py:875
+#: femlliga/views.py:883
 msgid "Total"
 msgstr "Total"
 
-#: femlliga/views.py:888
+#: femlliga/views.py:896
 msgid "Altes d'entitats"
 msgstr "Altes d'entitats"
 
-#: femlliga/views.py:891
+#: femlliga/views.py:899
 msgid "Recursos per tipus d'entitat"
 msgstr "Recursos per tipus d'entitat"
 
-#: femlliga/views.py:891 femlliga/views.py:897 femlliga/views.py:900
-#: femlliga/views.py:906
+#: femlliga/views.py:899 femlliga/views.py:905 femlliga/views.py:908
+#: femlliga/views.py:914
 msgid "Oferiments"
 msgstr "Oferiments"
 
-#: femlliga/views.py:891 femlliga/views.py:897 femlliga/views.py:900
-#: femlliga/views.py:906
+#: femlliga/views.py:899 femlliga/views.py:905 femlliga/views.py:908
+#: femlliga/views.py:914
 msgid "Necessitats"
 msgstr "Necessitats"
 
-#: femlliga/views.py:891 femlliga/views.py:897
+#: femlliga/templates/femlliga/report.html:49 femlliga/views.py:899
+#: femlliga/views.py:905
 msgid "Entitats"
 msgstr "Entitats"
 
-#: femlliga/views.py:894
+#: femlliga/views.py:902
 msgid "Oferiments que es cobren per tipus d'entitat"
 msgstr "Oferiments que es cobren per tipus d'entitat"
 
-#: femlliga/views.py:894 femlliga/views.py:903
+#: femlliga/views.py:902 femlliga/views.py:911
 msgid "Oferiments cobrant"
 msgstr "Oferiments cobrant"
 
-#: femlliga/views.py:894 femlliga/views.py:903
+#: femlliga/views.py:902 femlliga/views.py:911
 msgid "Oferiments gratuïts"
 msgstr "Oferiments gratuïts"
 
-#: femlliga/views.py:897
+#: femlliga/views.py:905
 msgid "Recursos per àmbit de treball de l'entitat"
 msgstr "Recursos per àmbit de treball de l'entitat"
 
-#: femlliga/views.py:900
+#: femlliga/views.py:908
 msgid "Recursos per tipus de recurs"
 msgstr "Recursos per tipus de recurs"
 
-#: femlliga/views.py:903
+#: femlliga/views.py:911
 msgid "Oferiments que es cobren per tipus de recurs"
 msgstr "Oferiments que es cobren per tipus de recurs"
 
-#: femlliga/views.py:906
+#: femlliga/views.py:914
 msgid "Recursos per tipus concret de recurs"
 msgstr "Recursos per tipus concret de recurs"
 
-#: femlliga/views.py:910
+#: femlliga/views.py:918
 msgid "Interaccions per tipus d'entitat sol·licitant"
 msgstr "Interaccions per tipus d'entitat sol·licitant"
 
-#: femlliga/views.py:913
+#: femlliga/views.py:921
 msgid "Interaccions per àmbit de treball de l'entitat sol·licitant"
 msgstr "Interaccions per àmbit de treball de l'entitat sol·licitant"
 
-#: femlliga/views.py:917
+#: femlliga/views.py:925
 msgid "Interaccions per tipus d'entitat sol·licitada"
 msgstr "Interaccions per tipus d'entitat sol·licitada"
 
-#: femlliga/views.py:920
+#: femlliga/views.py:928
 msgid "Interaccions per àmbit de treball de l'entitat sol·licitada"
 msgstr "Interaccions per àmbit de treball de l'entitat sol·licitada"
 
-#: femlliga/views.py:924
+#: femlliga/views.py:932
 msgid "Interaccions per tipus de recurs"
 msgstr "Interaccions per tipus de recurs"
 
-#: femlliga/views.py:927
+#: femlliga/views.py:935
 msgid "Peticions de col·laboració"
 msgstr "Peticions de col·laboració"
 
-#: femlliga/views.py:928
+#: femlliga/views.py:936
 msgid "Comunicació acceptada"
 msgstr "Comunicació acceptada"
 
-#: femlliga/views.py:929
+#: femlliga/views.py:937
 msgid "Col·laboració exitosa"
 msgstr "Col·laboració exitosa"
 
-#: femlliga/views.py:1001
+#: femlliga/views.py:1009
 #, python-format
 msgid "S'ha rebut un contacte a la web de %(name)s"
 msgstr "S'ha rebut un contacte a la web de %(name)s"
 
-#: femlliga/views.py:1002
+#: femlliga/views.py:1010
 #, python-format
 msgid ""
 "Des del correu %(email)s envien el següent missatge:\n"
@@ -739,10 +754,33 @@ msgstr ""
 "\n"
 "%(content)s"
 
-#: femlliga/views.py:1011
+#: femlliga/views.py:1019
 #, python-format
 msgid "El formulari de contacte amb %(name)s s'ha enviat correctament"
 msgstr "El formulari de contacte amb %(name)s s'ha enviat correctament"
+
+#: femlliga/management/commands/send_notifications.py:25
+msgid "Tens peticions pendents de respondre"
+msgstr "Tens peticions pendents de respondre"
+
+#: femlliga/management/commands/send_reminder.py:27
+#, python-format
+msgid ""
+"%(name)s ha fet lliga, descobreix amb qui! Saps què et pot oferir Fem lliga?"
+msgstr ""
+"%(name)s ha fet lliga, descobreix amb qui! Saps què et pot oferir Fem lliga?"
+
+#: femlliga/middleware/middleware.py:52
+msgid "S'ha tancat la sessió per inactivitat"
+msgstr "S'ha tancat la sessió per inactivitat"
+
+#: femlliga/templates/400.html:3 femlliga/templates/400.html:4
+msgid "Error 400"
+msgstr "Error 400"
+
+#: femlliga/templates/400.html:6
+msgid "No hem sabut interpretar la petició."
+msgstr "No hem sabut interpretar la petició."
 
 #: femlliga/templates/403.html:3 femlliga/templates/403.html:4
 msgid "Error 403"
@@ -751,6 +789,438 @@ msgstr "Error 403"
 #: femlliga/templates/403.html:6
 msgid "Sembla que no tens permís per accedir a la pàgina."
 msgstr "Sembla que no tens permís per accedir a la pàgina."
+
+#: femlliga/templates/404.html:3 femlliga/templates/404.html:4
+msgid "Error 404"
+msgstr "Error 404"
+
+#: femlliga/templates/404.html:6
+msgid "Sembla que la pàgina a la que intentes accedir ja no existeix."
+msgstr "Sembla que la pàgina a la que intentes accedir ja no existeix."
+
+#: femlliga/templates/500.html:3 femlliga/templates/500.html:4
+msgid "Error 500"
+msgstr "Error 500"
+
+#: femlliga/templates/500.html:6
+msgid ""
+"Sembla que el servidor ha tingut un error intern i no ha pogut completar la "
+"sol·licitud."
+msgstr ""
+"Sembla que el servidor ha tingut un error intern i no ha pogut completar la "
+"sol·licitud."
+
+#: femlliga/templates/account/_passwords.html:16
+msgid "Amaga la contrasenya"
+msgstr "Amaga la contrasenya"
+
+#: femlliga/templates/account/email_confirm.html:3
+#: femlliga/templates/account/email_confirm.html:17
+msgid "Confirma"
+msgstr "Confirma"
+
+#: femlliga/templates/account/email_confirm.html:7
+msgid "Confirma l'adreça de correu electrònic"
+msgstr "Confirma l'adreça de correu electrònic"
+
+#: femlliga/templates/account/email_confirm.html:12
+#, python-format
+msgid ""
+"Per favor confirma que <a href='mailto:%(email)s'>%(email)s</a> és una adreça "
+"de correu vàlida per a l'usuari que has creat."
+msgstr ""
+"Per favor confirma que <a href='mailto:%(email)s'>%(email)s</a> és una adreça "
+"de correu vàlida per a l'usuari que has creat."
+
+#: femlliga/templates/account/email_confirm.html:22
+msgid "Aquest enllaç de confirmació de correu electrònic ha expirat o és invàlid."
+msgstr ""
+"Aquest enllaç de confirmació de correu electrònic ha expirat o és invàlid."
+
+#: femlliga/templates/account/login.html:5
+#: femlliga/templates/account/login.html:28
+#: femlliga/templates/femlliga/_base_template.html:34
+msgid "Entra"
+msgstr "Entra"
+
+#: femlliga/templates/account/login.html:9
+#: femlliga/templates/account/signup.html:44
+#: femlliga/templates/socialaccount/signup.html:9
+msgid "Inicia sessió"
+msgstr "Inicia sessió"
+
+#: femlliga/templates/account/login.html:17
+#: femlliga/templates/account/password_change.html:21
+#: femlliga/templates/account/password_change.html:28
+#: femlliga/templates/account/signup.html:21
+msgid "Contrasenya"
+msgstr "Contrasenya"
+
+#: femlliga/templates/account/login.html:29
+#: femlliga/templates/account/signup.html:43
+msgid "Registra't"
+msgstr "Registra't"
+
+#: femlliga/templates/account/login.html:30
+msgid "He oblidat la contrasenya"
+msgstr "He oblidat la contrasenya"
+
+#: femlliga/templates/account/login.html:32
+msgid "Logo de Google"
+msgstr "Logo de Google"
+
+#: femlliga/templates/account/login.html:33
+msgid "Entra amb un compte de Google"
+msgstr "Entra amb un compte de Google"
+
+#: femlliga/templates/account/logout.html:3
+#: femlliga/templates/account/logout.html:11
+#: femlliga/templates/femlliga/_base_template.html:55
+msgid "Surt"
+msgstr "Surt"
+
+#: femlliga/templates/account/logout.html:7
+msgid "Tanca la sessió"
+msgstr "Tanca la sessió"
+
+#: femlliga/templates/account/logout.html:8
+msgid "Segur que vols tancar la sessió?"
+msgstr "Segur que vols tancar la sessió?"
+
+#: femlliga/templates/account/password_change.html:5
+#: femlliga/templates/account/password_change.html:9
+#: femlliga/templates/account/password_change.html:36
+#: femlliga/templates/account/password_reset_from_key.html:5
+#: femlliga/templates/account/password_reset_from_key.html:15
+#: femlliga/templates/account/password_reset_from_key.html:36
+msgid "Canvia la contrasenya"
+msgstr "Canvia la contrasenya"
+
+#: femlliga/templates/account/password_change.html:14
+msgid "Contrasenya actual"
+msgstr "Contrasenya actual"
+
+#: femlliga/templates/account/password_change.html:37
+msgid "Has oblidat la contrasenya?"
+msgstr "Has oblidat la contrasenya?"
+
+#: femlliga/templates/account/password_reset.html:5
+#: femlliga/templates/account/password_reset.html:9
+#: femlliga/templates/account/password_reset.html:19
+#: femlliga/templates/account/password_reset_done.html:3
+#: femlliga/templates/account/password_reset_done.html:7
+msgid "Recupera la contrasenya"
+msgstr "Recupera la contrasenya"
+
+#: femlliga/templates/account/password_reset.html:11
+msgid ""
+"Has perdut la contrasenya? Introdueix el teu correu electrònic i t'enviarem un "
+"correu amb un enllaç per introduir-ne una de nova."
+msgstr ""
+"Has perdut la contrasenya? Introdueix el teu correu electrònic i t'enviarem un "
+"correu amb un enllaç per introduir-ne una de nova."
+
+#: femlliga/templates/account/password_reset.html:22
+msgid "Si us plau, contacta amb nosaltres si tens algun problema."
+msgstr "Si us plau, contacta amb nosaltres si tens algun problema."
+
+#: femlliga/templates/account/password_reset_done.html:8
+msgid ""
+"T'hem enviat un correu electrònic. Per favor, contacta'ns si no el reps en uns "
+"minuts."
+msgstr ""
+"T'hem enviat un correu electrònic. Per favor, contacta'ns si no el reps en uns "
+"minuts."
+
+#: femlliga/templates/account/password_reset_from_key.html:10
+msgid "Codi incorrecte"
+msgstr "Codi incorrecte"
+
+#: femlliga/templates/account/password_reset_from_key.html:12
+#, python-format
+msgid ""
+"El codi de recuperació de contrasenya és invalid, probablement perquè ja s'ha "
+"fet servir. Si us plau, sol·liciteu la <a href='%(url)s'>recuperació de "
+"contrasenya</a> de nou."
+msgstr ""
+"El codi de recuperació de contrasenya és invalid, probablement perquè ja s'ha "
+"fet servir. Si us plau, sol·liciteu la <a href='%(url)s'>recuperació de "
+"contrasenya</a> de nou."
+
+#: femlliga/templates/account/password_reset_from_key.html:21
+msgid "Contrasenya nova"
+msgstr "Contrasenya nova"
+
+#: femlliga/templates/account/password_reset_from_key.html:28
+msgid "Contrasenya nova (repeteix)"
+msgstr "Contrasenya nova (repeteix)"
+
+#: femlliga/templates/account/password_reset_from_key.html:40
+msgid "S'ha actualitzat la contrasenya."
+msgstr "S'ha actualitzat la contrasenya."
+
+#: femlliga/templates/account/password_reset_from_key_done.html:3
+#: femlliga/templates/account/password_reset_from_key_done.html:7
+msgid "Canvi de contrasenya"
+msgstr "Canvi de contrasenya"
+
+#: femlliga/templates/account/password_reset_from_key_done.html:8
+msgid "La teua contrasenya s'ha canviat."
+msgstr "La teua contrasenya s'ha canviat."
+
+#: femlliga/templates/account/signup.html:5
+#: femlliga/templates/account/signup.html:9
+msgid "Registre"
+msgstr "Registre"
+
+#: femlliga/templates/account/signup.html:11
+msgid ""
+"Per inscriure una entitat, primer heu de crear un compte. Si ja el teniu creat, "
+"podeu iniciar sessió."
+msgstr ""
+"Per inscriure una entitat, primer heu de crear un compte. Si ja el teniu creat, "
+"podeu iniciar sessió."
+
+#: femlliga/templates/account/signup.html:28
+msgid "Contrasenya (de nou)"
+msgstr "Contrasenya (de nou)"
+
+#: femlliga/templates/account/signup.html:39
+#, python-format
+msgid ""
+"En registrar-te, acceptes la <a target='_blank' rel='noopener noreferrer' "
+"href='%(url)s'>política de protecció de dades</a>."
+msgstr ""
+"En registrar-te, acceptes la <a target='_blank' rel='noopener noreferrer' "
+"href='%(url)s'>política de protecció de dades</a>."
+
+#: femlliga/templates/account/signup.html:47
+msgid "Registra't amb un compte de Google"
+msgstr "Registra't amb un compte de Google"
+
+#: femlliga/templates/account/verification_sent.html:3
+#: femlliga/templates/account/verification_sent.html:7
+msgid "Verifica el correu electrònic"
+msgstr "Verifica el correu electrònic"
+
+#: femlliga/templates/account/verification_sent.html:8
+msgid ""
+"T'hem enviat un correu electrònic per fer la verificació. Clica a l'enllaç que "
+"hi ha al correu per completar el procés de registre. Per favor, contacta'ns si "
+"no l'has rebut en uns pocs minuts."
+msgstr ""
+"T'hem enviat un correu electrònic per fer la verificació. Clica a l'enllaç que "
+"hi ha al correu per completar el procés de registre. Per favor, contacta'ns si "
+"no l'has rebut en uns pocs minuts."
+
+#: femlliga/templates/account/email/account_already_exists_message.html:6
+#, python-format
+msgid ""
+"Has rebut aquest correu perquè tu o algu altre ha intentat registrar-se fent "
+"servir l'adreça de correu %(email)s. Tanmateix, ja existeix un compte que fa "
+"servir aquesta adreça de correu. Si te n'havies oblidat, o vols canviar la "
+"contrasenya, per favor fes clic <a href='%(url)s'>ací</a>."
+msgstr ""
+"Has rebut aquest correu perquè tu o algu altre ha intentat registrar-se fent "
+"servir l'adreça de correu %(email)s. Tanmateix, ja existeix un compte que fa "
+"servir aquesta adreça de correu. Si te n'havies oblidat, o vols canviar la "
+"contrasenya, per favor fes clic <a href='%(url)s'>ací</a>."
+
+#: femlliga/templates/account/email/email_confirmation_message.html:6
+#, python-format
+msgid ""
+"Has rebut aquest correu perquè s'ha registrat un usuari en %(domain)s amb "
+"aquesta adreça de correu electrònic."
+msgstr ""
+"Has rebut aquest correu perquè s'ha registrat un usuari en %(domain)s amb "
+"aquesta adreça de correu electrònic."
+
+#: femlliga/templates/account/email/email_confirmation_message.html:12
+#, python-format
+msgid ""
+"Per confirmar que és correcte, i poder entrar a la web, clica <a "
+"href='%(url)s'>ací</a> i confirma."
+msgstr ""
+"Per confirmar que és correcte, i poder entrar a la web, clica <a "
+"href='%(url)s'>ací</a> i confirma."
+
+#: femlliga/templates/account/email/password_reset_key_message.html:6
+msgid ""
+"Has rebut aquest correu perquè tu o alguna altra persona ha demanat recuperar "
+"la contrasenya del teu compte."
+msgstr ""
+"Has rebut aquest correu perquè tu o alguna altra persona ha demanat recuperar "
+"la contrasenya del teu compte."
+
+#: femlliga/templates/account/email/password_reset_key_message.html:12
+#, python-format
+msgid ""
+"Si no ho has demanat tu, pots ignorar aquest correu sense problema. Si vols "
+"canviar-te la contrasenya, clica aquest <a href='%(url)s'>enllaç</a>."
+msgstr ""
+"Si no ho has demanat tu, pots ignorar aquest correu sense problema. Si vols "
+"canviar-te la contrasenya, clica aquest <a href='%(url)s'>enllaç</a>."
+
+#: femlliga/templates/account/email/unknown_account_message.html:6
+#, python-format
+msgid ""
+"Has rebut aquest correu perquè tu o alguna altra persona ha demanar recuperar "
+"la contrasenya del compte associat amb aquest correu electrònic. Tanmateix, no "
+"tenim constància de cap usuari registrat que faça servir el correu %(email)s en "
+"la nostra base de dades."
+msgstr ""
+"Has rebut aquest correu perquè tu o alguna altra persona ha demanar recuperar "
+"la contrasenya del compte associat amb aquest correu electrònic. Tanmateix, no "
+"tenim constància de cap usuari registrat que faça servir el correu %(email)s en "
+"la nostra base de dades."
+
+#: femlliga/templates/account/email/unknown_account_message.html:12
+msgid ""
+"Pots ignorar aquest correu sense problema si no has sol·licitat un canvi de "
+"contrasenya."
+msgstr ""
+"Pots ignorar aquest correu sense problema si no has sol·licitat un canvi de "
+"contrasenya."
+
+#: femlliga/templates/account/email/unknown_account_message.html:18
+#, python-format
+msgid ""
+"Si has sigut tu qui l'has demanat, pots registrar-te fent servir aquest <a "
+"href='%(url)s'>enllaç</a>."
+msgstr ""
+"Si has sigut tu qui l'has demanat, pots registrar-te fent servir aquest <a "
+"href='%(url)s'>enllaç</a>."
+
+#: femlliga/templates/email/_base_template.html:16
+msgid "Banner Fem lliga!"
+msgstr "Banner Fem lliga!"
+
+#: femlliga/templates/email/_base_template.html:24
+msgid "Hola!"
+msgstr "Hola!"
+
+#: femlliga/templates/email/_base_template.html:31
+#, python-format
+msgid "Gràcies per fer servir %(name)s"
+msgstr "Gràcies per fer servir %(name)s"
+
+#: femlliga/templates/email/agreement_connect.html:6
+#, python-format
+msgid ""
+"Us enviem aquest missatge des de %(name)s ja que %(solicitor)s va demanar a "
+"%(solicitee)s"
+msgstr ""
+"Us enviem aquest missatge des de %(name)s ja que %(solicitor)s va demanar a "
+"%(solicitee)s"
+
+#: femlliga/templates/email/agreement_connect.html:8
+msgid "buscar conjuntament"
+msgstr "buscar conjuntament"
+
+#: femlliga/templates/email/agreement_connect.html:10
+msgid "compartir"
+msgstr "compartir"
+
+#: femlliga/templates/email/agreement_connect.html:12
+msgid "amb aquest missatge:"
+msgstr "amb aquest missatge:"
+
+#: femlliga/templates/email/agreement_connect.html:23
+msgid ""
+"Podeu seguir parlant polsant a <strong>«Respon a tots»</strong> en aquest "
+"mateix correu, i concretar els detalls de la vostra col·laboració."
+msgstr ""
+"Podeu seguir parlant polsant a <strong>«Respon a tots»</strong> en aquest "
+"mateix correu, i concretar els detalls de la vostra col·laboració."
+
+#: femlliga/templates/email/contact_received.html:6
+#, python-format
+msgid ""
+"El missatge que ens has enviat a través del formulari de contacte de %(name)s "
+"ha arribat correctament, i intentarem respondre't el més aviat possible. A sota "
+"pots veure una còpia del missatge que has enviat:"
+msgstr ""
+"El missatge que ens has enviat a través del formulari de contacte de %(name)s "
+"ha arribat correctament, i intentarem respondre't el més aviat possible. A sota "
+"pots veure una còpia del missatge que has enviat:"
+
+#: femlliga/templates/email/notification.html:6
+#, python-format
+msgid ""
+"Us enviem aquest missatge des de %(name)s ja que teniu peticions pendents de "
+"respondre a la nostra plataforma. Alguna organització s'ha posat en contacte "
+"amb vosaltres per fer-vos una sol·licitud i està esperant a que li responeu. "
+"Només cal que entreu a l'aplicació, al menú de Peticions rebudes, i indiqueu si "
+"voleu iniciar la comunicació o no."
+msgstr ""
+"Us enviem aquest missatge des de %(name)s ja que teniu peticions pendents de "
+"respondre a la nostra plataforma. Alguna organització s'ha posat en contacte "
+"amb vosaltres per fer-vos una sol·licitud i està esperant a que li responeu. "
+"Només cal que entreu a l'aplicació, al menú de Peticions rebudes, i indiqueu si "
+"voleu iniciar la comunicació o no."
+
+#: femlliga/templates/email/notification.html:12
+msgid ""
+"Tant si arribeu a un acord com si no, us agraïm si ho indiqueu a l'aplicació. "
+"També us agrairem si ens feu arribar qualsevol suggerència sobre com podríem "
+"millorar la plataforma."
+msgstr ""
+"Tant si arribeu a un acord com si no, us agraïm si ho indiqueu a l'aplicació. "
+"També us agrairem si ens feu arribar qualsevol suggerència sobre com podríem "
+"millorar la plataforma."
+
+#: femlliga/templates/email/notification.html:20
+#: femlliga/templates/email/reminder.html:33
+#, python-format
+msgid ""
+"Si voleu deixar de rebre aquestes notificacions, ho podeu configurar <a "
+"href='%(url)s'>dins de l'aplicació</a>, a l'enllaç de Perfil, notificacions."
+msgstr ""
+"Si voleu deixar de rebre aquestes notificacions, ho podeu configurar <a "
+"href='%(url)s'>dins de l'aplicació</a>, a l'enllaç de Perfil, notificacions."
+
+#: femlliga/templates/email/reminder.html:6
+#, python-format
+msgid ""
+"Us enviem aquest missatge des de %(name)s ja que heu indicat que teniu algunes "
+"necessitats que podrieu cobrir col·laborant amb altres entitats de la "
+"plataforma. Només cal que entreu a l'aplicació, al menú de «Has lligat», i "
+"enviar un missatge a l'entitat que preferiu."
+msgstr ""
+"Us enviem aquest missatge des de %(name)s ja que heu indicat que teniu algunes "
+"necessitats que podrieu cobrir col·laborant amb altres entitats de la "
+"plataforma. Només cal que entreu a l'aplicació, al menú de «Has lligat», i "
+"enviar un missatge a l'entitat que preferiu."
+
+#: femlliga/templates/email/reminder.html:12
+#, python-format
+msgid ""
+"Entre altres, heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s "
+"entitats que estan en la mateixa situació</strong> que vosaltres. Podeu "
+"contactar amb elles per buscar solucions comunes a la vostra necessitat."
+msgstr ""
+"Entre altres, heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s "
+"entitats que estan en la mateixa situació</strong> que vosaltres. Podeu "
+"contactar amb elles per buscar solucions comunes a la vostra necessitat."
+
+#: femlliga/templates/email/reminder.html:20
+msgid "També"
+msgstr "També"
+
+#: femlliga/templates/email/reminder.html:22
+msgid "Entre altres,"
+msgstr "Entre altres,"
+
+#: femlliga/templates/email/reminder.html:24
+#, python-format
+msgid ""
+"heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que ho "
+"ofereixen</strong>. Podeu contactar amb elles per concretar la manera de "
+"col·laborar."
+msgstr ""
+"heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que ho "
+"ofereixen</strong>. Podeu contactar amb elles per concretar la manera de "
+"col·laborar."
 
 #: femlliga/templates/femlliga/_base.html:32
 msgid "Salta al contingut principal"
@@ -818,6 +1288,7 @@ msgid "Logo de l'Ajuntament de Castelló"
 msgstr "Logo de l'Ajuntament de Castelló"
 
 #: femlliga/templates/femlliga/_base_template.html:19
+#: femlliga/templates/femlliga/app.html:5
 msgid "Entitat"
 msgstr "Entitat"
 
@@ -830,6 +1301,7 @@ msgid "Descobreix"
 msgstr "Descobreix"
 
 #: femlliga/templates/femlliga/_base_template.html:23
+#: femlliga/templates/femlliga/dashboard.html:12
 msgid "Peticions"
 msgstr "Peticions"
 
@@ -838,18 +1310,16 @@ msgid "Informe"
 msgstr "Informe"
 
 #: femlliga/templates/femlliga/_base_template.html:28
+#: femlliga/templates/femlliga/dashboard.html:7
 msgid "Dashboard"
 msgstr "Dashboard"
-
-#: femlliga/templates/femlliga/_base_template.html:34
-msgid "Entra"
-msgstr "Entra"
 
 #: femlliga/templates/femlliga/_base_template.html:42
 msgid "Expandeix el menú del perfil"
 msgstr "Expandeix el menú del perfil"
 
 #: femlliga/templates/femlliga/_base_template.html:48
+#: femlliga/templates/femlliga/profile.html:5
 msgid "Perfil"
 msgstr "Perfil"
 
@@ -859,9 +1329,22 @@ msgstr "Perfil"
 msgid "Preferències"
 msgstr "Preferències"
 
-#: femlliga/templates/femlliga/_base_template.html:55
-msgid "Surt"
-msgstr "Surt"
+#: femlliga/templates/femlliga/_error.html:10
+msgid "Recoi!"
+msgstr "Recoi!"
+
+#: femlliga/templates/femlliga/_error.html:23
+#, python-format
+msgid ""
+"Sentim molt la molèstia. Pots tornar a intentar el que estaves fent, o, si "
+"l'error continua, <a href='%(url)s'>contactar amb nosaltres</a>"
+msgstr ""
+"Sentim molt la molèstia. Pots tornar a intentar el que estaves fent, o, si "
+"l'error continua, <a href='%(url)s'>contactar amb nosaltres</a>"
+
+#: femlliga/templates/femlliga/_error.html:26
+msgid "Ves a la pàgina d'inici"
+msgstr "Ves a la pàgina d'inici"
 
 #: femlliga/templates/femlliga/_macros.html:28
 msgid ""
@@ -903,6 +1386,7 @@ msgid "Següent"
 msgstr "Següent"
 
 #: femlliga/templates/femlliga/_macros.html:251
+#: femlliga/templates/femlliga/add_organization.html:71
 msgid "Xarxes socials i contacte"
 msgstr "Xarxes socials i contacte"
 
@@ -915,6 +1399,7 @@ msgid "Esborra"
 msgstr "Esborra"
 
 #: femlliga/templates/femlliga/_macros.html:389
+#: femlliga/templates/femlliga/add_organization.html:100
 msgid "Forma jurídica"
 msgstr "Forma jurídica"
 
@@ -936,11 +1421,11 @@ msgstr "S'ha enviat el missatge correctament."
 
 #: femlliga/templates/femlliga/_macros.html:462
 msgid ""
-"podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una "
-"conversa per correu electrònic."
+"podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa "
+"per correu electrònic."
 msgstr ""
-"podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una "
-"conversa per correu electrònic."
+"podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa "
+"per correu electrònic."
 
 #: femlliga/templates/femlliga/_macros.html:465
 msgid ""
@@ -998,6 +1483,209 @@ msgstr "Cal indicar el missatge"
 msgid "Cal indicar les opcions"
 msgstr "Cal indicar les opcions"
 
+#: femlliga/templates/femlliga/add_organization.html:9
+msgid "Edita l'entitat"
+msgstr "Edita l'entitat"
+
+#: femlliga/templates/femlliga/add_organization.html:11
+msgid "Crea una entitat"
+msgstr "Crea una entitat"
+
+#: femlliga/templates/femlliga/add_organization.html:18
+msgid "Edita la informació de l'entitat"
+msgstr "Edita la informació de l'entitat"
+
+#: femlliga/templates/femlliga/add_organization.html:21
+msgid ""
+"Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les "
+"dades de sota per crear-la. Podràs modificar i afegir més informació després."
+msgstr ""
+"Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les "
+"dades de sota per crear-la. Podràs modificar i afegir més informació després."
+
+#: femlliga/templates/femlliga/add_organization.html:27
+msgid ""
+"Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo."
+msgstr ""
+"Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo."
+
+#: femlliga/templates/femlliga/add_organization.html:35
+msgid "Nom de l'entitat"
+msgstr "Nom de l'entitat"
+
+#: femlliga/templates/femlliga/add_organization.html:52
+msgid "Esborrant..."
+msgstr "Esborrant..."
+
+#: femlliga/templates/femlliga/add_organization.html:54
+#: femlliga/templates/femlliga/resources-wizard.html:65
+msgid "Esborra la imatge"
+msgstr "Esborra la imatge"
+
+#: femlliga/templates/femlliga/add_organization.html:59
+msgid "Logo o imatge de l'entitat"
+msgstr "Logo o imatge de l'entitat"
+
+#: femlliga/templates/femlliga/add_organization.html:59
+#: femlliga/templates/femlliga/add_organization.html:65
+msgid "opcional"
+msgstr "opcional"
+
+#: femlliga/templates/femlliga/add_organization.html:65
+msgid "Descripció de l'activitat de l'entitat"
+msgstr "Descripció de l'activitat de l'entitat"
+
+#: femlliga/templates/femlliga/add_organization.html:93
+msgid "Afegeix xarxa social"
+msgstr "Afegeix xarxa social"
+
+#: femlliga/templates/femlliga/add_organization.html:108
+msgid "Ubicació."
+msgstr "Ubicació."
+
+#: femlliga/templates/femlliga/add_organization.html:108
+msgid ""
+"Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça "
+"aproximada:"
+msgstr ""
+"Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça "
+"aproximada:"
+
+#: femlliga/templates/femlliga/add_organization.html:109
+msgid "Nom del carrer, número, codi postal, població, país"
+msgstr "Nom del carrer, número, codi postal, població, país"
+
+#: femlliga/templates/femlliga/add_organization.html:114
+msgid "És necessari indicar la posició o l'adreça de l'entitat"
+msgstr "És necessari indicar la posició o l'adreça de l'entitat"
+
+#: femlliga/templates/femlliga/add_organization.html:124
+#: femlliga/templates/femlliga/preferences.html:41
+msgid "Desa"
+msgstr "Desa"
+
+#: femlliga/templates/femlliga/add_organization.html:126
+msgid "Crea l'entitat"
+msgstr "Crea l'entitat"
+
+#: femlliga/templates/femlliga/app.html:14
+msgid "Afegeix"
+msgstr "Afegeix"
+
+#: femlliga/templates/femlliga/app.html:35 femlliga/templates/femlliga/app.html:56
+#: femlliga/templates/femlliga/resources-wizard.html:7
+msgid "Edita"
+msgstr "Edita"
+
+#: femlliga/templates/femlliga/app.html:76
+msgid "Pareix que encara no heu completat el procés d'alta. Voleu fer-ho ara?"
+msgstr "Pareix que encara no heu completat el procés d'alta. Voleu fer-ho ara?"
+
+#: femlliga/templates/femlliga/app.html:79
+msgid "Completa l'alta"
+msgstr "Completa l'alta"
+
+#: femlliga/templates/femlliga/aux-wizard.html:5
+#: femlliga/templates/femlliga/resources-wizard.html:9
+msgid "Alta"
+msgstr "Alta"
+
+#: femlliga/templates/femlliga/aux-wizard.html:7
+msgid "Meitat d'alta completada"
+msgstr "Meitat d'alta completada"
+
+#: femlliga/templates/femlliga/aux-wizard.html:9
+msgid "Alta completada"
+msgstr "Alta completada"
+
+#: femlliga/templates/femlliga/aux-wizard.html:16
+msgid "Benvinguda!"
+msgstr "Benvinguda!"
+
+#: femlliga/templates/femlliga/aux-wizard.html:18
+#, python-format
+msgid ""
+"Ara que has donat d'alta la teua %(org_type)s, ens agradaria que ens indiques "
+"de quins recursos disposeu i quines necessitats teniu en el vostre dia a dia. "
+"Aquesta informació es farà servir per saber amb quines altres organitzacions "
+"podeu col·laborar."
+msgstr ""
+"Ara que has donat d'alta la teua %(org_type)s, ens agradaria que ens indiques "
+"de quins recursos disposeu i quines necessitats teniu en el vostre dia a dia. "
+"Aquesta informació es farà servir per saber amb quines altres organitzacions "
+"podeu col·laborar."
+
+#: femlliga/templates/femlliga/aux-wizard.html:20
+msgid ""
+"Et farem una sèrie de preguntes sobre els recursos que teniu o necessiteu, i "
+"podreu respondre «Sí» o «No» a cadascuna, i també indicar alguns detalls si "
+"així ho voleu."
+msgstr ""
+"Et farem una sèrie de preguntes sobre els recursos que teniu o necessiteu, i "
+"podreu respondre «Sí» o «No» a cadascuna, i també indicar alguns detalls si "
+"així ho voleu."
+
+#: femlliga/templates/femlliga/aux-wizard.html:22
+msgid ""
+"No patisques si tens dubtes sobre el que has de respondre! Podràs modificar "
+"totes les respostes més endavant."
+msgstr ""
+"No patisques si tens dubtes sobre el que has de respondre! Podràs modificar "
+"totes les respostes més endavant."
+
+#: femlliga/templates/femlliga/aux-wizard.html:24
+msgid ""
+"Si et va bé fer el procés ara, clica «Endavant!». Si no, pots clicar «Ho faré "
+"més tard»."
+msgstr ""
+"Si et va bé fer el procés ara, clica «Endavant!». Si no, pots clicar «Ho faré "
+"més tard»."
+
+#: femlliga/templates/femlliga/aux-wizard.html:26
+msgid "Ja vas per la meitat!"
+msgstr "Ja vas per la meitat!"
+
+#: femlliga/templates/femlliga/aux-wizard.html:28
+#, python-format
+msgid ""
+"Has acabat d'introduir les necessitats de la teua %(org_type)s, només et falta "
+"introduir els recursos que podeu oferir a les altres organitzacions."
+msgstr ""
+"Has acabat d'introduir les necessitats de la teua %(org_type)s, només et falta "
+"introduir els recursos que podeu oferir a les altres organitzacions."
+
+#: femlliga/templates/femlliga/aux-wizard.html:30
+msgid ""
+"Si et va bé seguir el procés, clica «Endavant!». Si no, pots clicar «Ho faré "
+"més tard»."
+msgstr ""
+"Si et va bé seguir el procés, clica «Endavant!». Si no, pots clicar «Ho faré "
+"més tard»."
+
+#: femlliga/templates/femlliga/aux-wizard.html:34
+#, python-format
+msgid ""
+"Has acabat d'introduir la informació de la teua %(org_type)s. A partir d'ara "
+"podeu buscar altres organitzacions amb les que col·laborar i us podeu posar en "
+"contacte amb elles a través de l'aplicació. Altres organitzacions també poden "
+"entrar en contacte amb vosaltres. No us oblideu de anar revisant les dades cada "
+"cert temps!"
+msgstr ""
+"Has acabat d'introduir la informació de la teua %(org_type)s. A partir d'ara "
+"podeu buscar altres organitzacions amb les que col·laborar i us podeu posar en "
+"contacte amb elles a través de l'aplicació. Altres organitzacions també poden "
+"entrar en contacte amb vosaltres. No us oblideu de anar revisant les dades cada "
+"cert temps!"
+
+#: femlliga/templates/femlliga/aux-wizard.html:43
+#: femlliga/templates/femlliga/aux-wizard.html:50
+msgid "Endavant!"
+msgstr "Endavant!"
+
+#: femlliga/templates/femlliga/aux-wizard.html:47
+msgid "Ho faré més tard"
+msgstr "Ho faré més tard"
+
 #: femlliga/templates/femlliga/contact.html:9
 msgid "Contacta amb nosaltres"
 msgstr "Contacta amb nosaltres"
@@ -1008,11 +1696,11 @@ msgstr "Gràcies per enviar el missatge! Et respondrem tan aviat com puguem."
 
 #: femlliga/templates/femlliga/contact.html:16
 msgid ""
-"Si tens qualsevol pregunta o suggerència, no dubtes a contactar amb "
-"nosaltres, envia'ns un missatge!"
+"Si tens qualsevol pregunta o suggerència, no dubtes a contactar amb nosaltres, "
+"envia'ns un missatge!"
 msgstr ""
-"Si tens qualsevol pregunta o suggerència, no dubtes a contactar amb "
-"nosaltres, envia'ns un missatge!"
+"Si tens qualsevol pregunta o suggerència, no dubtes a contactar amb nosaltres, "
+"envia'ns un missatge!"
 
 #: femlliga/templates/femlliga/contact.html:22
 msgid "El teu correu electrònic. El farem servir per respondre't"
@@ -1030,6 +1718,18 @@ msgstr "Missatge"
 #: femlliga/templates/femlliga/contact.html:33
 msgid "Envia"
 msgstr "Envia"
+
+#: femlliga/templates/femlliga/dashboard.html:9
+msgid "Vista general:"
+msgstr "Vista general:"
+
+#: femlliga/templates/femlliga/dashboard.html:11
+msgid "Organitzacions"
+msgstr "Organitzacions"
+
+#: femlliga/templates/femlliga/dashboard.html:13
+msgid "Contactes rebuts"
+msgstr "Contactes rebuts"
 
 #: femlliga/templates/femlliga/index.html:5
 msgid "Portada"
@@ -1066,21 +1766,21 @@ msgstr "Carregant..."
 
 #: femlliga/templates/femlliga/index.html:86
 msgid ""
-"Actualment cap entitat ofereix ni necessita el mateix que vosaltres, però si "
-"us inscriviu altres entitats us podran trobar en el futur."
+"Actualment cap entitat ofereix ni necessita el mateix que vosaltres, però si us "
+"inscriviu altres entitats us podran trobar en el futur."
 msgstr ""
-"Actualment cap entitat ofereix ni necessita el mateix que vosaltres, però si "
-"us inscriviu altres entitats us podran trobar en el futur."
+"Actualment cap entitat ofereix ni necessita el mateix que vosaltres, però si us "
+"inscriviu altres entitats us podran trobar en el futur."
 
 #: femlliga/templates/femlliga/index.html:89
 msgid ""
-"Hi ha <strong>${ matches.needs }</strong> entitats que necessiten el mateix "
-"que vosaltres. Si us inscriviu podreu contactar amb elles i buscar una "
-"solució en comú."
+"Hi ha <strong>${ matches.needs }</strong> entitats que necessiten el mateix que "
+"vosaltres. Si us inscriviu podreu contactar amb elles i buscar una solució en "
+"comú."
 msgstr ""
-"Hi ha <strong>${ matches.needs }</strong> entitats que necessiten el mateix "
-"que vosaltres. Si us inscriviu podreu contactar amb elles i buscar una "
-"solució en comú."
+"Hi ha <strong>${ matches.needs }</strong> entitats que necessiten el mateix que "
+"vosaltres. Si us inscriviu podreu contactar amb elles i buscar una solució en "
+"comú."
 
 #: femlliga/templates/femlliga/index.html:92
 msgid ""
@@ -1096,13 +1796,11 @@ msgstr ""
 msgid ""
 "Hi ha <strong>${ matches.offers }</strong> entitats que ofereixen el que "
 "necessiteu i <strong>${ matches.needs }</strong> entitats que necessiten el "
-"mateix que vosaltres. Si us inscriviu podreu contactar amb elles i "
-"col·laborar."
+"mateix que vosaltres. Si us inscriviu podreu contactar amb elles i col·laborar."
 msgstr ""
 "Hi ha <strong>${ matches.offers }</strong> entitats que ofereixen el que "
 "necessiteu i <strong>${ matches.needs }</strong> entitats que necessiten el "
-"mateix que vosaltres. Si us inscriviu podreu contactar amb elles i "
-"col·laborar."
+"mateix que vosaltres. Si us inscriviu podreu contactar amb elles i col·laborar."
 
 #: femlliga/templates/femlliga/index.html:99
 #: femlliga/templates/femlliga/index.html:296
@@ -1130,16 +1828,16 @@ msgstr "Entre totes, associacions amb més impacte!"
 #: femlliga/templates/femlliga/index.html:143
 msgid ""
 "De forma semblant a les famoses aplicacions digitals de cites, us proposem "
-"recollir informació amb la qual filtrar els perfils que més poden interessar "
-"a la teua associació. Els col·lectius amb més probabilitats de ser "
-"compatibles a l'hora de <strong>compartir recursos</strong> podem entrar en "
-"contacte entre nosaltres."
+"recollir informació amb la qual filtrar els perfils que més poden interessar a "
+"la teua associació. Els col·lectius amb més probabilitats de ser compatibles a "
+"l'hora de <strong>compartir recursos</strong> podem entrar en contacte entre "
+"nosaltres."
 msgstr ""
 "De forma semblant a les famoses aplicacions digitals de cites, us proposem "
-"recollir informació amb la qual filtrar els perfils que més poden interessar "
-"a la teua associació. Els col·lectius amb més probabilitats de ser "
-"compatibles a l'hora de <strong>compartir recursos</strong> podem entrar en "
-"contacte entre nosaltres."
+"recollir informació amb la qual filtrar els perfils que més poden interessar a "
+"la teua associació. Els col·lectius amb més probabilitats de ser compatibles a "
+"l'hora de <strong>compartir recursos</strong> podem entrar en contacte entre "
+"nosaltres."
 
 #: femlliga/templates/femlliga/index.html:150
 #: femlliga/templates/femlliga/index.html:186
@@ -1163,10 +1861,10 @@ msgstr "Projector i pantalla"
 
 #: femlliga/templates/femlliga/index.html:167
 msgid ""
-"Decideixen inscriure la seua Associació en <em>Fem lliga</em>. Contesten el "
+"Decideixen inscriure la seua Associació en <em>Fem lliga!</em>. Contesten el "
 "formulari i posen en comú les seues peticions com per exemple el projector."
 msgstr ""
-"Decideixen inscriure la seua Associació en <em>Fem lliga</em>. Contesten el "
+"Decideixen inscriure la seua Associació en <em>Fem lliga!</em>. Contesten el "
 "formulari i posen en comú les seues peticions com per exemple el projector."
 
 #: femlliga/templates/femlliga/index.html:172
@@ -1179,13 +1877,13 @@ msgstr "EL<br>TEIXIT SOCIAL"
 
 #: femlliga/templates/femlliga/index.html:179
 msgid ""
-"Per la seua banda, Llúcia va donar d’alta el seu col·lectiu ja que fa "
-"setmanes buscaven espai. A més, la seua assemblea va decidir oferir un "
-"projector per si algú el necessitava."
+"Per la seua banda, Llúcia va donar d’alta el seu col·lectiu ja que fa setmanes "
+"buscaven espai. A més, la seua assemblea va decidir oferir un projector per si "
+"algú el necessitava."
 msgstr ""
-"Per la seua banda, Llúcia va donar d’alta el seu col·lectiu ja que fa "
-"setmanes buscaven espai. A més, la seua assemblea va decidir oferir un "
-"projector per si algú el necessitava."
+"Per la seua banda, Llúcia va donar d’alta el seu col·lectiu ja que fa setmanes "
+"buscaven espai. A més, la seua assemblea va decidir oferir un projector per si "
+"algú el necessitava."
 
 #: femlliga/templates/femlliga/index.html:191
 msgid ""
@@ -1246,29 +1944,29 @@ msgstr "Cooperar, intercanviar, fer lliga per a què?"
 
 #: femlliga/templates/femlliga/index.html:239
 msgid ""
-"Sovint a les nostres organitzacions ens costa trobar solucions als problemes "
-"i cobrir les necessitats que ens sorgeixen. Disposem d'escassos recursos i "
-"molt poc temps. Aquesta ferramenta ens facilita el <strong>treball en xarxa</"
-"strong> amb altres entitats per resoldre aquests problemes i incrementar el "
-"nostre impacte i la nostra projecció."
+"Sovint a les nostres organitzacions ens costa trobar solucions als problemes i "
+"cobrir les necessitats que ens sorgeixen. Disposem d'escassos recursos i molt "
+"poc temps. Aquesta ferramenta ens facilita el <strong>treball en xarxa</strong> "
+"amb altres entitats per resoldre aquests problemes i incrementar el nostre "
+"impacte i la nostra projecció."
 msgstr ""
-"Sovint a les nostres organitzacions ens costa trobar solucions als problemes "
-"i cobrir les necessitats que ens sorgeixen. Disposem d'escassos recursos i "
-"molt poc temps. Aquesta ferramenta ens facilita el <strong>treball en xarxa</"
-"strong> amb altres entitats per resoldre aquests problemes i incrementar el "
-"nostre impacte i la nostra projecció."
+"Sovint a les nostres organitzacions ens costa trobar solucions als problemes i "
+"cobrir les necessitats que ens sorgeixen. Disposem d'escassos recursos i molt "
+"poc temps. Aquesta ferramenta ens facilita el <strong>treball en xarxa</strong> "
+"amb altres entitats per resoldre aquests problemes i incrementar el nostre "
+"impacte i la nostra projecció."
 
 #: femlliga/templates/femlliga/index.html:292
 msgid ""
 "és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, "
-"habilitats, serveis o coneixements. Es tracta d’una ferramenta que "
-"<strong>posa en contacte</strong> les organitzacions segons les nostres "
-"necessitats i el que podem oferir."
+"habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa "
+"en contacte</strong> les organitzacions segons les nostres necessitats i el que "
+"podem oferir."
 msgstr ""
 "és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, "
-"habilitats, serveis o coneixements. Es tracta d’una ferramenta que "
-"<strong>posa en contacte</strong> les organitzacions segons les nostres "
-"necessitats i el que podem oferir."
+"habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa "
+"en contacte</strong> les organitzacions segons les nostres necessitats i el que "
+"podem oferir."
 
 #: femlliga/templates/femlliga/index.html:318
 msgid "Us desborden les qüestions legals?"
@@ -1276,11 +1974,11 @@ msgstr "Us desborden les qüestions legals?"
 
 #: femlliga/templates/femlliga/index.html:318
 msgid ""
-"Segur que teniu dubtes a l'hora de saber si cal contractar una assegurança "
-"per a alguna activitat o si heu de complir amb la Llei de Transparència,"
+"Segur que teniu dubtes a l'hora de saber si cal contractar una assegurança per "
+"a alguna activitat o si heu de complir amb la Llei de Transparència,"
 msgstr ""
-"Segur que teniu dubtes a l'hora de saber si cal contractar una assegurança "
-"per a alguna activitat o si heu de complir amb la Llei de Transparència,"
+"Segur que teniu dubtes a l'hora de saber si cal contractar una assegurança per "
+"a alguna activitat o si heu de complir amb la Llei de Transparència,"
 
 #: femlliga/templates/femlliga/index.html:318
 msgid "O per exemple fiscals i comptables?"
@@ -1380,11 +2078,11 @@ msgstr "S'ha superat el nombre d'intents d'inici de sessió"
 
 #: femlliga/templates/femlliga/lockout.html:6
 msgid ""
-"L'aplicació bloqueja els intents d'inici de sessió erronis per seguretat. "
-"Pots tornar a intentar entrar d'ací a una hora."
+"L'aplicació bloqueja els intents d'inici de sessió erronis per seguretat. Pots "
+"tornar a intentar entrar d'ací a una hora."
 msgstr ""
-"L'aplicació bloqueja els intents d'inici de sessió erronis per seguretat. "
-"Pots tornar a intentar entrar d'ací a una hora."
+"L'aplicació bloqueja els intents d'inici de sessió erronis per seguretat. Pots "
+"tornar a intentar entrar d'ací a una hora."
 
 #: femlliga/templates/femlliga/preferences.html:16
 msgid "Adreça de correu electrònic."
@@ -1400,21 +2098,178 @@ msgid "(correus pendents de validar: %(emails)s)"
 msgstr "(correus pendents de validar: %(emails)s)"
 
 #: femlliga/templates/femlliga/preferences.html:26
-msgid ""
-"Configura cada quant de temps vols rebre notificacions. Només te n'enviarem "
-"en cas que tingues peticions pendents de respondre."
-msgstr ""
-"Configura cada quant de temps vols rebre notificacions. Només te n'enviarem "
-"en cas que tingues peticions pendents de respondre."
+msgid "Configura l'idioma de l'aplicació"
+msgstr "Configura l'idioma de l'aplicació"
 
-#: femlliga/templates/femlliga/preferences.html:33
+#: femlliga/templates/femlliga/preferences.html:30
 msgid ""
-"Marca aquest camp si vols iniciar conversa per correu automàticament per a "
-"totes les peticions de comunicació"
+"Configura cada quant de temps vols rebre notificacions. Només te n'enviarem en "
+"cas que tingues peticions pendents de respondre."
 msgstr ""
-"Marca aquest camp si vols iniciar conversa per correu automàticament per a "
-"totes les peticions de comunicació"
+"Configura cada quant de temps vols rebre notificacions. Només te n'enviarem en "
+"cas que tingues peticions pendents de respondre."
 
 #: femlliga/templates/femlliga/preferences.html:37
-msgid "Desa"
-msgstr "Desa"
+msgid ""
+"Marca aquest camp si vols iniciar conversa per correu automàticament per a "
+"totes les peticions de comunicació"
+msgstr ""
+"Marca aquest camp si vols iniciar conversa per correu automàticament per a "
+"totes les peticions de comunicació"
+
+#: femlliga/templates/femlliga/report.html:47
+msgid "Informe d'activitat de la plataforma"
+msgstr "Informe d'activitat de la plataforma"
+
+#: femlliga/templates/femlliga/report.html:51
+msgid "Mapa d'entitats"
+msgstr "Mapa d'entitats"
+
+#: femlliga/templates/femlliga/report.html:55
+msgid "Graf de relacions entre entitats"
+msgstr "Graf de relacions entre entitats"
+
+#: femlliga/templates/femlliga/report.html:59
+msgid "Evolució temporal de l'alta d'entitats"
+msgstr "Evolució temporal de l'alta d'entitats"
+
+#: femlliga/templates/femlliga/report.html:72
+msgid "Suggerències de necessitats indicades en «altres»"
+msgstr "Suggerències de necessitats indicades en «altres»"
+
+#: femlliga/templates/femlliga/report.html:74
+msgid "Paraules més repetides en les necessitats:"
+msgstr "Paraules més repetides en les necessitats:"
+
+#: femlliga/templates/femlliga/report.html:78
+#: femlliga/templates/femlliga/report.html:104
+msgid "vegades"
+msgstr "vegades"
+
+#: femlliga/templates/femlliga/report.html:82
+msgid "Una mostra d'exemples de necessitats expressades:"
+msgstr "Una mostra d'exemples de necessitats expressades:"
+
+#: femlliga/templates/femlliga/report.html:90
+msgid "Comentaris en necessitats concretes"
+msgstr "Comentaris en necessitats concretes"
+
+#: femlliga/templates/femlliga/report.html:98
+msgid "Suggerències de oferiments indicades en «altres»"
+msgstr "Suggerències de oferiments indicades en «altres»"
+
+#: femlliga/templates/femlliga/report.html:100
+msgid "Paraules més repetides en els oferiments:"
+msgstr "Paraules més repetides en els oferiments:"
+
+#: femlliga/templates/femlliga/report.html:108
+msgid "Una mostra d'exemples de oferiments expressats:"
+msgstr "Una mostra d'exemples de oferiments expressats:"
+
+#: femlliga/templates/femlliga/report.html:116
+msgid "Comentaris en oferiments concrets"
+msgstr "Comentaris en oferiments concrets"
+
+#: femlliga/templates/femlliga/report.html:125
+msgid "Interaccions"
+msgstr "Interaccions"
+
+#: femlliga/templates/femlliga/report.html:135
+msgid "Evolució temporal de les peticions de col·laboració"
+msgstr "Evolució temporal de les peticions de col·laboració"
+
+#: femlliga/templates/femlliga/resources-wizard.html:12
+msgid "necessitat"
+msgstr "necessitat"
+
+#: femlliga/templates/femlliga/resources-wizard.html:14
+msgid "oferiment"
+msgstr "oferiment"
+
+#: femlliga/templates/femlliga/resources-wizard.html:38
+msgid "En cas que si, per favor indiqueu quins dels següents apliquen:"
+msgstr "En cas que si, per favor indiqueu quins dels següents apliquen:"
+
+#: femlliga/templates/femlliga/resources-wizard.html:46
+msgid ""
+"Marca aquest camp si demaneu alguna retribució a canvi del producte o servei"
+msgstr ""
+"Marca aquest camp si demaneu alguna retribució a canvi del producte o servei"
+
+#: femlliga/templates/femlliga/resources-wizard.html:53
+msgid "Comentaris, observacions, o altres opcions que us interessarien:"
+msgstr "Comentaris, observacions, o altres opcions que us interessarien:"
+
+#: femlliga/templates/femlliga/resources-wizard.html:98
+msgid "Torna sense fer canvis"
+msgstr "Torna sense fer canvis"
+
+#: femlliga/templates/socialaccount/authentication_error.html:3
+#: femlliga/templates/socialaccount/authentication_error.html:7
+msgid "Error autenticant-se amb un compte extern"
+msgstr "Error autenticant-se amb un compte extern"
+
+#: femlliga/templates/socialaccount/authentication_error.html:9
+msgid ""
+"Hi ha hagut un error mentre intentaves autenticar-te a través del teu compte "
+"extern."
+msgstr ""
+"Hi ha hagut un error mentre intentaves autenticar-te a través del teu compte "
+"extern."
+
+#: femlliga/templates/socialaccount/login.html:6
+#, python-format
+msgid "Connecta amb %(provider)s"
+msgstr "Connecta amb %(provider)s"
+
+#: femlliga/templates/socialaccount/login.html:8
+#, python-format
+msgid "Estàs a punt de connectar un compte extern de %(provider)s"
+msgstr "Estàs a punt de connectar un compte extern de %(provider)s"
+
+#: femlliga/templates/socialaccount/login.html:10
+#, python-format
+msgid "Inicia sessió via %(provider)s"
+msgstr "Inicia sessió via %(provider)s"
+
+#: femlliga/templates/socialaccount/login.html:12
+#, python-format
+msgid ""
+"Esteu a punt d'iniciar sessió utilitzant un compte extern des de %(provider)s."
+msgstr ""
+"Esteu a punt d'iniciar sessió utilitzant un compte extern des de %(provider)s."
+
+#: femlliga/templates/socialaccount/login.html:17
+msgid "Continua"
+msgstr "Continua"
+
+#: femlliga/templates/socialaccount/login_cancelled.html:3
+#: femlliga/templates/socialaccount/login_cancelled.html:8
+msgid "S'ha cancel·lat l'inici de sessió"
+msgstr "S'ha cancel·lat l'inici de sessió"
+
+#: femlliga/templates/socialaccount/login_cancelled.html:10
+#, python-format
+msgid ""
+"Has decidit cancel·lar l'inici de sessió en aquest lloc web fent servir un dels "
+"vostres comptes existents. Si ha sigut per error, per favor ves a la pàgina <a "
+"href='%(url)s'>d'inici de sessió</a>."
+msgstr ""
+"Has decidit cancel·lar l'inici de sessió en aquest lloc web fent servir un dels "
+"vostres comptes existents. Si ha sigut per error, per favor ves a la pàgina <a "
+"href='%(url)s'>d'inici de sessió</a>."
+
+#: femlliga/templates/socialaccount/signup.html:5
+msgid "El correu electrònic ja s'ha fet servir"
+msgstr "El correu electrònic ja s'ha fet servir"
+
+#: femlliga/templates/socialaccount/signup.html:7
+#, python-format
+msgid ""
+"Sembla que el correu electrònic de %(name)s amb el que us esteu intentant "
+"identificar ja es va fer servir per registrar-se en aquesta web. Si us plau, "
+"inicieu la sessió fent servir el correu electrònic i la contrasenya:"
+msgstr ""
+"Sembla que el correu electrònic de %(name)s amb el que us esteu intentant "
+"identificar ja es va fer servir per registrar-se en aquesta web. Si us plau, "
+"inicieu la sessió fent servir el correu electrònic i la contrasenya:"
