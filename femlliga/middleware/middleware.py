@@ -2,7 +2,7 @@ import pytz
 import time
 
 from django.conf import settings
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
@@ -17,6 +17,20 @@ class TimezoneMiddleware:
         return self.get_response(request)
 
 SESSION_TIMEOUT_KEY = "_session_init_timestamp_"
+
+class LocaleMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if not hasattr(request, "session") or request.session.is_empty():
+            return self.get_response(request)
+
+        if request.user and request.user.language:
+            translation.activate(request.user.language)
+            request.LANGUAGE_CODE = translation.get_language()
+
+        return self.get_response(request)
 
 class SessionTimeoutMiddleware:
     def __init__(self, get_response):

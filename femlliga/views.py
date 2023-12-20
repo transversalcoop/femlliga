@@ -24,7 +24,7 @@ from django.utils.cache import patch_response_headers
 from django.views.static import serve
 from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language_from_request, gettext_lazy as _
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -74,12 +74,18 @@ def index(request):
     return render(request, "femlliga/index.html", {"form": ContactForm()})
 
 def page(request, name):
+    lang = get_language_from_request(request)
     try:
-        page = get_object_or_404(Page, name=name)
+        page = get_object_or_404(Page, name=name, language=lang)
     except:
         if name in ["faq", "legal", "privacy", "accessibility"]:
-            page = Page(name=name, heading=_("Títol"), subheading=_("Subtítol"), content="<p>Cal definir aquesta pàgina</p>")
-            page.save()
+            page = Page.objects.create(
+                name=name,
+                language=lang,
+                heading=_("Títol"),
+                subheading=_("Subtítol"),
+                content=_("<p>Cal definir aquesta pàgina</p>"),
+            )
         else:
             raise
     return render(request, "femlliga/page.html", { "page": page })
@@ -578,6 +584,7 @@ def search(request, organization_id):
 def preferences(request):
     form = PreferencesForm({
         "email": request.user.email,
+        "language": request.user.language,
         "notifications_frequency": request.user.notifications_frequency,
         "accept_communications_automatically": request.user.accept_communications_automatically,
     })
@@ -588,6 +595,7 @@ def preferences(request):
             if new_email != request.user.email:
                 # will send confirmation email and then execute update_user_email function on email_confirmed signal
                 EmailAddress.objects.add_email(request, request.user, new_email, confirm=True)
+            request.user.language = form.cleaned_data["language"]
             request.user.notifications_frequency = form.cleaned_data["notifications_frequency"]
             request.user.accept_communications_automatically = form.cleaned_data["accept_communications_automatically"]
             request.user.save()

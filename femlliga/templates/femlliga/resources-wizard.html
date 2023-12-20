@@ -4,14 +4,14 @@
 
 {% block title %}
 {% if editing %}
-Edita
+{{ _("Edita") }}
 {% else %}
-Alta
+{{ _("Alta") }}
 {% endif %}
 {% if resource_type == "need" %}
-necessitat
+{{ _("necessitat") }}
 {% else %}
-oferiment
+{{ _("oferiment") }}
 {% endif %}
 {{ resource }}
 {% endblock %}
@@ -35,7 +35,7 @@ oferiment
 
     {% set options = resource.options() %}
     {% if len(options) > 0 %}
-        {{ render_multiple_tags(form, "options", "En cas que si, per favor indiqueu quins dels següents apliquen:", options) }}
+        {{ render_multiple_tags(form, "options", _("En cas que si, per favor indiqueu quins dels següents apliquen:"), options) }}
     {% endif %}
 
     {% if resource_type == "offers" %}
@@ -43,14 +43,14 @@ oferiment
         <input class="form-check-input" type="checkbox" id="charge" name="charge"
                {% if form and form.cleaned_data and form.cleaned_data["charge"] %}checked{% endif %}>
         <label class="form-check-label" for="charge">
-          Marca aquest camp si demaneu alguna retribució a canvi del producte o servei
+          {{ _("Marca aquest camp si demaneu alguna retribució a canvi del producte o servei") }}
         </label>
       </div>
     {% endif %}
 
     <div class="spacing"></div>
 
-    <label for="comments">Comentaris, observacions, o altres opcions que us interessarien:</label>
+    <label for="comments">{{ _("Comentaris, observacions, o altres opcions que us interessarien:") }}</label>
     <textarea id="comments" name="comments" rows="2" {{ input_classes(form, "comments") }}>{{ textarea_value(form, "comments") }}</textarea>
     {{ input_feedback(form, "comments") }}
 
@@ -62,7 +62,7 @@ oferiment
                 {% set name = "delete-image-%d" % (image.id,) %}
                 <input class="form-check-input" type="checkbox" value="" id="id_{{ name }}" name="{{ name }}">
                 <label class="form-check-label" for="{{ name }}">
-                    Esborra la imatge
+                  {{ _("Esborra la imatge") }}
                 </label>
             </div>
         </div>
@@ -95,7 +95,7 @@ oferiment
       </div>
       {% if editing %}
       <div class="col-12 d-grid mt-3">
-        <a href="{{ url("app") }}" class="btn btn-lg btn-light text-dark">Torna sense fer canvis</a>
+        <a href="{{ url("app") }}" class="btn btn-lg btn-light text-dark">{{ _("Torna sense fer canvis") }}</a>
       </div>
       {% endif %}
     </div>

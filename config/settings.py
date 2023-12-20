@@ -73,6 +73,7 @@ MIDDLEWARE = [
     'django.middleware.common.BrokenLinkEmailsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'femlliga.middleware.middleware.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
@@ -165,7 +166,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ca'
 
 TIME_ZONE = 'UTC'
 
@@ -176,7 +177,6 @@ USE_TZ = True
 LANGUAGES = [
     ('ca', 'Català'),
     ('es', 'Castellano'),
-    ('en-us', 'English'),
 ]
 
 LOCALE_PATHS = ['locale']

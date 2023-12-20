@@ -20,7 +20,7 @@ class PreferencesForm(forms.ModelForm):
     email = forms.EmailField()
     class Meta:
         model = CustomUser
-        fields = ["notifications_frequency", "accept_communications_automatically"]
+        fields = ["language", "notifications_frequency", "accept_communications_automatically"]
 
 class OrganizationForm(forms.ModelForm):
     scopes = forms.MultipleChoiceField(

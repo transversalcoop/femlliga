@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 
 from .constants import *
@@ -40,7 +41,9 @@ class LimitFileSize:
     def __eq__(self, other):
         return self.MB == other.MB
 
+USER_LANGUAGE_CHOICES = [("", _("Idioma configurat al navegador"))] + [x for x in LANGUAGE_CHOICES]
 class CustomUser(AbstractUser):
+    language = models.CharField(max_length=50, choices=USER_LANGUAGE_CHOICES, null=True, blank=True)
     notifications_frequency = models.CharField(max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY")
     accept_communications_automatically = models.BooleanField(default=True)
     last_notification_date = models.DateTimeField(auto_now_add=True)
@@ -52,11 +55,23 @@ class CustomUser(AbstractUser):
         return None
 
 class Page(models.Model):
-    name = models.SlugField(primary_key = True)
+    id = models.UUIDField(
+        default = uuid.uuid4,
+        editable = False,
+        primary_key = True,
+    )
+    name = models.SlugField()
+    language = models.CharField(max_length=50, choices=LANGUAGE_CHOICES, default="ca")
     heading = models.TextField()
     subheading = models.TextField(blank=True)
     content = models.TextField()
     image = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        unique_together = (("name", "language"),)
+
+    def __str__(self):
+        return f"[{self.language}] {self.name}"
 
 class OrganizationScope(models.Model):
     name = models.CharField(max_length=100, choices=ORG_SCOPES, primary_key = True)

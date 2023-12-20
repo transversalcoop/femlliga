@@ -2,7 +2,7 @@
 
 {% from 'femlliga/_macros.html' import resource_details %}
 
-{% block title %}Entitat{% endblock %}
+{% block title %}{{ _("Entitat") }}{% endblock %}
 
 {% macro resources(name, resource_type, data, missing, description) %}
     <div class="col-lg-6">
@@ -11,7 +11,7 @@
         {% if len(missing) > 0 %}
           <span class="float-end">
             <a class="dropdown-toogle btn btn-sm btn-custom btn-custom-sm" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#" style="background-color: #f4f4f4; margin-top: -5px;" title="Afegeix">
-              <i class="bi-plus-lg"></i> <span class="d-none d-md-inline">Afegeix</span>
+              <i class="bi-plus-lg"></i> <span class="d-none d-md-inline">{{ _("Afegeix") }}</span>
             </a>
             <ul class="dropdown-menu" aria-labelledby="afegeix{{ resource_type }}">
               {% for resource in missing %}
@@ -32,7 +32,7 @@
           {% endif %}
           <div class="edit-row">
             <span class="edit d-md-none d-block" style="float: right; position: relative; z-index: 1;">
-              <a href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.resource]) }}" title="Edita">
+              <a href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.resource]) }}" title="{{ _("Edita") }}">
                 <i class="bi-pencil-square edit" style="font-size: 1.5rem;"></i>
               </a>
             </span>
@@ -53,7 +53,7 @@
     <div class="row edit-row" style="padding-top: 3.5rem;">
       <div class="col-md-6">
         <span class="edit d-md-none d-block" style="float: right;">
-          <a href="{{ url("edit_organization", args=[org.id]) }}" style="color: black;" title="Edita">
+          <a href="{{ url("edit_organization", args=[org.id]) }}" style="color: black;" title="{{ _("Edita") }}">
             <i class="bi-pencil-square edit" style="font-size: 1.5rem; margin-top: 10px;"></i>
           </a>
         </span>
@@ -73,10 +73,10 @@
 <div class="container mb-4">
   {% if org.needs_not_set() or org.offers_not_set() %}
   <div class="alert alert-primary mt-3" role="alert">
-    Pareix que encara no heu completat el procés d'alta. Voleu fer-ho ara?
+    {{ _("Pareix que encara no heu completat el procés d'alta. Voleu fer-ho ara?") }}
     <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" class="float-end">
         {{ csrf_input }}
-        <button class="btn btn-sm btn-custom">Completa l'alta</button>
+        <button class="btn btn-sm btn-custom">{{ _("Completa l'alta") }}</button>
     </form>
   </div>
   {% endif %}

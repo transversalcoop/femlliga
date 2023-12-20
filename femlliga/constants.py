@@ -3,6 +3,11 @@ from django.utils.translation import gettext_lazy as _
 APP_NAME = _("Fem lliga!")
 FROM_EMAIL = f"{APP_NAME} <no-reply@femlliga.org>"
 
+LANGUAGE_CHOICES = [
+    ("ca", "Català"),
+    ("es", "Castellano"),
+]
+
 NOTIFICATION_CHOICES = [
     ("DAILY", _("Diàriament")),
     ("WEEKLY", _("Setmanalment")),

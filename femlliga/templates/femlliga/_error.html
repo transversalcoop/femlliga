@@ -7,7 +7,7 @@
     </div>
     <div class="container">
       <h1 style="font-weight: 900; font-size: 3.75em; color: #000;" class="text-center">
-        Recoi!
+        {{ _("Recoi!") }}
 {% block error_code %}{% endblock %}
       </h1>
     </div>
@@ -20,10 +20,10 @@
 </section>
 
 <div class="container mb-2">
-  <p class="text-center">Sentim molt la molèstia. Pots tornar a intentar el que estaves fent, o, si l'error continua, <a href="{{ url("contact") }}">contactar amb nosaltres</a></p>
+  <p class="text-center">{{ _("Sentim molt la molèstia. Pots tornar a intentar el que estaves fent, o, si l'error continua, <a href='%(url)s'>contactar amb nosaltres</a>", url=url("contact")) }}</p>
 
   <div style="text-align: center;">
-    <a class="btn btn-custom" href="{{ url("index") }}" style="font-weight: bold; font-size: 1.25rem;">Ves a la pàgina d'inici</a>
+    <a class="btn btn-custom" href="{{ url("index") }}" style="font-weight: bold; font-size: 1.25rem;">{{ _("Ves a la pàgina d'inici") }}</a>
   </div>
 </div>
 {% endblock %}

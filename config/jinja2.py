@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.html import json_script
 from django.templatetags.static import static
-from django.utils.translation import gettext, ngettext, get_language
+from django.utils.translation import gettext, ngettext, get_language_from_request
 
 from jinja2 import Environment
 from allauth.utils import get_request_param
@@ -14,12 +14,6 @@ from allauth.socialaccount.adapter import get_adapter
 import femlliga.constants
 
 from femlliga.models import *
-
-def get_current_language():
-    lang = get_language()
-    if lang in ["ca", "es"]:
-        return lang
-    return "ca"
 
 def add_http(url):
     if not url.startswith("http://") and not url.startswith("https://"):
@@ -106,6 +100,6 @@ def environment(**options):
         "json_script": json_script,
         "js_bool": js_bool,
         "media_type_placeholder": media_type_placeholder,
-        "get_current_language": get_current_language,
+        "get_language_from_request": get_language_from_request,
     })
     return env
