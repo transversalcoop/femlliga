@@ -26,7 +26,7 @@ class LocaleMiddleware:
         if not hasattr(request, "session") or request.session.is_empty():
             return self.get_response(request)
 
-        if request.user and request.user.language:
+        if request.user and hasattr(request.user, "language"):
             translation.activate(request.user.language)
             request.LANGUAGE_CODE = translation.get_language()
 

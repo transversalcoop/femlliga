@@ -3,7 +3,7 @@
 {% block content %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    El missatge que ens has enviat a través del formulari de contacte de {{ consts.APP_NAME }} ha arribat correctament, i intentarem respondre't el més aviat possible. A sota pots veure una còpia del missatge que has enviat:
+    {{ _("El missatge que ens has enviat a través del formulari de contacte de %(name)s ha arribat correctament, i intentarem respondre't el més aviat possible. A sota pots veure una còpia del missatge que has enviat:", name=consts.APP_NAME) }}
   </td>
 </tr>
 

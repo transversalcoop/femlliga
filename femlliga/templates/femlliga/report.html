@@ -44,19 +44,19 @@
 
 {% block content %}
 <div class="container">
-<h1>Informe d'activitat de la plataforma</h1>
+  <h1>{{ _("Informe d'activitat de la plataforma") }}</h1>
 
-<h2>Entitats</h2>
+  <h2>{{ _("Entitats") }}</h2>
 
-<h3>Mapa d'entitats</h3>
+  <h3>{{ _("Mapa d'entitats") }}</h3>
 
 <div id="citymap" class="map-height-big"></div>
 
-<h3>Graf de relacions entre entitats</h3>
+<h3>{{ _("Graf de relacions entre entitats") }}</h3>
 
 {{ plot(graph.plot()) }}
 
-<h3>Evolució temporal de l'alta d'entitats</h3>
+<h3>{{ _("Evolució temporal de l'alta d'entitats") }}</h3>
 
 {{ plot(organizations.plot()) }}
 
@@ -69,17 +69,17 @@
 {{ render_table(charge_by_resource_type) }}
 {{ render_table(resources_by_resource_option) }}
 
-<h3>Suggerències de necessitats indicades en «altres»</h3>
+<h3>{{ _("Suggerències de necessitats indicades en «altres»") }}</h3>
 
-<p>Paraules més repetides en les necessitats:</p>
+<p>{{ _("Paraules més repetides en les necessitats:") }}</p>
 
 <ul>
   {% for x in most_needed[:10] %}
-  <li>{{ x[0] }} ({{ x[1] }} vegades)</li>
+  <li>{{ x[0] }} ({{ x[1] }} {{ _("vegades") }})</li>
   {% endfor %}
 </ul>
 
-<p>Una mostra d'exemples de necessitats expressades:</p>
+<p>{{ _("Una mostra d'exemples de necessitats expressades:") }}</p>
 
 <ul>
   {% for need in other_needs[:10] %}
@@ -87,7 +87,7 @@
   {% endfor %}
 </ul>
 
-<h3>Comentaris en necessitats concretes</h3>
+<h3>{{ _("Comentaris en necessitats concretes") }}</h3>
 
 <ul>
   {% for need in needs_comments[:10] %}
@@ -95,17 +95,17 @@
   {% endfor %}
 </ul>
 
-<h3>Suggerències de oferiments indicades en «altres»</h3>
+<h3>{{ _("Suggerències de oferiments indicades en «altres»") }}</h3>
 
-<p>Paraules més repetides en els oferiments:</p>
+<p>{{ _("Paraules més repetides en els oferiments:") }}</p>
 
 <ul>
   {% for x in most_offered[:10]%}
-  <li>{{ x[0] }} ({{ x[1] }} vegades)</li>
+  <li>{{ x[0] }} ({{ x[1] }} {{ _("vegades") }})</li>
   {% endfor %}
 </ul>
 
-<p>Una mostra d'exemples de oferiments expressats:</p>
+<p>{{ _("Una mostra d'exemples de oferiments expressats:") }}</p>
 
 <ul>
   {% for offer in other_offers[:10] %}
@@ -113,7 +113,7 @@
   {% endfor %}
 </ul>
 
-<h3>Comentaris en oferiments concrets</h3>
+<h3>{{ _("Comentaris en oferiments concrets") }}</h3>
 
 <ul>
   {% for offer in offers_comments[:10] %}
@@ -122,7 +122,7 @@
 </ul>
 
 
-<h2>Interaccions</h2>
+<h2>{{ _("Interaccions") }}</h2>
 
 {{ render_table(agreements_by_solicitor_type) }}
 {{ render_table(agreements_by_solicitor_scope) }}
@@ -132,7 +132,7 @@
 
 {{ render_table(agreements_by_resource_type) }}
 
-<h3>Evolució temporal de les peticions de col·laboració</h3>
+<h3>{{ _("Evolució temporal de les peticions de col·laboració") }}</h3>
 
 {{ plot(agreements_started.plot()) }}
 {{ plot(agreements_comm.plot()) }}

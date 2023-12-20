@@ -36,7 +36,7 @@ class LimitFileSize:
 
     def __call__(self, value):
         if value.size > self.limit:
-            raise ValidationError(f"L'arxiu és massa gran, hauria d'ocupar menys de {self.MB} MB.")
+            raise ValidationError(_("L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB.", max=self.MB))
 
     def __eq__(self, other):
         return self.MB == other.MB
@@ -435,9 +435,6 @@ class Agreement(models.Model):
 
     def __str__(self):
         return f"[{self.id}] {self.solicitor} sol·licita {self.resource} a {self.solicitee}"
-
-    def state(self):
-        return f"""{self.resource}. Comunicació: {self.communication_accepted}. Èxit: {self.agreement_successful}."""
 
     def render_options(self):
         options = [str(x) for x in self.options.all()]

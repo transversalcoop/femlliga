@@ -3,13 +3,13 @@
 {% block content %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    Has rebut aquest correu perquè s'ha registrat un usuari en {{ current_site.domain }} amb aquesta adreça de correu electrònic.
+    {{ _("Has rebut aquest correu perquè s'ha registrat un usuari en %(domain)s amb aquesta adreça de correu electrònic.", domain=current_site.domain) }}
   </td>
 </tr>
 
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    Per confirmar que és correcte, i poder entrar a la web, clica <a href="{{ activate_url }}">ací</a> i confirma.
+    {{ _("Per confirmar que és correcte, i poder entrar a la web, clica <a href='%(url)s'>ací</a> i confirma.", url=activate_url) }}
   </td>
 </tr>
 {% endblock %}

@@ -1,4 +1,4 @@
 {% extends "account/email/base_message.txt" %}
 
-{% block content %}Has rebut aquest correu perquè tu o algu altre ha intentat registrar-se fent servir l'adreça de correu {{ email }}. Tanmateix, ja existeix un compte que fa servir aquesta adreça de correu. Si te n'havies oblidat, per favor fes servir la opció de «He oblidat la contrasenya» per recuperar el compte: {{ password_reset_url }}.{% endblock %}
+{% block content %}{{ _("Has rebut aquest correu perquè tu o algu altre ha intentat registrar-se fent servir l'adreça de correu %(email)s. Tanmateix, ja existeix un compte que fa servir aquesta adreça de correu. Si te n'havies oblidat, per favor fes servir la opció de «He oblidat la contrasenya» per recuperar el compte: %(url)s.", email=email, url=password_reset_url) }}{% endblock %}
 

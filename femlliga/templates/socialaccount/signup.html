@@ -2,10 +2,10 @@
 
 {% block content %}
 <div class="container">
-  <h1>El correu electrònic ja s'ha fet servir</h1>
+  <h1>{{ _("El correu electrònic ja s'ha fet servir") }}</h1>
 
-  <p>Sembla que el correu electrònic de {{ account.get_provider().name }} amb el que us esteu intentant identificar ja es va fer servir per registrar-se en aquesta web. Si us plau, inicieu la sessió fent servir el correu electrònic i la contrasenya:</p>
+  <p>{{ _("Sembla que el correu electrònic de %(name)s amb el que us esteu intentant identificar ja es va fer servir per registrar-se en aquesta web. Si us plau, inicieu la sessió fent servir el correu electrònic i la contrasenya:", name=account.get_provider().name) }}</p>
 
-  <a href="{{ url("account_login") }}" class="btn btn-custom">Inicia sessió</a>
+  <a href="{{ url("account_login") }}" class="btn btn-custom">{{ _("Inicia sessió") }}</a>
 </div>
 {% endblock %}

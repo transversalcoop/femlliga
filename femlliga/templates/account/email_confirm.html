@@ -1,25 +1,25 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% block title %}Confirma{% endblock title %}
+{% block title %}{{ _("Confirma") }}{% endblock title %}
 
 {% block content %}
 <div class="container">
-<h2>Confirma l'adreça de correu electrònic</h2>
+  <h2>{{ _("Confirma l'adreça de correu electrònic") }}</h2>
 
 {% if confirmation %}
 
 {% with email = confirmation.email_address.email %}
-<p>Per favor confirma que <a href="mailto:{{ email }}">{{ email }}</a> és una adreça de correu vàlida per a l'usuari que has creat.</p>
+<p>{{ _("Per favor confirma que <a href='mailto:%(email)s'>%(email)s</a> és una adreça de correu vàlida per a l'usuari que has creat.", email=email) }}</p>
 {% endwith %}
 
 <form method="post" action="{{ url('account_confirm_email', kwargs = {'key': confirmation.key }) }}" class="mb-1">
     {{ csrf_input }}
-    <button type="submit" class="btn btn-custom">Confirma</button>
+    <button type="submit" class="btn btn-custom">{{ _("Confirma") }}</button>
 </form>
 
 {% else %}
 
-<p class="mb-1">Aquest enllaç de confirmació de correu electrònic ha expirat o és invàlid.</p>
+<p class="mb-1">{{ _("Aquest enllaç de confirmació de correu electrònic ha expirat o és invàlid.") }}</p>
 
 {% endif %}
 

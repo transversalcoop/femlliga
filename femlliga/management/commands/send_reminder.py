@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.utils import translation
+from django.utils.translation import gettext_lazy as _
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
@@ -19,8 +21,10 @@ notificacions si ha passat el temps configurat en el camp `notifications_frequen
             org, need, offer = self.has_matches(user, needs, offers)
             if need["count"] > 0 or offer["count"] > 0:
                 print(f"Sending email to {user.email}...", end="")
+                if user.language:
+                    translation.activate(user.language)
                 send_notification(
-                    f"{org.name} ha fet lliga, descobreix amb qui! Saps què et pot oferir Fem lliga?",
+                    _("%(name)s ha fet lliga, descobreix amb qui! Saps què et pot oferir Fem lliga?", name=org.name),
                     "email/reminder.html",
                     user,
                     {

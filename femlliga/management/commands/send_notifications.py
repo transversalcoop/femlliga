@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils import translation
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
@@ -18,8 +19,10 @@ camp `notifications_frequency`"""
         for user in users:
             if self.has_pending_agreements(user):
                 print(f"Sending email to {user.email}...", end="")
+                if user.language:
+                    translation.activate(user.language)
                 send_notification(
-                    f"Tens peticions pendents de respondre",
+                    _("Tens peticions pendents de respondre"),
                     "email/notification.html",
                     user,
                     { "current_site": site },

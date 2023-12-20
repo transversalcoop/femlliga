@@ -3,19 +3,19 @@
 {% block content %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif;">
-    Has rebut aquest correu perquè tu o alguna altra persona ha demanar recuperar la contrasenya del compte associat amb aquest correu electrònic. Tanmateix, no tenim constància de cap usuari registrat que faça servir el correu {{ email }} en la nostra base de dades.
+    {{ _("Has rebut aquest correu perquè tu o alguna altra persona ha demanar recuperar la contrasenya del compte associat amb aquest correu electrònic. Tanmateix, no tenim constància de cap usuari registrat que faça servir el correu %(email)s en la nostra base de dades.", email=email) }}
   </td>
 </tr>
 
 <tr>
   <td style="font-family: 'Poppins', sans-serif;">
-    Pots ignorar aquest correu sense problema si no has sol·licitat un canvi de contrasenya.
+    {{ _("Pots ignorar aquest correu sense problema si no has sol·licitat un canvi de contrasenya.") }}
   </td>
 </tr>
 
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    Si has sigut tu qui l'has demanat, pots registrar-te fent servir aquest <a href="{{ signup_url }}">enllaç</a>.
+    {{ _("Si has sigut tu qui l'has demanat, pots registrar-te fent servir aquest <a href='%(url)s'>enllaç</a>.", url=signup_url) }}
   </td>
 </tr>
 {% endblock %}
