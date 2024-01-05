@@ -3,7 +3,7 @@
 {% from 'femlliga/_macros.html' import render_select_raw, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, vue_js, show_matches_vue, match_contains_func_js, matches_methods_vue %}
 
 {% block title %}
-Has lligat!
+{{ _("Has lligat!") }}
 {% endblock %}
 
 {% block content %}
@@ -11,10 +11,10 @@ Has lligat!
 <main id="content" class="container-fluid">
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
-      <h1>Has lligat!</h1>
-      <input v-model="search" type="text" class="form-control" placeholder="Cerca recursos o organitzacions">
+      <h1>{{ _("Has lligat!") }}</h1>
+      <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
       <ul class="nav nav-pills flex-column mb-auto mt-2">
-        <h2 class="resource-matches-title background-yellow">Que necessiteu?</h2>
+        <h2 class="resource-matches-title background-yellow">{{ _("Que necessiteu?") }}</h2>
         <template v-for="resource of matched_needs" :key="resource">
           <li v-if="resource.resource in matches" class="nav-item">
             <button
@@ -28,7 +28,7 @@ Has lligat!
               <span
                 v-if="resource.resource in matches"
                 class="float-end badge ms-2 bg-light"
-                title="Entitats que ofereixen o necessiten recursos">
+                title="{{ _("Entitats que ofereixen o necessiten recursos") }}">
                 ${ matches[resource.resource].length }
               </span>
               <i class="me-2" :class="resourceIconsMap[resource.resource]"></i>
@@ -45,21 +45,21 @@ Has lligat!
     <div class="col-md-8 ms-sm-auto px-md-4">
       <div v-if="initialLoading" class="mt-4 text-center">
         <div class="spinner-border" role="status">
-          <span class="visually-hidden">Carregant...</span>
+          <span class="visually-hidden">{{ _("Carregant...") }}</span>
         </div>
       </div>
       <template v-else>
         <div v-if="resourceSelected" class="row mt-3">
           <div class="col-12">
             <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
-            <div class="matches-count"><span>${ matches[resourceSelected].length } resultats</span></div>
+            <div class="matches-count"><span>${ matches[resourceSelected].length } {{ _("resultats") }}</span></div>
             {{ show_matches_vue("matches[resourceSelected]") }}
           </div>
         </div>
         <div v-else class="row mt-3">
           <div class="col-12">
-            <h2 class="match-resource-title">Tot</h2>
-            <div class="matches-count"><span>${ concatenateMatches(matches).length } resultats</span></div>
+            <h2 class="match-resource-title">{{ _("Tot") }}</h2>
+            <div class="matches-count"><span>${ concatenateMatches(matches).length } {{ _("resultats") }}</span></div>
             {{ show_matches_vue("concatenateMatches(matches)") }}
           </div>
         </div>
@@ -71,8 +71,8 @@ Has lligat!
 </main>
 {% else %}
 <div class="container text-center pt-4">
-  <h1>Sembla que no hi ha sort...</h1>
-  <p>No cal patir! Amb el temps s'incorporaran noves entitats que probablement compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-ho en uns dies.</p>
+  <h1>{{ _("Sembla que no hi ha sort...") }}</h1>
+  <p>{{ _("No cal patir! Amb el temps s'incorporaran noves entitats que probablement compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-ho en uns dies.") }}</p>
 </div>
 {% endif %}
 {% endblock %}

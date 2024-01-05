@@ -191,9 +191,9 @@ class Organization(models.Model):
     def distance_text(self, other):
         d = self.distance(other)
         if d < 1:
-            return "menys d'un km"
+            return _("menys d'un km")
         dc = int(math.ceil(d))
-        return f"menys de {dc}km"
+        return _("menys de %(d)skm") % {"d": dc}
 
     def pending_agreements(self):
         sent = self.sent_agreements.filter(communication_accepted=True, agreement_successful=None)

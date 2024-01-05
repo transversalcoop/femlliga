@@ -427,8 +427,8 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
   <div class="p-2">
     <h3 class="mt-0">
       <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
-      <span v-if="result.type === 'offer'" class="ms-2 background-yellow">ofereix</span>
-      <span v-if="result.type === 'need'" class="ms-2 background-yellow-dark">necessita</span>
+      <span v-if="result.type === 'offer'" class="ms-2 background-yellow">{{ _("ofereix") }}</span>
+      <span v-if="result.type === 'need'" class="ms-2 background-yellow-dark">{{ _("necessita") }}</span>
       <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
     </h3>
     <div>
