@@ -180,27 +180,29 @@ class IntegrationTests(TestCase):
         save_response(response)
         self.assertContains(response, contains)
 
-    @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)
-    def test_happy_path(self):
+    def aux_create_org(self, name, email):
+        self.client.logout()
         # signup
         response = self.client.post(reverse("account_signup"), {
-            "email": "test3@example.com",
+            "email": email,
             "password1": PASS_FOR_TESTS,
             "password2": PASS_FOR_TESTS,
             "g-recaptcha-response": "test",
         }, follow=True)
+        save_response(response)
         self.assertContains(response, "Verifica el correu electrònic")
-        e = EmailAddress.objects.get(email="test3@example.com")
+        e = EmailAddress.objects.get(email=email)
         e.verified = True
         e.save()
-        self.client.login(email="test3@example.com", password=PASS_FOR_TESTS)
+
+        self.client.login(email=email, password=PASS_FOR_TESTS)
 
         # add organization
         response = self.client.get(reverse("app"), follow=True)
         self.assertContains(response, "Sembla que encara no heu donat d'alta cap entitat")
 
         response = self.client.post(reverse("add_organization"), {
-            "name": "Nom entitat de test",
+            "name": name,
             "description": "Descripció entitat de test",
             "social_media-0-media_type": "INSTAGRAM",
             "social_media-0-value": "usuari_instagram_de_test",
@@ -212,7 +214,12 @@ class IntegrationTests(TestCase):
             "lng": "1.000",
         }, follow=True)
         self.assertContains(response, "preguntes sobre els recursos que teniu o necessiteu")
-        o = Organization.objects.get(name="Nom entitat de test")
+        return Organization.objects.get(name=name)
+
+    @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)
+    def test_happy_path(self):
+        org_name = "Nom entitat de test"
+        o = self.aux_create_org(org_name, "test3@example.com")
 
         # needs wizard
         response = self.client.post(reverse("pre-wizard", args=[o.id]), {"start": "yes"}, follow=True)
@@ -278,7 +285,7 @@ class IntegrationTests(TestCase):
         # app main page
         response = self.client.get(reverse("app"))
         should_contain = [
-            "Nom entitat de test",
+            org_name,
             "Local",
             "Servei",
             "Formació",
@@ -359,13 +366,39 @@ class IntegrationTests(TestCase):
         self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 2)
 
+    def aux_send_message(self, o1_id, o2_id):
+        send_message_url = reverse("send_message", args=[o1_id, o2_id, "offer", "PLACE"])
+        response = self.client.post(send_message_url, {
+            "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+            "message": "test message",
+        }, follow=True)
+        save_response(response)
+
     @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)
     def test_deleted_organizations(self):
-        org1 = self.aux_create_org("test4@example.com")
-        org2 = self.aux_create_org("test5@example.com")
+        email4 = "test4@example.com"
+        email5 = "test5@example.com"
+        org1 = self.aux_create_org("Nom entitat de test 4", email4)
+        org2 = self.aux_create_org("Nom entitat de test 5", email5)
+        Offer.objects.create(resource="PLACE", organization=org1)
+        Offer.objects.create(resource="PLACE", organization=org2)
 
-        # TODO implement aux_create_org similar to start of happy path
-        # TODO org1 send message to org2 and viceversa
-        # TODO delete org2
-        # TODO check reverse("agreements", args=[org1.id]) works, and the same for other views that fail
+        o1id, o2id = org1.id, org2.id
+        self.client.login(email=email5, password=PASS_FOR_TESTS)
+        self.aux_send_message(o2id, o1id)
+
+        self.client.login(email=email4, password=PASS_FOR_TESTS)
+        self.aux_send_message(o1id, o2id)
+        self.assertEqual(Agreement.objects.filter(solicitor=org1).count(), 1)
+        self.assertEqual(Agreement.objects.filter(solicitee=org1).count(), 1)
+
+        org2.delete() # delete org so Agreement's have None fields
+
+        # org2 deleted, no new message is sent
+        self.aux_send_message(o1id, o2id)
+        self.assertEqual(Agreement.objects.filter(solicitor=org1).count(), 1)
+
+        self.client.get(reverse("agreements", args=[o1id]))
+        self.client.get(reverse("matches", args=[o1id]))
+        self.client.get(reverse("search", args=[o1id]))
 

@@ -342,7 +342,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
         else:
             forms_valid = form.is_valid() and imageformset.is_valid()
         if forms_valid:
-            for option, _ in Resource.resource(resource).options():
+            for option, ignore in Resource.resource(resource).options():
                 ro = ResourceOption(name=option)
                 ro.save()
                 if option in form.cleaned_data["options"]:
@@ -467,9 +467,9 @@ def get_last_agreement_declined_map_resource(l):
     }
 
 def get_last_agreement_declined_map_organization(l):
-    org_ids = set([x.solicitee.id for x in l])
+    org_ids = set([x.solicitee.id for x in l if x.solicitee])
     return {
-        id: get_last_agreement_declined(list(filter(lambda x: x.solicitee.id==id, l))) for id in org_ids
+        id: get_last_agreement_declined(list(filter(lambda x: x.solicitee and x.solicitee.id==id, l))) for id in org_ids
     }
 
 def get_last_agreement_declined(l):
@@ -711,9 +711,9 @@ def group_agreements_by_organizations(agreements, organization):
     return [orgs[k] for k in sorted(orgs.keys(), key=lambda k: agreement_other_organization(orgs[k][0], organization.id).distance(organization))]
 
 def agreement_other_organization(agreement, organization_id):
-    if agreement.solicitor.id == organization_id:
-        return agreement.solicitee
-    return agreement.solicitor
+    if agreement.solicitor_safe().id == organization_id:
+        return agreement.solicitee_safe()
+    return agreement.solicitor_safe()
 
 @login_required
 @require_own_agreement
@@ -741,6 +741,9 @@ def agreement_connect(request, organization_id, agreement_id):
     if organization != a.solicitee:
         return # user owns organization; only solicitee organization should be able to accept
 
+    if not a.solicitor or not a.solicitee:
+        return JsonResponse({"ok": False})
+
     do_agreement_connect(request, a, post["connect"] == "yes")
 
     return JsonResponse({"ok": True})
@@ -750,7 +753,7 @@ def do_agreement_connect(request, a, communication_accepted):
     a.communication_date = timezone.now()
     a.save()
     if a.communication_accepted:
-        subject = _("Comunicació iniciada per compartir %(resource)s", resource=resource_name(a.resource))
+        subject = _("Comunicació iniciada per compartir %(resource)s") % {"resource": resource_name(a.resource)}
         body = render_to_string("email/agreement_connect.html", {
             "a": a,
             "current_site": get_current_site(request),
@@ -966,8 +969,10 @@ def get_relationships_graph():
     orgs = Organization.objects.all()
     agreements = Agreement.objects.all().prefetch_related("solicitor").prefetch_related("solicitee")
     relations = {}
-    for agreement in agreements:
-        key = (agreement.solicitor.id, agreement.solicitee.id)
+    for a in agreements:
+        if not a.solicitor or not a.solicitee:
+            continue
+        key = (a.solicitor.id, a.solicitee.id)
         if key not in relations.keys():
             relations[key] = 1
         else:
@@ -1006,8 +1011,8 @@ def contact(request):
         ).save()
         # send contact to managers
         mail_managers(
-            _("S'ha rebut un contacte a la web de %(name)s", name=APP_NAME),
-            _("Des del correu %(email)s envien el següent missatge:\n\n%(content)s", email=email, content=content),
+            _("S'ha rebut un contacte a la web de %(name)s") % {"name": APP_NAME},
+            _("Des del correu %(email)s envien el següent missatge:\n\n%(content)s") % {"email": email, "content": content},
         )
 
         # send confirmation to user
@@ -1016,7 +1021,7 @@ def contact(request):
             "current_site": get_current_site(request),
         })
         msg = EmailMessage(
-            subject=_("El formulari de contacte amb %(name)s s'ha enviat correctament", name=APP_NAME),
+            subject=_("El formulari de contacte amb %(name)s s'ha enviat correctament") % {"name": APP_NAME},
             body=body,
             from_email=FROM_EMAIL,
             to=[email],

@@ -2,4 +2,4 @@
 
 {% block content %}{{ _("Has rebut aquest correu perquè s'ha registrat un usuari en {{ current_site.domain }} amb aquesta adreça de correu electrònic.") }}
 
-{{ _("Per confirmar que és correcte, i poder entrar a la web, ves a %(url)s i confirma.", url=activate_url){% endblock %}
+{{ _("Per confirmar que és correcte, i poder entrar a la web, ves a %(url)s i confirma.", url=activate_url) }}{% endblock %}

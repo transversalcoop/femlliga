@@ -77,7 +77,7 @@ class OrganizationScope(models.Model):
     name = models.CharField(max_length=100, choices=ORG_SCOPES, primary_key = True)
 
     def __str__(self):
-        return ORG_SCOPES_NAMES_MAP[self.name]
+        return str(ORG_SCOPES_NAMES_MAP[self.name])
 
 class Organization(models.Model):
     id = models.UUIDField(
@@ -107,14 +107,22 @@ class Organization(models.Model):
     def __str__(self):
         return f"(Entitat) {self.name}"
 
+    @classmethod
+    def deleted_organization(cls):
+        o = Organization(name=_("«organització eliminada»"), lat=0, lng=0)
+        o.id = None # even if an id is not given, the constructor creates it
+        return o
+
     def json(self, current_organization=None, include_children=False):
         j = {
             "id": self.id,
             "name": self.name,
             "description": self.description,
             "org_type": self.org_type,
-            "href": reverse("view_organization", kwargs={"organization_id": self.id})
         }
+        # could be a deleted organization
+        if self.id:
+            j["href"] = reverse("view_organization", kwargs={"organization_id": self.id})
         if current_organization:
             j["distance"] = self.distance_text(current_organization)
         if include_children:
@@ -440,11 +448,21 @@ class Agreement(models.Model):
         options = [str(x) for x in self.options.all()]
         return ", ".join(options)
 
+    def solicitor_safe(self):
+        if self.solicitor:
+            return self.solicitor
+        return Organization.deleted_organization()
+
+    def solicitee_safe(self):
+        if self.solicitee:
+            return self.solicitee
+        return Organization.deleted_organization()
+
     def json(self, organization_id):
         return {
             "id": self.id,
-            "solicitor": self.solicitor.json(),
-            "solicitee": self.solicitee.json(),
+            "solicitor": self.solicitor_safe().json(),
+            "solicitee": self.solicitee_safe().json(),
             "date": self.date,
             "message": self.message,
             "options": [o.name for o in self.options.all()],
