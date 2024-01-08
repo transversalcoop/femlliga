@@ -185,7 +185,9 @@
         {% if len(options) > 0 %}
             {% set choices = options %}
         {% endif %}
+        {% if label %}
         <label for="id_{{ name }}">{{ label }}</label>
+        {% endif %}
         <div class="multi-select">
             {% for choice in choices %}
             {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}

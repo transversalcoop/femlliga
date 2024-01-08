@@ -1,5 +1,6 @@
 :root {
     --blue: #3945B8;
+    --lightbrown: #5b5b00;
     --brown: #505000;
     --yellow: #ffce1c;
     --darkgrey: #212529;
@@ -92,6 +93,16 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 
 .btn-custom-sm {
     padding: 0.25rem 0.5rem;
+}
+
+.btn-brown {
+    color: white;
+    background-color: var(--brown);
+}
+
+.btn-brown:hover {
+    color: white;
+    background-color: var(--lightbrown);
 }
 
 nav a {

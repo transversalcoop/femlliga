@@ -231,18 +231,6 @@ class Resource:
                 return options[1]
         raise Exception("Unknown option")
 
-    def question(self, resource_type):
-        if resource_type == "offers":
-            return RESOURCE_OFFER_DESCRIPTIONS[self.code]
-        return RESOURCE_NEED_DESCRIPTIONS[self.code]
-
-    def answer_no(self, resource_type): return self.answer(resource_type, 0)
-    def answer_yes(self, resource_type): return self.answer(resource_type, 1)
-    def answer(self, resource_type, i):
-        if resource_type == "offers":
-            return RESOURCE_OFFER_ACTIONS[self.code][i]
-        return RESOURCE_NEED_ACTIONS[self.code][i]
-
     def options(self):
         return RESOURCE_OPTIONS_MAP[self.code]
 

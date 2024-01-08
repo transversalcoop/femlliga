@@ -56,21 +56,8 @@ class OrganizationForm(forms.ModelForm):
 class ResourceForm(forms.Form):
     resource = forms.ChoiceField(choices=[("", "-----------")] + RESOURCES)
     options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=False)
-    has_resource = forms.CharField(max_length=10)
     comments = forms.CharField(required = False)
     charge = forms.BooleanField(required = False)
-
-    def clean(self):
-        super().clean()
-        has_resource = self.cleaned_data.get("has_resource", "no") == "yes"
-        resource_options = Resource.resource(self.cleaned_data["resource"]).options()
-        missing_options = len(resource_options) > 0 and len(self.cleaned_data.get("options", [])) == 0
-        missing_comments = not self.cleaned_data["comments"]
-        if has_resource and missing_options and missing_comments:
-            self._errors["options"] = self.error_class([
-                _("Cal indicar una opció com a mínim, o indicar en comentaris altres opcions que us interessarien"),
-            ])
-        return self.cleaned_data
 
 class ImageForm(forms.Form):
     image = forms.ImageField()

@@ -14,6 +14,7 @@ from allauth.socialaccount.adapter import get_adapter
 import femlliga.constants
 
 from femlliga.models import *
+from femlliga.utils import wizard_url
 
 def add_http(url):
     if not url.startswith("http://") and not url.startswith("https://"):
@@ -101,5 +102,6 @@ def environment(**options):
         "js_bool": js_bool,
         "media_type_placeholder": media_type_placeholder,
         "get_language_from_request": get_language_from_request,
+        "wizard_url": wizard_url,
     })
     return env

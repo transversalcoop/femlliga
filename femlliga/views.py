@@ -279,7 +279,11 @@ def edit_resources_wizard(request, organization_id, resource_type, resource):
         return resources_wizard(request, organization_id, resource_type, resource, editing = True)
 
     org = get_object_or_404(Organization, pk=organization_id)
-    model, imagemodel = get_resources_models(resource_type)
+    r, form = get_resource_form(org, resource_type, resource)
+    return render_wizard(request, org, resource, form, resource_type, editing = True, db_resource = r)
+
+def get_resource_form(org, resource_type, resource):
+    model, _ = get_resources_models(resource_type)
     try:
         r = model.objects.get(organization = org, resource = resource)
         data = {
@@ -296,8 +300,7 @@ def edit_resources_wizard(request, organization_id, resource_type, resource):
     except:
         r = None
         form = ResourceForm()
-
-    return render_wizard(request, org, resource, form, resource_type, editing = True, db_resource = r)
+    return r, form
 
 def get_resources_models(resource_type):
     if resource_type == "offers":
@@ -342,16 +345,17 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
         else:
             forms_valid = form.is_valid() and imageformset.is_valid()
         if forms_valid:
+            options = form.cleaned_data["options"]
             for option, ignore in Resource.resource(resource).options():
                 ro = ResourceOption(name=option)
                 ro.save()
-                if option in form.cleaned_data["options"]:
+                if option in options:
                     m.options.add(ro)
                 else:
                     m.options.remove(ro)
 
             m.comments = form.cleaned_data["comments"]
-            m.has_resource = form.cleaned_data["has_resource"] == "yes"
+            m.has_resource = len(options) > 0 or len(m.comments) > 0
             m.charge = form.cleaned_data["charge"]
             m.save()
             if resource_type == "offers":
@@ -375,7 +379,8 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
         else:
             return render_wizard(request, org, resource, form, resource_type, editing = editing, db_resource=m, imageforms=imageformset)
 
-    return render_wizard(request, org, resource, ResourceForm(), resource_type)
+    r, form = get_resource_form(org, resource_type, resource)
+    return render_wizard(request, org, resource, form, resource_type, db_resource = r)
 
 def redirect_resource_set(org, resource_type, resource):
     if org.resources_set:

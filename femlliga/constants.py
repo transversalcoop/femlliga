@@ -183,38 +183,6 @@ RESOURCE_OPTIONS_DEF_MAP = {}
 for option in RESOURCE_OPTIONS:
     RESOURCE_OPTIONS_DEF_MAP[option[0]] = option[1]
 
-RESOURCE_NEED_DESCRIPTIONS = {
-    "PLACE": _("Esteu buscant un local on poder desenvolupar la vostra activitat?"),
-    "SERVICE": _("Esteu buscant algú que us proporcione aquests serveis?"),
-    "TRAINING": _("Voleu rebre formació en algun d'aquests temes?"),
-    "EQUIPMENT": _("Necessiteu alguna d'aquestes coses?"),
-    "OTHER": _("Podeu indicar qualsevol altra necessitat que tingueu. Tindrem en compte les vostres suggerències per incloure-les a l'aplicació."),
-}
-
-RESOURCE_NEED_ACTIONS = {
-    "PLACE": (_("No n'estem buscant"), _("Sí que n'estem buscant")),
-    "SERVICE": (_("No n'estem buscant"), _("Sí que n'estem buscant")),
-    "TRAINING": (_("No volem formació"), _("Sí que volem formació")),
-    "EQUIPMENT": (_("No en necessitem"), _("Sí que en necessitem")),
-    "OTHER": (_("No tenim altres necessitats"), _("Sí que tenim altres necessitats")),
-}
-
-RESOURCE_OFFER_DESCRIPTIONS = {
-    "PLACE": _("Teniu un local que estigueu disposats a compartir amb altres entitats?"),
-    "SERVICE": _("Oferiu algun d'aquests serveis per a altres entitats, o podeu recomanar-ne proveïdors?"),
-    "TRAINING": _("Oferiu formació en algun d'aquests temes?"),
-    "EQUIPMENT": _("Teniu alguna d'aquestes coses que pugueu compartir?"),
-    "OTHER": _("Podeu indicar qualsevol altre servei o material que oferiu. Tindrem en compte les vostres suggerències per incloure-les a l'aplicació."),
-}
-
-RESOURCE_OFFER_ACTIONS = {
-    "PLACE": (_("No en tenim"), _("Sí que en tenim")),
-    "SERVICE": (_("No oferim serveis"), _("Sí que oferim serveis")),
-    "TRAINING": (_("No oferim formació"), _("Sí que oferim formació")),
-    "EQUIPMENT": (_("No en tenim cap"), _("Sí que en tenim alguna")),
-    "OTHER": (_("No oferim altres coses"), _("Sí que oferim altres coses")),
-}
-
 RESOURCE_ADD_IMAGE_LABEL = {
     "PLACE": _("Afegeix imatge del local"),
     "SERVICE": _("Afegeix imatge del servei"),

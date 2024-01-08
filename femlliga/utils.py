@@ -3,6 +3,7 @@ import unicodedata
 
 from datetime import datetime, timedelta
 
+from django.urls import reverse
 from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
@@ -53,6 +54,14 @@ def add_one_month(t):
 
 def clean_form_email(s):
     return unicodedata.normalize("NFKC", s.strip()).casefold()
+
+def wizard_url(o_id, index):
+    resource_type = "needs"
+    if index > len(RESOURCES):
+        resource_type = "offers"
+        index -= len(RESOURCES)
+    resource = RESOURCES[index-1][0]
+    return reverse("resources-wizard", kwargs={"organization_id": o_id, "resource_type": resource_type, "resource": resource})
 
 def get_next_resource(resource):
     try:
