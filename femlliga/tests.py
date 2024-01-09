@@ -28,8 +28,6 @@ class ResourcesTests(TestCase):
         for resource in RESOURCES:
             self.assertIn(resource[0], RESOURCE_ICONS_MAP)
             self.assertIn(resource[0], RESOURCE_OPTIONS_MAP)
-            self.assertIn(resource[0], RESOURCE_NEED_DESCRIPTIONS)
-            self.assertIn(resource[0], RESOURCE_OFFER_DESCRIPTIONS)
 
 class OrganizationTests(TestCase):
     def test_disstance(self):
@@ -112,7 +110,7 @@ class SmokeTests(TestCase):
         org, org2 = self.get_orgs()
         URLS = [
             ("app", "Example organization", []),
-            ("force-resources-wizard", "Esteu buscant un local", [org.id, "needs", "PLACE"]),
+            ("force-resources-wizard", "Local", [org.id, "needs", "PLACE"]),
             ("matches", "Has lligat!", [org.id]),
             ("agreements", "Encara no heu enviat ni rebut peticions", [org.id]),
         ]
@@ -165,12 +163,11 @@ class ComponentTests(TestCase):
 class IntegrationTests(TestCase):
     fixtures = ["testdata.json"]
 
-    def aux_wizard(self, url, resource, options, comments, has_resource, contains, charge=False):
+    def aux_wizard(self, url, resource, options, comments, contains, charge=False):
         params = {
             "resource": resource,
             "options": options,
             "comments": comments,
-            "has_resource": has_resource,
             "images-TOTAL_FORMS": 6,
             "images-INITIAL_FORMS": 0,
         }
@@ -223,50 +220,50 @@ class IntegrationTests(TestCase):
 
         # needs wizard
         response = self.client.post(reverse("pre-wizard", args=[o.id]), {"start": "yes"}, follow=True)
-        self.assertContains(response, "Esteu buscant un local on poder desenvolupar")
+        self.assertContains(response, "Local")
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "PLACE"])
-        self.aux_wizard(needs_url, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"], "comentaris de necessita local de test", "yes",
-            "Voleu rebre formació en algun d&#39;aquests temes")
+        self.aux_wizard(needs_url, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"], "comentaris de necessita local de test",
+            "Formació")
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "TRAINING"])
-        self.aux_wizard(needs_url, "TRAINING", ["TRAINING_DIGITAL"], "comentaris de necessita formació de test", "yes",
-            "Esteu buscant algú que us proporcione aquests serveis")
+        self.aux_wizard(needs_url, "TRAINING", ["TRAINING_DIGITAL"], "comentaris de necessita formació de test",
+            "Servei")
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "SERVICE"])
-        self.aux_wizard(needs_url, "SERVICE", ["AGENCY"], "comentaris de necessita servei de test", "yes",
-            "Necessiteu alguna d&#39;aquestes coses")
+        self.aux_wizard(needs_url, "SERVICE", ["AGENCY"], "comentaris de necessita servei de test",
+            "Equipaments")
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "EQUIPMENT"])
-        self.aux_wizard(needs_url, "EQUIPMENT", [], "comentaris de necessita material de test", "no",
-            "Podeu indicar qualsevol altra necessitat que tingueu")
+        self.aux_wizard(needs_url, "EQUIPMENT", [], "",
+            "Altres")
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "OTHER"])
-        self.aux_wizard(needs_url, "OTHER", [], "comentaris de necessita altres de test", "no",
+        self.aux_wizard(needs_url, "OTHER", [], "comentaris de necessita altres de test",
             "Ja vas per la meitat")
 
         # offers wizard
         response = self.client.post(reverse("mid-wizard", args=[o.id]), {"start": "yes"}, follow=True)
-        self.assertContains(response, "Teniu un local que estigueu disposats a compartir amb altres entitats")
+        self.assertContains(response, "Local")
 
         offers_url = reverse("resources-wizard", args=[o.id, "offers", "PLACE"])
-        self.aux_wizard(offers_url, "PLACE", [], "comentaris de ofereix local de test", "no",
-            "Oferiu formació en algun d&#39;aquests temes")
+        self.aux_wizard(offers_url, "PLACE", [], "comentaris de ofereix local de test",
+            "Formació")
 
         offers_url = reverse("resources-wizard", args=[o.id, "offers", "TRAINING"])
-        self.aux_wizard(offers_url, "TRAINING", ["TRAINING_DIGITAL"], "comentaris de ofereix formació de test", "yes",
-            "Oferiu algun d&#39;aquests serveis per a altres entitats")
+        self.aux_wizard(offers_url, "TRAINING", ["TRAINING_DIGITAL"], "comentaris de ofereix formació de test",
+            "Servei")
 
         offers_url = reverse("resources-wizard", args=[o.id, "offers", "SERVICE"])
-        self.aux_wizard(offers_url, "SERVICE", [], "comentaris de ofereix serveis de test", "no",
-            "Teniu alguna d&#39;aquestes coses que pugueu compartir", charge = True)
+        self.aux_wizard(offers_url, "SERVICE", [], "comentaris de ofereix serveis de test",
+            "Equipaments", charge = True)
 
         offers_url = reverse("resources-wizard", args=[o.id, "offers", "EQUIPMENT"])
-        self.aux_wizard(offers_url, "EQUIPMENT", [], "comentaris de ofereix material de test", "yes",
-            "Podeu indicar qualsevol altre servei o material que oferiu", charge = True)
+        self.aux_wizard(offers_url, "EQUIPMENT", [], "",
+            "Altres", charge = True)
 
         offers_url = reverse("resources-wizard", args=[o.id, "offers", "OTHER"])
-        self.aux_wizard(offers_url, "OTHER", [], "comentaris de ofereix altres de test", "yes",
+        self.aux_wizard(offers_url, "OTHER", [], "comentaris de ofereix altres de test",
             "Has acabat d'introduir la informació de la teua associació", charge = True)
 
         # matches page
@@ -284,6 +281,7 @@ class IntegrationTests(TestCase):
 
         # app main page
         response = self.client.get(reverse("app"))
+        save_response(response)
         should_contain = [
             org_name,
             "Local",
@@ -295,17 +293,17 @@ class IntegrationTests(TestCase):
             "comentaris de necessita servei de test",
             "comentaris de necessita formació de test",
             "comentaris de ofereix formació de test",
-            "comentaris de ofereix material de test",
             "comentaris de ofereix altres de test",
             "Producte o servei remunerat",
+            "comentaris de necessita altres de test",
+            "comentaris de ofereix local de test",
+            "comentaris de ofereix serveis de test",
+            "bi-book-half",
         ]
         for s in should_contain:
             self.assertContains(response, s)
         for s in [
-            "comentaris de necessita material de test",
-            "comentaris de necessita altres de test",
-            "comentaris de ofereix local de test",
-            "comentaris de ofereix serveis de test",
+            "bi-gear-fill",
         ]:
             self.assertNotContains(response, s)
 
