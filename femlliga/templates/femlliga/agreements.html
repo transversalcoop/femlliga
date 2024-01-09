@@ -140,7 +140,7 @@
     <a :href="result.solicitor.href" v-html="highlightSearch(result.solicitor.name, search)"></a>
   </h3>
   <div class="mb-2">
-    <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Es demana remuneració a canvi") }}">€</span>
+    <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Producte o servei remunerat") }}">€</span>
     <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
     <p v-if="agreementSent(result)">{{ _("Missatge que vau enviar el") }} ${ formatDateTime(result.date) }:</p>
     <p v-else>{{ _("Missatge que va enviar") }} ${ result.solicitor.name } {{ _("el") }} ${ formatDateTime(result.date) }:</p>

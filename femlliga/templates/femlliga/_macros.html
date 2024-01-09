@@ -49,7 +49,7 @@
 {% macro resource_details(resource, match_type) %}
   <div style="margin-bottom: 10px;">
     {% if resource.charge %}
-      <span class="badge bg-light" title="{{ _("Es demana remuneració a canvi") }}">€</span>
+      <span class="badge bg-light" title="{{ _("Producte o servei remunerat") }}">€</span>
     {% endif %}
     {% for option in resource.options.all() %}
       <span class="badge bg-light">{{ option }}</span>
@@ -437,7 +437,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } {{ _("de vosaltres") }}</span>
     </div>
     <div class="mb-2">
-      <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Es demana remuneració a canvi") }}">€</span>
+      <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Producte o servei remunerat") }}">€</span>
       <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
     </div>
     <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">{{ _("Observacions:") }}</strong><span v-html="highlightSearch(result.comments, search)"></span></p>

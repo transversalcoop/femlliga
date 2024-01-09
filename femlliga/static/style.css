@@ -45,6 +45,15 @@ a:hover {
     color: var(--yellow);
 }
 
+a.rounded-link {
+    text-decoration: none;
+}
+
+a.rounded-link:hover {
+    color: var(--darkgrey);
+    background-color: var(--yellow);
+}
+
 .organization-main-page a:hover {
     color: var(--darkgrey);
     font-weight: bold;
@@ -100,9 +109,13 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     background-color: var(--brown);
 }
 
-.btn-brown:hover {
+.btn-brown:hover, .btn-brown:focus-visible {
     color: white;
     background-color: var(--lightbrown);
+}
+
+.btn-brown:focus-visible, .btn-custom:focus-visible {
+    box-shadow: 0 0 0 0.25rem var(--lightgrey);
 }
 
 nav a {
@@ -316,6 +329,10 @@ pre {
     padding: 5px 12px;
     margin: 0 20px 10px 0;
     display: inline-block;
+}
+
+.multi-select-choice:focus-visible {
+    box-shadow: 0 0 0 0.25rem var(--lightgrey);
 }
 
 .multi-select .selected {
@@ -604,3 +621,20 @@ nav .nav-link.active {
     color: white;
 }
 
+.text-bg-lightgrey1 {
+    background-color: var(--lightgrey1);
+}
+
+.square-2 {
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+}
+
+.border-dotted-right {
+    border-right: 2px dotted var(--lightgrey);
+}
+
+.w-100 {
+    width: 100%;
+}

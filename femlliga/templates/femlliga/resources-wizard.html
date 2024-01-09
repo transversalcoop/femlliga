@@ -25,10 +25,18 @@
 {% endmacro %}
 
 {% macro steps(resource_type, current_resource_type, count) %}
-TODO links if editing
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-around">
   {% for i, resource in enumerate(consts.RESOURCES) %}
-  <span class="fs-4 badge rounded-circle {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-light{% endif %}">{{ i+1 }}</span>
+  {% if editing %}
+  <a
+    class="rounded-link fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}"
+    href="{% if editing %}{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}{% endif %}"
+  >
+    {{ i+1 }}
+  </a>
+  {% else %}
+  <span class="fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}">{{ i+1 }}</span>
+  {% endif %}
   {% endfor %}
 </div>
 {% endmacro %}
@@ -36,15 +44,15 @@ TODO links if editing
 {% block content %}
 <div class="container">
   <div class="row mt-3">
-    <div class="col-md-4">
-      <h1 class="resources-title">{{ resource_type_title(resource_type) }}</h1>
+    <div class="col-md-4 d-flex align-items-end">
+      <h1 class="resources-title w-100 m-0 p-0 ps-2">{{ resource_type_title(resource_type) }}</h1>
     </div>
-    <div class="col-md-4">
-      {{ resource_type_title("needs") }}
+    <div class="col-md-4 border-dotted-right">
+      <span class="text-secondary">{{ resource_type_title("needs") }}</span>
       {{ steps("needs", resource_type, count) }}
     </div>
     <div class="col-md-4">
-      {{ resource_type_title("offers") }}
+      <span class="text-secondary">{{ resource_type_title("offers") }}</span>
       {{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
     </div>
   </div>
@@ -66,11 +74,11 @@ TODO links if editing
       {% endif %}
 
       {% if resource_type == "offers" %}
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="charge" name="charge"
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="charge" name="charge" role="switch"
                  {% if form and form.cleaned_data and form.cleaned_data["charge"] %}checked{% endif %}>
           <label class="form-check-label" for="charge">
-            {{ _("Marca aquest camp si demaneu alguna retribució a canvi del producte o servei") }}
+            {{ _("Producte o servei remunerat") }}
           </label>
         </div>
       {% endif %}
@@ -121,6 +129,8 @@ TODO links if editing
           <button type="submit" class="btn btn-lg btn-warning">
             {% if editing %}
             {{ _("Desa els canvis") }}
+            {% elif count == len(consts.RESOURCES) * 2 %}
+            {{ _("Comprova si has lligat!") }}
             {% else %}
             {{ _("Següent") }}
             {% endif %}

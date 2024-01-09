@@ -297,7 +297,7 @@ class IntegrationTests(TestCase):
             "comentaris de ofereix formació de test",
             "comentaris de ofereix material de test",
             "comentaris de ofereix altres de test",
-            "Es demana remuneració a canvi",
+            "Producte o servei remunerat",
         ]
         for s in should_contain:
             self.assertContains(response, s)
