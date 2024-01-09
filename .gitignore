@@ -4,3 +4,4 @@ static/
 db.sqlite3
 run
 Dockerfile.*
+.checks.*
