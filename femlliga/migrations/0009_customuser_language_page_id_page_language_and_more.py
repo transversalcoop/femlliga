@@ -6,7 +6,7 @@ from django.db import migrations, models
 def set_unique_ids(apps, schema_editor):
     Page = apps.get_model('femlliga', 'Page')
     for p in Page.objects.all():
-        p.id = uuid.uuid4()
+        p.uuid = uuid.uuid4()
         p.save()
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='page',
-            name='id',
+            name='uuid',
             field=models.UUIDField(default=uuid.uuid4, editable=False),
         ),
         migrations.AddField(

@@ -55,7 +55,7 @@ class CustomUser(AbstractUser):
         return None
 
 class Page(models.Model):
-    id = models.UUIDField(
+    uuid = models.UUIDField(
         default = uuid.uuid4,
         editable = False,
         primary_key = True,
