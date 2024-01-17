@@ -19,7 +19,7 @@ from django.contrib import messages
 from django.dispatch import receiver
 from django.db.models import Prefetch
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.mail import EmailMessage, mail_managers
+from django.core.mail import mail_managers
 from django.utils.cache import patch_response_headers
 from django.views.static import serve
 from django.core.exceptions import PermissionDenied
@@ -36,7 +36,7 @@ from config.settings import MEDIA_ROOT
 from .models import *
 from .constants import *
 from .forms import *
-from .utils import clean_form_email, get_next_resource, get_resource_index, get_json_body
+from .utils import get_next_resource, get_resource_index, get_json_body, send_email
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
@@ -659,6 +659,9 @@ def send_message(request, organization_id, organization_to, resource_type, resou
 
         if other.creator.accept_communications_automatically:
             do_agreement_connect(request, a, True)
+        # TODO FL079
+        # elif other.creator.notify_immediate_communications_received:
+        #   send_notification(user=other.creator, subject=..., template="email/notify_communication_received.html", context={ ... })
 
         return JsonResponse({"ok": True})
     return JsonResponse({"ok": False})
@@ -753,20 +756,23 @@ def agreement_connect(request, organization_id, agreement_id):
 
     return JsonResponse({"ok": True})
 
+# already checked that a.solicitor and a.solicitee exist
 def do_agreement_connect(request, a, communication_accepted):
     a.communication_accepted = communication_accepted
     a.communication_date = timezone.now()
     a.save()
     if a.communication_accepted:
-        subject = _("Comunicació iniciada per compartir %(resource)s") % {"resource": resource_name(a.resource)}
-        body = render_to_string("email/agreement_connect.html", {
-            "a": a,
-            "current_site": get_current_site(request),
-        })
-        to_list = [a.solicitor.creator.email, a.solicitee.creator.email]
-        msg = EmailMessage(subject=subject, body=body, from_email=FROM_EMAIL, to=to_list)
-        msg.content_subtype = "html"
-        msg.send()
+        send_email(
+            to = [a.solicitor.creator.email, a.solicitee.creator.email],
+            subject = _("Comunicació iniciada per compartir %(resource)s") % {"resource": resource_name(a.resource)},
+            body = render_to_string("email/agreement_connect.html", {
+                "a": a,
+                "current_site": get_current_site(request),
+            }),
+        )
+    # TODO FL085
+    # elif a.solicitor and a.solicitor.creator.notify_immediate_communications_rejected:
+    #   send_notification(user=a.solicitor.creator, subject=..., template="email/notify_communication_rejected.html", context={ ... })
 
 def get_city_from_coordinates(lat, lng):
     """Nominatim also accepts a search option that gives coordinates given a place's name"""
@@ -1021,18 +1027,14 @@ def contact(request):
         )
 
         # send confirmation to user
-        body = render_to_string("email/contact_received.html", {
-            "content": content,
-            "current_site": get_current_site(request),
-        })
-        msg = EmailMessage(
-            subject=_("El formulari de contacte amb %(name)s s'ha enviat correctament") % {"name": APP_NAME},
-            body=body,
-            from_email=FROM_EMAIL,
-            to=[email],
+        send_email(
+            to = [email],
+            subject = _("El formulari de contacte amb %(name)s s'ha enviat correctament") % {"name": APP_NAME},
+            body = render_to_string("email/contact_received.html", {
+                "content": content,
+                "current_site": get_current_site(request),
+            }),
         )
-        msg.content_subtype = "html"
-        msg.send()
         form_sent = True
     return render(request, "femlliga/contact.html", {"form": form, "form_sent": form_sent})
 

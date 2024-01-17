@@ -13,7 +13,6 @@ from allauth.account.models import EmailAddress
 
 from .models import *
 from .constants import *
-from .utils import date_intervals
 
 AUTH_BACKENDS = settings.AUTHENTICATION_BACKENDS[1:]
 PASS_FOR_TESTS = "passfortests"

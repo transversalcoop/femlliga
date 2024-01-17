@@ -3,37 +3,47 @@ from django.utils import translation
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
-from femlliga.utils import get_users_to_notify, send_notification
-from femlliga.models import *
+from femlliga.utils import get_users_to_notify, send_periodic_notification, get_periodic_notification_data, get_ordered_needs_and_offers
 
 class Command(BaseCommand):
     help = """./manage.py send_notifications
-El script enviarà correus a tots els usuaris que tinguen peticions pendents de respondre, és a dir, rebudes i sense
-especificar si s'inicia la comunicació o no. Només s'enviaran les notificacions si ha passat el temps configurat en el
-camp `notifications_frequency`"""
+El script enviarà correus a tots els usuaris que tinguen alguna informació per comunicar de les que ha cofigurat que
+vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat en el camp `notifications_frequency`"""
+
+    def add_arguments(self, parser):
+        parser.add_argument("--send", type=bool)
 
     def handle(self, *args, **options):
+        if not options["send"]:
+            print("Dry run, set '--send=true' to actually send emails")
+
         users = get_users_to_notify()
+        needs, offers = get_ordered_needs_and_offers()
         site = Site.objects.get(id=settings.SITE_ID)
-        sent = 1
+        sent_count = 0
         for user in users:
-            if self.has_pending_agreements(user):
+            context = get_periodic_notification_data(site, user, needs, offers)
+            if context:
                 print(f"Sending email to {user.email}...", end="")
                 if user.language:
                     translation.activate(user.language)
-                send_notification(
-                    _("Tens peticions pendents de respondre"),
-                    "email/notification.html",
-                    user,
-                    { "current_site": site },
-                )
-                print("sent {}".format(sent))
-                sent += 1
 
-    def has_pending_agreements(self, user):
-        try:
-            o = Organization.objects.get(creator = user)
-            a = Agreement.objects.filter(solicitee = o, communication_accepted = None)
-            return len(a) > 0
-        except:
-            return False
+                if options["send"]:
+                    sent = send_periodic_notification(
+                        _("Novetats de %(name)s", name=site.name),
+                        "email/periodic_notification.html",
+                        user,
+                        context,
+                    )
+                else:
+                    sent = False
+
+                if sent:
+                    sent_count += 1
+                    print("sent {sent_count}")
+                else:
+                    print("not sent")
+
+            else:
+                print(f"No content for {user.email}")
+

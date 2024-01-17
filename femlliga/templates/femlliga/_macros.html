@@ -132,30 +132,39 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_select(form, name, label, options = [], strong_label=False) %}
-    {% if form.fields[name] %}
-        <label for="id_{{ name }}">
-          {% if strong_label %}
-          <strong>{{ label }}</strong>
-          {% else %}
-          {{ label }}
-          {% endif %}
-        </label>
-        <select id="id_{{ name }}" name="{{ name }}" {{ input_value(form, name) }} class="form-select {% if form.errors[name] %} is-invalid{% endif %}">
-            {% set choices = form.fields[name].choices %}
-            {% if len(options) > 0 %}
-                {% set choices = (choices[0],) + options %}
-            {% endif %}
-            {% for choice in choices %}
-            <option value="{{ choice[0] }}"
-                {% if form and form.cleaned_data and form.cleaned_data[name] == choice[0] %}selected{% endif %}
-            >
-                {{ choice[1] }}
-            </option>
-            {% endfor %}
-        </select>
-        {{ input_feedback(form, name) }}
-    {% endif %}
+{% macro render_select(form, name, label, options = [], strong_label=False, extra_label=None, cols=[]) %}
+  {% if form.fields[name] %}
+  {% if len(cols) == 2 %}<div class="col-md-{{ cols[0] }}">{% endif %}
+    <label for="id_{{ name }}">
+      {% if strong_label or extra_label %}
+      <strong>{{ label }}</strong>
+      {% else %}
+      {{ label }}
+      {% endif %}
+      {% if extra_label %}
+      <div>{{ extra_label }}</div>
+      {% endif %}
+    </label>
+  {% if len(cols) == 2 %}
+  </div>
+  <div class="col-md-{{ cols[1] }}">
+  {% endif %}
+    <select id="id_{{ name }}" name="{{ name }}" {{ input_value(form, name) }} class="form-select {% if form.errors[name] %} is-invalid{% endif %}">
+        {% set choices = form.fields[name].choices %}
+        {% if len(options) > 0 %}
+            {% set choices = (choices[0],) + options %}
+        {% endif %}
+        {% for choice in choices %}
+        <option value="{{ choice[0] }}"
+            {% if form and form.cleaned_data and form.cleaned_data[name] == choice[0] %}selected{% endif %}
+        >
+            {{ choice[1] }}
+        </option>
+        {% endfor %}
+    </select>
+    {{ input_feedback(form, name) }}
+  {% if len(cols) == 2 %}</div>{% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% macro render_multi_checkboxes(form, name, label, options = []) %}
@@ -163,7 +172,7 @@
     <div class="{% if form.errors[name] %}is-invalid{% endif %}">
       <label for="id_{{ name }}"><strong>{{ label }}</strong></label>
       {% set choices = form.fields[name].choices %}
-      <div class="triple-column">
+      <div class="columns">
         {% for i, choice in enumerate(choices) %}
         <div class="form-check">
           <input class="form-check-input" type="checkbox" value="{{ choice[0] }}" id="{{ name }}_{{ i }}" name="{{ name }}"

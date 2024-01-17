@@ -1,0 +1,88 @@
+{% extends "email/_base_template.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {{ _("Us enviem aquest missatge des de %(name)s ja que teniu peticions pendents de respondre a la nostra plataforma. Alguna organització s'ha posat en contacte amb vosaltres per fer-vos una sol·licitud i està esperant a que li responeu. Només cal que entreu a l'aplicació, al menú de Peticions rebudes, i indiqueu si voleu iniciar la comunicació o no.", name=consts.APP_NAME) }}
+  </td>
+</tr>
+
+{% if agreement_communication_pending %}
+{{ show_agreement_communication_pending(agreement_communication_pending.agreements, agreement_communication_pending.more_agreements) }}
+{% endif %}
+
+{% if agreement_success_pending %}
+{{ show_agreement_success_pending() }}
+{% endif %}
+
+{% if matches %}
+{{ show_matches(matches.need, matches.offer) }}
+{% endif %}
+
+{% if new_resources %}
+{{ show_new_resources() }}
+{% endif %}
+{% endblock %}
+
+{% block final_note %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; color: gray; padding: 0 20px;">
+    {{ _("Si voleu deixar de rebre aquestes notificacions, ho podeu configurar <a href='%(url)s'>dins de l'aplicació</a>, a l'enllaç de Perfil, notificacions.", url="https://" + current_site.domain) }}
+  </td>
+</tr>
+{% endblock %}
+
+{% macro show_agreement_communication_pending(agreements, more_agreements) %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; color: gray; padding: 0 20px;">
+    <h1>{{ _("Peticions pendents de respondre") }}</h1>
+
+    {{ _("Hi ha organitzacions que us han fet una petició a través de la plataforma i estan pendents de que els indiqueu si voleu iniciar una conversa per correu o no.") }}
+    {% if more_agreements %}
+    {{ _("Entre altres, hi ha les següents peticions pendents:") }}
+    {% else %}
+    {{ _("Hi ha les següents peticions pendents:") }}
+    {% endif %}
+
+    <ul>
+      {% for a in agreements %}
+      <li>{{ _("%(org)s sol·licita %(resource)s", org=a.solicitor_safe().name, resource=resource_name(a.resource)) }}</li>
+      {% endfor %}
+    </ul>
+  </td>
+</tr>
+{% endmacro %}
+
+{% macro show_agreement_success_pending() %}
+{% endmacro %}
+
+{% macro show_matches(need, offer) %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    <h1>{{ _("Possibles lligues") }}</h1>
+    {{ _("Teniu algunes necessitats que podrieu cobrir col·laborant amb altres entitats de la plataforma. Només cal que entreu a l'aplicació, al menú de «Has lligat», i enviar un missatge a l'entitat que preferiu.", name=consts.APP_NAME) }}
+  </td>
+</tr>
+{% if need.count > 0 %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {{ _("Entre altres, heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que estan en la mateixa situació</strong> que vosaltres. Podeu contactar amb elles per buscar solucions comunes a la vostra necessitat.", name=need.name, count=need.count) }}
+  </td>
+</tr>
+{% endif %}
+{% if offer.count > 0 %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {% if need.count > 0 %}
+    {{ _("També") }}
+    {% else %}
+    {{ _("Entre altres,") }}
+    {% endif %}
+    {{ _("heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que ho ofereixen</strong>. Podeu contactar amb elles per concretar la manera de col·laborar.", name=offer.name, count=offer.count) }}
+  </td>
+</tr>
+{% endmacro %}
+
+{% macro show_new_resources() %}
+{% endmacro %}
+

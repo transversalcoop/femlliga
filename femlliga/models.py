@@ -17,7 +17,27 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 
 from .constants import *
-from .utils import date_intervals, clean_form_email
+
+def date_intervals(start, end):
+    start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+    if (end - start) < timedelta(days=30):
+        f = lambda x: x + timedelta(days=1)
+    elif (end - start) < timedelta(days=30*3):
+        f = lambda x: x + timedelta(days=7)
+    else:
+        start = start.replace(day=1)
+        f = lambda x: add_one_month(x)
+
+    intervals = [start]
+    mid = start
+    while mid < end:
+        mid = f(mid)
+        intervals.append(mid)
+
+    return intervals
+
+def clean_form_email(s):
+    return unicodedata.normalize("NFKC", s.strip()).casefold()
 
 def need_images_directory_path(instance, filename):
     return str(Path("images/needs") / filename)
@@ -44,9 +64,20 @@ class LimitFileSize:
 USER_LANGUAGE_CHOICES = [("", _("Idioma configurat al navegador"))] + [x for x in LANGUAGE_CHOICES]
 class CustomUser(AbstractUser):
     language = models.CharField(max_length=50, choices=USER_LANGUAGE_CHOICES, null=True, blank=True)
-    notifications_frequency = models.CharField(max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY")
+
+    # immediate notifications
     accept_communications_automatically = models.BooleanField(default=True)
+    # TODO uncomment new fields
+#    notify_immediate_communications_received = models.BooleanField(default=True)
+#    notify_immediate_communications_rejected = models.BooleanField(default=True)
+
+    # periodic notifications
     last_notification_date = models.DateTimeField(auto_now_add=True)
+    notifications_frequency = models.CharField(max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY")
+#    notify_agreement_communication_pending = models.BooleanField(default=True)
+#    notify_agreement_success_pending = models.BooleanField(default=True)
+#    notify_matches = models.BooleanField(default=True)
+#    notify_new_resources = models.BooleanField(default=True)
 
     def get_organization(self):
         organizations = self.organizations.all()

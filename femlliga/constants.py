@@ -11,6 +11,7 @@ LANGUAGE_CHOICES = [
 NOTIFICATION_CHOICES = [
     ("DAILY", _("Diàriament")),
     ("WEEKLY", _("Setmanalment")),
+    ("MONTHLY", _("Mensualment")),
     ("NEVER", _("Mai")),
 ]
 
@@ -22,7 +23,7 @@ SOCIAL_MEDIA_TYPES = [
     ("TWITTER", _("Twitter")),
     ("LINKEDIN", _("Linkedin")),
     ("WHATSAPP", _("Whatsapp")),
-    # TODO add phone
+    ("PHONE", _("Telèfon")),
 ]
 
 SOCIAL_MEDIA_TYPES_MAP, SOCIAL_MEDIA_TYPES_ORDER = {}, []

@@ -48,7 +48,7 @@
         </nav>
       </header>
       <wrapper class="d-flex flex-column">
-        <main id="content">
+        <main id="content" class="{% block content_classes %}{% endblock %}">
           {% if messages %}
           <div class="container">
             {% for message in messages %}

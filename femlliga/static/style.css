@@ -4,6 +4,7 @@
     --brown: #505000;
     --yellow: #ffce1c;
     --darkgrey: #212529;
+    --midgrey: #5b5b5b;
     --lightgrey: #9a9a9a;
     --lightgrey1: #cccccc;
     --lightgrey2: #f6f6f6;
@@ -487,8 +488,21 @@ nav .nav-link.active {
     }
 }
 
-.triple-column {
+
+.columns {
     columns: 3;
+}
+
+@media (max-width: 768px) {
+    .columns {
+        columns: 2;
+    }
+}
+
+@media (max-width: 576px) {
+    .columns {
+        columns: 1;
+    }
 }
 
 .landing-container {
@@ -637,4 +651,41 @@ nav .nav-link.active {
 
 .w-100 {
     width: 100%;
+}
+
+.preferences-section {
+    padding: 1rem 1rem 0 1rem;
+    background-color: white;
+    margin-bottom: 2rem;
+}
+
+.preferences-section-title {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: normal;
+    color: var(--midgrey);
+}
+
+.preferences-row {
+    padding: 1rem 0 0 0;
+    border-bottom: 2px solid var(--lightgrey2);
+    display: flex;
+    align-items: center;
+}
+
+.preferences-row:last-of-type {
+    border-bottom: none;
+}
+
+.preferences-row label, .preferences-row input, .preferences-row select {
+    margin-bottom: 1rem;
+}
+
+.preferences-row .form-switch.form-check-reverse .form-check-input {
+    font-size: 1.5rem;
+    margin-right: -1em;
+}
+
+.background-grey {
+    background-color: var(--lightgrey2);
 }
