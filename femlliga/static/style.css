@@ -689,3 +689,9 @@ nav .nav-link.active {
 .background-grey {
     background-color: var(--lightgrey2);
 }
+
+.form-switch .form-check-input:checked {
+    background-color: var(--brown);
+    border-color: var(--brown);
+}
+

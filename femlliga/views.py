@@ -22,6 +22,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import mail_managers
 from django.utils.cache import patch_response_headers
 from django.views.static import serve
+from django.forms.models import model_to_dict
 from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_from_request, gettext_lazy as _
@@ -36,7 +37,7 @@ from config.settings import MEDIA_ROOT
 from .models import *
 from .constants import *
 from .forms import *
-from .utils import get_next_resource, get_resource_index, get_json_body, send_email
+from .utils import get_next_resource, get_resource_index, get_json_body, send_email, str_to_bool, clean_form_email
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
@@ -137,18 +138,13 @@ def pre_wizard(request, organization_id):
 def mid_wizard(request, organization_id):
     org = get_object_or_404(Organization, pk=organization_id)
     if not org.offers_not_set():
-        return redirect("post-wizard", organization_id=org.id)
+        return redirect_wizard_finish(org)
     return aux_wizard(request, organization_id, "offers", "mid-wizard")
 
-@login_required
-@require_own_organization
-def post_wizard(request, organization_id):
-    org = get_object_or_404(Organization, pk=organization_id)
-    if request.method == "POST":
-        org.resources_set = True
-        org.save()
-        return redirect("matches", organization_id=org.id)
-    return render(request, "femlliga/aux-wizard.html", {"org": org, "page": "post-wizard"})
+def redirect_wizard_finish(org):
+    org.resources_set = True
+    org.save()
+    return redirect(reverse("matches", kwargs={"organization_id": org.id}) + "?wizard_finished=true")
 
 @login_required
 @require_own_organization
@@ -169,6 +165,7 @@ def aux_wizard(request, organization_id, resource_type, page):
             org.resources_set = True
             org.save()
             return redirect("app")
+
     return render(request, "femlliga/aux-wizard.html", { "org": org, "page": page })
 
 @login_required
@@ -261,6 +258,8 @@ def process_organization_post(request, org = None):
             else:
                 org.scopes.remove(s)
 
+        if org:
+            return redirect("profile", organization_id=org.id)
         return redirect("app")
 
     return render(request, "femlliga/add_organization.html", {
@@ -391,7 +390,7 @@ def redirect_resource_set(org, resource_type, resource):
         if resource_type == "needs":
             return redirect("mid-wizard", organization_id=org.id)
         else:
-            return redirect("post-wizard", organization_id=org.id)
+            return redirect_wizard_finish(org)
 
     return redirect("resources-wizard", organization_id=org.id, resource_type=resource_type, resource=next_resource)
 
@@ -457,7 +456,11 @@ def render_matches_page(request, template, organization, matches, needs_json, or
     }
     if organization_matches:
         json_data["organization_matches"] = organization_matches
-    return render(request, template, { "json_data": json_data })
+    return render(request, template, {
+        "org": organization,
+        "json_data": json_data,
+        "wizard_finished": str_to_bool(request.GET.get("wizard_finished")),
+    })
 
 def get_last_agreement_declined_map(organization):
     l = list(Agreement.objects.prefetch_related("solicitee").filter(solicitor=organization).exclude(communication_accepted=None))
@@ -587,26 +590,10 @@ def search(request, organization_id):
 
 @login_required
 def preferences(request):
-    form = PreferencesForm({
-        "email": request.user.email,
-        "language": request.user.language,
-        "notifications_frequency": request.user.notifications_frequency,
-        "accept_communications_automatically": request.user.accept_communications_automatically,
-    })
+    form = PreferencesForm(model_to_dict(request.user))
     if request.method == "POST":
-        form = PreferencesForm(request.POST)
-        if form.is_valid():
-            new_email = form.cleaned_data["email"]
-            if new_email != request.user.email:
-                # will send confirmation email and then execute update_user_email function on email_confirmed signal
-                EmailAddress.objects.add_email(request, request.user, new_email, confirm=True)
-            request.user.language = form.cleaned_data["language"]
-            request.user.notifications_frequency = form.cleaned_data["notifications_frequency"]
-            request.user.accept_communications_automatically = form.cleaned_data["accept_communications_automatically"]
-            request.user.save()
-            msg = _("La configuració s'ha desat correctament")
-            if new_email != request.user.email:
-                msg += _(". S'ha enviat un correu electrònic per confirmar la nova adreça")
+        form, ok, msg = process_preferences_post(request)
+        if ok:
             messages.info(request, msg, extra_tags="show")
             return redirect("preferences")
 
@@ -615,6 +602,38 @@ def preferences(request):
         "form": form,
         "other_emails": ", ".join([e.email for e in other_emails]),
     })
+
+def process_preferences_post(request):
+    form = PreferencesForm(request.POST)
+    if form.is_valid():
+        new_email = clean_form_email(form.cleaned_data["email"])
+        if new_email != request.user.email:
+            if EmailAddress.objects.filter(email=new_email).exclude(user=request.user).count() > 0:
+                form.add_error("email", _("Aquesta adreça ja està en ús"))
+                form.cleaned_data["email"] = new_email
+                return form, False, ""
+            try:
+                e = EmailAddress.objects.get(email=new_email, user=request.user)
+                e.send_confirmation()
+            except:
+                # will send confirmation email and then execute update_user_email function on email_confirmed signal
+                EmailAddress.objects.add_email(request, request.user, new_email, confirm=True)
+
+        request.user.language = form.cleaned_data["language"]
+        request.user.notifications_frequency = form.cleaned_data["notifications_frequency"]
+        request.user.accept_communications_automatically = form.cleaned_data["accept_communications_automatically"]
+        request.user.notify_immediate_communications_received = form.cleaned_data["notify_immediate_communications_received"]
+        request.user.notify_immediate_communications_rejected = form.cleaned_data["notify_immediate_communications_rejected"]
+        request.user.notify_agreement_communication_pending = form.cleaned_data["notify_agreement_communication_pending"]
+        request.user.notify_agreement_success_pending = form.cleaned_data["notify_agreement_success_pending"]
+        request.user.notify_matches = form.cleaned_data["notify_matches"]
+        request.user.notify_new_resources = form.cleaned_data["notify_new_resources"]
+        request.user.save()
+        msg = _("La configuració s'ha desat correctament")
+        if new_email != request.user.email:
+            msg += _(". S'ha enviat un correu electrònic per confirmar la nova adreça")
+        return form, True, msg
+    return form, False, ""
 
 @receiver(email_confirmed)
 def update_user_email(sender, request, email_address, **kwargs):

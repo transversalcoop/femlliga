@@ -64,20 +64,21 @@ class LimitFileSize:
 USER_LANGUAGE_CHOICES = [("", _("Idioma configurat al navegador"))] + [x for x in LANGUAGE_CHOICES]
 class CustomUser(AbstractUser):
     language = models.CharField(max_length=50, choices=USER_LANGUAGE_CHOICES, null=True, blank=True)
+    distance_limit_km = models.DecimalField(max_digits=6, decimal_places=1, default=100) # from 0.0 to 99999.9
 
     # immediate notifications
     accept_communications_automatically = models.BooleanField(default=True)
-    # TODO uncomment new fields
-#    notify_immediate_communications_received = models.BooleanField(default=True)
-#    notify_immediate_communications_rejected = models.BooleanField(default=True)
+    notify_immediate_communications_received = models.BooleanField(default=True)
+    notify_immediate_communications_rejected = models.BooleanField(default=True)
 
     # periodic notifications
     last_notification_date = models.DateTimeField(auto_now_add=True)
+    last_long_notification_date = models.DateTimeField(auto_now_add=True)
     notifications_frequency = models.CharField(max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY")
-#    notify_agreement_communication_pending = models.BooleanField(default=True)
-#    notify_agreement_success_pending = models.BooleanField(default=True)
-#    notify_matches = models.BooleanField(default=True)
-#    notify_new_resources = models.BooleanField(default=True)
+    notify_agreement_communication_pending = models.BooleanField(default=True)
+    notify_agreement_success_pending = models.BooleanField(default=True)
+    notify_matches = models.BooleanField(default=True)
+    notify_new_resources = models.BooleanField(default=True)
 
     def get_organization(self):
         organizations = self.organizations.all()
@@ -355,6 +356,7 @@ class ResourceOption(models.Model):
         return str(RESOURCE_OPTIONS_DEF_MAP[self.name])
 
 class BaseResource(models.Model):
+    last_updated_on = models.DateTimeField(auto_now=True)
     resource = models.CharField(max_length=100, choices=RESOURCES)
     options = models.ManyToManyField(ResourceOption)
     comments = models.TextField(null = True, blank = True)

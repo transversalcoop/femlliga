@@ -433,7 +433,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 </span>
 {% endmacro %}
 
-{% macro show_matches_vue(matches) %}
+{% macro show_matches_vue(matches, needs = None) %}
 <div v-for="result in {{ matches }}" :key="result" class="row match-box">
   <div class="p-2">
     <h3 class="mt-0">
@@ -447,7 +447,16 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     </div>
     <div class="mb-2">
       <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Producte o servei remunerat") }}">€</span>
-      <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
+      <span
+        {% if needs %}
+        class="badge me-2" :class="{ 'bg-light': optionMatches(result.resource, option, {{ needs }}), 'bg-secondary': !optionMatches(result.resource, option, {{ needs }}) }"
+        {% else %}
+        class="badge bg-light me-2"
+        {% endif %}
+        v-for="option in result.options"
+        :key="option"
+        v-html="highlightSearch(optionNamesMap[option], search)">
+      </span>
     </div>
     <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">{{ _("Observacions:") }}</strong><span v-html="highlightSearch(result.comments, search)"></span></p>
 

@@ -8,7 +8,7 @@
 </tr>
 
 {% if agreement_communication_pending %}
-{{ show_agreement_communication_pending(agreement_communication_pending.agreements, agreement_communication_pending.more_agreements) }}
+{{ show_agreement_communication_pending(agreement_communication_pending.agreements, agreement_communication_pending.total_agreements) }}
 {% endif %}
 
 {% if agreement_success_pending %}
@@ -32,17 +32,12 @@
 </tr>
 {% endblock %}
 
-{% macro show_agreement_communication_pending(agreements, more_agreements) %}
+{% macro show_agreement_communication_pending(agreements, total_agreements) %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; color: gray; padding: 0 20px;">
     <h1>{{ _("Peticions pendents de respondre") }}</h1>
 
-    {{ _("Hi ha organitzacions que us han fet una petició a través de la plataforma i estan pendents de que els indiqueu si voleu iniciar una conversa per correu o no.") }}
-    {% if more_agreements %}
-    {{ _("Entre altres, hi ha les següents peticions pendents:") }}
-    {% else %}
-    {{ _("Hi ha les següents peticions pendents:") }}
-    {% endif %}
+    <p>{{ _("Hi ha organitzacions que us han fet una petició a través de la plataforma i estan pendents de que els indiqueu si voleu iniciar una conversa per correu o no. Teniu un total de %(total)d peticions pendents, entre elles les següents:", total=total_agreements) }}</p>
 
     <ul>
       {% for a in agreements %}

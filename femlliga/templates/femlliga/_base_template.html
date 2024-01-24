@@ -1,15 +1,12 @@
 {% extends "femlliga/_base.html" %}
 
 {% macro pending_dot() %}
-<span
-  class="position-absolute bg-danger rounded-circle p-1"
-  title="Teniu peticions pendents d'atendre">
-</span>
-{% endmacro %}
-{% macro menu_url(name, href, args=[], pending=False) %}
-<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}">{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
+<span class="position-absolute bg-danger rounded-circle p-1"></span>
 {% endmacro %}
 
+{% macro menu_url(name, href, args=[], pending=False) %}
+<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}" {% if pending %} title="{{ _("Teniu peticions pendents d'atendre") }}"{% endif %}>{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
+{% endmacro %}
 
 {% block primary_navigation %}
   <ul class="navbar-nav me-auto mb-lg-0">

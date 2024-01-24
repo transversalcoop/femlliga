@@ -57,10 +57,17 @@
     </div>
   </div>
 
-  <h2>
+  <h2 class="fs-1">
     <i class="{{ resource_icon(resource.code) }}"></i>
     {{ resource }}
   </h2>
+  <p>
+    {% if resource_type == "needs" %}
+    {{ _("Selecciona les opcions que necessiteu:") }}
+    {% else %}
+    {{ _("Selecciona les opcions que oferiu:") }}
+    {% endif %}
+  </p>
 
   <form method="post" enctype="multipart/form-data" class="mb-1">
       {{ csrf_input }}

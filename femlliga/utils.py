@@ -2,6 +2,7 @@ import json
 import unicodedata
 
 from datetime import datetime, timedelta
+from distutils.util import strtobool
 
 from django.urls import reverse
 from django.utils import timezone
@@ -9,9 +10,8 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 
-from femlliga.constants import FROM_EMAIL, RESOURCES, RESOURCES_ORDER, RESOURCE_OPTIONS_MAP
-
 from femlliga.models import Organization, Agreement
+from femlliga.constants import FROM_EMAIL, RESOURCES, RESOURCES_ORDER, RESOURCE_OPTIONS_MAP
 
 # Emails and notifications
 
@@ -25,29 +25,42 @@ def user_ready_to_notify(user):
         (user.notifications_frequency == "DAILY" and time_from_last_notification > timedelta(hours=23)) or \
         (user.notifications_frequency == "MONTHLY" and time_from_last_notification > timedelta(days=29, hours=23))
 
+EMAIL_ITEMS_LIMIT = 3
 def get_periodic_notification_data(site, user, needs, offers):
     context = {}
 
     if user.notify_agreement_communication_pending:
         pa = user_pending_agreements(user)
         if len(pa) > 0:
-            context["agreement_communication_pending"] = { "agreements": pa[:5], "more_agreements": len(pa) > 5 }
+            context["agreement_communication_pending"] = {
+                "agreements": pa[:EMAIL_ITEMS_LIMIT],
+                "total_agreements": len(pa),
+            }
 
     # TODO FL080 (here and in periodic_notification.html)
     if user.notify_agreement_success_pending:
         pass
 
-    if user.notify_matches:
+    time_from_last_long_notification = timezone.now() - user.last_long_notification_date
+    long_notification_ready = time_from_last_long_notification > timedelta(days = 30 * 6)
+    send_long_notification = False
+    if user.notify_matches and long_notification_ready:
+        # TODO FL090 consider only matches within distance_limit_km
         org, need, offer = user_has_matches(user, needs, offers)
         if need["count"] > 0 or offer["count"] > 0:
             context["matches"] = { "need": need, "offer": offer }
+            send_long_notification = True
 
-    # TODO FL078 (here and in periodic_notification.html)
-    if user.notify_new_resources:
-        pass
+    # TODO FL078 (here and in periodic_notification.html)consider only resources with last_updated_on > last_long_notification_date
+    # TODO FL090 consider only resources within distance_limit_km
+    if user.notify_new_resources and long_notification_ready:
+        if False:
+            context["new_resources"] = {}
+            send_long_notification = True
 
     if context:
         context["current_site"] = site
+        context["send_long_notification"] = send_long_notification
 
     return context
 
@@ -105,9 +118,14 @@ def send_notification(subject, template, user, context):
 def send_periodic_notification(subject, template, user, context):
     if not user_ready_to_notify(user):
         return False
+
     send_email(to = [user.email], subject = subject, body = render_to_string(template, context))
+
     user.last_notification_date = timezone.now()
+    if context.get("send_long_notification", False):
+        user.last_long_notification_date = timezone.now()
     user.save()
+
     return True
 
 def send_email(to, subject, body):
@@ -153,3 +171,10 @@ def get_json_body(request):
     except:
         return request.POST # request from Django, or test
 
+def str_to_bool(s):
+    if not s:
+        return False
+    return bool(strtobool(s))
+
+def clean_form_email(s):
+    return unicodedata.normalize("NFKC", s.strip()).casefold()

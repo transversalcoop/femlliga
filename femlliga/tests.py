@@ -266,7 +266,7 @@ class IntegrationTests(TestCase):
             "Has acabat d'introduir la informació de la teua associació", charge = True)
 
         # matches page
-        response = self.client.post(reverse("post-wizard", args=[o.id]), {"start": "yes"}, follow=True)
+        response = self.client.get(reverse("matches", args=[o.id]))
         for s in [
             "Has lligat!",
             "Local",

@@ -21,7 +21,6 @@ urlpatterns = [
     path('organization/<uuid:organization_id>/delete-logo/', views.delete_organization_logo, name='delete_organization_logo'),
     path('organization/<uuid:organization_id>/pre-wizard/', views.pre_wizard, name='pre-wizard'),
     path('organization/<uuid:organization_id>/mid-wizard/', views.mid_wizard, name='mid-wizard'),
-    path('organization/<uuid:organization_id>/post-wizard/', views.post_wizard, name='post-wizard'),
     path('organization/<uuid:organization_id>/reset-wizard/', views.reset_wizard, name='reset-wizard'),
     path('organization/<uuid:organization_id>/resources-wizard/<str:resource_type>/resource/<str:resource>/', views.resources_wizard, name='resources-wizard'),
     path('organization/<uuid:organization_id>/resources-wizard/<str:resource_type>/edit/<str:resource>/', views.edit_resources_wizard, name='force-resources-wizard'),
