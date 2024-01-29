@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils import translation
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+from django.utils.translation import gettext_lazy as _
 
 from femlliga.utils import get_users_to_notify, send_periodic_notification, get_periodic_notification_data, get_ordered_needs_and_offers
 
@@ -30,7 +31,7 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
 
                 if options["send"]:
                     sent = send_periodic_notification(
-                        _("Novetats de %(name)s", name=site.name),
+                        _("Novetats de %(name)s") % { "name": site.name},
                         "email/periodic_notification.html",
                         user,
                         context,
@@ -40,9 +41,9 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
 
                 if sent:
                     sent_count += 1
-                    print("sent {sent_count}")
+                    print(f" sent {sent_count}")
                 else:
-                    print("not sent")
+                    print(" not sent")
 
             else:
                 print(f"No content for {user.email}")

@@ -6,6 +6,7 @@ from distutils.util import strtobool
 
 from django.urls import reverse
 from django.utils import timezone
+from django.db.models import Q
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -29,17 +30,23 @@ EMAIL_ITEMS_LIMIT = 3
 def get_periodic_notification_data(site, user, needs, offers):
     context = {}
 
+    org = Organization.objects.get(creator = user)
     if user.notify_agreement_communication_pending:
-        pa = user_pending_agreements(user)
+        pa = org_pending_agreements(org)
         if len(pa) > 0:
             context["agreement_communication_pending"] = {
                 "agreements": pa[:EMAIL_ITEMS_LIMIT],
                 "total_agreements": len(pa),
             }
 
-    # TODO FL080 (here and in periodic_notification.html)
     if user.notify_agreement_success_pending:
-        pass
+        pa = org_pending_success_agreements(org)
+        if len(pa) > 0:
+            context["agreement_success_pending"] = {
+                "organization": org,
+                "agreements": pa[:EMAIL_ITEMS_LIMIT],
+                "total_agreements": len(pa),
+            }
 
     time_from_last_long_notification = timezone.now() - user.last_long_notification_date
     long_notification_ready = time_from_last_long_notification > timedelta(days = 30 * 6)
@@ -64,10 +71,20 @@ def get_periodic_notification_data(site, user, needs, offers):
 
     return context
 
-def user_pending_agreements(user):
+def org_pending_agreements(o):
     try:
-        o = Organization.objects.get(creator = user)
         a = Agreement.objects.filter(solicitee = o, communication_accepted = None)
+        return list(a)
+    except:
+        return []
+
+def org_pending_success_agreements(o):
+    try:
+        a = Agreement.objects.filter(
+            Q(solicitee = o) | Q(solicitor = o),
+            communication_accepted = True,
+            agreement_successful = None,
+        )
         return list(a)
     except:
         return []
