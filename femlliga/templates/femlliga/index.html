@@ -289,7 +289,7 @@
 
 {% macro initial_block_text() %}
 <p>
-  {{ consts.APP_NAME }} {{ _("és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.") }}
+  {{ get_current_site(request).name }} {{ _("és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.") }}
 </p>
 <div class="mt-3 text-center">
   <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">

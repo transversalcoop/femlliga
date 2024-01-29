@@ -1,7 +1,7 @@
 import json
 import unicodedata
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from distutils.util import strtobool
 
 from django.urls import reverse
@@ -10,8 +10,8 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 
-from femlliga.models import Organization, Agreement
-from femlliga.constants import FROM_EMAIL, RESOURCES, RESOURCES_ORDER, RESOURCE_OPTIONS_MAP
+from femlliga.models import Organization, Agreement, Need, Offer
+from femlliga.constants import FROM_EMAIL, RESOURCES, RESOURCES_ORDER, RESOURCE_OPTIONS_MAP, RESOURCE_OPTIONS_READABLE_MAP
 
 # Emails and notifications
 
@@ -46,7 +46,7 @@ def get_periodic_notification_data(site, user, needs, offers):
     send_long_notification = False
     if user.notify_matches and long_notification_ready:
         # TODO FL090 consider only matches within distance_limit_km
-        org, need, offer = user_has_matches(user, needs, offers)
+        _, need, offer = user_has_matches(user, needs, offers)
         if need["count"] > 0 or offer["count"] > 0:
             context["matches"] = { "need": need, "offer": offer }
             send_long_notification = True
@@ -98,19 +98,19 @@ def user_has_matches(user, needs, offers):
         return None, need, offer
 
     for n in needs:
-        if user_has_need(org, n):
+        if user_has_resource(Need, org, n):
             need = {"name": RESOURCE_OPTIONS_READABLE_MAP[(n[0], n[1])], "count": n[2]}
             break
 
     for o in offers:
-        if user_has_need(org, o):
+        if user_has_resource(Offer, org, o):
             offer = {"name": RESOURCE_OPTIONS_READABLE_MAP[(o[0], o[1])], "count": o[2]}
             break
 
     return org, need, offer
 
-def user_has_need(self, org, n):
-    return len(Need.objects.filter(organization=org, resource=n[0], options=n[1], has_resource=True)) > 0
+def user_has_resource(model, org, n):
+    return len(model.objects.filter(organization=org, resource=n[0], options=n[1], has_resource=True)) > 0
 
 def send_notification(subject, template, user, context):
     send_email(to = [user.email], subject = subject, body = render_to_string(template, context))
@@ -134,12 +134,6 @@ def send_email(to, subject, body):
     msg.send()
 
 # Other
-
-def add_one_month(t):
-    t = t.replace(day=1)
-    t = t + timedelta(days=32)
-    t = t.replace(day=1)
-    return t
 
 def wizard_url(o_id, index):
     resource_type = "needs"

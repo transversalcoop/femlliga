@@ -1,0 +1,23 @@
+{% extends "email/_base_template.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {{ _("Us enviem aquest missatge des de %(name)s ja que %(solicitee)s ha declinat una petició que vau fer el %(date)s per", name=current_site.name, solicitee=a.solicitee_safe().name, date=format_time(a.date)) }}
+    {% if a.resource_type == "need" %}
+      {{ _("buscar conjuntament") }}
+    {% else %}
+      {{ _("compartir") }}
+    {% endif %}
+    {{ resource_name(a.resource) }}{% if a.options.count() > 0 %} ({{ a.render_options() }}){% endif %}.
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 20px 20px 0 20px;">
+    {{ _("Sentim que aquesta oportunitat de col·laboració no haja prosperat, i esperem que altres iniciatives tinguen més èxit en el futur.") }}
+  </td>
+</tr>
+{% endblock %}
+
+

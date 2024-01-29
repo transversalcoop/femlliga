@@ -4,8 +4,9 @@ from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
 from django.utils.html import json_script
-from django.templatetags.static import static
 from django.utils.translation import gettext, ngettext, get_language_from_request
+from django.templatetags.static import static
+from django.contrib.sites.shortcuts import get_current_site
 
 from jinja2 import Environment
 from allauth.utils import get_request_param
@@ -103,5 +104,6 @@ def environment(**options):
         "media_type_placeholder": media_type_placeholder,
         "get_language_from_request": get_language_from_request,
         "wizard_url": wizard_url,
+        "get_current_site": get_current_site,
     })
     return env

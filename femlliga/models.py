@@ -1,12 +1,15 @@
 import math
 import uuid
 import base64
+import unicodedata
+
 import pandas as pd
-import matplotlib.pyplot as plt
 import networkx as nx
+import matplotlib.pyplot as plt
 
 from io import BytesIO
 from pathlib import Path
+from datetime import timedelta
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -17,6 +20,12 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 
 from .constants import *
+
+def add_one_month(t):
+    t = t.replace(day=1)
+    t = t + timedelta(days=32)
+    t = t.replace(day=1)
+    return t
 
 def date_intervals(start, end):
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)

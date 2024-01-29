@@ -1,10 +1,8 @@
-import os
 import exif
 import json
 import time
 import uuid
 import logging
-import datetime
 import unicodedata
 import networkx as nx
 
@@ -13,14 +11,13 @@ from pathlib import Path
 from functools import cmp_to_key, reduce
 
 from django.http import Http404, JsonResponse
-from django.forms import formset_factory, inlineformset_factory
+from django.forms import inlineformset_factory
 from django.utils import timezone
 from django.contrib import messages
 from django.dispatch import receiver
 from django.db.models import Prefetch
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import mail_managers
-from django.utils.cache import patch_response_headers
 from django.views.static import serve
 from django.forms.models import model_to_dict
 from django.core.exceptions import PermissionDenied
@@ -37,7 +34,7 @@ from config.settings import MEDIA_ROOT
 from .models import *
 from .constants import *
 from .forms import *
-from .utils import get_next_resource, get_resource_index, get_json_body, send_email, str_to_bool, clean_form_email
+from .utils import get_next_resource, get_resource_index, get_json_body, send_email, send_notification, str_to_bool, clean_form_email
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
@@ -331,7 +328,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
         model, imagemodel = get_resources_models(resource_type)
         try:
             m = model.objects.get(resource = resource, organization = org)
-        except Exception as ex:
+        except Exception:
             m = model(resource = resource, organization = org)
             m.save()
 
@@ -345,7 +342,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
             forms_valid = form.is_valid() and imageformset.is_valid()
         if forms_valid:
             options = form.cleaned_data["options"]
-            for option, ignore in Resource.resource(resource).options():
+            for option, _ in Resource.resource(resource).options():
                 ro = ResourceOption(name=option)
                 ro.save()
                 if option in options:
@@ -371,7 +368,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
                             if f.is_file():
                                 f.unlink()
                             image.delete()
-                        except Exception as ex:
+                        except Exception:
                             raise
 
             return redirect_resource_set(org, resource_type, resource)
@@ -425,7 +422,7 @@ def clean_file(posted_file):
 @record_stats("matches")
 def matches(request, organization_id):
     # TODO better matches computation, does much more work than needed
-    organization = request.user.organizations.first()
+    organization = get_object_or_404(Organization, pk = organization_id)
     own_needs = sort_resources([
         n for n in organization.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
     ])
@@ -642,7 +639,7 @@ def update_user_email(sender, request, email_address, **kwargs):
     email_address.user.email = email_address.email
     email_address.user.save()
     # remove previous addresses
-    stale_addresses = EmailAddress.objects.filter(
+    EmailAddress.objects.filter(
         user = email_address.user,
     ).exclude(primary = True).delete()
 
@@ -678,9 +675,19 @@ def send_message(request, organization_id, organization_to, resource_type, resou
 
         if other.creator.accept_communications_automatically:
             do_agreement_connect(request, a, True)
-        # TODO FL079
-        # elif other.creator.notify_immediate_communications_received:
-        #   send_notification(user=other.creator, subject=..., template="email/notify_communication_received.html", context={ ... })
+        elif other.creator.notify_immediate_communications_received:
+            subject = _("T'han enviat una petició per compartir %(resource)s") % {
+                "resource": resource_name(a.resource),
+            }
+            send_notification(
+                user=other.creator,
+                subject=subject,
+                template="email/notify_communication_received.html",
+                context={
+                    "a": a,
+                    "current_site": get_current_site(request),
+                },
+            )
 
         return JsonResponse({"ok": True})
     return JsonResponse({"ok": False})
@@ -780,18 +787,26 @@ def do_agreement_connect(request, a, communication_accepted):
     a.communication_accepted = communication_accepted
     a.communication_date = timezone.now()
     a.save()
+    context = {
+        "a": a,
+        "current_site": get_current_site(request),
+    }
     if a.communication_accepted:
+        subject = _("Comunicació iniciada per compartir %(resource)s") % {
+            "resource": resource_name(a.resource),
+        }
         send_email(
             to = [a.solicitor.creator.email, a.solicitee.creator.email],
-            subject = _("Comunicació iniciada per compartir %(resource)s") % {"resource": resource_name(a.resource)},
-            body = render_to_string("email/agreement_connect.html", {
-                "a": a,
-                "current_site": get_current_site(request),
-            }),
+            subject = subject,
+            body = render_to_string("email/agreement_connect.html", context),
         )
-    # TODO FL085
-    # elif a.solicitor and a.solicitor.creator.notify_immediate_communications_rejected:
-    #   send_notification(user=a.solicitor.creator, subject=..., template="email/notify_communication_rejected.html", context={ ... })
+    elif a.solicitor and a.solicitor.creator.notify_immediate_communications_rejected:
+        send_notification(
+            user = a.solicitor.creator,
+            subject = _("Us han declinat una petició"),
+            template = "email/notify_communication_rejected.html",
+            context = context,
+        )
 
 def get_city_from_coordinates(lat, lng):
     """Nominatim also accepts a search option that gives coordinates given a place's name"""
@@ -996,7 +1011,6 @@ def count_word_freqs(s):
     return sorted(l, key=lambda x: x[1], reverse=True)
 
 def get_relationships_graph():
-    orgs = Organization.objects.all()
     agreements = Agreement.objects.all().prefetch_related("solicitor").prefetch_related("solicitee")
     relations = {}
     for a in agreements:
@@ -1041,14 +1055,17 @@ def contact(request):
         ).save()
         # send contact to managers
         mail_managers(
-            _("S'ha rebut un contacte a la web de %(name)s") % {"name": APP_NAME},
+            _("S'ha rebut un contacte a la web de %(name)s") % {"name": get_current_site(request).name},
             _("Des del correu %(email)s envien el següent missatge:\n\n%(content)s") % {"email": email, "content": content},
         )
 
         # send confirmation to user
+        subject = _("El formulari de contacte amb %(name)s s'ha enviat correctament") % {
+            "name": get_current_site(request).name,
+        }
         send_email(
             to = [email],
-            subject = _("El formulari de contacte amb %(name)s s'ha enviat correctament") % {"name": APP_NAME},
+            subject = subject,
             body = render_to_string("email/contact_received.html", {
                 "content": content,
                 "current_site": get_current_site(request),

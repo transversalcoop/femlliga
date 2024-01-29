@@ -17,7 +17,7 @@
         <link href="{{ static("style.css") }}" rel="stylesheet">
 {% block css %}{% endblock %}
         <title>
-{% block title %}{% endblock %} | {{ consts.APP_NAME }}
+{% block title %}{% endblock %} | {{ get_current_site(request).name }}
         </title>
     </head>
 
