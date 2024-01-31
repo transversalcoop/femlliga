@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext_lazy as _
 
+from femlliga.models import Organization
 from femlliga.utils import get_users_to_notify, send_periodic_notification, get_periodic_notification_data, get_ordered_needs_and_offers
 
 class Command(BaseCommand):
@@ -19,10 +20,11 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
             print("Dry run, set '--send=true' to actually send emails")
 
         users = get_users_to_notify()
-        needs, offers = get_ordered_needs_and_offers()
         site = Site.objects.get(id=settings.SITE_ID)
         sent_count = 0
         for user in users:
+            org = Organization.objects.get(creator = user)
+            needs, offers = get_ordered_needs_and_offers(org)
             context = get_periodic_notification_data(site, user, needs, offers)
             if context:
                 print(f"Sending email to {user.email}...", end="")

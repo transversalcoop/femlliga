@@ -287,6 +287,7 @@ CSP_OBJECT_SRC = ("'self'", )
 CSP_BASE_URI = ("'self'", )
 CSP_FRAME_SRC = ("'self'",
     "www.google.com",
+    "www.youtube.com",
 )
 CSP_FRAME_ANCESTORS = ("'self'", )
 CSP_FORM_ACTION = ("'self'",

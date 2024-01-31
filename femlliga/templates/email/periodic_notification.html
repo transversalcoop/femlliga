@@ -1,5 +1,7 @@
 {% extends "email/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import render_resource %}
+
 {% block content %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
@@ -20,7 +22,7 @@
 {% endif %}
 
 {% if new_resources %}
-{{ show_new_resources() }}
+{{ show_new_resources(new_resources) }}
 {% endif %}
 {% endblock %}
 
@@ -98,11 +100,16 @@
 {% endif %}
 {% endmacro %}
 
-{% macro show_new_resources() %}
+{% macro show_new_resources(c) %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    <h1 style="margin: 20px 0 0 0;">{{ _("Nous recursos") }}</h1>
-    {{ _("") }}
+    <h1 style="margin: 20px 0 0 0;">{{ _("Nous recursos a la plataforma") }}</h1>
+    {{ _("%(name)s està en constant evolució. Els darrers mesos hem afegit noves opcions de recursos i etiquetes, i més organitzacions s'han donat d'alta o han actualitzat els recursos que ofereixen. Us enviem un recull de les novetats, que potser us poden interessar ara encara que en el seu moment no estigueren disponibles o no les seleccionareu. Son les següents:", name=current_site.name) }}
+    <ul>
+      {% for r in c.resources %}
+      <li>{{ render_resource(r.code, r.options) }}</li>
+      {% endfor %}
+    </ul>
   </td>
 </tr>
 {% endmacro %}

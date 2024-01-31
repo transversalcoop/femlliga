@@ -1,5 +1,7 @@
 {% extends "email/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import render_resource %}
+
 {% block content %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
@@ -9,7 +11,7 @@
     {% else %}
       {{ _("compartir") }}
     {% endif %}
-    {{ resource_name(a.resource) }}{% if a.options.count() > 0 %} ({{ a.render_options() }}){% endif %}.
+    {{ render_resource(a.resource, a.options.all()) }}.
   </td>
 </tr>
 

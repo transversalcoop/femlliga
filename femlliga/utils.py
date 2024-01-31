@@ -2,6 +2,7 @@ import json
 import unicodedata
 
 from datetime import timedelta
+from operator import attrgetter
 from distutils.util import strtobool
 
 from django.urls import reverse
@@ -11,7 +12,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 
-from femlliga.models import Organization, Agreement, Need, Offer
+from femlliga.models import Organization, Agreement, Need, Offer, sort_resources
 from femlliga.constants import FROM_EMAIL, RESOURCES, RESOURCES_ORDER, RESOURCE_OPTIONS_MAP, RESOURCE_OPTIONS_READABLE_MAP
 
 # Emails and notifications
@@ -53,16 +54,16 @@ def get_periodic_notification_data(site, user, needs, offers):
     send_long_notification = False
     if user.notify_matches and long_notification_ready:
         # TODO FL090 consider only matches within distance_limit_km
-        _, need, offer = user_has_matches(user, needs, offers)
+        _, need, offer = org_has_matches(org, needs, offers)
         if need["count"] > 0 or offer["count"] > 0:
             context["matches"] = { "need": need, "offer": offer }
             send_long_notification = True
 
-    # TODO FL078 (here and in periodic_notification.html)consider only resources with last_updated_on > last_long_notification_date
     # TODO FL090 consider only resources within distance_limit_km
     if user.notify_new_resources and long_notification_ready:
-        if False:
-            context["new_resources"] = {}
+        offers = org_offers_not_matching(org, user.last_long_notification_date)
+        if len(offers) > 0:
+            context["new_resources"] = {"resources": offers}
             send_long_notification = True
 
     if context:
@@ -89,8 +90,9 @@ def org_pending_success_agreements(o):
     except:
         return []
 
-def get_ordered_needs_and_offers():
-    organizations = Organization.objects.all()
+# TODO FL090 limit by distance from organization
+def get_ordered_needs_and_offers(org):
+    organizations = Organization.objects.exclude(id=org.id)
     all_needs, all_offers = [], []
     for resource in RESOURCES_ORDER:
         for option in RESOURCE_OPTIONS_MAP[resource]:
@@ -107,26 +109,53 @@ def get_ordered_needs_and_offers():
 
     return sorted(all_needs, key=lambda x: -x[2]), sorted(all_offers, key=lambda x: -x[2])
 
-def user_has_matches(user, needs, offers):
+def org_has_matches(org, needs, offers):
     need, offer = {"name": "", "count": 0}, {"name": "", "count": 0}
-    try:
-        org = Organization.objects.get(creator=user)
-    except:
-        return None, need, offer
-
     for n in needs:
-        if user_has_resource(Need, org, n):
+        if org_has_resource(Need, org, n):
             need = {"name": RESOURCE_OPTIONS_READABLE_MAP[(n[0], n[1])], "count": n[2]}
             break
 
     for o in offers:
-        if user_has_resource(Offer, org, o):
+        if org_has_resource(Need, org, o):
             offer = {"name": RESOURCE_OPTIONS_READABLE_MAP[(o[0], o[1])], "count": o[2]}
             break
 
     return org, need, offer
 
-def user_has_resource(model, org, n):
+def org_offers_not_matching(org, last_long_notification_date):
+    offers = []
+    own_needs = get_own_needs(org)
+    for need in own_needs:
+        need_options = [n.name for n in need.options.all()]
+        l = list(Offer.objects.exclude(organization=org).filter(
+            resource = need.resource,
+            has_resource = True,
+            last_updated_on__gt = last_long_notification_date,
+        ))
+        l = [o for o in l if has_different_options(o.options.all(), need_options)]
+        if len(l) > 0:
+            offers.append(join_offers_not_matching(l, need_options))
+
+    return offers
+
+def has_different_options(has_options, exclude_options):
+    return any([o.name not in exclude_options for o in has_options])
+
+def join_offers_not_matching(offers, ignore_options):
+    options = set()
+    for offer in offers:
+        for o in offer.options.all():
+            if o.name not in ignore_options:
+                options.add(o)
+    return { "code": offers[0].resource, "options": list(sorted(options, key=attrgetter("name"))) }
+
+def get_own_needs(org):
+    return sort_resources([
+        n for n in org.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
+    ])
+
+def org_has_resource(model, org, n):
     return len(model.objects.filter(organization=org, resource=n[0], options=n[1], has_resource=True)) > 0
 
 def send_notification(subject, template, user, context):

@@ -170,6 +170,10 @@ nav a:hover {
     max-height: 200px;
 }
 
+.max-w-100 {
+    max-width: 100%;
+}
+
 .spacing {
     margin-top: 20px;
 }

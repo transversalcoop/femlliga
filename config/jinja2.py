@@ -17,6 +17,11 @@ import femlliga.constants
 from femlliga.models import *
 from femlliga.utils import wizard_url
 
+def get_language(request):
+    if not request:
+        return "ca"
+    return get_language_from_request(request)
+
 def add_http(url):
     if not url.startswith("http://") and not url.startswith("https://"):
         return "https://" + url
@@ -27,6 +32,9 @@ def format_time(t):
 
 def path_parent(path):
     return "/".join(path.split("/")[:-2]) + "/"
+
+def display_list(l):
+    return ", ".join([str(x) for x in l])
 
 def js_bool(value):
     if value:
@@ -102,8 +110,9 @@ def environment(**options):
         "json_script": json_script,
         "js_bool": js_bool,
         "media_type_placeholder": media_type_placeholder,
-        "get_language_from_request": get_language_from_request,
+        "get_language": get_language,
         "wizard_url": wizard_url,
         "get_current_site": get_current_site,
+        "display_list": display_list,
     })
     return env

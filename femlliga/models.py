@@ -474,10 +474,6 @@ class Agreement(models.Model):
     def __str__(self):
         return f"[{self.id}] {self.solicitor} sol·licita {self.resource} a {self.solicitee}"
 
-    def render_options(self):
-        options = [str(x) for x in self.options.all()]
-        return ", ".join(options)
-
     def solicitor_safe(self):
         if self.solicitor:
             return self.solicitor

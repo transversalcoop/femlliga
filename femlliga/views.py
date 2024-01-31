@@ -34,7 +34,7 @@ from config.settings import MEDIA_ROOT
 from .models import *
 from .constants import *
 from .forms import *
-from .utils import get_next_resource, get_resource_index, get_json_body, send_email, send_notification, str_to_bool, clean_form_email
+from .utils import get_next_resource, get_resource_index, get_json_body, send_email, send_notification, str_to_bool, clean_form_email, get_own_needs
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
@@ -110,9 +110,7 @@ def app(request):
     if not org.resources_set:
         return redirect("pre-wizard", organization_id=org.id)
 
-    own_needs = sort_resources([
-        n for n in org.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
-    ])
+    own_needs = get_own_needs(org)
     offer_matches, need_matches = get_organization_matches(org, own_needs)
     return render(request, "femlliga/app.html", {
         "org": org,
@@ -225,8 +223,9 @@ def social_media_forms():
         extra=len(SOCIAL_MEDIA_TYPES),
     )
 
-def process_organization_post(request, org = None):
+def process_organization_post(request, existing_org = None):
     form = OrganizationForm(request.POST, request.FILES)
+    org = existing_org
     socialmedia_formset = social_media_forms()(request.POST, instance=org)
     if form.is_valid() and socialmedia_formset.is_valid():
         if org is None:
@@ -255,8 +254,8 @@ def process_organization_post(request, org = None):
             else:
                 org.scopes.remove(s)
 
-        if org:
-            return redirect("profile", organization_id=org.id)
+        if existing_org:
+            return redirect("profile", organization_id=existing_org.id)
         return redirect("app")
 
     return render(request, "femlliga/add_organization.html", {
@@ -343,8 +342,8 @@ def resources_wizard(request, organization_id, resource_type, resource, editing 
         if forms_valid:
             options = form.cleaned_data["options"]
             for option, _ in Resource.resource(resource).options():
-                ro = ResourceOption(name=option)
-                ro.save()
+                # avoid clash with _ translation function
+                ro, _created = ResourceOption.objects.get_or_create(name=option)
                 if option in options:
                     m.options.add(ro)
                 else:
@@ -423,9 +422,7 @@ def clean_file(posted_file):
 def matches(request, organization_id):
     # TODO better matches computation, does much more work than needed
     organization = get_object_or_404(Organization, pk = organization_id)
-    own_needs = sort_resources([
-        n for n in organization.needs.all().prefetch_related("options") if n.has_resource and n.resource != "OTHER"
-    ])
+    own_needs = get_own_needs(organization)
     needs_json = [{
         "resource": x.resource,
         "options": [o.name for o in x.options.all()],
@@ -653,9 +650,7 @@ def send_message(request, organization_id, organization_to, resource_type, resou
     assert_url_param_in_list(resource, RESOURCES_LIST)
     organization = get_object_or_404(Organization, pk = organization_id)
     other = get_object_or_404(Organization, pk = organization_to)
-    model = Offer
-    if resource_type == "need":
-        model = Need
+    model = Offer if resource_type == "offer" else Need
     r = get_object_or_404(model, organization=other, resource = resource)
     post = get_json_body(request)
     form = MessageForm(post, resource=r)
@@ -669,8 +664,8 @@ def send_message(request, organization_id, organization_to, resource_type, resou
         )
         a.save()
         for option in form.cleaned_data["options"]:
-            ro = ResourceOption(name=option)
-            ro.save()
+            # avoid clash with _ translation function
+            ro, _created = ResourceOption.objects.get_or_create(name=option)
             a.options.add(ro)
 
         if other.creator.accept_communications_automatically:

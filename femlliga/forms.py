@@ -59,7 +59,7 @@ class OrganizationForm(forms.ModelForm):
             except:
                 pass
         else:
-            self._errors["address"] = self.error_class([_("Cal indicar la posició o l'adreça")])
+            self.add_error("address", _("Cal indicar la posició o l'adreça"))
 
         return self.cleaned_data
 
@@ -86,7 +86,8 @@ class MessageForm(forms.Form):
             return self.cleaned_data
 
         if len(self.cleaned_data.get("options", [])) == 0:
-            self._errors["options"] = self.error_class([_("Cal indicar una opció com a mínim")])
+            self.add_error("options", _("Cal indicar una opció com a mínim"))
+
         return self.cleaned_data
 
 class ContactForm(forms.ModelForm):
