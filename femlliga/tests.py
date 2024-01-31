@@ -23,6 +23,10 @@ def save_response(response):
     with open('/tmp/tmp.html', 'w') as f:
         f.write(str(response.content.decode("utf-8")))
 
+def save_email(mail, filename):
+    with open('/tmp/' + filename, 'w') as f:
+        f.write(mail.body)
+
 class ResourcesTests(TestCase):
     def test_resource_types_match(self):
         for resource in RESOURCES:
@@ -159,6 +163,8 @@ class ComponentTests(TestCase):
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("S'ha rebut un contacte a la web", mail.outbox[0].subject)
         self.assertIn("s'ha enviat correctament", mail.outbox[1].subject)
+        save_email(mail.outbox[0], "contact0.html")
+        save_email(mail.outbox[1], "contact1.html")
 
 class IntegrationTests(TestCase):
     maxDiff = None
@@ -190,6 +196,7 @@ class IntegrationTests(TestCase):
         save_response(response)
         self.assertContains(response, "Verifica el correu electrònic")
         self.assertEqual(1, len(mail.outbox))
+        save_email(mail.outbox[0], "email_verification.html")
         mail.outbox.clear()
         e = EmailAddress.objects.get(email=email)
         e.verified = True
@@ -354,6 +361,7 @@ class IntegrationTests(TestCase):
         }, follow=True)
         self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 2)
+        save_email(mail.outbox[1], "agreement_connect.html")
 
         # check sent
         self.client.login(email=email3, password=PASS_FOR_TESTS)
@@ -460,6 +468,7 @@ class IntegrationTests(TestCase):
         })
         self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 1)
+        save_email(mail.outbox[0], "notify_communication_received.html")
         self.assertIn("T'han enviat una petició per compartir", mail.outbox[0].subject)
 
         self.client.login(email=email7, password=PASS_FOR_TESTS)
@@ -470,6 +479,7 @@ class IntegrationTests(TestCase):
         })
         self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 2)
+        save_email(mail.outbox[1], "notify_communication_rejected.html")
         self.assertIn("Us han declinat una petició", mail.outbox[1].subject)
 
     @override_settings(AUTHENTICATION_BACKENDS = AUTH_BACKENDS)
@@ -541,6 +551,7 @@ class IntegrationTests(TestCase):
             context,
         )
         self.assertEqual(len(mail.outbox), 1)
+        save_email(mail.outbox[0], "periodic_notification.html")
         for s in [
             "Peticions pendents de respondre",
             "Peticions pendents d'acord",
