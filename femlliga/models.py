@@ -19,7 +19,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 
-from .constants import *
+from . import constants as const
 
 
 def add_one_month(t):
@@ -29,15 +29,22 @@ def add_one_month(t):
     return t
 
 
+def add_days(days):
+    def f(t):
+        return t + timedelta(days=days)
+
+    return f
+
+
 def date_intervals(start, end):
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)
     if (end - start) < timedelta(days=30):
-        f = lambda x: x + timedelta(days=1)
+        f = add_days(1)
     elif (end - start) < timedelta(days=30 * 3):
-        f = lambda x: x + timedelta(days=7)
+        f = add_days(7)
     else:
         start = start.replace(day=1)
-        f = lambda x: add_one_month(x)
+        f = add_one_month
 
     intervals = [start]
     mid = start
@@ -84,7 +91,7 @@ class LimitFileSize:
 
 
 USER_LANGUAGE_CHOICES = [("", _("Idioma configurat al navegador"))] + [
-    x for x in LANGUAGE_CHOICES
+    x for x in const.LANGUAGE_CHOICES
 ]
 
 
@@ -105,7 +112,7 @@ class CustomUser(AbstractUser):
     last_notification_date = models.DateTimeField(auto_now_add=True)
     last_long_notification_date = models.DateTimeField(auto_now_add=True)
     notifications_frequency = models.CharField(
-        max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY"
+        max_length=50, choices=const.NOTIFICATION_CHOICES, default="WEEKLY"
     )
     notify_agreement_communication_pending = models.BooleanField(default=True)
     notify_agreement_success_pending = models.BooleanField(default=True)
@@ -126,7 +133,9 @@ class Page(models.Model):
         primary_key=True,
     )
     name = models.SlugField()
-    language = models.CharField(max_length=50, choices=LANGUAGE_CHOICES, default="ca")
+    language = models.CharField(
+        max_length=50, choices=const.LANGUAGE_CHOICES, default="ca"
+    )
     heading = models.TextField()
     subheading = models.TextField(blank=True)
     content = models.TextField()
@@ -140,10 +149,10 @@ class Page(models.Model):
 
 
 class OrganizationScope(models.Model):
-    name = models.CharField(max_length=100, choices=ORG_SCOPES, primary_key=True)
+    name = models.CharField(max_length=100, choices=const.ORG_SCOPES, primary_key=True)
 
     def __str__(self):
-        return str(ORG_SCOPES_NAMES_MAP[self.name])
+        return str(const.ORG_SCOPES_NAMES_MAP[self.name])
 
 
 class Organization(models.Model):
@@ -162,7 +171,7 @@ class Organization(models.Model):
     description = models.TextField(blank=True)
     date = models.DateTimeField(auto_now_add=True)
     scopes = models.ManyToManyField(OrganizationScope)
-    org_type = models.CharField(max_length=100, choices=ORG_TYPES)
+    org_type = models.CharField(max_length=100, choices=const.ORG_TYPES)
     resources_set = models.BooleanField(default=False)
     lat = models.DecimalField(max_digits=12, decimal_places=9)
     lng = models.DecimalField(max_digits=12, decimal_places=9)
@@ -217,7 +226,7 @@ class Organization(models.Model):
         return j
 
     def type(self):
-        for t in ORG_TYPES:
+        for t in const.ORG_TYPES:
             if t[0] == self.org_type:
                 return t[1]
         return ""
@@ -248,11 +257,7 @@ class Organization(models.Model):
         )
 
     def aux_missing_not_set(self, has):
-        l = []
-        for resource in RESOURCES:
-            if resource[0] not in has:
-                l.append(Resource(resource))
-        return l
+        return [Resource(x) for x in const.RESOURCES if x[0] not in has]
 
     def has_scope(self, scope):
         return scope in map(lambda x: x.name, self.scopes.all())
@@ -295,7 +300,7 @@ class SocialMedia(models.Model):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, related_name="social_media"
     )
-    media_type = models.CharField(max_length=30, choices=SOCIAL_MEDIA_TYPES)
+    media_type = models.CharField(max_length=30, choices=const.SOCIAL_MEDIA_TYPES)
     value = models.CharField(max_length=200)
 
 
@@ -309,7 +314,7 @@ class Resource:
 
     @classmethod
     def resource(cls, code):
-        for resource in RESOURCES:
+        for resource in const.RESOURCES:
             if resource[0] == code:
                 return Resource(resource)
         raise Exception("Unknown resource")
@@ -319,16 +324,16 @@ class Resource:
         if option == "":
             return ""
 
-        for options in RESOURCE_OPTIONS_MAP[code]:
+        for options in const.RESOURCE_OPTIONS_MAP[code]:
             if options[0] == option:
                 return options[1]
         raise Exception("Unknown option")
 
     def options(self):
-        return RESOURCE_OPTIONS_MAP[self.code]
+        return const.RESOURCE_OPTIONS_MAP[self.code]
 
     def add_image_label(self):
-        return RESOURCE_ADD_IMAGE_LABEL[self.code]
+        return const.RESOURCE_ADD_IMAGE_LABEL[self.code]
 
 
 class Table:
@@ -410,45 +415,47 @@ def plot():
 
 
 def option_name(code):
-    return RESOURCE_OPTIONS_DEF_MAP[code]
+    return const.RESOURCE_OPTIONS_DEF_MAP[code]
 
 
 def resource_name(code):
-    return RESOURCE_NAMES_MAP[code]
+    return const.RESOURCE_NAMES_MAP[code]
 
 
 def org_scope_name(code):
-    return ORG_SCOPES_NAMES_MAP[code]
+    return const.ORG_SCOPES_NAMES_MAP[code]
 
 
 def org_type_name(code):
-    return ORG_TYPES_NAMES_MAP[code]
+    return const.ORG_TYPES_NAMES_MAP[code]
 
 
 def social_media_type_name(code):
-    return SOCIAL_MEDIA_TYPES_MAP[code]
+    return const.SOCIAL_MEDIA_TYPES_MAP[code]
 
 
 def sort_resources(resources):
-    return sorted(resources, key=lambda r: RESOURCES_ORDER.index(r.resource))
+    return sorted(resources, key=lambda r: const.RESOURCES_ORDER.index(r.resource))
 
 
 def sort_social_media(social_media):
     return sorted(
-        social_media, key=lambda sm: SOCIAL_MEDIA_TYPES_ORDER.index(sm.media_type)
+        social_media, key=lambda sm: const.SOCIAL_MEDIA_TYPES_ORDER.index(sm.media_type)
     )
 
 
 class ResourceOption(models.Model):
-    name = models.CharField(max_length=100, choices=RESOURCE_OPTIONS, primary_key=True)
+    name = models.CharField(
+        max_length=100, choices=const.RESOURCE_OPTIONS, primary_key=True
+    )
 
     def __str__(self):
-        return str(RESOURCE_OPTIONS_DEF_MAP[self.name])
+        return str(const.RESOURCE_OPTIONS_DEF_MAP[self.name])
 
 
 class BaseResource(models.Model):
     last_updated_on = models.DateTimeField(auto_now=True)
-    resource = models.CharField(max_length=100, choices=RESOURCES)
+    resource = models.CharField(max_length=100, choices=const.RESOURCES)
     options = models.ManyToManyField(ResourceOption)
     comments = models.TextField(null=True, blank=True)
     has_resource = models.BooleanField(default=False)
@@ -514,7 +521,7 @@ class Need(BaseResource):
     def last_message_declined(self, agreement_declined_map):
         try:
             return agreement_declined_map["need"][self.resource][self.organization.id]
-        except:
+        except KeyError:
             return False
 
 
@@ -562,7 +569,7 @@ class Offer(BaseResource):
     def last_message_declined(self, agreement_declined_map):
         try:
             return agreement_declined_map["offer"][self.resource][self.organization.id]
-        except:
+        except KeyError:
             return False
 
 
@@ -586,7 +593,7 @@ class Agreement(models.Model):
     )
     message = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
-    resource = models.CharField(max_length=100, choices=RESOURCES)
+    resource = models.CharField(max_length=100, choices=const.RESOURCES)
     resource_type = models.CharField(
         max_length=10, choices=[("need", "need"), ("offer", "offer")]
     )

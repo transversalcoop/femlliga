@@ -10,6 +10,7 @@ from io import BytesIO
 from pathlib import Path
 from functools import cmp_to_key, reduce
 
+from django.urls import reverse
 from django.http import Http404, JsonResponse
 from django.forms import inlineformset_factory
 from django.utils import timezone
@@ -31,18 +32,57 @@ from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
 
 from config.settings import MEDIA_ROOT
-from .models import *
-from .constants import *
-from .forms import *
+from .models import (
+    Agreement,
+    Contact,
+    ContactDenyList,
+    Graph,
+    Need,
+    NeedImage,
+    Offer,
+    OfferImage,
+    Organization,
+    OrganizationScope,
+    Page,
+    Resource,
+    ResourceOption,
+    SocialMedia,
+    Table,
+    Timeline,
+    option_name,
+    org_scope_name,
+    org_type_name,
+    resource_name,
+)
+from .constants import (
+    ORG_SCOPES,
+    ORG_TYPES,
+    RESOURCES,
+    RESOURCES_LIST,
+    RESOURCES_ORDER,
+    RESOURCE_ICONS_MAP,
+    RESOURCE_NAMES_MAP,
+    RESOURCE_OPTIONS_MAP,
+    RESOURCE_OPTIONS_DEF_MAP,
+    SOCIAL_MEDIA_TYPES,
+)
+from .forms import (
+    ContactForm,
+    MessageForm,
+    OrganizationForm,
+    PreferencesForm,
+    ResourceForm,
+    http_get,
+)
 from .utils import (
+    clean_form_email,
+    get_own_needs,
     get_next_resource,
     get_resource_index,
     get_json_body,
     send_email,
     send_notification,
     str_to_bool,
-    clean_form_email,
-    get_own_needs,
 )
 
 
@@ -324,7 +364,7 @@ def process_organization_post(request, existing_org=None):
             "form": form,
             "org": org,
             "social_media_forms": socialmedia_formset,
-            "edit": org != None,
+            "edit": org is not None,
         },
     )
 
@@ -430,7 +470,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
             forms_valid = form.is_valid() and imageformset.is_valid()
         if forms_valid:
             options = form.cleaned_data["options"]
-            for option, _ in Resource.resource(resource).options():
+            for option, _ignore in Resource.resource(resource).options():
                 # avoid clash with _ translation function
                 ro, _created = ResourceOption.objects.get_or_create(name=option)
                 if option in options:
@@ -811,8 +851,9 @@ def process_preferences_post(request):
             try:
                 e = EmailAddress.objects.get(email=new_email, user=request.user)
                 e.send_confirmation()
-            except:
-                # will send confirmation email and then execute update_user_email function on email_confirmed signal
+            except EmailAddress.DoesNotExist:
+                # will send confirmation email and then execute
+                # update_user_email function on email_confirmed signal
                 EmailAddress.objects.add_email(
                     request, request.user, new_email, confirm=True
                 )
@@ -921,7 +962,7 @@ def agreements(request, organization_id):
         organization_names_map_json[str(org.id)] = org.name
     return render(
         request,
-        f"femlliga/agreements.html",
+        "femlliga/agreements.html",
         {
             "org": organization,
             "agreements": {"sent": sent, "received": received},
@@ -1016,7 +1057,8 @@ def agreement_connect(request, organization_id, agreement_id):
     organization = get_object_or_404(Organization, pk=organization_id)
     post = get_json_body(request)
     if organization != a.solicitee:
-        return  # user owns organization; only solicitee organization should be able to accept
+        # user owns organization; only solicitee organization should be able to accept
+        return
 
     if not a.solicitor or not a.solicitee:
         return JsonResponse({"ok": False})
@@ -1128,27 +1170,27 @@ def report(request):
     def agreements_orgs(orgs, f):
         return [
             count(
-                orgs, lambda x: [a for a in f(x) if a.communication_accepted == None]
+                orgs, lambda x: [a for a in f(x) if a.communication_accepted is None]
             ),
             count(
                 orgs,
                 lambda x: [
                     a
                     for a in f(x)
-                    if a.communication_accepted == True
-                    and a.agreement_successful == None
+                    if a.communication_accepted is True
+                    and a.agreement_successful is None
                 ],
             ),
             count(
-                orgs, lambda x: [a for a in f(x) if a.communication_accepted == False]
+                orgs, lambda x: [a for a in f(x) if a.communication_accepted is False]
             ),
             count(
                 orgs,
                 lambda x: [
                     a
                     for a in f(x)
-                    if a.communication_accepted == True
-                    and a.agreement_successful == True
+                    if a.communication_accepted is True
+                    and a.agreement_successful is True
                 ],
             ),
             count(
@@ -1156,8 +1198,8 @@ def report(request):
                 lambda x: [
                     a
                     for a in f(x)
-                    if a.communication_accepted == True
-                    and a.agreement_successful == False
+                    if a.communication_accepted is True
+                    and a.agreement_successful is False
                 ],
             ),
             count(orgs, lambda x: [a for a in f(x)]),

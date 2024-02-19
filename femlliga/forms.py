@@ -7,8 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from django_recaptcha.fields import ReCaptchaField
 from allauth.account.forms import LoginForm, SignupForm
 
-from .models import CustomUser, Organization, Contact, Resource
-from .constants import *
+from .models import CustomUser, Organization, Contact
+from . import constants as const
 
 
 def http_get(url):
@@ -40,12 +40,20 @@ class OrganizationForm(forms.ModelForm):
     scopes = forms.MultipleChoiceField(
         required=True,
         widget=forms.CheckboxSelectMultiple,
-        choices=ORG_SCOPES,
+        choices=const.ORG_SCOPES,
     )
 
     class Meta:
         model = Organization
-        fields = ["name", "logo", "description", "org_type", "lat", "lng", "address"]
+        fields = [
+            "name",
+            "logo",
+            "description",
+            "org_type",
+            "lat",
+            "lng",
+            "address",
+        ]
 
     def clean(self):
         super().clean()
@@ -58,22 +66,23 @@ class OrganizationForm(forms.ModelForm):
             self.cleaned_data["lng"] = 0
             try:
                 address = urllib.parse.quote(self.cleaned_data["address"])
-                res = http_get(
-                    f"https://nominatim.openstreetmap.org/search?format=json&q={address}"
-                )
+                url = f"https://nominatim.openstreetmap.org/search?format=json&q={address}"
+                res = http_get(url)
                 self.cleaned_data["lat"] = res[0]["lat"]
                 self.cleaned_data["lng"] = res[0]["lon"]
             except:
                 pass
         else:
-            self.add_error("address", _("Cal indicar la posició o l'adreça"))
+            self._errors["address"] = self.error_class(
+                [_("Cal indicar la posició o l'adreça")]
+            )
 
         return self.cleaned_data
 
 
 class ResourceForm(forms.Form):
-    resource = forms.ChoiceField(choices=[("", "-----------")] + RESOURCES)
-    options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=False)
+    resource = forms.ChoiceField(choices=[("", "-----------")] + const.RESOURCES)
+    options = forms.MultipleChoiceField(choices=const.RESOURCE_OPTIONS, required=False)
     comments = forms.CharField(required=False)
     charge = forms.BooleanField(required=False)
 
@@ -84,7 +93,7 @@ class ImageForm(forms.Form):
 
 class MessageForm(forms.Form):
     message = forms.CharField(min_length=1)
-    options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=False)
+    options = forms.MultipleChoiceField(choices=const.RESOURCE_OPTIONS, required=False)
 
     def __init__(self, *args, **kwargs):
         self.resource = kwargs.pop(
@@ -98,8 +107,9 @@ class MessageForm(forms.Form):
             return self.cleaned_data
 
         if len(self.cleaned_data.get("options", [])) == 0:
-            self.add_error("options", _("Cal indicar una opció com a mínim"))
-
+            self._errors["options"] = self.error_class(
+                [_("Cal indicar una opció com a mínim")]
+            )
         return self.cleaned_data
 
 
