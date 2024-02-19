@@ -1,14 +1,14 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% block title %}Surt{% endblock title %}
+{% block title %}{{ _("Surt") }}{% endblock title %}
 
 {% block content %}
 <div class="container">
-<h2>Tanca la sessió</h2>
-<p>Segur que vols tancar la sessió?</p>
+  <h2>{{ _("Tanca la sessió") }}</h2>
+  <p>{{ _("Segur que vols tancar la sessió?") }}</p>
 <form method="post" class="mb-2">
     {{ csrf_input }}
-    <button type="submit" class="btn btn-custom">Surt</button>
+    <button type="submit" class="btn btn-custom">{{ _("Surt") }}</button>
 </form>
 </div>
 {% endblock %}

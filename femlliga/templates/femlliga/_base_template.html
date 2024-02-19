@@ -1,37 +1,34 @@
 {% extends "femlliga/_base.html" %}
 
 {% macro pending_dot() %}
-<span
-  class="position-absolute bg-danger rounded-circle p-1"
-  title="Teniu peticions pendents d'atendre">
-</span>
-{% endmacro %}
-{% macro menu_url(name, href, args=[], pending=False) %}
-<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}">{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
+<span class="position-absolute bg-danger rounded-circle p-1"></span>
 {% endmacro %}
 
+{% macro menu_url(name, href, args=[], pending=False) %}
+<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}" {% if pending %} title="{{ _("Teniu peticions pendents d'atendre") }}"{% endif %}>{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
+{% endmacro %}
 
 {% block primary_navigation %}
   <ul class="navbar-nav me-auto mb-lg-0">
   {% if not user.is_anonymous %}
     {% set organization = request.user.get_organization() %}
     {% if organization %}
-    <li>{{ menu_url("Entitat", "app") }}</li>
-    <li>{{ menu_url("Has lligat?", "matches", [organization.id]) }}</li>
-    <li>{{ menu_url("Descobreix", "search", [organization.id]) }}</li>
+    <li>{{ menu_url(_("Entitat"), "app") }}</li>
+    <li>{{ menu_url(_("Has lligat?"), "matches", [organization.id]) }}</li>
+    <li>{{ menu_url(_("Descobreix"), "search", [organization.id]) }}</li>
     {% set pending_sent, pending_received = organization.pending_agreements() %}
-    <li>{{ menu_url("Peticions", "agreements", [organization.id], pending=pending_sent or pending_received) }}</li>
+    <li>{{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}</li>
     {% endif %}
   {% endif %}
   {% if user.is_staff %}
-  <li>{{ menu_url("Informe", "report") }}</li>
-  <li>{{ menu_url("Dashboard", "dashboard") }}</li>
+  <li>{{ menu_url(_("Informe"), "report") }}</li>
+  <li>{{ menu_url(_("Dashboard"), "dashboard") }}</li>
   {% endif %}
 {% block menu %}{% endblock %}
   </ul>
   <ul class="navbar-nav">
   {% if user.is_anonymous %}
-    <li>{{ menu_url("Entra", "account_login") }}</li>
+    <li>{{ menu_url(_("Entra"), "account_login") }}</li>
   {% else %}
     <li class="nav-item dropstart">
       <a
@@ -39,20 +36,20 @@
         role="button"
         data-bs-toggle="dropdown"
         aria-expanded="false"
-        aria-label="Expandeix el menú del perfil"
+        aria-label="{{ _("Expandeix el menú del perfil") }}"
         href="#">
         <i class="bi-person-circle"></i>
       </a>
       <ul class="dropdown-menu">
         {% if organization %}
-        <li><a class="dropdown-item" href="{{ url("profile", args=[organization.id]) }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{ url("profile", args=[organization.id]) }}">{{ _("Perfil") }}</a></li>
         {% endif %}
-        <li><a class="dropdown-item" href="{{ url("preferences") }}">Preferències</a></li>
+        <li><a class="dropdown-item" href="{{ url("preferences") }}">{{ _("Preferències") }}</a></li>
         <li>
           <form method="post" action="{{ url("account_logout") }}">
             {{ csrf_input }}
             <button class="dropdown-item invisible-button" type="submit">
-              Surt
+              {{ _("Surt") }}
             </button>
           </form>
         </li>

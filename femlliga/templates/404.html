@@ -1,7 +1,7 @@
 {% extends "femlliga/_error.html" %}
 
-{% block title %}Error 404{% endblock %}
-{% block error_code %}Error 404{% endblock %}
+{% block title %}{{ _("Error 404") }}{% endblock %}
+{% block error_code %}{{ _("Error 404") }}{% endblock %}
 {% block error_description %}
-<p>Sembla que la pàgina a la que intentes accedir ja no existeix.</p>
+<p>{{ _("Sembla que la pàgina a la que intentes accedir ja no existeix.") }}</p>
 {% endblock %}

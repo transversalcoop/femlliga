@@ -25,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", None)
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(strtobool(os.getenv("DJANGO_DEBUG", "false")))
 
 allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", ".localhost,127.0.0.1,[::1]")
@@ -58,7 +57,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'debug_toolbar',
     'axes',
-    'captcha',
+    'django_recaptcha',
 
     'femlliga',
 ]
@@ -68,10 +67,12 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'femlliga.middleware.middleware.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
@@ -172,6 +173,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+LANGUAGES = [
+    ('ca', 'Català'),
+    ('es', 'Castellano'),
+]
+
+LOCALE_PATHS = ['locale']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -280,6 +287,7 @@ CSP_OBJECT_SRC = ("'self'", )
 CSP_BASE_URI = ("'self'", )
 CSP_FRAME_SRC = ("'self'",
     "www.google.com",
+    "www.youtube.com",
 )
 CSP_FRAME_ANCESTORS = ("'self'", )
 CSP_FORM_ACTION = ("'self'",
@@ -350,4 +358,4 @@ if recaptcha_public != "" and recaptcha_private != "":
     RECAPTCHA_PUBLIC_KEY = recaptcha_public
     RECAPTCHA_PRIVATE_KEY = recaptcha_private
 else:
-    SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+    SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']

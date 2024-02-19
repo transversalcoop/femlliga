@@ -1,10 +1,12 @@
+import bleach
+
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
 from django.utils.html import json_script
+from django.utils.translation import gettext, ngettext, get_language_from_request
 from django.templatetags.static import static
-
-import bleach
+from django.contrib.sites.shortcuts import get_current_site
 
 from jinja2 import Environment
 from allauth.utils import get_request_param
@@ -13,6 +15,12 @@ from allauth.socialaccount.adapter import get_adapter
 import femlliga.constants
 
 from femlliga.models import *
+from femlliga.utils import wizard_url
+
+def get_language(request):
+    if not request:
+        return "ca"
+    return get_language_from_request(request)
 
 def add_http(url):
     if not url.startswith("http://") and not url.startswith("https://"):
@@ -24,6 +32,9 @@ def format_time(t):
 
 def path_parent(path):
     return "/".join(path.split("/")[:-2]) + "/"
+
+def display_list(l):
+    return ", ".join([str(x) for x in l])
 
 def js_bool(value):
     if value:
@@ -73,7 +84,8 @@ def clean(s, style=False):
     })
 
 def environment(**options):
-    env = Environment(**options)
+    env = Environment(extensions=["jinja2.ext.i18n"], **options)
+    env.install_gettext_callables(gettext=gettext, ngettext=ngettext, newstyle=True)
     env.globals.update({
         "len": len,
         "str": str,
@@ -98,5 +110,9 @@ def environment(**options):
         "json_script": json_script,
         "js_bool": js_bool,
         "media_type_placeholder": media_type_placeholder,
+        "get_language": get_language,
+        "wizard_url": wizard_url,
+        "get_current_site": get_current_site,
+        "display_list": display_list,
     })
     return env

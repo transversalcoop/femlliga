@@ -1,31 +1,68 @@
 import math
 import uuid
 import base64
+import unicodedata
+
 import pandas as pd
-import matplotlib.pyplot as plt
 import networkx as nx
+import matplotlib.pyplot as plt
 
 from io import BytesIO
 from pathlib import Path
+from datetime import timedelta
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 
 from .constants import *
-from .utils import date_intervals, clean_form_email
+
+
+def add_one_month(t):
+    t = t.replace(day=1)
+    t = t + timedelta(days=32)
+    t = t.replace(day=1)
+    return t
+
+
+def date_intervals(start, end):
+    start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+    if (end - start) < timedelta(days=30):
+        f = lambda x: x + timedelta(days=1)
+    elif (end - start) < timedelta(days=30 * 3):
+        f = lambda x: x + timedelta(days=7)
+    else:
+        start = start.replace(day=1)
+        f = lambda x: add_one_month(x)
+
+    intervals = [start]
+    mid = start
+    while mid < end:
+        mid = f(mid)
+        intervals.append(mid)
+
+    return intervals
+
+
+def clean_form_email(s):
+    return unicodedata.normalize("NFKC", s.strip()).casefold()
+
 
 def need_images_directory_path(instance, filename):
     return str(Path("images/needs") / filename)
 
+
 def offer_images_directory_path(instance, filename):
     return str(Path("images/offers") / filename)
 
+
 def organization_logos_directory_path(instance, filename):
     return str(Path("images/logos") / filename)
+
 
 @deconstructible
 class LimitFileSize:
@@ -35,15 +72,45 @@ class LimitFileSize:
 
     def __call__(self, value):
         if value.size > self.limit:
-            raise ValidationError(f"L'arxiu és massa gran, hauria d'ocupar menys de {self.MB} MB.")
+            raise ValidationError(
+                _(
+                    "L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB.",
+                    max=self.MB,
+                )
+            )
 
     def __eq__(self, other):
         return self.MB == other.MB
 
+
+USER_LANGUAGE_CHOICES = [("", _("Idioma configurat al navegador"))] + [
+    x for x in LANGUAGE_CHOICES
+]
+
+
 class CustomUser(AbstractUser):
-    notifications_frequency = models.CharField(max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY")
+    language = models.CharField(
+        max_length=50, choices=USER_LANGUAGE_CHOICES, null=True, blank=True
+    )
+    distance_limit_km = models.DecimalField(
+        max_digits=6, decimal_places=1, default=100
+    )  # from 0.0 to 99999.9
+
+    # immediate notifications
     accept_communications_automatically = models.BooleanField(default=True)
+    notify_immediate_communications_received = models.BooleanField(default=True)
+    notify_immediate_communications_rejected = models.BooleanField(default=True)
+
+    # periodic notifications
     last_notification_date = models.DateTimeField(auto_now_add=True)
+    last_long_notification_date = models.DateTimeField(auto_now_add=True)
+    notifications_frequency = models.CharField(
+        max_length=50, choices=NOTIFICATION_CHOICES, default="WEEKLY"
+    )
+    notify_agreement_communication_pending = models.BooleanField(default=True)
+    notify_agreement_success_pending = models.BooleanField(default=True)
+    notify_matches = models.BooleanField(default=True)
+    notify_new_resources = models.BooleanField(default=True)
 
     def get_organization(self):
         organizations = self.organizations.all()
@@ -51,27 +118,47 @@ class CustomUser(AbstractUser):
             return organizations[0]
         return None
 
+
 class Page(models.Model):
-    name = models.SlugField(primary_key = True)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+    )
+    name = models.SlugField()
+    language = models.CharField(max_length=50, choices=LANGUAGE_CHOICES, default="ca")
     heading = models.TextField()
     subheading = models.TextField(blank=True)
     content = models.TextField()
     image = models.CharField(max_length=100, blank=True)
 
-class OrganizationScope(models.Model):
-    name = models.CharField(max_length=100, choices=ORG_SCOPES, primary_key = True)
+    class Meta:
+        unique_together = (("name", "language"),)
 
     def __str__(self):
-        return ORG_SCOPES_NAMES_MAP[self.name]
+        return f"[{self.language}] {self.name}"
+
+
+class OrganizationScope(models.Model):
+    name = models.CharField(max_length=100, choices=ORG_SCOPES, primary_key=True)
+
+    def __str__(self):
+        return str(ORG_SCOPES_NAMES_MAP[self.name])
+
 
 class Organization(models.Model):
     id = models.UUIDField(
-        primary_key = True,
-        default = uuid.uuid4,
-        editable = False,
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
     )
-    name = models.CharField(max_length = 200)
-    logo = models.ImageField(upload_to=organization_logos_directory_path, validators=[LimitFileSize(10)], null=True, blank=True)
+    name = models.CharField(max_length=200)
+    logo = models.ImageField(
+        upload_to=organization_logos_directory_path,
+        validators=[LimitFileSize(10)],
+        null=True,
+        blank=True,
+    )
     description = models.TextField(blank=True)
     date = models.DateTimeField(auto_now_add=True)
     scopes = models.ManyToManyField(OrganizationScope)
@@ -92,23 +179,40 @@ class Organization(models.Model):
     def __str__(self):
         return f"(Entitat) {self.name}"
 
+    @classmethod
+    def deleted_organization(cls):
+        o = Organization(name=_("«organització eliminada»"), lat=0, lng=0)
+        o.id = None  # even if an id is not given, the constructor creates it
+        return o
+
     def json(self, current_organization=None, include_children=False):
         j = {
             "id": self.id,
             "name": self.name,
             "description": self.description,
             "org_type": self.org_type,
-            "href": reverse("view_organization", kwargs={"organization_id": self.id})
         }
+        # could be a deleted organization
+        if self.id:
+            j["href"] = reverse(
+                "view_organization", kwargs={"organization_id": self.id}
+            )
         if current_organization:
             j["distance"] = self.distance_text(current_organization)
         if include_children:
             j["scopes"] = [s.name for s in self.scopes.all()]
-            j["social_media"] = [{"id": sm.id, "media_type": sm.media_type, "value": sm.value} for sm in self.social_media.all()]
-            j["needs"] = [n.json(current_organization=current_organization, include_org=False) for n in
-                    self.needs.all()]
-            j["offers"] = [o.json(current_organization=current_organization, include_org=False) for o in
-                    self.offers.all()]
+            j["social_media"] = [
+                {"id": sm.id, "media_type": sm.media_type, "value": sm.value}
+                for sm in self.social_media.all()
+            ]
+            j["needs"] = [
+                n.json(current_organization=current_organization, include_org=False)
+                for n in self.needs.all()
+            ]
+            j["offers"] = [
+                o.json(current_organization=current_organization, include_org=False)
+                for o in self.offers.all()
+            ]
 
         return j
 
@@ -139,7 +243,9 @@ class Organization(models.Model):
         return self.aux_missing(self.offers.all())
 
     def aux_missing(self, data):
-        return self.aux_missing_not_set(list(map(lambda x: x.resource, [x for x in data if x.has_resource])))
+        return self.aux_missing_not_set(
+            list(map(lambda x: x.resource, [x for x in data if x.has_resource]))
+        )
 
     def aux_missing_not_set(self, has):
         l = []
@@ -157,31 +263,41 @@ class Organization(models.Model):
         lat2, lon2 = other.lat, other.lng
 
         phi1, phi2 = math.radians(lat1), math.radians(lat2)
-        dphi       = math.radians(lat2 - lat1)
-        dlambda    = math.radians(lon2 - lon1)
+        dphi = math.radians(lat2 - lat1)
+        dlambda = math.radians(lon2 - lon1)
 
-        a = math.sin(dphi/2)**2 + \
-            math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+        a = (
+            math.sin(dphi / 2) ** 2
+            + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+        )
 
-        return 2*6372.8*math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return 2 * 6372.8 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
     def distance_text(self, other):
         d = self.distance(other)
         if d < 1:
-            return "menys d'un km"
+            return _("menys d'un km")
         dc = int(math.ceil(d))
-        return f"menys de {dc}km"
+        return _("menys de %(d)skm") % {"d": dc}
 
     def pending_agreements(self):
-        sent = self.sent_agreements.filter(communication_accepted=True, agreement_successful=None)
+        sent = self.sent_agreements.filter(
+            communication_accepted=True, agreement_successful=None
+        )
         received0 = self.received_agreements.filter(communication_accepted=None)
-        received1 = self.received_agreements.filter(communication_accepted=True, agreement_successful=None)
+        received1 = self.received_agreements.filter(
+            communication_accepted=True, agreement_successful=None
+        )
         return len(sent) > 0, len(received0) > 0 or len(received1) > 0
 
+
 class SocialMedia(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="social_media")
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="social_media"
+    )
     media_type = models.CharField(max_length=30, choices=SOCIAL_MEDIA_TYPES)
     value = models.CharField(max_length=200)
+
 
 class Resource:
     def __init__(self, values):
@@ -189,7 +305,7 @@ class Resource:
         self.name = values[1]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     @classmethod
     def resource(cls, code):
@@ -208,23 +324,12 @@ class Resource:
                 return options[1]
         raise Exception("Unknown option")
 
-    def question(self, resource_type):
-        if resource_type == "offers":
-            return RESOURCE_OFFER_DESCRIPTIONS[self.code]
-        return RESOURCE_NEED_DESCRIPTIONS[self.code]
-
-    def answer_no(self, resource_type): return self.answer(resource_type, 0)
-    def answer_yes(self, resource_type): return self.answer(resource_type, 1)
-    def answer(self, resource_type, i):
-        if resource_type == "offers":
-            return RESOURCE_OFFER_ACTIONS[self.code][i]
-        return RESOURCE_NEED_ACTIONS[self.code][i]
-
     def options(self):
         return RESOURCE_OPTIONS_MAP[self.code]
 
     def add_image_label(self):
         return RESOURCE_ADD_IMAGE_LABEL[self.code]
+
 
 class Table:
     def __init__(self, columns, labels, rows):
@@ -234,18 +339,21 @@ class Table:
         self.footer = ["Total"] + [0] * len(rows[0])
         for row in rows:
             for i in range(len(row)):
-                self.footer[i+1] += row[i]
+                self.footer[i + 1] += row[i]
 
     def plot(self):
         df = pd.DataFrame(
             self.rows,
-            columns = self.columns[1:],
-            index = map(lambda x: x if len(x) < 15 else x[:12].strip()+"...", self.labels),
+            columns=self.columns[1:],
+            index=map(
+                lambda x: x if len(x) < 15 else x[:12].strip() + "...", self.labels
+            ),
         )
         return plot_dataframe(df)
 
+
 class Timeline:
-    def __init__(self, rows, name = ""):
+    def __init__(self, rows, name=""):
         self.rows = [0]
         self.index = [timezone.now()]
         self.name = name
@@ -259,7 +367,10 @@ class Timeline:
         counts = [0] * len(date_intervals)
         interval_index = 0
         for date in dates:
-            while interval_index < len(date_intervals)-1 and date > date_intervals[interval_index+1]:
+            while (
+                interval_index < len(date_intervals) - 1
+                and date > date_intervals[interval_index + 1]
+            ):
                 interval_index += 1
             counts[interval_index] += 1
         return counts
@@ -267,10 +378,11 @@ class Timeline:
     def plot(self):
         df = pd.DataFrame(
             self.rows,
-            columns = [self.name],
+            columns=[self.name],
             index=map(lambda x: x.strftime("%Y/%m/%d"), self.index),
         )
-        return plot_dataframe(df, figsize = (10, 6))
+        return plot_dataframe(df, figsize=(10, 6))
+
 
 class Graph:
     def __init__(self, graph):
@@ -281,41 +393,64 @@ class Graph:
         nx.draw_kamada_kawai(self.graph)
         return plot()
 
-def plot_dataframe(df, figsize = (10, 8)):
+
+def plot_dataframe(df, figsize=(10, 8)):
     plt.switch_backend("AGG")
     df.plot.bar(
-        rot = 30,
-        figsize = figsize,
+        rot=30,
+        figsize=figsize,
     )
     return plot()
+
 
 def plot():
     sio = BytesIO()
     plt.savefig(sio, format="png")
     return base64.encodebytes(sio.getvalue()).decode()
 
-def option_name(code):    return RESOURCE_OPTIONS_DEF_MAP[code]
-def resource_name(code):  return RESOURCE_NAMES_MAP[code]
-def org_scope_name(code): return ORG_SCOPES_NAMES_MAP[code]
-def org_type_name(code):  return ORG_TYPES_NAMES_MAP[code]
-def social_media_type_name(code): return SOCIAL_MEDIA_TYPES_MAP[code]
+
+def option_name(code):
+    return RESOURCE_OPTIONS_DEF_MAP[code]
+
+
+def resource_name(code):
+    return RESOURCE_NAMES_MAP[code]
+
+
+def org_scope_name(code):
+    return ORG_SCOPES_NAMES_MAP[code]
+
+
+def org_type_name(code):
+    return ORG_TYPES_NAMES_MAP[code]
+
+
+def social_media_type_name(code):
+    return SOCIAL_MEDIA_TYPES_MAP[code]
+
 
 def sort_resources(resources):
-    return sorted(resources, key = lambda r: RESOURCES_ORDER.index(r.resource))
+    return sorted(resources, key=lambda r: RESOURCES_ORDER.index(r.resource))
+
 
 def sort_social_media(social_media):
-    return sorted(social_media, key = lambda sm: SOCIAL_MEDIA_TYPES_ORDER.index(sm.media_type))
+    return sorted(
+        social_media, key=lambda sm: SOCIAL_MEDIA_TYPES_ORDER.index(sm.media_type)
+    )
+
 
 class ResourceOption(models.Model):
-    name = models.CharField(max_length=100, choices=RESOURCE_OPTIONS, primary_key = True)
+    name = models.CharField(max_length=100, choices=RESOURCE_OPTIONS, primary_key=True)
 
     def __str__(self):
-        return RESOURCE_OPTIONS_DEF_MAP[self.name]
+        return str(RESOURCE_OPTIONS_DEF_MAP[self.name])
+
 
 class BaseResource(models.Model):
+    last_updated_on = models.DateTimeField(auto_now=True)
     resource = models.CharField(max_length=100, choices=RESOURCES)
     options = models.ManyToManyField(ResourceOption)
-    comments = models.TextField(null = True, blank = True)
+    comments = models.TextField(null=True, blank=True)
     has_resource = models.BooleanField(default=False)
 
     class Meta:
@@ -336,6 +471,7 @@ class BaseResource(models.Model):
             "options": [o.name for o in self.options.all()],
         }
 
+
 class Need(BaseResource):
     organization = models.ForeignKey(
         Organization,
@@ -345,10 +481,14 @@ class Need(BaseResource):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint("organization", "resource", name="unique_organization_need"),
+            models.UniqueConstraint(
+                "organization", "resource", name="unique_organization_need"
+            ),
         ]
 
-    def json(self, current_organization=None, include_org=True, agreement_declined_map=None):
+    def json(
+        self, current_organization=None, include_org=True, agreement_declined_map=None
+    ):
         j = super().json()
         j["type"] = "need"
         if include_org:
@@ -356,8 +496,18 @@ class Need(BaseResource):
         if current_organization:
             j["distance"] = current_organization.distance_text(self.organization)
             if agreement_declined_map:
-                j["last_message_declined"] = self.last_message_declined(agreement_declined_map)
-            j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "need", self.resource])
+                j["last_message_declined"] = self.last_message_declined(
+                    agreement_declined_map
+                )
+            j["message_href"] = reverse(
+                "send_message",
+                args=[
+                    current_organization.id,
+                    self.organization.id,
+                    "need",
+                    self.resource,
+                ],
+            )
         j["images"] = [i.json() for i in self.images.all()]
         return j
 
@@ -366,6 +516,7 @@ class Need(BaseResource):
             return agreement_declined_map["need"][self.resource][self.organization.id]
         except:
             return False
+
 
 class Offer(BaseResource):
     organization = models.ForeignKey(
@@ -377,10 +528,14 @@ class Offer(BaseResource):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint("organization", "resource", name="unique_organization_offer"),
+            models.UniqueConstraint(
+                "organization", "resource", name="unique_organization_offer"
+            ),
         ]
 
-    def json(self, current_organization=None, include_org=True, agreement_declined_map=None):
+    def json(
+        self, current_organization=None, include_org=True, agreement_declined_map=None
+    ):
         j = super().json()
         j["type"] = "offer"
         if include_org:
@@ -388,8 +543,18 @@ class Offer(BaseResource):
         if current_organization:
             j["distance"] = current_organization.distance_text(self.organization)
             if agreement_declined_map:
-                j["last_message_declined"] = self.last_message_declined(agreement_declined_map)
-            j["message_href"] = reverse("send_message", args=[current_organization.id, self.organization.id, "offer", self.resource])
+                j["last_message_declined"] = self.last_message_declined(
+                    agreement_declined_map
+                )
+            j["message_href"] = reverse(
+                "send_message",
+                args=[
+                    current_organization.id,
+                    self.organization.id,
+                    "offer",
+                    self.resource,
+                ],
+            )
         j["images"] = [i.json() for i in self.images.all()]
         j["charge"] = self.charge
         return j
@@ -400,18 +565,31 @@ class Offer(BaseResource):
         except:
             return False
 
+
 class Agreement(models.Model):
     id = models.UUIDField(
-        primary_key = True,
-        default = uuid.uuid4,
-        editable = False,
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
     )
-    solicitor = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="sent_agreements", null=True)
-    solicitee = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="received_agreements", null=True)
+    solicitor = models.ForeignKey(
+        Organization,
+        on_delete=models.SET_NULL,
+        related_name="sent_agreements",
+        null=True,
+    )
+    solicitee = models.ForeignKey(
+        Organization,
+        on_delete=models.SET_NULL,
+        related_name="received_agreements",
+        null=True,
+    )
     message = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
     resource = models.CharField(max_length=100, choices=RESOURCES)
-    resource_type = models.CharField(max_length=10, choices=[("need", "need"), ("offer", "offer")])
+    resource_type = models.CharField(
+        max_length=10, choices=[("need", "need"), ("offer", "offer")]
+    )
     options = models.ManyToManyField(ResourceOption)
     communication_accepted = models.BooleanField(null=True)
     communication_date = models.DateTimeField(null=True, blank=True)
@@ -421,18 +599,21 @@ class Agreement(models.Model):
     def __str__(self):
         return f"[{self.id}] {self.solicitor} sol·licita {self.resource} a {self.solicitee}"
 
-    def state(self):
-        return f"""{self.resource}. Comunicació: {self.communication_accepted}. Èxit: {self.agreement_successful}."""
+    def solicitor_safe(self):
+        if self.solicitor:
+            return self.solicitor
+        return Organization.deleted_organization()
 
-    def render_options(self):
-        options = [str(x) for x in self.options.all()]
-        return ", ".join(options)
+    def solicitee_safe(self):
+        if self.solicitee:
+            return self.solicitee
+        return Organization.deleted_organization()
 
     def json(self, organization_id):
         return {
             "id": self.id,
-            "solicitor": self.solicitor.json(),
-            "solicitee": self.solicitee.json(),
+            "solicitor": self.solicitor_safe().json(),
+            "solicitee": self.solicitee_safe().json(),
             "date": self.date,
             "message": self.message,
             "options": [o.name for o in self.options.all()],
@@ -442,14 +623,22 @@ class Agreement(models.Model):
             "communication_date": self.communication_date,
             "agreement_successful": self.agreement_successful,
             "successful_date": self.successful_date,
-            "href_connect": reverse("agreement_connect", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
-            "href_successful": reverse("agreement_successful", kwargs={"organization_id": organization_id, "agreement_id": self.id}),
+            "href_connect": reverse(
+                "agreement_connect",
+                kwargs={"organization_id": organization_id, "agreement_id": self.id},
+            ),
+            "href_successful": reverse(
+                "agreement_successful",
+                kwargs={"organization_id": organization_id, "agreement_id": self.id},
+            ),
         }
+
 
 class Contact(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     email = models.EmailField()
     content = models.TextField()
+
 
 class ContactDenyList(models.Model):
     email = models.EmailField()
@@ -461,17 +650,22 @@ class ContactDenyList(models.Model):
         self.email = clean_form_email(self.email)
         super(ContactDenyList, self).save(*args, **kwargs)
 
+
 class NeedImage(models.Model):
     resource = models.ForeignKey(Need, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to=need_images_directory_path, validators=[LimitFileSize(10)])
+    image = models.ImageField(
+        upload_to=need_images_directory_path, validators=[LimitFileSize(10)]
+    )
 
     def json(self):
-        return { "url": self.image.url }
+        return {"url": self.image.url}
+
 
 class OfferImage(models.Model):
     resource = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to=offer_images_directory_path, validators=[LimitFileSize(10)])
+    image = models.ImageField(
+        upload_to=offer_images_directory_path, validators=[LimitFileSize(10)]
+    )
 
     def json(self):
-        return { "url": self.image.url }
-
+        return {"url": self.image.url}

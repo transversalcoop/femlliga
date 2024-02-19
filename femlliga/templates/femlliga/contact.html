@@ -2,35 +2,35 @@
 
 {% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback %}
 
-{% block title %}Contacte{% endblock %}
+{% block title %}{{ _("Contacte") }}{% endblock %}
 
 {% block content %}
 <div class="container">
-<h2 id="contacte">Contacta amb nosaltres</h2>
+<h2 id="contacte">{{ _("Contacta amb nosaltres") }}</h2>
 
 {% if form_sent %}
 <div class="alert alert-primary mt-2" role="alert">
-    Gràcies per enviar el missatge! Et respondrem tan aviat com puguem.
+  {{ _("Gràcies per enviar el missatge! Et respondrem tan aviat com puguem.") }}
 </div>
 {% else %}
-<p>Si tens qualsevol pregunta o suggerència, no dubtes a contactar amb nosaltres, envia'ns un missatge!</p>
+<p>{{ _("Si tens qualsevol pregunta o suggerència, no dubtes a contactar amb nosaltres, envia'ns un missatge!") }}</p>
 
 <form method="POST" class="mb-4">
     {{ csrf_input }}
     {{ form_feedback(form) }}
 
-    <label for="id_email">El teu correu electrònic. El farem servir per respondre't</label>
-    <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="Nom" id="id_email" {{ input_value(form, "email") }} required>
+    <label for="id_email">{{ _("El teu correu electrònic. El farem servir per respondre't") }}</label>
+    <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="{{ _("Nom") }}" id="id_email" {{ input_value(form, "email") }} required>
     {{ input_feedback(form, "email") }}
 
-    <label for="id_content" class="mt-2">Missatge</label>
+    <label for="id_content" class="mt-2">{{ _("Missatge") }}</label>
     <textarea id="content" name="content" rows="8" {{ input_classes(form, "content") }} required>{{ textarea_value(form, "content") }}</textarea>
     {{ input_feedback(form, "content") }}
 
     <div class="mt-2"></div>
     {{ form.captcha }}
 
-    <button type="submit" class="btn btn-success mt-2">Envia</button>
+    <button type="submit" class="btn btn-success mt-2">{{ _("Envia") }}</button>
 </form>
 
 {% endif %}

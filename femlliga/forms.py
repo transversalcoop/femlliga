@@ -4,29 +4,45 @@ import urllib
 import django.forms as forms
 from django.utils.translation import gettext_lazy as _
 
-from captcha.fields import ReCaptchaField
+from django_recaptcha.fields import ReCaptchaField
 from allauth.account.forms import LoginForm, SignupForm
 
 from .models import CustomUser, Organization, Contact, Resource
 from .constants import *
 
+
 def http_get(url):
     f = urllib.request.urlopen(url)
-    res = json.loads(f.read().decode('utf-8'))
+    res = json.loads(f.read().decode("utf-8"))
     f.close()
     return res
 
+
 class PreferencesForm(forms.ModelForm):
+    email = forms.EmailField()
+
     class Meta:
         model = CustomUser
-        fields = ["notifications_frequency", "accept_communications_automatically"]
+        fields = [
+            "language",
+            "notifications_frequency",
+            "accept_communications_automatically",
+            "notify_immediate_communications_received",
+            "notify_immediate_communications_rejected",
+            "notify_agreement_communication_pending",
+            "notify_agreement_success_pending",
+            "notify_matches",
+            "notify_new_resources",
+        ]
+
 
 class OrganizationForm(forms.ModelForm):
     scopes = forms.MultipleChoiceField(
-        required = True,
-        widget   = forms.CheckboxSelectMultiple,
-        choices  = ORG_SCOPES,
+        required=True,
+        widget=forms.CheckboxSelectMultiple,
+        choices=ORG_SCOPES,
     )
+
     class Meta:
         model = Organization
         fields = ["name", "logo", "description", "org_type", "lat", "lng", "address"]
@@ -42,44 +58,38 @@ class OrganizationForm(forms.ModelForm):
             self.cleaned_data["lng"] = 0
             try:
                 address = urllib.parse.quote(self.cleaned_data["address"])
-                res = http_get(f"https://nominatim.openstreetmap.org/search?format=json&q={address}")
+                res = http_get(
+                    f"https://nominatim.openstreetmap.org/search?format=json&q={address}"
+                )
                 self.cleaned_data["lat"] = res[0]["lat"]
                 self.cleaned_data["lng"] = res[0]["lon"]
             except:
                 pass
         else:
-            self._errors["address"] = self.error_class(["Cal indicar la posició o l'adreça"])
+            self.add_error("address", _("Cal indicar la posició o l'adreça"))
 
         return self.cleaned_data
+
 
 class ResourceForm(forms.Form):
     resource = forms.ChoiceField(choices=[("", "-----------")] + RESOURCES)
     options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=False)
-    has_resource = forms.CharField(max_length=10)
-    comments = forms.CharField(required = False)
-    charge = forms.BooleanField(required = False)
+    comments = forms.CharField(required=False)
+    charge = forms.BooleanField(required=False)
 
-    def clean(self):
-        super().clean()
-        has_resource = self.cleaned_data.get("has_resource", "no") == "yes"
-        resource_options = Resource.resource(self.cleaned_data["resource"]).options()
-        missing_options = len(resource_options) > 0 and len(self.cleaned_data.get("options", [])) == 0
-        missing_comments = not self.cleaned_data["comments"]
-        if has_resource and missing_options and missing_comments:
-            self._errors["options"] = self.error_class([
-                "Cal indicar una opció com a mínim, o indicar en comentaris altres opcions que us interessarien",
-            ])
-        return self.cleaned_data
 
 class ImageForm(forms.Form):
     image = forms.ImageField()
+
 
 class MessageForm(forms.Form):
     message = forms.CharField(min_length=1)
     options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=False)
 
     def __init__(self, *args, **kwargs):
-        self.resource = kwargs.pop('resource') # must be done first, if not super().__init__(...) fails
+        self.resource = kwargs.pop(
+            "resource"
+        )  # must be done first, if not super().__init__(...) fails
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -88,8 +98,10 @@ class MessageForm(forms.Form):
             return self.cleaned_data
 
         if len(self.cleaned_data.get("options", [])) == 0:
-            self._errors["options"] = self.error_class(["Cal indicar una opció com a mínim"])
+            self.add_error("options", _("Cal indicar una opció com a mínim"))
+
         return self.cleaned_data
+
 
 class ContactForm(forms.ModelForm):
     captcha = ReCaptchaField()
@@ -98,8 +110,10 @@ class ContactForm(forms.ModelForm):
         model = Contact
         fields = ["email", "content"]
 
+
 class CaptchaLoginForm(LoginForm):
     captcha = ReCaptchaField()
+
 
 class CaptchaSignupForm(SignupForm):
     captcha = ReCaptchaField()

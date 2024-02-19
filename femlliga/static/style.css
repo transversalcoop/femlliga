@@ -1,3 +1,15 @@
+:root {
+    --blue: #3945B8;
+    --lightbrown: #5b5b00;
+    --brown: #505000;
+    --yellow: #ffce1c;
+    --darkgrey: #212529;
+    --midgrey: #5b5b5b;
+    --lightgrey: #9a9a9a;
+    --lightgrey1: #cccccc;
+    --lightgrey2: #f6f6f6;
+}
+
 body, wrapper {
     min-height: 100vh;
     font-family: "Poppins", "Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
@@ -26,16 +38,25 @@ h1, h2, h3, h4, h5, h6 {
 
 a {
     text-decoration: underline;
-    color: #212529;
+    color: var(--darkgrey);
     transition: all .2s ease-in;
 }
 
 a:hover {
-    color: #FFCE1C;
+    color: var(--yellow);
+}
+
+a.rounded-link {
+    text-decoration: none;
+}
+
+a.rounded-link:hover {
+    color: var(--darkgrey);
+    background-color: var(--yellow);
 }
 
 .organization-main-page a:hover {
-    color: #212529;
+    color: var(--darkgrey);
     font-weight: bold;
 }
 
@@ -77,11 +98,25 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 }
 
 .btn-custom:hover {
-    background-color: #FFCE1C;
+    background-color: var(--yellow);
 }
 
 .btn-custom-sm {
     padding: 0.25rem 0.5rem;
+}
+
+.btn-brown {
+    color: white;
+    background-color: var(--brown);
+}
+
+.btn-brown:hover, .btn-brown:focus-visible {
+    color: white;
+    background-color: var(--lightbrown);
+}
+
+.btn-brown:focus-visible, .btn-custom:focus-visible {
+    box-shadow: 0 0 0 0.25rem var(--lightgrey);
 }
 
 nav a {
@@ -135,6 +170,10 @@ nav a:hover {
     max-height: 200px;
 }
 
+.max-w-100 {
+    max-width: 100%;
+}
+
 .spacing {
     margin-top: 20px;
 }
@@ -142,15 +181,15 @@ nav a:hover {
 .divider-1 {
     width: 50px;
     height: 3px;
-    background-color: #FFCE1C;
+    background-color: var(--yellow);
     margin: 10px auto;
     position: relative;
     border-radius: 2px;
 }
 
 .divider-1::before {
-    background-color: #FFCE1C;
-    box-shadow: 9px 0px 0px 0px #ffce1c, 18px 0px 0px 0px #ffce1c;
+    background-color: var(--yellow);
+    box-shadow: 9px 0px 0px 0px var(--yellow), 18px 0px 0px 0px var(--yellow);
     content: "";
     position: absolute;
     left: -27px;
@@ -243,7 +282,7 @@ pre {
 }
 
 .welcome-block {
-    background-color: #f6f6f6;
+    background-color: var(--lightgrey2);
     margin-top: 20px;
     padding: 100px 60px;
     background-image: url('/static/home-images/gent-portada.png');
@@ -280,7 +319,7 @@ pre {
 }
 
 .separator-yellow {
-    color: #ffce1c;
+    color: var(--yellow);
     height: 2px;
 }
 
@@ -297,8 +336,12 @@ pre {
     display: inline-block;
 }
 
+.multi-select-choice:focus-visible {
+    box-shadow: 0 0 0 0.25rem var(--lightgrey);
+}
+
 .multi-select .selected {
-    background-color: #FFCE1C;
+    background-color: var(--yellow);
 }
 
 .sidebar {
@@ -306,7 +349,7 @@ pre {
 }
 
 .nav-pills .nav-link.active {
-    background-color: #FFCE1C;
+    background-color: var(--yellow);
     color: black;
 }
 
@@ -319,8 +362,8 @@ nav .nav-link.active {
 }
 
 .badge.bg-light, .alert.alert-light {
-    border: 1px solid #333;
-    color: #333;
+    border: 1px solid var(--darkgrey);
+    color: var(--darkgrey);
 }
 
 @media (min-width: 768px) {
@@ -401,7 +444,7 @@ nav .nav-link.active {
 }
 
 .highlight {
-    background-color: #3945B8;
+    background-color: var(--blue);
     color: white;
 }
 
@@ -449,8 +492,21 @@ nav .nav-link.active {
     }
 }
 
-.triple-column {
+
+.columns {
     columns: 3;
+}
+
+@media (max-width: 768px) {
+    .columns {
+        columns: 2;
+    }
+}
+
+@media (max-width: 576px) {
+    .columns {
+        columns: 1;
+    }
 }
 
 .landing-container {
@@ -463,7 +519,7 @@ nav .nav-link.active {
 
 .resources-title {
     margin: 10px 0;
-    background-color: #ffce1c;
+    background-color: var(--yellow);
     font-size: 2.5em;
     text-align: left;
     padding: 0 5px 0 20px;
@@ -490,7 +546,7 @@ nav .nav-link.active {
 }
 
 .matches-count {
-    border-top: 1px solid #ccc;
+    border-top: 1px solid var(--lightgrey1);
     height: 2em;
     line-height: 1.8em;
     margin: 1rem auto;
@@ -500,7 +556,7 @@ nav .nav-link.active {
 
 .matches-count span {
     background-color: #ffffff;
-    color: #9A9A9A;
+    color: var(--lightgrey);
     font-style: italic;
     left: 50%;
     margin-left: -6em;
@@ -575,11 +631,71 @@ nav .nav-link.active {
 }
 
 .background-yellow {
-    background-color: #ffce1c;
+    background-color: var(--yellow);
 }
 
 .background-yellow-dark {
-    background-color: #505000;
+    background-color: var(--brown);
     color: white;
+}
+
+.text-bg-lightgrey1 {
+    background-color: var(--lightgrey1);
+}
+
+.square-2 {
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+}
+
+.border-dotted-right {
+    border-right: 2px dotted var(--lightgrey);
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.preferences-section {
+    padding: 1rem 1rem 0 1rem;
+    background-color: white;
+    margin-bottom: 2rem;
+}
+
+.preferences-section-title {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: normal;
+    color: var(--midgrey);
+}
+
+.preferences-row {
+    padding: 1rem 0 0 0;
+    border-bottom: 2px solid var(--lightgrey2);
+    display: flex;
+    align-items: center;
+}
+
+.preferences-row:last-of-type {
+    border-bottom: none;
+}
+
+.preferences-row label, .preferences-row input, .preferences-row select {
+    margin-bottom: 1rem;
+}
+
+.preferences-row .form-switch.form-check-reverse .form-check-input {
+    font-size: 1.5rem;
+    margin-right: -1em;
+}
+
+.background-grey {
+    background-color: var(--lightgrey2);
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--brown);
+    border-color: var(--brown);
 }
 

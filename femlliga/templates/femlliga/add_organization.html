@@ -6,25 +6,25 @@
 
 {% block title %}
 {% if edit %}
-Edita l'entitat
+{{ _("Edita l'entitat") }}
 {% else %}
-Crea una entitat
+{{ _("Crea una entitat") }}
 {% endif %}
 {% endblock %}
 
 {% block content %}
 <div class="container">
 {% if edit %}
-<h1>Edita la informació de l'entitat</h1>
+<h1>{{ _("Edita la informació de l'entitat") }}</h1>
 {% else %}
 <div class="alert alert-primary mt-2" role="alert">
-  Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les dades de sota per crear-la. Podràs modificar i afegir més informació després.
+  {{ _("Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les dades de sota per crear-la. Podràs modificar i afegir més informació després.") }}
 </div>
 {% endif %}
 
 {% if form.errors %}
 <div class="alert alert-warning mt-2" role="alert">
-  Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo.
+  {{ _("Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo.") }}
 </div>
 {% endif %}
 <form method="post" enctype="multipart/form-data" class="mb-2">
@@ -32,7 +32,7 @@ Crea una entitat
     {{ form_feedback(form) }}
 
     <div class="py-3">
-      <label for="id_name"><strong>Nom de l'entitat</strong></label>
+      <label for="id_name"><strong>{{ _("Nom de l'entitat") }}</strong></label>
       <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="Nom" id="id_name" {{ input_value(form, "name") }} required>
       {{ input_feedback(form, "name") }}
     </div>
@@ -49,26 +49,26 @@ Crea una entitat
         <div class="col-6">
           <button class="btn btn-custom" @click.prevent="deleteLogo" :disabled="loading">
             <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
-              <span class="visually-hidden">Esborrant...</span>
+              <span class="visually-hidden">{{ _("Esborrant...") }}</span>
             </div>
-            <span v-else>Esborra la imatge</span>
+            <span v-else>{{ _("Esborra la imatge") }}</span>
           </button>
         </div>
       </div>
       <div v-else class="py-3">
-        <label for="id_logo"><strong>Logo o imatge de l'entitat</strong> (opcional)</label>
+        <label for="id_logo"><strong>{{ _("Logo o imatge de l'entitat") }}</strong> ({{ _("opcional") }})</label>
         <input type="file" {{ input_classes(form, "logo") }} name="logo" autocomplete="Logo" id="id_logo" {{ input_value(form, "logo") }}>
         {{ input_feedback(form, "logo") }}
       </div>
 
       <div class="py-3">
-        <label for="id_description"><strong>Descripció de l'activitat de l'entitat</strong> (opcional)</label>
+        <label for="id_description"><strong>{{ _("Descripció de l'activitat de l'entitat") }}</strong> ({{ _("opcional") }})</label>
         <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description">{{ textarea_value(form, "description") }}</textarea>
         {{ input_feedback(form, "description") }}
       </div>
 
       <div class="py-3">
-        <p class="mb-1"><strong>Xarxes socials i contacte</strong></p>
+        <p class="mb-1"><strong>{{ _("Xarxes socials i contacte") }}</strong></p>
         {% for i, mform in enumerate(social_media_forms) %}
           {{ form_feedback(mform) }}
           <div
@@ -90,14 +90,14 @@ Crea una entitat
         {% endfor %}
         <div>
           <a v-if="socialMediasAddIndex < totalSocialMedias" @click.prevent="addSocialMedia" class="btn btn-custom" href="#">
-            <i class="bi-plus-lg"></i> Afegeix xarxa social
+            <i class="bi-plus-lg"></i> {{ _("Afegeix xarxa social") }}
           </a>
         </div>
       </div>
     </div>
 
     <div class="py-3">
-      {{ render_select(form, "org_type", "Forma jurídica", strong_label=True) }}
+      {{ render_select(form, "org_type", _("Forma jurídica"), strong_label=True) }}
     </div>
 
     <div class="py-3">
@@ -105,13 +105,13 @@ Crea una entitat
     </div>
 
     <div class="py-3">
-      <label for="id_name"><strong>Ubicació</strong>. Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça aproximada:</label>
-      <input type="text" {{ input_classes(form, "address") }} name="address" autocomplete="Adreça" id="id_address" {{ input_value(form, "address") }} placeholder="Nom del carrer, número, codi postal, població, país">
+      <label for="id_name"><strong>{{ _("Ubicació.") }}</strong> {{ _("Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça aproximada:") }}</label>
+      <input type="text" {{ input_classes(form, "address") }} name="address" autocomplete="Adreça" id="id_address" {{ input_value(form, "address") }} placeholder="{{ _("Nom del carrer, número, codi postal, població, país") }}">
     </div>
 
     {% if form.errors.lat or form.errors.lng or form.errors.address %}
     <div class="invalid-feedback d-block">
-      <ul><li>És necessari indicar la posició o l'adreça de l'entitat</li></ul>
+      <ul><li>{{ _("És necessari indicar la posició o l'adreça de l'entitat") }}</li></ul>
     </div>
     {% endif %}
     <div id="citymap" class="map-height"></div>
@@ -121,9 +121,9 @@ Crea una entitat
 
     <button type="submit" class="btn btn-custom mt-2">
       {% if edit %}
-      Desa
+      {{ _("Desa") }}
       {% else %}
-      Crea l'entitat
+      {{ _("Crea l'entitat") }}
       {% endif %}
     </button>
 </form>
