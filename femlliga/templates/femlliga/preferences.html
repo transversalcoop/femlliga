@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import form_feedback, input_classes, input_value, input_feedback, render_select %}
+{% from 'femlliga/_macros.html' import form_feedback, input_classes, input_value, input_feedback, render_select, vue_js %}
 
 {% block title %}{{ _("Preferències") }}{% endblock %}
 
@@ -36,6 +36,17 @@
 
       <div class="row preferences-row">
         {{ render_select(form, "language", _("Idioma de l'aplicació"), strong_label=True, cols=[8, 4]) }}
+      </div>
+
+      <div id="vue-app" class="row preferences-row">
+        <div class="col-12">
+          <label for="id_distance_log">
+            <strong>{{ _("Distància màxima per a les lligues") }}</strong>
+            (${ distance } km)
+          </label>
+          <input v-model="distanceLog" name="distance_log" type="range" class="form-range" min="0" max="3" step="0.25" id="id_distance_log">
+          <input type="hidden" name="distance_limit_km" :value="distance">
+        </div>
       </div>
     </div>
 
@@ -76,3 +87,32 @@
   </div>
 </div>
 {% endmacro %}
+
+{% block js %}
+{{ vue_js() }}
+<script>
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      distanceLog: Math.log10(jsonData.distance),
+    };
+  },
+  computed: {
+    distance() {
+      let v = Math.pow(10, this.distanceLog);
+      if (v < 10) {
+        v = Math.round(v);
+      } else if (v < 100) {
+        v = 10 * Math.round(v / 10);
+      } else if (v < 1000) {
+        v = 100 * Math.round(v / 100);
+      }
+      return v;
+    },
+  },
+}).mount("#vue-app");
+</script>
+{% endblock %}
+

@@ -25,6 +25,7 @@ class PreferencesForm(forms.ModelForm):
         model = CustomUser
         fields = [
             "language",
+            "distance_limit_km",
             "notifications_frequency",
             "accept_communications_automatically",
             "notify_immediate_communications_received",

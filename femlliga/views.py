@@ -2,6 +2,7 @@ import exif
 import json
 import time
 import uuid
+import decimal
 import logging
 import unicodedata
 import networkx as nx
@@ -16,7 +17,7 @@ from django.forms import inlineformset_factory
 from django.utils import timezone
 from django.contrib import messages
 from django.dispatch import receiver
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Func, F
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import mail_managers
 from django.views.static import serve
@@ -176,8 +177,6 @@ def app(request):
     if not org.resources_set:
         return redirect("pre-wizard", organization_id=org.id)
 
-    own_needs = get_own_needs(org)
-    offer_matches, need_matches = get_organization_matches(org, own_needs)
     return render(
         request,
         "femlliga/app.html",
@@ -185,8 +184,6 @@ def app(request):
             "org": org,
             "needs": [n for n in org.needs.all() if n.has_resource],
             "offers": [n for n in org.offers.all() if n.has_resource],
-            "offer_matches": offer_matches,
-            "need_matches": need_matches,
         },
     )
 
@@ -280,7 +277,7 @@ def profile(request, organization_id):
 def edit_organization(request, organization_id):
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
-        return process_organization_post(request, org=org)
+        return process_organization_post(request, existing_org=org)
 
     return render(
         request,
@@ -578,7 +575,7 @@ def matches(request, organization_id):
         for x in own_needs
     ]
     agreement_declined_map = get_last_agreement_declined_map(organization)
-    offer_matches, need_matches = get_organization_matches(organization, own_needs)
+    offer_matches, need_matches = get_organization_matches(request.user, organization, own_needs)
     organization_matches = group_matches_by_organization(
         organization, offer_matches, need_matches
     )
@@ -591,7 +588,7 @@ def matches(request, organization_id):
                 agreement_declined_map=agreement_declined_map,
             )
             for l in organization_matches
-            for m in filter(lambda x: x.resource == need, l)
+            for m in l if m.resource == need
         ]
     return render_matches_page(
         request, "femlliga/matches.html", organization, matches, needs_json
@@ -665,18 +662,12 @@ def get_last_agreement_declined(l):
 
 def group_matches_by_organization(organization, offer_matches, need_matches):
     orgs = {}
-    for k in offer_matches:
-        for m in offer_matches[k]:
-            try:
-                orgs[m.organization.id].append(m)
-            except:
-                orgs[m.organization.id] = [m]
-    for k in need_matches:
-        for m in need_matches[k]:
-            try:
-                orgs[m.organization.id].append(m)
-            except:
-                orgs[m.organization.id] = [m]
+    for k, l in offer_matches.items():
+        for m in l:
+            orgs.setdefault(m.organization.id, []).append(m)
+    for k, l in need_matches.items():
+        for m in l:
+            orgs.setdefault(m.organization.id, []).append(m)
 
     return [
         orgs[k]
@@ -686,11 +677,12 @@ def group_matches_by_organization(organization, offer_matches, need_matches):
     ]
 
 
-def get_organization_matches(organization, own_needs):
+def get_organization_matches(user, organization, own_needs):
     offer_matches, need_matches = {}, {}
     for need in own_needs:
         need_options = [n.name for n in need.options.all()]
         offers = get_model_matches(
+            user,
             organization,
             need.resource,
             Offer,
@@ -701,6 +693,7 @@ def get_organization_matches(organization, own_needs):
             offer_matches[need.resource] = offers
 
         needs = get_model_matches(
+            user,
             organization,
             need.resource,
             Need,
@@ -714,7 +707,7 @@ def get_organization_matches(organization, own_needs):
 
 
 def get_model_matches(
-    organization, resource, model, need_options=None, include_other=True
+    user, organization, resource, model, need_options=None, include_other=True
 ):
     if need_options is None:
         queryset = model.objects.filter(
@@ -731,24 +724,39 @@ def get_model_matches(
     if not include_other:
         queryset = queryset.exclude(resource="OTHER")
 
+    # limit distance inside db so fewer results are retrieved
+    queryset = limit_distance(queryset, organization, user.distance_limit_km)
     results = (
         queryset.exclude(organization=organization)
-        .prefetch_related("organization")
-        .prefetch_related("images")
-        .prefetch_related("options")
+        .prefetch_related("organization", "images", "options")
         .distinct()
     )
+    # limit distance in python, so exactly the appropriate results are returned
+    results = [r for r in results if r.organization.distance(organization) < user.distance_limit_km]
     return sorted(results, key=lambda r: r.organization.distance(organization))
 
 
-def get_all_resources(organization):
+def limit_distance(queryset, organization, max_distance):
+    # 111.22 is approximate number of km in a lat or lng degree
+    max_degree = max_distance / decimal.Decimal(111.22)
+    # if delta is the angle difference in degrees
+    # abs(delta) must be less than max_distance/km_in_degree
+    return (
+        queryset.annotate(lat_delta=Func(F("organization__lat")-organization.lat, function="ABS"))
+        .annotate(lng_delta=Func(F("organization__lng")-organization.lng, function="ABS"))
+        .exclude(lat_delta__gt=max_degree)
+        .exclude(lng_delta__gt=max_degree)
+    )
+
+
+def get_all_resources(user, organization):
     offer_matches, need_matches = {}, {}
     for resource in RESOURCES:
-        offers = get_model_matches(organization, resource[0], Offer)
+        offers = get_model_matches(user, organization, resource[0], Offer)
         if len(offers) > 0:
             offer_matches[resource[0]] = offers
 
-        needs = get_model_matches(organization, resource[0], Need)
+        needs = get_model_matches(user, organization, resource[0], Need)
         if len(needs) > 0:
             need_matches[resource[0]] = needs
 
@@ -762,7 +770,7 @@ def search(request, organization_id):
     organization = organization_prefetches(
         request.user.organizations.filter(id=organization_id)
     ).first()
-    offer_matches, need_matches = get_all_resources(organization)
+    offer_matches, need_matches = get_all_resources(request.user, organization)
     organization_matches = group_matches_by_organization(
         organization, offer_matches, need_matches
     )
@@ -816,7 +824,7 @@ def search(request, organization_id):
 def preferences(request):
     form = PreferencesForm(model_to_dict(request.user))
     if request.method == "POST":
-        form, ok, msg = process_preferences_post(request)
+        form, ok, msg = save_preferences(request)
         if ok:
             messages.info(request, msg, extra_tags="show")
             return redirect("preferences")
@@ -830,11 +838,14 @@ def preferences(request):
         {
             "form": form,
             "other_emails": ", ".join([e.email for e in other_emails]),
+            "json_data": {
+                "distance": request.user.distance_limit_km,
+            },
         },
     )
 
 
-def process_preferences_post(request):
+def save_preferences(request):
     form = PreferencesForm(request.POST)
     if form.is_valid():
         new_email = clean_form_email(form.cleaned_data["email"])
@@ -859,6 +870,7 @@ def process_preferences_post(request):
                 )
 
         request.user.language = form.cleaned_data["language"]
+        request.user.distance_limit_km = form.cleaned_data["distance_limit_km"]
         request.user.notifications_frequency = form.cleaned_data[
             "notifications_frequency"
         ]
@@ -1111,22 +1123,21 @@ def get_city_from_coordinates(lat, lng):
 
 def organization_prefetches(queryset, include_missing_resources=False):
     if include_missing_resources:
-        queryset = queryset.prefetch_related("needs").prefetch_related("offers")
+        queryset = queryset.prefetch_related("needs", "offers")
     else:
         queryset = queryset.prefetch_related(
-            Prefetch("needs", queryset=Need.objects.filter(has_resource=True))
-        ).prefetch_related(
-            Prefetch("offers", queryset=Offer.objects.filter(has_resource=True))
+            Prefetch("needs", queryset=Need.objects.filter(has_resource=True)),
+            Prefetch("offers", queryset=Offer.objects.filter(has_resource=True)),
         )
-    return (
-        queryset.prefetch_related("scopes")
-        .prefetch_related("social_media")
-        .prefetch_related("needs__options")
-        .prefetch_related("offers__options")
-        .prefetch_related("needs__images")
-        .prefetch_related("offers__images")
-        .prefetch_related("sent_agreements__options")
-        .prefetch_related("received_agreements__options")
+    return queryset.prefetch_related(
+        "scopes",
+        "social_media",
+        "needs__options",
+        "offers__options",
+        "needs__images",
+        "offers__images",
+        "sent_agreements__options",
+        "received_agreements__options",
     )
 
 
@@ -1459,11 +1470,7 @@ def count_word_freqs(s):
 
 
 def get_relationships_graph():
-    agreements = (
-        Agreement.objects.all()
-        .prefetch_related("solicitor")
-        .prefetch_related("solicitee")
-    )
+    agreements = Agreement.objects.all().prefetch_related("solicitor", "solicitee")
     relations = {}
     for a in agreements:
         if not a.solicitor or not a.solicitee:

@@ -699,3 +699,14 @@ nav .nav-link.active {
     border-color: var(--brown);
 }
 
+.preferences-row .form-range::-webkit-slider-thumb {
+    background-color: var(--brown);
+}
+
+.preferences-row .form-range::-moz-range-thumb {
+    background-color: var(--brown);
+}
+
+.preferences-row .form-range::-ms-thumb {
+    background-color: var(--brown);
+}
