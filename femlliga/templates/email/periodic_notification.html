@@ -104,7 +104,7 @@
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
     <h1 style="margin: 20px 0 0 0;">{{ _("Novetats a la plataforma!") }}</h1>
-    {{ _("%(name)s està en constant evolució. En els darrers mesos, hem afegit nous recursos, més organitzacions s'han donat d'alta, i s'altres han actualitzat les seues necessitats. No us les perdeu i visiteu <a href='%(url)s'>%(domain)s</a>! Us enviem un xicotet resum:", name=current_site.name, domain=current_site.domain, url="https://"+current_site.domain) }}
+    {{ _("%(name)s està en constant evolució. En els darrers mesos, hem afegit nous recursos, més organitzacions s'han donat d'alta, i altres han actualitzat les seues necessitats. No us les perdeu i visiteu <a href='%(url)s'>%(domain)s</a>! Us enviem un xicotet resum:", name=current_site.name, domain=current_site.domain, url="https://"+current_site.domain) }}
     <ul>
       {% for r in c.resources %}
       <li>{{ render_resource(r.code, r.options) }}</li>

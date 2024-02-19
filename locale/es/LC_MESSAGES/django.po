@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-01-31 12:30+0000\n"
-"PO-Revision-Date: 2024-01-31 13:45+0100\n"
+"POT-Creation-Date: 2024-02-19 11:54+0000\n"
+"PO-Revision-Date: 2024-02-19 12:54+0100\n"
 "Last-Translator: \n"
 "Language-Team: es <LL@li.org>\n"
 "Language: es\n"
@@ -465,187 +465,187 @@ msgstr "¿De qué temas os interesa formaros?"
 msgid "Quina d'aquestes coses necessiteu?"
 msgstr "¿Cuál de estas cosas necesitáis?"
 
-#: femlliga/forms.py:62
+#: femlliga/forms.py:69
 msgid "Cal indicar la posició o l'adreça"
 msgstr "Es necesario indicar la posición o la dirección"
 
-#: femlliga/forms.py:89
+#: femlliga/forms.py:101
 msgid "Cal indicar una opció com a mínim"
 msgstr "Es necesario indicar al menos una opción"
 
-#: femlliga/models.py:68
+#: femlliga/models.py:76
 #, python-format
 msgid "L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB."
 msgstr "El archivo es demasiado grande, tendría que ocupar menos de %(max)s MB."
 
-#: femlliga/models.py:73
+#: femlliga/models.py:86
 msgid "Idioma configurat al navegador"
 msgstr "Idioma configurado en el navegador"
 
-#: femlliga/models.py:153
+#: femlliga/models.py:184
 msgid "«organització eliminada»"
 msgstr "«organización eliminada»"
 
-#: femlliga/models.py:235
+#: femlliga/models.py:279
 msgid "menys d'un km"
 msgstr "menos de un km"
 
-#: femlliga/models.py:237
+#: femlliga/models.py:281
 #, python-format
 msgid "menys de %(d)skm"
 msgstr "menos de %(d)skm"
 
-#: femlliga/views.py:83
+#: femlliga/views.py:101
 msgid "Títol"
 msgstr "Título"
 
-#: femlliga/views.py:84
+#: femlliga/views.py:102
 msgid "Subtítol"
 msgstr "Subtítulo"
 
-#: femlliga/views.py:85
+#: femlliga/views.py:103
 msgid "<p>Cal definir aquesta pàgina</p>"
 msgstr "<p>Hay que definir esta página</p>"
 
-#: femlliga/views.py:606
+#: femlliga/views.py:808
 msgid "Aquesta adreça ja està en ús"
 msgstr "Esta dirección ya está en uso"
 
-#: femlliga/views.py:626
+#: femlliga/views.py:842
 msgid "La configuració s'ha desat correctament"
 msgstr "La configuración se ha guardado correctamente"
 
-#: femlliga/views.py:628
+#: femlliga/views.py:844
 msgid ". S'ha enviat un correu electrònic per confirmar la nova adreça"
 msgstr ". Se ha enviado un correo electrónico para confirmar la nueva dirección"
 
-#: femlliga/views.py:674
+#: femlliga/views.py:892
 #, python-format
 msgid "T'han enviat una petició per compartir %(resource)s"
 msgstr "Te han enviado una petición para compartir %(resource)s"
 
-#: femlliga/views.py:790
+#: femlliga/views.py:1039
 #, python-format
 msgid "Comunicació iniciada per compartir %(resource)s"
 msgstr "Comunicación iniciada para compartir %(resource)s"
 
-#: femlliga/views.py:801
+#: femlliga/views.py:1050
 msgid "Us han declinat una petició"
 msgstr "Os han declinado una petición"
 
-#: femlliga/views.py:921
+#: femlliga/views.py:1251
 msgid "Pendents de comunicació"
 msgstr "Pendientes de comunicación"
 
-#: femlliga/views.py:922
+#: femlliga/views.py:1252
 msgid "Comunicació iniciada"
 msgstr "Comunicación iniciada"
 
-#: femlliga/views.py:923
+#: femlliga/views.py:1253
 msgid "Comunicació rebutjada"
 msgstr "Comunicación rechazada"
 
-#: femlliga/views.py:924
+#: femlliga/views.py:1254
 msgid "Acord aconseguit"
 msgstr "Acuerdo logrado"
 
-#: femlliga/views.py:925
+#: femlliga/views.py:1255
 msgid "Acord no aconseguit"
 msgstr "Acuerdo no logrado"
 
-#: femlliga/views.py:926
+#: femlliga/views.py:1256
 msgid "Total"
 msgstr "Total"
 
-#: femlliga/views.py:939
+#: femlliga/views.py:1291
 msgid "Altes d'entitats"
 msgstr "Otras entidades"
 
-#: femlliga/views.py:942
+#: femlliga/views.py:1295
 msgid "Recursos per tipus d'entitat"
 msgstr "Recursos por tipos de entidad"
 
-#: femlliga/views.py:942 femlliga/views.py:948 femlliga/views.py:951
-#: femlliga/views.py:957
+#: femlliga/views.py:1296 femlliga/views.py:1315 femlliga/views.py:1323
+#: femlliga/views.py:1339
 msgid "Oferiments"
 msgstr "Ofrecimientos"
 
-#: femlliga/views.py:942 femlliga/views.py:948 femlliga/views.py:951
-#: femlliga/views.py:957
+#: femlliga/views.py:1297 femlliga/views.py:1316 femlliga/views.py:1323
+#: femlliga/views.py:1340
 msgid "Necessitats"
 msgstr "Necesidades"
 
-#: femlliga/templates/femlliga/report.html:49 femlliga/views.py:942
-#: femlliga/views.py:948
+#: femlliga/templates/femlliga/report.html:49 femlliga/views.py:1298
+#: femlliga/views.py:1317
 msgid "Entitats"
 msgstr "Entidades"
 
-#: femlliga/views.py:945
+#: femlliga/views.py:1305
 msgid "Oferiments que es cobren per tipus d'entitat"
 msgstr "Ofrecimientos que se cobran por tipo de entidad"
 
-#: femlliga/views.py:945 femlliga/views.py:954
+#: femlliga/views.py:1306 femlliga/views.py:1330
 msgid "Oferiments cobrant"
 msgstr "Ofrecimientos cobrando"
 
-#: femlliga/views.py:945 femlliga/views.py:954
+#: femlliga/views.py:1307 femlliga/views.py:1331
 msgid "Oferiments gratuïts"
 msgstr "Ofrecimientos gratuitos"
 
-#: femlliga/views.py:948
+#: femlliga/views.py:1314
 msgid "Recursos per àmbit de treball de l'entitat"
 msgstr "Recursos por ámbito de trabajo de la entidad"
 
-#: femlliga/views.py:951
+#: femlliga/views.py:1323
 msgid "Recursos per tipus de recurs"
 msgstr "Recursos por tipo de recurso"
 
-#: femlliga/views.py:954
+#: femlliga/views.py:1329
 msgid "Oferiments que es cobren per tipus de recurs"
 msgstr "Ofrecimientos que se cobran por tipo de recurso"
 
-#: femlliga/views.py:957
+#: femlliga/views.py:1338
 msgid "Recursos per tipus concret de recurs"
 msgstr "Recursos por tipo concreto de recurso"
 
-#: femlliga/views.py:961
+#: femlliga/views.py:1346
 msgid "Interaccions per tipus d'entitat sol·licitant"
 msgstr "Interacciones por tipo de entidad solicitante"
 
-#: femlliga/views.py:964
+#: femlliga/views.py:1352
 msgid "Interaccions per àmbit de treball de l'entitat sol·licitant"
 msgstr "Interacciones por ámbito de trabajo de la entidad solicitante"
 
-#: femlliga/views.py:968
+#: femlliga/views.py:1358
 msgid "Interaccions per tipus d'entitat sol·licitada"
 msgstr "Interacciones por tipo de entidad solicitada"
 
-#: femlliga/views.py:971
+#: femlliga/views.py:1364
 msgid "Interaccions per àmbit de treball de l'entitat sol·licitada"
 msgstr "Interacciones por ámbito de trabajo de la entidad solicitada"
 
-#: femlliga/views.py:975
+#: femlliga/views.py:1370
 msgid "Interaccions per tipus de recurs"
 msgstr "Interacciones por tipo de recurso"
 
-#: femlliga/views.py:978
+#: femlliga/views.py:1375
 msgid "Peticions de col·laboració"
 msgstr "Peticiones de colaboración"
 
-#: femlliga/views.py:979
+#: femlliga/views.py:1378
 msgid "Comunicació acceptada"
 msgstr "Comunicación aceptada"
 
-#: femlliga/views.py:980
+#: femlliga/views.py:1381
 msgid "Col·laboració exitosa"
 msgstr "Colaboración exitosa"
 
-#: femlliga/views.py:1053
+#: femlliga/views.py:1475
 #, python-format
 msgid "S'ha rebut un contacte a la web de %(name)s"
 msgstr "Se ha recibido un contacto a la web de %(name)s"
 
-#: femlliga/views.py:1054
+#: femlliga/views.py:1477
 #, python-format
 msgid ""
 "Des del correu %(email)s envien el següent missatge:\n"
@@ -656,7 +656,7 @@ msgstr ""
 "\n"
 "%(content)s"
 
-#: femlliga/views.py:1058
+#: femlliga/views.py:1482
 #, python-format
 msgid "El formulari de contacte amb %(name)s s'ha enviat correctament"
 msgstr "El formulario de contacto con %(name)s se ha enviado correctamente"
@@ -1044,11 +1044,25 @@ msgstr ""
 "ha llegado correctamente, e intentaremos responderte lo antes posible. Debajo "
 "puedes ver una copia del mensaje que has enviado:"
 
+#: femlliga/templates/email/immediate_notification.html:6
+#, python-format
+msgid ""
+"Si voleu deixar de rebre aquestes notificacions, ho podeu configurar <a "
+"href='%(url)s'>dins de l'aplicació</a>, a la pàgina de Preferències, secció de "
+"Notificacions immediates."
+msgstr ""
+"Si queréis dejar de recibir estas notificaciones, lo podéis configurar <a "
+"href='%(url)s'>dentro de la aplicación</a>, en la página de Preferencias, "
+"sección de Notificaciones inmediatas."
+
 #: femlliga/templates/email/notify_communication_received.html:8
 #, python-format
 msgid ""
-"Us enviem aquest missatge des de %(name)s ja que %(solicitor)s us ha demanat"
-msgstr "Os enviamos este mensaje des de %(name)s ya que %(solicitor)s os ha pedido"
+"Us enviem aquest missatge des de %(name)s ja que <strong>%(solicitor)s</strong> "
+"us ha demanat"
+msgstr ""
+"Os enviamos este mensaje des de %(name)s ya que <strong>%(solicitor)s</strong> "
+"os ha pedido"
 
 #: femlliga/templates/email/notify_communication_received.html:25
 #, python-format
@@ -1061,11 +1075,11 @@ msgstr ""
 #: femlliga/templates/email/notify_communication_rejected.html:8
 #, python-format
 msgid ""
-"Us enviem aquest missatge des de %(name)s ja que %(solicitee)s ha declinat una "
-"petició que vau fer el %(date)s per"
+"Us enviem aquest missatge des de %(name)s ja que <strong>%(solicitee)s ha "
+"declinat una petició</strong> que els vau fer el %(date)s per"
 msgstr ""
-"Os enviamos este mensaje des de %(name)s ya que %(solicitee)s ha declinado una "
-"petición que hicisteis el %(date)s para"
+"Os enviamos este mensaje des de %(name)s ya que <strong>%(solicitee)s ha "
+"declinado una petición</strong> que les hicisteis el %(date)s para"
 
 #: femlliga/templates/email/notify_communication_rejected.html:20
 msgid ""
@@ -1096,20 +1110,21 @@ msgstr ""
 "sección de Notificaciones periódicas."
 
 #: femlliga/templates/email/periodic_notification.html:40
-msgid "Peticions pendents de respondre"
-msgstr "Peticiones pendientes de responder"
+msgid "T'han fet una petició de col·laboració..."
+msgstr "Te han hecho una petición de colaboración..."
 
 #: femlliga/templates/email/periodic_notification.html:42
 #, python-format
 msgid ""
 "Hi ha organitzacions que us han fet una petició a través de la plataforma i "
-"estan pendents de que els indiqueu si voleu iniciar una conversa per correu o "
-"no. Teniu un total de %(total)d peticions pendents, entre elles les següents:"
+"estan esperant la vostra resposta. No els faces esperar més i entra a <a "
+"href='%(url)s'>%(name)s</a> per a contestar si accepteu la petició o no. Teniu "
+"%(total)d peticions pendents, entre elles:"
 msgstr ""
 "Hay organizaciones que os han hecho una petición a través de la plataforma y "
-"están pendientes de que les indiquéis si queréis iniciar una conversación por "
-"correo o no. Tenéis un total de %(total)d peticiones pendientes, entre ellas las "
-"siguientes:"
+"están esperando vuestra respuesta. No las hagáis esperar más y entrad a <a "
+"href='%(url)s'>%(name)s</a> para contestar si aceptáis la petición o no. Tenéis "
+"%(total)d peticiones pendientes, entre ellas:"
 
 #: femlliga/templates/email/periodic_notification.html:46
 #, python-format
@@ -1117,22 +1132,23 @@ msgid "%(org)s sol·licita %(resource)s"
 msgstr "%(org)s solicita %(resource)s"
 
 #: femlliga/templates/email/periodic_notification.html:56
-msgid "Peticions pendents d'acord"
-msgstr "Peticiones pendientes de acuerdo"
+msgid "Heu arribat a fer l'intercanvi finalment?"
+msgstr "¿Habéis llegado a hacer el intercambio finalmente?"
 
 #: femlliga/templates/email/periodic_notification.html:58
 #, python-format
 msgid ""
-"Hi ha organitzacions amb les que heu iniciat una conversa per correu per "
-"col·laborar, però que no heu indicat a la plataforma si s'ha arribat a un acord "
-"finalment. Aquesta informació ens pot ser molt útil per millorar la plataforma. "
-"Teniu un total de %(total)d peticions pendents, entre elles les següents:"
+"Heu començat una conversa per correu per col·laborar amb algunes organitzacions, "
+"però que no heu indicat a la plataforma si heu arribat a un acord finalment. "
+"Aquesta informació ens pot ser molt útil per millorar la plataforma. "
+"<strong>Teniu %(total)d confirmacions pendents</strong>, <a "
+"href='%(url)s'>entra</a> i informa'ns!"
 msgstr ""
-"Hay organizaciones con las que habéis iniciado una conversación por correo para "
-"colaborar, pero que no habéis indicado en la plataforma si se ha llegado a un "
+"Habéis empezado una conversación por correo para colaborar con algunas "
+"organizaciones, pero no habéis indicado en la plataforma si habéis llegado a un "
 "acuerdo finalmente. Esta información nos puede ser muy útil para mejorar la "
-"plataforma. Tenéis un total de %(total)d peticiones pendientes, entre ellas las "
-"siguientes:"
+"plataforma. <strong>Tenéis %(total)d confirmaciones pendientes</strong>, ¡<a "
+"href='%(url)s'>entra</a> e infórmanos!"
 
 #: femlliga/templates/email/periodic_notification.html:64
 #, python-format
@@ -1152,24 +1168,24 @@ msgstr "Posibles ligas"
 #: femlliga/templates/email/periodic_notification.html:79
 #, python-format
 msgid ""
-"Teniu algunes necessitats que podrieu cobrir col·laborant amb altres entitats de "
-"la plataforma. Només cal que entreu a l'aplicació, al menú de «Has lligat», i "
+"Sabeu que hi ha organitzacions que podrien cobrir les vostres necessitats? Només "
+"cal que entreu a la <a href='%(url)s'>plataforma</a>, al menú de «Has lligat», i "
 "enviar un missatge a l'entitat que preferiu."
 msgstr ""
-"Tenéis algunas necesidades que podríais cubrir colaborando con otras entidades "
-"de la plataforma. Sólo es necesario que entréis a la aplicación, al menú de «Has "
+"¿Sabéis que hay organizaciones que podrían cubrir vuestras necesidades? Sólo "
+"tenéis que entrar a la <a href='%(url)s'>plataforma</a>, al menú de «Has "
 "ligado», y enviar un mensaje a la entidad que prefiráis."
 
 #: femlliga/templates/email/periodic_notification.html:85
 #, python-format
 msgid ""
-"Entre altres, heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s "
-"entitats que estan en la mateixa situació</strong> que vosaltres. Podeu "
-"contactar amb elles per buscar solucions comunes a la vostra necessitat."
+"Entre altres, hi ha %(count)s entitats que <strong>també necessiten %(name)s</"
+"strong>, com vosaltres. Podeu contactar amb elles per buscar solucions "
+"conjuntament."
 msgstr ""
-"Entre otros, habéis indicado que <strong>necesitáis %(name)s, y hay %(count)s "
-"entidades que están en la misma situación</strong> que vosotras. Podéis "
-"contactar con ellas para buscar soluciones comunes a vuestra necesidad."
+"Entre otros, hay %(count)s entidades que <strong>también necesitan %(name)s</"
+"strong>, como vosotros. Podéis contactar con ellas para buscar soluciones "
+"conjuntamente."
 
 #: femlliga/templates/email/periodic_notification.html:93
 msgid "També"
@@ -1191,23 +1207,21 @@ msgstr ""
 "colaborar."
 
 #: femlliga/templates/email/periodic_notification.html:106
-msgid "Nous recursos a la plataforma"
-msgstr "Nuevos recursos en la plataforma"
+msgid "Novetats a la plataforma!"
+msgstr "¡Novedades a la plataforma!"
 
 #: femlliga/templates/email/periodic_notification.html:107
 #, python-format
 msgid ""
-"%(name)s està en constant evolució. Els darrers mesos hem afegit noves opcions "
-"de recursos i etiquetes, i més organitzacions s'han donat d'alta o han "
-"actualitzat els recursos que ofereixen. Us enviem un recull de les novetats, que "
-"potser us poden interessar ara encara que en el seu moment no estigueren "
-"disponibles o no les seleccionareu. Son les següents:"
+"%(name)s està en constant evolució. En els darrers mesos, hem afegit nous "
+"recursos, més organitzacions s'han donat d'alta, i altres han actualitzat les "
+"seues necessitats. No us les perdeu i visiteu <a href='%(url)s'>%(domain)s</a>! "
+"Us enviem un xicotet resum:"
 msgstr ""
-"%(name)s está en constante evolució. Los últimos meses hemos añadido nuevas "
-"opciones de recursos y etiquetas, y más organizaciones se han dado de alta o han "
-"actualizado los recursos que ofrecen. Os enviamos un resumen de las novedades, "
-"que puede que os interesen ahora aunque en su momento no estuvieran disponibles "
-"o no las seleccionarais. Son las siguientes:"
+"%(name)s está en constante evolución. En los últimos meses, hemos añadido nuevos "
+"recursos, más organizaciones se han dado de alta, y otras han actualizado sus "
+"necesidades. !No os las perdáis y visitad <a href='%(url)s'>%(domain)s</a>! Os "
+"enviamos un pequeño resumen:"
 
 #: femlliga/templates/femlliga/_base.html:32
 msgid "Salta al contingut principal"
@@ -2263,7 +2277,6 @@ msgid "Has acabat el procés d'alta!"
 msgstr "Has acabado el proceso de alta!"
 
 #: femlliga/templates/femlliga/matches.html:19
-#, python-format
 msgid ""
 "Has acabat d'introduir la informació de la teua organització. A partir d'ara "
 "podeu buscar i contactar amb altres organitzacions, i altres organitzacions "
@@ -2790,3 +2803,31 @@ msgstr ""
 #~ msgstr ""
 #~ "Marca este campo si quieres iniciar conversación por correo automáticamente "
 #~ "para todas las peticiones de comunicación"
+
+#~ msgid "Peticions pendents de respondre"
+#~ msgstr "Peticiones pendientes de responder"
+
+#~ msgid "Peticions pendents d'acord"
+#~ msgstr "Peticiones pendientes de acuerdo"
+
+#~ msgid ""
+#~ "Teniu algunes necessitats que podrieu cobrir col·laborant amb altres entitats "
+#~ "de la plataforma. Només cal que entreu a l'aplicació, al menú de «Has "
+#~ "lligat», i enviar un missatge a l'entitat que preferiu."
+#~ msgstr ""
+#~ "Tenéis algunas necesidades que podríais cubrir colaborando con otras "
+#~ "entidades de la plataforma. Sólo es necesario que entréis a la aplicación, al "
+#~ "menú de «Has ligado», y enviar un mensaje a la entidad que prefiráis."
+
+#~ msgid ""
+#~ "%(name)s està en constant evolució. Els darrers mesos hem afegit noves "
+#~ "opcions de recursos i etiquetes, i més organitzacions s'han donat d'alta o "
+#~ "han actualitzat els recursos que ofereixen. Us enviem un recull de les "
+#~ "novetats, que potser us poden interessar ara encara que en el seu moment no "
+#~ "estigueren disponibles o no les seleccionareu. Son les següents:"
+#~ msgstr ""
+#~ "%(name)s está en constante evolució. Los últimos meses hemos añadido nuevas "
+#~ "opciones de recursos y etiquetas, y más organizaciones se han dado de alta o "
+#~ "han actualizado los recursos que ofrecen. Os enviamos un resumen de las "
+#~ "novedades, que puede que os interesen ahora aunque en su momento no "
+#~ "estuvieran disponibles o no las seleccionarais. Son las siguientes:"

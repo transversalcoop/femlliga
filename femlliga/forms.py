@@ -10,14 +10,17 @@ from allauth.account.forms import LoginForm, SignupForm
 from .models import CustomUser, Organization, Contact, Resource
 from .constants import *
 
+
 def http_get(url):
     f = urllib.request.urlopen(url)
-    res = json.loads(f.read().decode('utf-8'))
+    res = json.loads(f.read().decode("utf-8"))
     f.close()
     return res
 
+
 class PreferencesForm(forms.ModelForm):
     email = forms.EmailField()
+
     class Meta:
         model = CustomUser
         fields = [
@@ -32,12 +35,14 @@ class PreferencesForm(forms.ModelForm):
             "notify_new_resources",
         ]
 
+
 class OrganizationForm(forms.ModelForm):
     scopes = forms.MultipleChoiceField(
-        required = True,
-        widget   = forms.CheckboxSelectMultiple,
-        choices  = ORG_SCOPES,
+        required=True,
+        widget=forms.CheckboxSelectMultiple,
+        choices=ORG_SCOPES,
     )
+
     class Meta:
         model = Organization
         fields = ["name", "logo", "description", "org_type", "lat", "lng", "address"]
@@ -53,7 +58,9 @@ class OrganizationForm(forms.ModelForm):
             self.cleaned_data["lng"] = 0
             try:
                 address = urllib.parse.quote(self.cleaned_data["address"])
-                res = http_get(f"https://nominatim.openstreetmap.org/search?format=json&q={address}")
+                res = http_get(
+                    f"https://nominatim.openstreetmap.org/search?format=json&q={address}"
+                )
                 self.cleaned_data["lat"] = res[0]["lat"]
                 self.cleaned_data["lng"] = res[0]["lon"]
             except:
@@ -63,21 +70,26 @@ class OrganizationForm(forms.ModelForm):
 
         return self.cleaned_data
 
+
 class ResourceForm(forms.Form):
     resource = forms.ChoiceField(choices=[("", "-----------")] + RESOURCES)
     options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=False)
-    comments = forms.CharField(required = False)
-    charge = forms.BooleanField(required = False)
+    comments = forms.CharField(required=False)
+    charge = forms.BooleanField(required=False)
+
 
 class ImageForm(forms.Form):
     image = forms.ImageField()
+
 
 class MessageForm(forms.Form):
     message = forms.CharField(min_length=1)
     options = forms.MultipleChoiceField(choices=RESOURCE_OPTIONS, required=False)
 
     def __init__(self, *args, **kwargs):
-        self.resource = kwargs.pop('resource') # must be done first, if not super().__init__(...) fails
+        self.resource = kwargs.pop(
+            "resource"
+        )  # must be done first, if not super().__init__(...) fails
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -90,6 +102,7 @@ class MessageForm(forms.Form):
 
         return self.cleaned_data
 
+
 class ContactForm(forms.ModelForm):
     captcha = ReCaptchaField()
 
@@ -97,8 +110,10 @@ class ContactForm(forms.ModelForm):
         model = Contact
         fields = ["email", "content"]
 
+
 class CaptchaLoginForm(LoginForm):
     captcha = ReCaptchaField()
+
 
 class CaptchaSignupForm(SignupForm):
     captcha = ReCaptchaField()

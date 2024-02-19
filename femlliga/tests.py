@@ -559,7 +559,6 @@ class IntegrationTests(TestCase):
             "Novetats a la plataforma",
         ]:
             self.assertIn(s, mail.outbox[0].body)
-        print(mail.outbox[0].body)
 
 
     def aux_create_resource(self, model, org, resource, options):
