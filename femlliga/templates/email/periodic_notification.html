@@ -37,9 +37,9 @@
 {% macro show_agreement_communication_pending(c) %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    <h1 style="margin: 20px 0 0 0;">{{ _("Peticions pendents de respondre") }}</h1>
+    <h1 style="margin: 20px 0 0 0;">{{ _("T'han fet una petició de col·laboració...") }}</h1>
 
-    <p style="margin-top: 0;">{{ _("Hi ha organitzacions que us han fet una petició a través de la plataforma i estan pendents de que els indiqueu si voleu iniciar una conversa per correu o no. Teniu un total de %(total)d peticions pendents, entre elles les següents:", total=c.total_agreements) }}</p>
+    <p style="margin-top: 0;">{{ _("Hi ha organitzacions que us han fet una petició a través de la plataforma i estan esperant la vostra resposta. No els faces esperar més i entra a <a href='%(url)s'>%(name)s</a> per a contestar si accepteu la petició o no. Teniu %(total)d peticions pendents, entre elles:", total=c.total_agreements, url="https://" + current_site.domain, name=current_site.name) }}</p>
 
     <ul>
       {% for a in c.agreements %}
@@ -53,9 +53,9 @@
 {% macro show_agreement_success_pending(c) %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    <h1 style="margin: 20px 0 0 0;">{{ _("Peticions pendents d'acord") }}</h1>
+    <h1 style="margin: 20px 0 0 0;">{{ _("Heu arribat a fer l'intercanvi finalment?") }}</h1>
 
-    <p style="margin-top: 0;">{{ _("Hi ha organitzacions amb les que heu iniciat una conversa per correu per col·laborar, però que no heu indicat a la plataforma si s'ha arribat a un acord finalment. Aquesta informació ens pot ser molt útil per millorar la plataforma. Teniu un total de %(total)d peticions pendents, entre elles les següents:", total=c.total_agreements) }}</p>
+    <p style="margin-top: 0;">{{ _("Heu començat una conversa per correu per col·laborar amb algunes organitzacions, però que no heu indicat a la plataforma si heu arribat a un acord finalment. Aquesta informació ens pot ser molt útil per millorar la plataforma. <strong>Teniu %(total)d confirmacions pendents</strong>, <a href='%(url)s'>entra</a> i informa'ns!", total=c.total_agreements, url="https://" + current_site.domain) }}</p>
 
     <ul>
       {% for a in c.agreements %}
@@ -74,21 +74,21 @@
 
 {% macro show_matches(need, offer) %}
 <tr>
-  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px 10px 20px;">
     <h1 style="margin: 20px 0 0 0;">{{ _("Possibles lligues") }}</h1>
-    {{ _("Teniu algunes necessitats que podrieu cobrir col·laborant amb altres entitats de la plataforma. Només cal que entreu a l'aplicació, al menú de «Has lligat», i enviar un missatge a l'entitat que preferiu.") }}
+    {{ _("Sabeu que hi ha organitzacions que podrien cobrir les vostres necessitats? Només cal que entreu a la <a href='%(url)s'>plataforma</a>, al menú de «Has lligat», i enviar un missatge a l'entitat que preferiu.", url="https://" + current_site.domain) }}
   </td>
 </tr>
 {% if need.count > 0 %}
 <tr>
-  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    {{ _("Entre altres, heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que estan en la mateixa situació</strong> que vosaltres. Podeu contactar amb elles per buscar solucions comunes a la vostra necessitat.", name=need.name, count=need.count) }}
+  <td style="font-family: 'Poppins', sans-serif; padding: 10px 20px;">
+    {{ _("Entre altres, hi ha %(count)s entitats que <strong>també necessiten %(name)s</strong>, com vosaltres. Podeu contactar amb elles per buscar solucions conjuntament.", name=need.name, count=need.count) }}
   </td>
 </tr>
 {% endif %}
 {% if offer.count > 0 %}
 <tr>
-  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+  <td style="font-family: 'Poppins', sans-serif; padding: 10px 20px 0 20px;">
     {% if need.count > 0 %}
     {{ _("També") }}
     {% else %}
@@ -103,8 +103,8 @@
 {% macro show_new_resources(c) %}
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    <h1 style="margin: 20px 0 0 0;">{{ _("Nous recursos a la plataforma") }}</h1>
-    {{ _("%(name)s està en constant evolució. Els darrers mesos hem afegit noves opcions de recursos i etiquetes, i més organitzacions s'han donat d'alta o han actualitzat els recursos que ofereixen. Us enviem un recull de les novetats, que potser us poden interessar ara encara que en el seu moment no estigueren disponibles o no les seleccionareu. Son les següents:", name=current_site.name) }}
+    <h1 style="margin: 20px 0 0 0;">{{ _("Novetats a la plataforma!") }}</h1>
+    {{ _("%(name)s està en constant evolució. En els darrers mesos, hem afegit nous recursos, més organitzacions s'han donat d'alta, i s'altres han actualitzat les seues necessitats. No us les perdeu i visiteu <a href='%(url)s'>%(domain)s</a>! Us enviem un xicotet resum:", name=current_site.name, domain=current_site.domain, url="https://"+current_site.domain) }}
     <ul>
       {% for r in c.resources %}
       <li>{{ render_resource(r.code, r.options) }}</li>

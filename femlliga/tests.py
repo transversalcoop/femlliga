@@ -553,12 +553,13 @@ class IntegrationTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         save_email(mail.outbox[0], "periodic_notification.html")
         for s in [
-            "Peticions pendents de respondre",
-            "Peticions pendents d'acord",
+            "T'han fet una petició de col·laboració...",
+            "Heu arribat a fer l'intercanvi finalment?",
             "Possibles lligues",
-            "Nous recursos a la plataforma",
+            "Novetats a la plataforma",
         ]:
             self.assertIn(s, mail.outbox[0].body)
+        print(mail.outbox[0].body)
 
 
     def aux_create_resource(self, model, org, resource, options):
