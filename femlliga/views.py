@@ -2,6 +2,7 @@ import exif
 import json
 import time
 import uuid
+import urllib
 import logging
 import unicodedata
 import networkx as nx
@@ -72,7 +73,6 @@ from .forms import (
     OrganizationForm,
     PreferencesForm,
     ResourceForm,
-    http_get,
 )
 from .utils import (
     clean_form_email,
@@ -80,6 +80,7 @@ from .utils import (
     get_next_resource,
     get_resource_index,
     get_json_body,
+    http_get,
     limit_organizations_distance,
     send_email,
     send_notification,
@@ -257,6 +258,13 @@ def add_organization(request):
             "social_media_forms": social_media_forms()(),
         },
     )
+
+
+@login_required
+def search_address(request):
+    address = urllib.parse.quote(request.GET.get("address", ""))
+    url = f"https://nominatim.openstreetmap.org/search?format=json&q={address}"
+    return JsonResponse({"addresses": http_get(url)})
 
 
 @login_required

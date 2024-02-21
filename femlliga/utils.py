@@ -1,4 +1,5 @@
 import json
+import urllib
 import decimal
 import unicodedata
 
@@ -238,3 +239,8 @@ def str_to_bool(s):
 
 def clean_form_email(s):
     return unicodedata.normalize("NFKC", s.strip()).casefold()
+
+def http_get(url):
+    with urllib.request.urlopen(url) as f:
+        res = json.loads(f.read().decode("utf-8"))
+    return res

@@ -9,6 +9,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('contact/', views.contact, name='contact'),
     path('check-matches/', views.check_matches, name='check_matches'),
+    path('search-address/', views.search_address, name='search_address'),
     path('page/<slug:name>/', views.page, name='page'),
 
     # login required
