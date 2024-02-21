@@ -41,19 +41,32 @@
 </div>
 {% endmacro %}
 
+{% macro all_steps(resource_type, count, border=True) %}
+<div class="col-md-4{% if border %} border-dotted-right{% endif %}">
+  <span class="text-secondary">{{ resource_type_title("needs") }}</span>
+  {{ steps("needs", resource_type, count) }}
+</div>
+<div class="col-md-4">
+  <span class="text-secondary">{{ resource_type_title("offers") }}</span>
+  {{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
+</div>
+{% endmacro %}
+
 {% block content %}
-<div class="container">
-  <div class="row mt-3">
-    <div class="col-md-4 d-flex align-items-end">
-      <h1 class="resources-title w-100 m-0 p-0 ps-2">{{ resource_type_title(resource_type) }}</h1>
+<div class="container mb-2">
+  <div class="d-none d-md-block">
+    <div class="row mt-3">
+      <div class="col-md-4 d-flex align-items-end">
+        <h1 class="resources-title w-100 m-0 p-0 ps-2">{{ resource_type_title(resource_type) }}</h1>
+      </div>
+      {{ all_steps(resource_type, count) }}
     </div>
-    <div class="col-md-4 border-dotted-right">
-      <span class="text-secondary">{{ resource_type_title("needs") }}</span>
-      {{ steps("needs", resource_type, count) }}
-    </div>
-    <div class="col-md-4">
-      <span class="text-secondary">{{ resource_type_title("offers") }}</span>
-      {{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
+  </div>
+  <div class="d-block d-md-none">
+    <div class="row mt-3">
+      <div class="col-md-4 d-flex align-items-end bg-yellow">
+        <h1 class="resources-title w-100 m-0 p-0 ps-2">{{ resource_type_title(resource_type) }}</h1>
+      </div>
     </div>
   </div>
 
@@ -125,14 +138,14 @@
       {% endif %}
 
       <div class="row mt-3">
-        <div class="col-4 d-grid gap-2">
+        <div class="col-6">
           {% if editing %}
           <a href="{{ url("app") }}" class="btn btn-lg btn-brown">{{ _("Torna sense fer canvis") }}</a>
           {% elif count > 1 %}
           <a href="{{ wizard_url(org.id, count-1) }}" class="btn btn-lg btn-brown">{{ _("Anterior") }}</a>
           {% endif %}
         </div>
-        <div class="col-4 offset-4 d-grid gap-2">
+        <div class="col-6 text-end">
           <button type="submit" class="btn btn-lg btn-warning">
             {% if editing %}
             {{ _("Desa els canvis") }}
@@ -145,6 +158,9 @@
         </div>
       </div>
   </form>
+  <div class="d-block d-md-none">
+    {{ all_steps(resource_type, count, border=False) }}
+  </div>
 </div>
 
 <script>

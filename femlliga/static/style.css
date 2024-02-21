@@ -30,6 +30,24 @@ h3 {
     font-weight: normal;
 }
 
+@media (max-width: 768px) {
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    .badge {
+        white-space: normal;
+    }
+}
+
 h1, h2, h3, h4, h5, h6 {
     margin-top: 20px;
     font-family: "Poppins", sans-serif;
@@ -709,4 +727,15 @@ nav .nav-link.active {
 
 .preferences-row .form-range::-ms-thumb {
     background-color: var(--brown);
+}
+
+.bg-yellow {
+    background-color: var(--yellow);
+}
+
+.text-toggle[aria-expanded=false] .text-expanded {
+    display: none;
+}
+.text-toggle[aria-expanded=true] .text-collapsed {
+    display: none;
 }

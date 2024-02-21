@@ -637,3 +637,10 @@ function matchContains(search) {
 {% endmacro %}
 
 {% macro render_resource(r, options) %}{{ resource_name(r) }}{% if len(options) > 0 %} ({{ display_list(options) }}){% endif %}{% endmacro %}
+
+{% macro sidebar_filter_show_link() %}
+<a href="#sidebar-filter" class="text-toggle d-md-none" data-bs-toggle="collapse" aria-expanded="true">
+  <span class="text-collapsed">{{ _("Mostra el filtre") }}</span>
+  <span class="text-expanded">{{ _("Amaga el filtre") }}</span>
+</a>
+{% endmacro %}

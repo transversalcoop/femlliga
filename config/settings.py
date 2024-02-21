@@ -224,6 +224,9 @@ ACCOUNT_FORMS = {
     "login": "femlliga.forms.CaptchaLoginForm",
     "signup": "femlliga.forms.CaptchaSignupForm",
 }
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/app"
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {

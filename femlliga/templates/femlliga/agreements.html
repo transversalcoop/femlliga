@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js %}
+{% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js, sidebar_filter_show_link %}
 
 {% block title %}{{ _("Peticions") }}{% endblock %}
 
@@ -10,52 +10,55 @@
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
       <h1>{{ _("Peticions enviades i rebudes") }}</h1>
-      <div class="btn-group w-100 mb-2" role="group" aria-label="{{ _("Selecciona si mostrar els resultats agrupats per recurs o per organització") }}">
-        <button
-          type="button"
-          class="btn"
-          @click="setShowBy('resources')"
-          :class="{'btn-warning': showBy === 'resources', 'btn-light': showBy !== 'resources'}">
-          {{ _("Recursos") }}
-        </button>
-        <button
-          type="button"
-          class="btn"
-          @click="setShowBy('organizations')"
-          :class="{'btn-warning': showBy === 'organizations', 'btn-light': showBy !== 'organizations'}">
-          {{ _("Organitzacions") }}
-        </button>
-      </div>
-      <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
-      <ul class="nav nav-pills flex-column mb-auto mt-2">
-        <template v-if="showBy === 'resources'">
-          <h2 class="resource-matches-title background-yellow">{{ _("Enviades") }}</h2>
-          {{ request_filter_row_vue("sent", _("Peticions enviades")) }}
-          <h2 class="resource-matches-title background-yellow-dark">{{ _("Rebudes") }}</h2>
-          {{ request_filter_row_vue("received", _("Peticions rebudes")) }}
-        </template>
-        <template v-else>
-          <li class="nav-item" v-for="x in organizationsWithRequests" :key="x.organization.id">
-            <button
-              @click="selectOrganization(x.organization)"
-              class="nav-link w-100 text-start"
-              :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
-              type="button"
-              role="tab"
-              aria-selected="false"
-              aria-current="page">
-              <span class="float-end">
-                <span
-                  class="badge ms-2 bg-light"
-                  title="{{ _("Peticions") }}">
-                  ${ x.agreements.length }
+      {{ sidebar_filter_show_link() }}
+      <div class="collapse show" id="sidebar-filter">
+        <div class="btn-group w-100 mb-2" role="group" aria-label="{{ _("Selecciona si mostrar els resultats agrupats per recurs o per organització") }}">
+          <button
+            type="button"
+            class="btn"
+            @click="setShowBy('resources')"
+            :class="{'btn-warning': showBy === 'resources', 'btn-light': showBy !== 'resources'}">
+            {{ _("Recursos") }}
+          </button>
+          <button
+            type="button"
+            class="btn"
+            @click="setShowBy('organizations')"
+            :class="{'btn-warning': showBy === 'organizations', 'btn-light': showBy !== 'organizations'}">
+            {{ _("Organitzacions") }}
+          </button>
+        </div>
+        <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
+        <ul class="nav nav-pills flex-column mb-auto mt-2">
+          <template v-if="showBy === 'resources'">
+            <h2 class="resource-matches-title background-yellow">{{ _("Enviades") }}</h2>
+            {{ request_filter_row_vue("sent", _("Peticions enviades")) }}
+            <h2 class="resource-matches-title background-yellow-dark">{{ _("Rebudes") }}</h2>
+            {{ request_filter_row_vue("received", _("Peticions rebudes")) }}
+          </template>
+          <template v-else>
+            <li class="nav-item" v-for="x in organizationsWithRequests" :key="x.organization.id">
+              <button
+                @click="selectOrganization(x.organization)"
+                class="nav-link w-100 text-start"
+                :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-current="page">
+                <span class="float-end">
+                  <span
+                    class="badge ms-2 bg-light"
+                    title="{{ _("Peticions") }}">
+                    ${ x.agreements.length }
+                  </span>
                 </span>
-              </span>
-              <span v-html="highlightSearch(x.organization.name, search)"></span>
-            </button>
-          </li>
-        </template>
-      </ul>
+                <span v-html="highlightSearch(x.organization.name, search)"></span>
+              </button>
+            </li>
+          </template>
+        </ul>
+      </div>
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
