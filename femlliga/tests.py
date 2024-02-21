@@ -34,7 +34,7 @@ class ResourcesTests(TestCase):
             self.assertIn(resource[0], RESOURCE_OPTIONS_MAP)
 
 class OrganizationTests(TestCase):
-    def test_disstance(self):
+    def test_distance(self):
         p1 = (39.982639180269345, -0.030035858750823794)
         p2 = (39.96994470876123, 0.014310397939378215)
         p3 = (39.97577675810347, 0.01660298876575851)
@@ -218,7 +218,7 @@ class IntegrationTests(TestCase):
             "org_type": "ASSOCIATION",
             "scopes": ["EQUALITY", "EDUCATION"],
             "lat": "40.000",
-            "lng": "1.000",
+            "lng": "0.100",
         }, follow=True)
         save_response(response)
         self.assertContains(response, "preguntes sobre els recursos que teniu o necessiteu")
@@ -286,6 +286,8 @@ class IntegrationTests(TestCase):
             "Second example organization",
         ]:
             self.assertContains(response, s)
+
+        self.assertNotContains(response, "Example organization") # too far away
 
         matches = BeautifulSoup(response.content.decode(), "html.parser").find("script", {"id": "django-json-data"})
         for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
@@ -512,7 +514,7 @@ class IntegrationTests(TestCase):
             communication_accepted=True,
         )
 
-        needs, offers = get_ordered_needs_and_offers(org1)
+        needs, offers = get_ordered_needs_and_offers(org1, 100)
         site = Site.objects.first()
         context = get_periodic_notification_data(site, org1.creator, needs, offers)
         self.assertEqual(context, {

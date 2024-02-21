@@ -1,4 +1,5 @@
 import json
+import decimal
 import unicodedata
 
 from datetime import timedelta
@@ -7,7 +8,7 @@ from distutils.util import strtobool
 
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Func, F
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -53,7 +54,6 @@ def get_periodic_notification_data(site, user, needs, offers):
     long_notification_ready = time_from_last_long_notification > timedelta(days = 30 * 6)
     send_long_notification = False
     if user.notify_matches and long_notification_ready:
-        # TODO FL090 consider only matches within distance_limit_km
         _, need, offer = org_has_matches(org, needs, offers)
         if need["count"] > 0 or offer["count"] > 0:
             context["matches"] = { "need": need, "offer": offer }
@@ -61,7 +61,7 @@ def get_periodic_notification_data(site, user, needs, offers):
 
     # TODO FL090 consider only resources within distance_limit_km
     if user.notify_new_resources and long_notification_ready:
-        offers = org_offers_not_matching(org, user.last_long_notification_date)
+        offers = org_offers_not_matching(org, user)
         if len(offers) > 0:
             context["new_resources"] = {"resources": offers}
             send_long_notification = True
@@ -90,9 +90,22 @@ def org_pending_success_agreements(o):
     except:
         return []
 
-# TODO FL090 limit by distance from organization
-def get_ordered_needs_and_offers(org):
-    organizations = Organization.objects.exclude(id=org.id)
+
+def limit_organizations_distance(queryset, organization, max_distance, field_prefix=""):
+    # 111.22 is approximate number of km in a lat or lng degree
+    max_degree = max_distance / decimal.Decimal(111.22)
+    # if delta is the angle difference in degrees
+    # abs(delta) must be less than max_distance/km_in_degree
+    return (
+        queryset.annotate(lat_delta=Func(F(field_prefix+"lat")-organization.lat, function="ABS"))
+        .annotate(lng_delta=Func(F(field_prefix+"lng")-organization.lng, function="ABS"))
+        .exclude(lat_delta__gt=max_degree)
+        .exclude(lng_delta__gt=max_degree)
+    )
+
+
+def get_ordered_needs_and_offers(org, distance_limit_km):
+    organizations = limit_organizations_distance(Organization.objects.exclude(id=org.id), org, distance_limit_km)
     all_needs, all_offers = [], []
     for resource in RESOURCES_ORDER:
         for option in RESOURCE_OPTIONS_MAP[resource]:
@@ -123,16 +136,23 @@ def org_has_matches(org, needs, offers):
 
     return org, need, offer
 
-def org_offers_not_matching(org, last_long_notification_date):
+def org_offers_not_matching(org, user):
     offers = []
     own_needs = get_own_needs(org)
     for need in own_needs:
         need_options = [n.name for n in need.options.all()]
-        l = list(Offer.objects.exclude(organization=org).filter(
+        queryset = Offer.objects.exclude(organization=org).filter(
             resource = need.resource,
             has_resource = True,
-            last_updated_on__gt = last_long_notification_date,
-        ))
+            last_updated_on__gt = user.last_long_notification_date,
+        )
+        queryset = limit_organizations_distance(
+            queryset,
+            org,
+            user.distance_limit_km,
+            field_prefix="organization__",
+        )
+        l = list(queryset)
         l = [o for o in l if has_different_options(o.options.all(), need_options)]
         if len(l) > 0:
             offers.append(join_offers_not_matching(l, need_options))

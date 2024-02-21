@@ -2,7 +2,6 @@ import exif
 import json
 import time
 import uuid
-import decimal
 import logging
 import unicodedata
 import networkx as nx
@@ -17,7 +16,7 @@ from django.forms import inlineformset_factory
 from django.utils import timezone
 from django.contrib import messages
 from django.dispatch import receiver
-from django.db.models import Prefetch, Func, F
+from django.db.models import Prefetch
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import mail_managers
 from django.views.static import serve
@@ -81,6 +80,7 @@ from .utils import (
     get_next_resource,
     get_resource_index,
     get_json_body,
+    limit_organizations_distance,
     send_email,
     send_notification,
     str_to_bool,
@@ -725,7 +725,12 @@ def get_model_matches(
         queryset = queryset.exclude(resource="OTHER")
 
     # limit distance inside db so fewer results are retrieved
-    queryset = limit_distance(queryset, organization, user.distance_limit_km)
+    queryset = limit_organizations_distance(
+        queryset,
+        organization,
+        user.distance_limit_km,
+        field_prefix="organization__",
+    )
     results = (
         queryset.exclude(organization=organization)
         .prefetch_related("organization", "images", "options")
@@ -734,19 +739,6 @@ def get_model_matches(
     # limit distance in python, so exactly the appropriate results are returned
     results = [r for r in results if r.organization.distance(organization) < user.distance_limit_km]
     return sorted(results, key=lambda r: r.organization.distance(organization))
-
-
-def limit_distance(queryset, organization, max_distance):
-    # 111.22 is approximate number of km in a lat or lng degree
-    max_degree = max_distance / decimal.Decimal(111.22)
-    # if delta is the angle difference in degrees
-    # abs(delta) must be less than max_distance/km_in_degree
-    return (
-        queryset.annotate(lat_delta=Func(F("organization__lat")-organization.lat, function="ABS"))
-        .annotate(lng_delta=Func(F("organization__lng")-organization.lng, function="ABS"))
-        .exclude(lat_delta__gt=max_degree)
-        .exclude(lng_delta__gt=max_degree)
-    )
 
 
 def get_all_resources(user, organization):

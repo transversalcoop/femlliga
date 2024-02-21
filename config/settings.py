@@ -219,7 +219,7 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https")
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = None
+ACCOUNT_RATE_LIMITS = False
 ACCOUNT_FORMS = {
     "login": "femlliga.forms.CaptchaLoginForm",
     "signup": "femlliga.forms.CaptchaSignupForm",

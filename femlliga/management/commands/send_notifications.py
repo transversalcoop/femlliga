@@ -24,7 +24,7 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
         sent_count = 0
         for user in users:
             org = Organization.objects.get(creator = user)
-            needs, offers = get_ordered_needs_and_offers(org)
+            needs, offers = get_ordered_needs_and_offers(org, user.distance_limit_km)
             context = get_periodic_notification_data(site, user, needs, offers)
             if context:
                 print(f"Sending email to {user.email}...", end="")
