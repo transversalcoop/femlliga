@@ -116,9 +116,12 @@
       </div>
     </div>
 
+    <div v-if="noAddresses">
+      {{ _("No s'ha trobat cap lloc coincident amb l'adreça indicada. Per favor, indiqueu-ne una altra o concreteu-la més.") }}
+    </div>
     <ul v-if="addresses.length > 0">
       <li v-for="address of addresses" :key="address.place_id">
-        <a @click="setAddress(address)">${ address.display_name }</a>
+        <a @click="setAddress(address)" class="link-underline-class clickable">{{ _("Selecciona l'adreça:") }}</a> ${ address.display_name }
       </li>
     </ul>
 
@@ -202,11 +205,17 @@ Vue.createApp({
       totalSocialMedias: +document.getElementById("id_social_media-TOTAL_FORMS").value,
       mediaTypesPlaceholdersMap: mediaTypesPlaceholdersMap,
       address: "",
-      lat: "{{ form.cleaned_data["lat"] }}",
-      lng: "{{ form.cleaned_data["lng"] }}",
+      lat: "{% if form.cleaned_data %}{{ form.cleaned_data["lat"] }}{% endif %}",
+      lng: "{% if form.cleaned_data %}{{ form.cleaned_data["lng"] }}{% endif %}",
       debounceAddress: createDebounce(),
       addresses: [],
+      noAddresses: false,
     };
+  },
+  mounted() {
+    if (this.lat && this.lng) {
+      map.setView([+this.lat, +this.lng], 15);
+    }
   },
   methods: {
     deleteLogo() {
@@ -241,9 +250,13 @@ Vue.createApp({
       this.lng = ("" + e.latlng.lng).slice(0, 10);
     },
     searchAddresses() {
+      this.noAddresses = false;
       get("{{ url("search_address") }}?address=" + this.address).then(res => {
         this.addresses = res.addresses;
         this.loadingAddresses = false;
+        if (this.addresses.length === 0) {
+          this.noAddresses = true;
+        }
       });
     },
     setAddress(address) {
