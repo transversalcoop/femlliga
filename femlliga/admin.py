@@ -10,8 +10,12 @@ class OffersInline(admin.StackedInline):
     model = Offer
     extra = 0
 
+class SocialMediaInline(admin.StackedInline):
+    model = SocialMedia
+    extra = 0
+
 class OrganizationAdmin(admin.ModelAdmin):
-    inlines = [NeedsInline, OffersInline]
+    inlines = [NeedsInline, OffersInline, SocialMediaInline]
 
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Agreement)

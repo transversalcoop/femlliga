@@ -70,6 +70,23 @@
 
     <button type="submit" class="btn btn-warning my-2">{{ _("Actualitza les preferències") }}</button>
   </form>
+
+  <div id="delete-question" class="d-none">{{ _("Segur que vols esborrar el compte? L'acció no es pot desfer") }}</div>
+  <form method="post" action="{{ url("delete_account") }}" onsubmit="return confirm(document.getElementById('delete-question').textContent)" class="mt-2">
+    {{ csrf_input }}
+
+    <div class="preferences-section">
+      <h2 class="preferences-section-title">{{ _("Gestiona el compte") }}</h2>
+      <div class="row preferences-row">
+        <div class="col-md-8">
+          <strong>{{ _("Esborra el compte") }}</strong>
+          <div>{{ _("Aquesta acció esborrarà la organització i l'usuari amb què has iniciat sessió. L'acció no es pot desfer") }}</div>
+        </div>
+        <div class="col-md-4 text-end">
+          <button type="submit" class="btn btn-danger">{{ _("Esborra el compte") }}</button>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}
 

@@ -316,6 +316,8 @@ function clickOption(element) {
       {% for choice in form.fields[field_name].choices %}
       <option value="{{ choice[0] }}"
           {% if field.value() and field.value() == choice[0] %}selected{% endif %}
+          {% if not field.value() and choice[0] == "" %}selected{% endif %}
+          {% if choice[0] == "" %}disabled{% endif %}
       >
           {{ choice[1] }}
       </option>

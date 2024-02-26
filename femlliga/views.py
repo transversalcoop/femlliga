@@ -912,6 +912,17 @@ def update_user_email(sender, request, email_address, **kwargs):
 
 
 @login_required
+def delete_account(request):
+    if request.method == "POST" and request.user.organizations.count() == 1:
+        request.user.organizations.first().delete()
+        request.user.delete()
+        messages.info(request, _("S'ha esborrat el compte i la organització"), extra_tags="show")
+        return redirect("index")
+
+    return redirect("preferences")
+
+
+@login_required
 @require_own_organization
 def send_message(request, organization_id, organization_to, resource_type, resource):
     if request.method != "POST":

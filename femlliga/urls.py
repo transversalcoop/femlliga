@@ -14,6 +14,7 @@ urlpatterns = [
 
     # login required
     path('preferences/', views.preferences, name='preferences'),
+    path('account/delete/', views.delete_account, name='delete_account'),
     path('app/', views.app, name='app'),
     path('organization/add/', views.add_organization, name='add_organization'),
     path('organization/<uuid:organization_id>/profile/', views.profile, name='profile'),
