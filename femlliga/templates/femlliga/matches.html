@@ -107,6 +107,9 @@
 {% if wizard_finished %}
 const modal = new bootstrap.Modal('#wizard-finished-modal')
 modal.show()
+if (history.replaceState) {
+  history.replaceState(null, "", "?wizard_finished=false")
+}
 {% endif %}
 
 var jsonData = getJsonData();
