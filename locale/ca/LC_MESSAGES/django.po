@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-02-19 11:54+0000\n"
-"PO-Revision-Date: 2024-02-19 12:54+0100\n"
+"POT-Creation-Date: 2024-02-28 11:19+0000\n"
+"PO-Revision-Date: 2024-02-28 12:20+0100\n"
 "Last-Translator: \n"
 "Language-Team: ca <LL@li.org>\n"
 "Language: ca\n"
@@ -181,7 +181,7 @@ msgstr "Tecnologia i electrònica"
 msgid "Textil"
 msgstr "Textil"
 
-#: femlliga/constants.py:68 femlliga/templates/femlliga/_base.html:73
+#: femlliga/constants.py:68 femlliga/templates/femlliga/_base.html:74
 msgid "Accessibilitat"
 msgstr "Accessibilitat"
 
@@ -465,187 +465,187 @@ msgstr "De quins temes us interessa formar-vos?"
 msgid "Quina d'aquestes coses necessiteu?"
 msgstr "Quina d'aquestes coses necessiteu?"
 
-#: femlliga/forms.py:69
-msgid "Cal indicar la posició o l'adreça"
-msgstr "Cal indicar la posició o l'adreça"
-
-#: femlliga/forms.py:101
+#: femlliga/forms.py:80
 msgid "Cal indicar una opció com a mínim"
 msgstr "Cal indicar una opció com a mínim"
 
-#: femlliga/models.py:76
+#: femlliga/models.py:83
 #, python-format
 msgid "L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB."
 msgstr "L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB."
 
-#: femlliga/models.py:86
+#: femlliga/models.py:93
 msgid "Idioma configurat al navegador"
 msgstr "Idioma configurat al navegador"
 
-#: femlliga/models.py:184
+#: femlliga/models.py:193
 msgid "«organització eliminada»"
 msgstr "«organització eliminada»"
 
-#: femlliga/models.py:279
+#: femlliga/models.py:284
 msgid "menys d'un km"
 msgstr "menys d'un km"
 
-#: femlliga/models.py:281
+#: femlliga/models.py:286
 #, python-format
 msgid "menys de %(d)skm"
 msgstr "menys de %(d)skm"
 
-#: femlliga/views.py:101
+#: femlliga/views.py:143
 msgid "Títol"
 msgstr "Títol"
 
-#: femlliga/views.py:102
+#: femlliga/views.py:144
 msgid "Subtítol"
 msgstr "Subtítol"
 
-#: femlliga/views.py:103
+#: femlliga/views.py:145
 msgid "<p>Cal definir aquesta pàgina</p>"
 msgstr "<p>Cal definir aquesta pàgina</p>"
 
-#: femlliga/views.py:808
+#: femlliga/views.py:861
 msgid "Aquesta adreça ja està en ús"
 msgstr "Aquesta adreça ja està en ús"
 
-#: femlliga/views.py:842
+#: femlliga/views.py:897
 msgid "La configuració s'ha desat correctament"
 msgstr "La configuració s'ha desat correctament"
 
-#: femlliga/views.py:844
+#: femlliga/views.py:899
 msgid ". S'ha enviat un correu electrònic per confirmar la nova adreça"
 msgstr ". S'ha enviat un correu electrònic per confirmar la nova adreça"
 
-#: femlliga/views.py:892
+#: femlliga/views.py:921
+msgid "S'ha esborrat el compte i la organització"
+msgstr "S'ha esborrat el compte i la organització"
+
+#: femlliga/views.py:958
 #, python-format
 msgid "T'han enviat una petició per compartir %(resource)s"
 msgstr "T'han enviat una petició per compartir %(resource)s"
 
-#: femlliga/views.py:1039
+#: femlliga/views.py:1106
 #, python-format
 msgid "Comunicació iniciada per compartir %(resource)s"
 msgstr "Comunicació iniciada per compartir %(resource)s"
 
-#: femlliga/views.py:1050
+#: femlliga/views.py:1117
 msgid "Us han declinat una petició"
 msgstr "Us han declinat una petició"
 
-#: femlliga/views.py:1251
+#: femlliga/views.py:1317
 msgid "Pendents de comunicació"
 msgstr "Pendents de comunicació"
 
-#: femlliga/views.py:1252
+#: femlliga/views.py:1318
 msgid "Comunicació iniciada"
 msgstr "Comunicació iniciada"
 
-#: femlliga/views.py:1253
+#: femlliga/views.py:1319
 msgid "Comunicació rebutjada"
 msgstr "Comunicació rebutjada"
 
-#: femlliga/views.py:1254
+#: femlliga/views.py:1320
 msgid "Acord aconseguit"
 msgstr "Acord aconseguit"
 
-#: femlliga/views.py:1255
+#: femlliga/views.py:1321
 msgid "Acord no aconseguit"
 msgstr "Acord no aconseguit"
 
-#: femlliga/views.py:1256
+#: femlliga/views.py:1322
 msgid "Total"
 msgstr "Total"
 
-#: femlliga/views.py:1291
+#: femlliga/views.py:1357
 msgid "Altes d'entitats"
 msgstr "Altes d'entitats"
 
-#: femlliga/views.py:1295
+#: femlliga/views.py:1361
 msgid "Recursos per tipus d'entitat"
 msgstr "Recursos per tipus d'entitat"
 
-#: femlliga/views.py:1296 femlliga/views.py:1315 femlliga/views.py:1323
-#: femlliga/views.py:1339
+#: femlliga/views.py:1362 femlliga/views.py:1381 femlliga/views.py:1389
+#: femlliga/views.py:1405
 msgid "Oferiments"
 msgstr "Oferiments"
 
-#: femlliga/views.py:1297 femlliga/views.py:1316 femlliga/views.py:1323
-#: femlliga/views.py:1340
+#: femlliga/views.py:1363 femlliga/views.py:1382 femlliga/views.py:1389
+#: femlliga/views.py:1406
 msgid "Necessitats"
 msgstr "Necessitats"
 
-#: femlliga/templates/femlliga/report.html:49 femlliga/views.py:1298
-#: femlliga/views.py:1317
+#: femlliga/templates/femlliga/report.html:49 femlliga/views.py:1364
+#: femlliga/views.py:1383
 msgid "Entitats"
 msgstr "Entitats"
 
-#: femlliga/views.py:1305
+#: femlliga/views.py:1371
 msgid "Oferiments que es cobren per tipus d'entitat"
 msgstr "Oferiments que es cobren per tipus d'entitat"
 
-#: femlliga/views.py:1306 femlliga/views.py:1330
+#: femlliga/views.py:1372 femlliga/views.py:1396
 msgid "Oferiments cobrant"
 msgstr "Oferiments cobrant"
 
-#: femlliga/views.py:1307 femlliga/views.py:1331
+#: femlliga/views.py:1373 femlliga/views.py:1397
 msgid "Oferiments gratuïts"
 msgstr "Oferiments gratuïts"
 
-#: femlliga/views.py:1314
+#: femlliga/views.py:1380
 msgid "Recursos per àmbit de treball de l'entitat"
 msgstr "Recursos per àmbit de treball de l'entitat"
 
-#: femlliga/views.py:1323
+#: femlliga/views.py:1389
 msgid "Recursos per tipus de recurs"
 msgstr "Recursos per tipus de recurs"
 
-#: femlliga/views.py:1329
+#: femlliga/views.py:1395
 msgid "Oferiments que es cobren per tipus de recurs"
 msgstr "Oferiments que es cobren per tipus de recurs"
 
-#: femlliga/views.py:1338
+#: femlliga/views.py:1404
 msgid "Recursos per tipus concret de recurs"
 msgstr "Recursos per tipus concret de recurs"
 
-#: femlliga/views.py:1346
+#: femlliga/views.py:1412
 msgid "Interaccions per tipus d'entitat sol·licitant"
 msgstr "Interaccions per tipus d'entitat sol·licitant"
 
-#: femlliga/views.py:1352
+#: femlliga/views.py:1418
 msgid "Interaccions per àmbit de treball de l'entitat sol·licitant"
 msgstr "Interaccions per àmbit de treball de l'entitat sol·licitant"
 
-#: femlliga/views.py:1358
+#: femlliga/views.py:1424
 msgid "Interaccions per tipus d'entitat sol·licitada"
 msgstr "Interaccions per tipus d'entitat sol·licitada"
 
-#: femlliga/views.py:1364
+#: femlliga/views.py:1430
 msgid "Interaccions per àmbit de treball de l'entitat sol·licitada"
 msgstr "Interaccions per àmbit de treball de l'entitat sol·licitada"
 
-#: femlliga/views.py:1370
+#: femlliga/views.py:1436
 msgid "Interaccions per tipus de recurs"
 msgstr "Interaccions per tipus de recurs"
 
-#: femlliga/views.py:1375
+#: femlliga/views.py:1441
 msgid "Peticions de col·laboració"
 msgstr "Peticions de col·laboració"
 
-#: femlliga/views.py:1378
+#: femlliga/views.py:1444
 msgid "Comunicació acceptada"
 msgstr "Comunicació acceptada"
 
-#: femlliga/views.py:1381
+#: femlliga/views.py:1447
 msgid "Col·laboració exitosa"
 msgstr "Col·laboració exitosa"
 
-#: femlliga/views.py:1475
+#: femlliga/views.py:1539
 #, python-format
 msgid "S'ha rebut un contacte a la web de %(name)s"
 msgstr "S'ha rebut un contacte a la web de %(name)s"
 
-#: femlliga/views.py:1477
+#: femlliga/views.py:1541
 #, python-format
 msgid ""
 "Des del correu %(email)s envien el següent missatge:\n"
@@ -656,7 +656,7 @@ msgstr ""
 "\n"
 "%(content)s"
 
-#: femlliga/views.py:1482
+#: femlliga/views.py:1546
 #, python-format
 msgid "El formulari de contacte amb %(name)s s'ha enviat correctament"
 msgstr "El formulari de contacte amb %(name)s s'ha enviat correctament"
@@ -733,7 +733,8 @@ msgid "Aquest enllaç de confirmació de correu electrònic ha expirat o és inv
 msgstr "Aquest enllaç de confirmació de correu electrònic ha expirat o és invàlid."
 
 #: femlliga/templates/account/login.html:5 femlliga/templates/account/login.html:28
-#: femlliga/templates/femlliga/_base_template.html:31
+#: femlliga/templates/femlliga/_base_template.html:64
+#: femlliga/templates/femlliga/_base_template.html:91
 msgid "Entra"
 msgstr "Entra"
 
@@ -769,7 +770,7 @@ msgstr "Entra amb un compte de Google"
 
 #: femlliga/templates/account/logout.html:3
 #: femlliga/templates/account/logout.html:11
-#: femlliga/templates/femlliga/_base_template.html:52
+#: femlliga/templates/femlliga/_base_template.html:16
 msgid "Surt"
 msgstr "Surt"
 
@@ -998,7 +999,23 @@ msgstr "Hola!"
 msgid "Gràcies per fer servir %(name)s"
 msgstr "Gràcies per fer servir %(name)s"
 
-#: femlliga/templates/email/agreement_connect.html:8
+#: femlliga/templates/email/_macros.html:3
+msgid "buscar conjuntament"
+msgstr "buscar conjuntament"
+
+#: femlliga/templates/email/_macros.html:10
+msgid "una"
+msgstr "una"
+
+#: femlliga/templates/email/_macros.html:12
+msgid "un"
+msgstr "un"
+
+#: femlliga/templates/email/_macros.html:16
+msgid "compartir"
+msgstr "compartir"
+
+#: femlliga/templates/email/agreement_connect.html:9
 #, python-format
 msgid ""
 "Us enviem aquest missatge des de %(name)s ja que %(solicitor)s va demanar a "
@@ -1007,24 +1024,12 @@ msgstr ""
 "Us enviem aquest missatge des de %(name)s ja que %(solicitor)s va demanar a "
 "%(solicitee)s"
 
-#: femlliga/templates/email/agreement_connect.html:10
-#: femlliga/templates/email/notify_communication_received.html:10
-#: femlliga/templates/email/notify_communication_rejected.html:10
-msgid "buscar conjuntament"
-msgstr "buscar conjuntament"
-
-#: femlliga/templates/email/agreement_connect.html:12
-#: femlliga/templates/email/notify_communication_received.html:12
-#: femlliga/templates/email/notify_communication_rejected.html:12
-msgid "compartir"
-msgstr "compartir"
-
-#: femlliga/templates/email/agreement_connect.html:14
-#: femlliga/templates/email/notify_communication_received.html:14
+#: femlliga/templates/email/agreement_connect.html:11
+#: femlliga/templates/email/notify_communication_received.html:11
 msgid "amb aquest missatge:"
 msgstr "amb aquest missatge:"
 
-#: femlliga/templates/email/agreement_connect.html:25
+#: femlliga/templates/email/agreement_connect.html:22
 msgid ""
 "Podeu seguir parlant polsant a <strong>«Respon a tots»</strong> en aquest mateix "
 "correu, i concretar els detalls de la vostra col·laboració."
@@ -1054,7 +1059,7 @@ msgstr ""
 "href='%(url)s'>dins de l'aplicació</a>, a la pàgina de Preferències, secció de "
 "Notificacions immediates."
 
-#: femlliga/templates/email/notify_communication_received.html:8
+#: femlliga/templates/email/notify_communication_received.html:9
 #, python-format
 msgid ""
 "Us enviem aquest missatge des de %(name)s ja que <strong>%(solicitor)s</strong> "
@@ -1063,14 +1068,14 @@ msgstr ""
 "Us enviem aquest missatge des de %(name)s ja que <strong>%(solicitor)s</strong> "
 "us ha demanat"
 
-#: femlliga/templates/email/notify_communication_received.html:25
+#: femlliga/templates/email/notify_communication_received.html:22
 #, python-format
 msgid ""
 "Podeu entrar a <a href='%(url)s'>%(site)s</a> per acceptar o declinar la petició."
 msgstr ""
 "Podeu entrar a <a href='%(url)s'>%(site)s</a> per acceptar o declinar la petició."
 
-#: femlliga/templates/email/notify_communication_rejected.html:8
+#: femlliga/templates/email/notify_communication_rejected.html:9
 #, python-format
 msgid ""
 "Us enviem aquest missatge des de %(name)s ja que <strong>%(solicitee)s ha "
@@ -1079,7 +1084,11 @@ msgstr ""
 "Us enviem aquest missatge des de %(name)s ja que <strong>%(solicitee)s ha "
 "declinat una petició</strong> que els vau fer el %(date)s per"
 
-#: femlliga/templates/email/notify_communication_rejected.html:20
+#: femlliga/templates/email/notify_communication_rejected.html:10
+msgid "demanar"
+msgstr "demanar"
+
+#: femlliga/templates/email/notify_communication_rejected.html:17
 msgid ""
 "Sentim que aquesta oportunitat de col·laboració no haja prosperat, i esperem que "
 "altres iniciatives tinguen més èxit en el futur."
@@ -1108,107 +1117,137 @@ msgstr ""
 "Notificacions periòdiques."
 
 #: femlliga/templates/email/periodic_notification.html:40
-msgid "T'han fet una petició de col·laboració..."
-msgstr "T'han fet una petició de col·laboració..."
+msgid "Us han fet una petició de col·laboració..."
+msgstr "Us han fet una petició de col·laboració..."
 
-#: femlliga/templates/email/periodic_notification.html:42
-#, python-format
+#: femlliga/templates/email/periodic_notification.html:43
 msgid ""
 "Hi ha organitzacions que us han fet una petició a través de la plataforma i "
-"estan esperant la vostra resposta. No els faces esperar més i entra a <a "
-"href='%(url)s'>%(name)s</a> per a contestar si accepteu la petició o no. Teniu "
-"%(total)d peticions pendents, entre elles:"
+"estan esperant la vostra resposta."
 msgstr ""
 "Hi ha organitzacions que us han fet una petició a través de la plataforma i "
-"estan esperant la vostra resposta. No els faces esperar més i entra a <a "
-"href='%(url)s'>%(name)s</a> per a contestar si accepteu la petició o no. Teniu "
-"%(total)d peticions pendents, entre elles:"
+"estan esperant la vostra resposta."
 
-#: femlliga/templates/email/periodic_notification.html:46
+#: femlliga/templates/email/periodic_notification.html:44
+#, python-format
+msgid "Teniu una petició pendent, no els feu "
+msgid_plural "Teniu %(num)d peticions pendents, no els feu "
+msgstr[0] "Teniu una petició pendent, no els feu "
+msgstr[1] "Teniu %(num)d peticions pendents, no els feu "
+
+#: femlliga/templates/email/periodic_notification.html:45
+#, python-format
+msgid ""
+"esperar més i entreu a <a href='%(url)s'>%(name)s</a> per a contestar si "
+"accepteu la petició o no:"
+msgstr ""
+"esperar més i entreu a <a href='%(url)s'>%(name)s</a> per a contestar si "
+"accepteu la petició o no:"
+
+#: femlliga/templates/email/periodic_notification.html:50
 #, python-format
 msgid "%(org)s sol·licita %(resource)s"
 msgstr "%(org)s sol·licita %(resource)s"
 
-#: femlliga/templates/email/periodic_notification.html:56
+#: femlliga/templates/email/periodic_notification.html:60
 msgid "Heu arribat a fer l'intercanvi finalment?"
 msgstr "Heu arribat a fer l'intercanvi finalment?"
 
-#: femlliga/templates/email/periodic_notification.html:58
-#, python-format
+#: femlliga/templates/email/periodic_notification.html:63
 msgid ""
 "Heu començat una conversa per correu per col·laborar amb algunes organitzacions, "
 "però que no heu indicat a la plataforma si heu arribat a un acord finalment. "
-"Aquesta informació ens pot ser molt útil per millorar la plataforma. "
-"<strong>Teniu %(total)d confirmacions pendents</strong>, <a "
-"href='%(url)s'>entra</a> i informa'ns!"
+"Aquesta informació ens pot ser molt útil per millorar la plataforma."
 msgstr ""
 "Heu començat una conversa per correu per col·laborar amb algunes organitzacions, "
 "però que no heu indicat a la plataforma si heu arribat a un acord finalment. "
-"Aquesta informació ens pot ser molt útil per millorar la plataforma. "
-"<strong>Teniu %(total)d confirmacions pendents</strong>, <a "
-"href='%(url)s'>entra</a> i informa'ns!"
+"Aquesta informació ens pot ser molt útil per millorar la plataforma."
 
 #: femlliga/templates/email/periodic_notification.html:64
+#, python-format
+msgid "<strong>Teniu una confirmació pendent</strong>,"
+msgid_plural "<strong>Teniu %(num)d confirmacions pendents</strong>,"
+msgstr[0] "<strong>Teniu una confirmació pendent</strong>,"
+msgstr[1] "<strong>Teniu %(num)d confirmacions pendents</strong>,"
+
+#: femlliga/templates/email/periodic_notification.html:65
+#, python-format
+msgid "<a href='%(url)s'>entreu</a> i informeu-nos!"
+msgstr "<a href='%(url)s'>entreu</a> i informeu-nos!"
+
+#: femlliga/templates/email/periodic_notification.html:72
 #, python-format
 msgid "Vau sol·licitar %(resource)s a %(org)s"
 msgstr "Vau sol·licitar %(resource)s a %(org)s"
 
-#: femlliga/templates/email/periodic_notification.html:66
+#: femlliga/templates/email/periodic_notification.html:74
 #, python-format
 msgid "%(org)s va sol·licitar %(resource)s"
 msgstr "%(org)s va sol·licitar %(resource)s"
 
-#: femlliga/templates/email/periodic_notification.html:78
-#: femlliga/templates/femlliga/preferences.html:56
+#: femlliga/templates/email/periodic_notification.html:86
+#: femlliga/templates/femlliga/preferences.html:67
 msgid "Possibles lligues"
 msgstr "Possibles lligues"
 
-#: femlliga/templates/email/periodic_notification.html:79
+#: femlliga/templates/email/periodic_notification.html:87
 #, python-format
 msgid ""
 "Sabeu que hi ha organitzacions que podrien cobrir les vostres necessitats? Només "
 "cal que entreu a la <a href='%(url)s'>plataforma</a>, al menú de «Has lligat», i "
-"enviar un missatge a l'entitat que preferiu."
+"envieu un missatge a l'entitat que preferiu."
 msgstr ""
 "Sabeu que hi ha organitzacions que podrien cobrir les vostres necessitats? Només "
 "cal que entreu a la <a href='%(url)s'>plataforma</a>, al menú de «Has lligat», i "
-"enviar un missatge a l'entitat que preferiu."
-
-#: femlliga/templates/email/periodic_notification.html:85
-#, python-format
-msgid ""
-"Entre altres, hi ha %(count)s entitats que <strong>també necessiten %(name)s</"
-"strong>, com vosaltres. Podeu contactar amb elles per buscar solucions "
-"conjuntament."
-msgstr ""
-"Entre altres, hi ha %(count)s entitats que <strong>també necessiten %(name)s</"
-"strong>, com vosaltres. Podeu contactar amb elles per buscar solucions "
-"conjuntament."
+"envieu un missatge a l'entitat que preferiu."
 
 #: femlliga/templates/email/periodic_notification.html:93
+#, python-format
+msgid ""
+"Entre altres, hi ha una entitat que <strong>també necessita %(name)s</strong>,"
+msgid_plural ""
+"Entre altres, hi ha %(num)d entitats que <strong>també necessiten %(name)s</"
+"strong>,"
+msgstr[0] ""
+"Entre altres, hi ha una entitat que <strong>també necessita %(name)s</strong>,"
+msgstr[1] ""
+"Entre altres, hi ha %(num)d entitats que <strong>també necessiten %(name)s</"
+"strong>,"
+
+#: femlliga/templates/email/periodic_notification.html:94
+msgid "com vosaltres. Podeu contactar amb elles per buscar solucions conjuntament."
+msgstr ""
+"com vosaltres. Podeu contactar amb elles per buscar solucions conjuntament."
+
+#: femlliga/templates/email/periodic_notification.html:101
 msgid "També"
 msgstr "També"
 
-#: femlliga/templates/email/periodic_notification.html:95
+#: femlliga/templates/email/periodic_notification.html:101
 msgid "Entre altres,"
 msgstr "Entre altres,"
 
-#: femlliga/templates/email/periodic_notification.html:97
+#: femlliga/templates/email/periodic_notification.html:102
 #, python-format
-msgid ""
-"heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que ho "
-"ofereixen</strong>. Podeu contactar amb elles per concretar la manera de "
-"col·laborar."
-msgstr ""
-"heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que ho "
-"ofereixen</strong>. Podeu contactar amb elles per concretar la manera de "
-"col·laborar."
+msgid "heu indicat que <strong>necessiteu %(name)s, i hi ha"
+msgstr "heu indicat que <strong>necessiteu %(name)s, i hi ha"
 
-#: femlliga/templates/email/periodic_notification.html:106
+#: femlliga/templates/email/periodic_notification.html:103
+#, python-format
+msgid "una entitat que ho ofereix</strong>."
+msgid_plural "%(num)d entitats que ho ofereixen</strong>."
+msgstr[0] "una entitat que ho ofereix</strong>."
+msgstr[1] "%(num)d entitats que ho ofereixen</strong>."
+
+#: femlliga/templates/email/periodic_notification.html:104
+msgid "Podeu contactar amb elles per concretar la manera de col·laborar."
+msgstr "Podeu contactar amb elles per concretar la manera de col·laborar."
+
+#: femlliga/templates/email/periodic_notification.html:113
 msgid "Novetats a la plataforma!"
 msgstr "Novetats a la plataforma!"
 
-#: femlliga/templates/email/periodic_notification.html:107
+#: femlliga/templates/email/periodic_notification.html:114
 #, python-format
 msgid ""
 "%(name)s està en constant evolució. En els darrers mesos, hem afegit nous "
@@ -1221,48 +1260,48 @@ msgstr ""
 "seues necessitats. No us les perdeu i visiteu <a href='%(url)s'>%(domain)s</a>! "
 "Us enviem un xicotet resum:"
 
-#: femlliga/templates/femlliga/_base.html:32
+#: femlliga/templates/femlliga/_base.html:33
 msgid "Salta al contingut principal"
 msgstr "Salta al contingut principal"
 
-#: femlliga/templates/femlliga/_base.html:70
+#: femlliga/templates/femlliga/_base.html:71
 msgid "INFORMACIÓ"
 msgstr "INFORMACIÓ"
 
-#: femlliga/templates/femlliga/_base.html:72
+#: femlliga/templates/femlliga/_base.html:73
 msgid "Avís legal"
 msgstr "Avís legal"
 
-#: femlliga/templates/femlliga/_base.html:74
+#: femlliga/templates/femlliga/_base.html:75
 msgid "Política de protecció de dades"
 msgstr "Política de protecció de dades"
 
-#: femlliga/templates/femlliga/_base.html:75
+#: femlliga/templates/femlliga/_base.html:76
 msgid "Preguntes freqüents"
 msgstr "Preguntes freqüents"
 
-#: femlliga/templates/femlliga/_base.html:76
+#: femlliga/templates/femlliga/_base.html:77
 #: femlliga/templates/femlliga/contact.html:5
 msgid "Contacte"
 msgstr "Contacte"
 
-#: femlliga/templates/femlliga/_base.html:80
+#: femlliga/templates/femlliga/_base.html:81
 msgid "CONTACTE"
 msgstr "CONTACTE"
 
-#: femlliga/templates/femlliga/_base.html:82
+#: femlliga/templates/femlliga/_base.html:83
 msgid "Correu electrònic:"
 msgstr "Correu electrònic:"
 
-#: femlliga/templates/femlliga/_base.html:84
+#: femlliga/templates/femlliga/_base.html:85
 msgid "Enllaços"
 msgstr "Enllaços"
 
-#: femlliga/templates/femlliga/_base.html:85
+#: femlliga/templates/femlliga/_base.html:86
 msgid "Les imatges emprades pertanyen a"
 msgstr "Les imatges emprades pertanyen a"
 
-#: femlliga/templates/femlliga/_base.html:86
+#: femlliga/templates/femlliga/_base.html:87
 msgid ""
 "Web creada amb <a target='_blank' rel='noopener noreferrer' href='https://github."
 "com/transversalcoop/femlliga'>programari lliure</a>"
@@ -1270,19 +1309,19 @@ msgstr ""
 "Web creada amb <a target='_blank' rel='noopener noreferrer' href='https://github."
 "com/transversalcoop/femlliga'>programari lliure</a>"
 
-#: femlliga/templates/femlliga/_base.html:89
+#: femlliga/templates/femlliga/_base.html:90
 msgid "Un projecte desenvolupat per"
 msgstr "Un projecte desenvolupat per"
 
-#: femlliga/templates/femlliga/_base.html:91
+#: femlliga/templates/femlliga/_base.html:92
 msgid "Logo de la Cooperativa Transversal"
 msgstr "Logo de la Cooperativa Transversal"
 
-#: femlliga/templates/femlliga/_base.html:94
+#: femlliga/templates/femlliga/_base.html:95
 msgid "Amb el suport econòmic de"
 msgstr "Amb el suport econòmic de"
 
-#: femlliga/templates/femlliga/_base.html:96
+#: femlliga/templates/femlliga/_base.html:97
 msgid "Logo de l'Ajuntament de Castelló"
 msgstr "Logo de l'Ajuntament de Castelló"
 
@@ -1290,45 +1329,67 @@ msgstr "Logo de l'Ajuntament de Castelló"
 msgid "Teniu peticions pendents d'atendre"
 msgstr "Teniu peticions pendents d'atendre"
 
-#: femlliga/templates/femlliga/_base_template.html:16
+#: femlliga/templates/femlliga/_base_template.html:29
+msgid "Des d'aquesta pàgina podeu canviar les dades donades durant l'alta"
+msgstr "Des d'aquesta pàgina podeu canviar les dades donades durant l'alta"
+
+#: femlliga/templates/femlliga/_base_template.html:31
 #: femlliga/templates/femlliga/app.html:5
 msgid "Entitat"
 msgstr "Entitat"
 
-#: femlliga/templates/femlliga/_base_template.html:17
+#: femlliga/templates/femlliga/_base_template.html:35
+msgid ""
+"Des d'aquesta pàgina podeu veure amb qui heu fet lliga i podeu intercanviar "
+"recursos"
+msgstr ""
+"Des d'aquesta pàgina podeu veure amb qui heu fet lliga i podeu intercanviar "
+"recursos"
+
+#: femlliga/templates/femlliga/_base_template.html:37
 msgid "Has lligat?"
 msgstr "Has lligat?"
 
-#: femlliga/templates/femlliga/_base_template.html:18
+#: femlliga/templates/femlliga/_base_template.html:41
+msgid "Des d'aquesta pàgina podeu trobar altres organitzacions de la plataforma"
+msgstr "Des d'aquesta pàgina podeu trobar altres organitzacions de la plataforma"
+
+#: femlliga/templates/femlliga/_base_template.html:43
 msgid "Descobreix"
 msgstr "Descobreix"
 
-#: femlliga/templates/femlliga/_base_template.html:20
+#: femlliga/templates/femlliga/_base_template.html:48
+msgid "Des d'aquesta pàgina podeu veure els intercanvis que heu fet anteriorment"
+msgstr "Des d'aquesta pàgina podeu veure els intercanvis que heu fet anteriorment"
+
+#: femlliga/templates/femlliga/_base_template.html:50
 #: femlliga/templates/femlliga/agreements.html:5
-#: femlliga/templates/femlliga/agreements.html:50
+#: femlliga/templates/femlliga/agreements.html:52
 #: femlliga/templates/femlliga/dashboard.html:12
 msgid "Peticions"
 msgstr "Peticions"
 
-#: femlliga/templates/femlliga/_base_template.html:24
+#: femlliga/templates/femlliga/_base_template.html:55
 msgid "Informe"
 msgstr "Informe"
 
-#: femlliga/templates/femlliga/_base_template.html:25
+#: femlliga/templates/femlliga/_base_template.html:56
 #: femlliga/templates/femlliga/dashboard.html:7
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: femlliga/templates/femlliga/_base_template.html:39
+#: femlliga/templates/femlliga/_base_template.html:72
 msgid "Expandeix el menú del perfil"
 msgstr "Expandeix el menú del perfil"
 
-#: femlliga/templates/femlliga/_base_template.html:45
+#: femlliga/templates/femlliga/_base_template.html:78
+#: femlliga/templates/femlliga/_base_template.html:94
 #: femlliga/templates/femlliga/profile.html:5
 msgid "Perfil"
 msgstr "Perfil"
 
-#: femlliga/templates/femlliga/_base_template.html:47
+#: femlliga/templates/femlliga/_base_template.html:80
+#: femlliga/templates/femlliga/_base_template.html:96
 #: femlliga/templates/femlliga/preferences.html:5
 #: femlliga/templates/femlliga/preferences.html:11
 msgid "Preferències"
@@ -1360,86 +1421,91 @@ msgstr ""
 "contrasenya en la pantalla."
 
 #: femlliga/templates/femlliga/_macros.html:52
-#: femlliga/templates/femlliga/_macros.html:449
-#: femlliga/templates/femlliga/agreements.html:143
-#: femlliga/templates/femlliga/resources-wizard.html:88
+#: femlliga/templates/femlliga/_macros.html:454
+#: femlliga/templates/femlliga/resources-wizard.html:101
 msgid "Producte o servei remunerat"
 msgstr "Producte o servei remunerat"
 
-#: femlliga/templates/femlliga/_macros.html:59
-#: femlliga/templates/femlliga/_macros.html:461
+#: femlliga/templates/femlliga/_macros.html:55
+#: femlliga/templates/femlliga/_macros.html:455
+#: femlliga/templates/femlliga/resources-wizard.html:109
+msgid "Local accessible"
+msgstr "Local accessible"
+
+#: femlliga/templates/femlliga/_macros.html:62
+#: femlliga/templates/femlliga/_macros.html:467
 msgid "Observacions:"
 msgstr "Observacions:"
 
-#: femlliga/templates/femlliga/_macros.html:76
-#: femlliga/templates/femlliga/_macros.html:341
-#: femlliga/templates/femlliga/matches.html:16
-#: femlliga/templates/femlliga/matches.html:24
+#: femlliga/templates/femlliga/_macros.html:79
+#: femlliga/templates/femlliga/_macros.html:346
 msgid "Tanca"
 msgstr "Tanca"
 
-#: femlliga/templates/femlliga/_macros.html:89
-#: femlliga/templates/femlliga/_macros.html:356
+#: femlliga/templates/femlliga/_macros.html:92
+#: femlliga/templates/femlliga/_macros.html:361
 #: femlliga/templates/femlliga/index.html:133
 #: femlliga/templates/femlliga/index.html:261
 #: femlliga/templates/femlliga/index.html:284
-#: femlliga/templates/femlliga/resources-wizard.html:132
+#: femlliga/templates/femlliga/matches.html:95
+#: femlliga/templates/femlliga/resources-wizard.html:154
 msgid "Anterior"
 msgstr "Anterior"
 
-#: femlliga/templates/femlliga/_macros.html:93
-#: femlliga/templates/femlliga/_macros.html:360
+#: femlliga/templates/femlliga/_macros.html:96
+#: femlliga/templates/femlliga/_macros.html:365
 #: femlliga/templates/femlliga/index.html:137
 #: femlliga/templates/femlliga/index.html:265
 #: femlliga/templates/femlliga/index.html:288
-#: femlliga/templates/femlliga/resources-wizard.html:142
+#: femlliga/templates/femlliga/matches.html:94
+#: femlliga/templates/femlliga/resources-wizard.html:164
 msgid "Següent"
 msgstr "Següent"
 
-#: femlliga/templates/femlliga/_macros.html:262
+#: femlliga/templates/femlliga/_macros.html:265
 #: femlliga/templates/femlliga/add_organization.html:71
 msgid "Xarxes socials i contacte"
 msgstr "Xarxes socials i contacte"
 
-#: femlliga/templates/femlliga/_macros.html:288
+#: femlliga/templates/femlliga/_macros.html:291
 msgid "Xarxes socials"
 msgstr "Xarxes socials"
 
-#: femlliga/templates/femlliga/_macros.html:328
+#: femlliga/templates/femlliga/_macros.html:333
 msgid "Esborra"
 msgstr "Esborra"
 
-#: femlliga/templates/femlliga/_macros.html:400
-#: femlliga/templates/femlliga/add_organization.html:100
+#: femlliga/templates/femlliga/_macros.html:405
+#: femlliga/templates/femlliga/add_organization.html:99
 msgid "Forma jurídica"
 msgstr "Forma jurídica"
 
-#: femlliga/templates/femlliga/_macros.html:401
+#: femlliga/templates/femlliga/_macros.html:406
 msgid "Àmbits de treball"
 msgstr "Àmbits de treball"
 
-#: femlliga/templates/femlliga/_macros.html:441
+#: femlliga/templates/femlliga/_macros.html:446
 msgid "ofereix"
 msgstr "ofereix"
 
-#: femlliga/templates/femlliga/_macros.html:442
+#: femlliga/templates/femlliga/_macros.html:447
 msgid "necessita"
 msgstr "necessita"
 
-#: femlliga/templates/femlliga/_macros.html:446
-#: femlliga/templates/femlliga/search.html:57
+#: femlliga/templates/femlliga/_macros.html:451
+#: femlliga/templates/femlliga/search.html:59
 msgid "de vosaltres"
 msgstr "de vosaltres"
 
-#: femlliga/templates/femlliga/_macros.html:473
+#: femlliga/templates/femlliga/_macros.html:479
 msgid "Contacta"
 msgstr "Contacta"
 
-#: femlliga/templates/femlliga/_macros.html:482
+#: femlliga/templates/femlliga/_macros.html:488
 msgid "S'ha enviat el missatge correctament."
 msgstr "S'ha enviat el missatge correctament."
 
-#: femlliga/templates/femlliga/_macros.html:482
+#: femlliga/templates/femlliga/_macros.html:488
 msgid ""
 "podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa "
 "per correu electrònic."
@@ -1447,7 +1513,7 @@ msgstr ""
 "podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa "
 "per correu electrònic."
 
-#: femlliga/templates/femlliga/_macros.html:485
+#: femlliga/templates/femlliga/_macros.html:491
 msgid ""
 "Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més "
 "endavant, i si el problema persisteix poseu-vos en contacte amb"
@@ -1455,7 +1521,7 @@ msgstr ""
 "Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més "
 "endavant, i si el problema persisteix poseu-vos en contacte amb"
 
-#: femlliga/templates/femlliga/_macros.html:489
+#: femlliga/templates/femlliga/_macros.html:495
 msgid ""
 "La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar "
 "la comunicació."
@@ -1463,27 +1529,27 @@ msgstr ""
 "La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar "
 "la comunicació."
 
-#: femlliga/templates/femlliga/_macros.html:492
+#: femlliga/templates/femlliga/_macros.html:498
 msgid "Quines opcions vos interessen concretament?"
 msgstr "Quines opcions vos interessen concretament?"
 
-#: femlliga/templates/femlliga/_macros.html:507
+#: femlliga/templates/femlliga/_macros.html:513
 msgid "Escriu ací el missatge que els arribarà"
 msgstr "Escriu ací el missatge que els arribarà"
 
-#: femlliga/templates/femlliga/_macros.html:517
+#: femlliga/templates/femlliga/_macros.html:523
 msgid "Enviant..."
 msgstr "Enviant..."
 
-#: femlliga/templates/femlliga/_macros.html:523
+#: femlliga/templates/femlliga/_macros.html:529
 msgid "Envia el missatge"
 msgstr "Envia el missatge"
 
-#: femlliga/templates/femlliga/_macros.html:524
+#: femlliga/templates/femlliga/_macros.html:530
 msgid "Se li enviarà un missatge a "
 msgstr "Se li enviarà un missatge a "
 
-#: femlliga/templates/femlliga/_macros.html:524
+#: femlliga/templates/femlliga/_macros.html:530
 msgid ""
 ", que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una "
 "conversa per correu electrònic"
@@ -1491,17 +1557,25 @@ msgstr ""
 ", que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una "
 "conversa per correu electrònic"
 
-#: femlliga/templates/femlliga/_macros.html:592
+#: femlliga/templates/femlliga/_macros.html:598
 msgid "Cal indicar tant en missatge com les opcions"
 msgstr "Cal indicar tant en missatge com les opcions"
 
-#: femlliga/templates/femlliga/_macros.html:594
+#: femlliga/templates/femlliga/_macros.html:600
 msgid "Cal indicar el missatge"
 msgstr "Cal indicar el missatge"
 
-#: femlliga/templates/femlliga/_macros.html:596
+#: femlliga/templates/femlliga/_macros.html:602
 msgid "Cal indicar les opcions"
 msgstr "Cal indicar les opcions"
+
+#: femlliga/templates/femlliga/_macros.html:649
+msgid "Mostra el filtre"
+msgstr "Mostra el filtre"
+
+#: femlliga/templates/femlliga/_macros.html:650
+msgid "Amaga el filtre"
+msgstr "Amaga el filtre"
 
 #: femlliga/templates/femlliga/add_organization.html:9
 msgid "Edita l'entitat"
@@ -1537,7 +1611,7 @@ msgid "Esborrant..."
 msgstr "Esborrant..."
 
 #: femlliga/templates/femlliga/add_organization.html:54
-#: femlliga/templates/femlliga/resources-wizard.html:107
+#: femlliga/templates/femlliga/resources-wizard.html:129
 msgid "Esborra la imatge"
 msgstr "Esborra la imatge"
 
@@ -1558,11 +1632,11 @@ msgstr "Descripció de l'activitat de l'entitat"
 msgid "Afegeix xarxa social"
 msgstr "Afegeix xarxa social"
 
-#: femlliga/templates/femlliga/add_organization.html:108
+#: femlliga/templates/femlliga/add_organization.html:107
 msgid "Ubicació."
 msgstr "Ubicació."
 
-#: femlliga/templates/femlliga/add_organization.html:108
+#: femlliga/templates/femlliga/add_organization.html:107
 msgid ""
 "Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça "
 "aproximada:"
@@ -1574,15 +1648,31 @@ msgstr ""
 msgid "Nom del carrer, número, codi postal, població, país"
 msgstr "Nom del carrer, número, codi postal, població, país"
 
-#: femlliga/templates/femlliga/add_organization.html:114
-msgid "És necessari indicar la posició o l'adreça de l'entitat"
-msgstr "És necessari indicar la posició o l'adreça de l'entitat"
+#: femlliga/templates/femlliga/add_organization.html:112
+msgid "Carregant adreces..."
+msgstr "Carregant adreces..."
+
+#: femlliga/templates/femlliga/add_organization.html:120
+msgid ""
+"No s'ha trobat cap lloc coincident amb l'adreça indicada. Per favor, indiqueu-ne "
+"una altra o concreteu-la més."
+msgstr ""
+"No s'ha trobat cap lloc coincident amb l'adreça indicada. Per favor, indiqueu-ne "
+"una altra o concreteu-la més."
 
 #: femlliga/templates/femlliga/add_organization.html:124
+msgid "Selecciona l'adreça:"
+msgstr "Selecciona l'adreça:"
+
+#: femlliga/templates/femlliga/add_organization.html:134
+msgid "És necessari indicar la posició de l'entitat"
+msgstr "És necessari indicar la posició de l'entitat"
+
+#: femlliga/templates/femlliga/add_organization.html:141
 msgid "Desa"
 msgstr "Desa"
 
-#: femlliga/templates/femlliga/add_organization.html:126
+#: femlliga/templates/femlliga/add_organization.html:143
 msgid "Crea l'entitat"
 msgstr "Crea l'entitat"
 
@@ -1590,76 +1680,76 @@ msgstr "Crea l'entitat"
 msgid "Peticions enviades i rebudes"
 msgstr "Peticions enviades i rebudes"
 
-#: femlliga/templates/femlliga/agreements.html:13
-#: femlliga/templates/femlliga/search.html:15
+#: femlliga/templates/femlliga/agreements.html:15
+#: femlliga/templates/femlliga/search.html:17
 msgid "Selecciona si mostrar els resultats agrupats per recurs o per organització"
 msgstr "Selecciona si mostrar els resultats agrupats per recurs o per organització"
 
-#: femlliga/templates/femlliga/agreements.html:19
-#: femlliga/templates/femlliga/search.html:21
+#: femlliga/templates/femlliga/agreements.html:21
+#: femlliga/templates/femlliga/search.html:23
 msgid "Recursos"
 msgstr "Recursos"
 
-#: femlliga/templates/femlliga/agreements.html:26
+#: femlliga/templates/femlliga/agreements.html:28
 #: femlliga/templates/femlliga/dashboard.html:11
-#: femlliga/templates/femlliga/search.html:28
+#: femlliga/templates/femlliga/search.html:30
 msgid "Organitzacions"
 msgstr "Organitzacions"
 
-#: femlliga/templates/femlliga/agreements.html:29
-#: femlliga/templates/femlliga/matches.html:36
-#: femlliga/templates/femlliga/search.html:31
+#: femlliga/templates/femlliga/agreements.html:31
+#: femlliga/templates/femlliga/matches.html:23
+#: femlliga/templates/femlliga/search.html:33
 msgid "Cerca recursos o organitzacions"
 msgstr "Cerca recursos o organitzacions"
 
-#: femlliga/templates/femlliga/agreements.html:32
+#: femlliga/templates/femlliga/agreements.html:34
 msgid "Enviades"
 msgstr "Enviades"
 
-#: femlliga/templates/femlliga/agreements.html:33
+#: femlliga/templates/femlliga/agreements.html:35
 msgid "Peticions enviades"
 msgstr "Peticions enviades"
 
-#: femlliga/templates/femlliga/agreements.html:34
+#: femlliga/templates/femlliga/agreements.html:36
 msgid "Rebudes"
 msgstr "Rebudes"
 
-#: femlliga/templates/femlliga/agreements.html:35
+#: femlliga/templates/femlliga/agreements.html:37
 msgid "Peticions rebudes"
 msgstr "Peticions rebudes"
 
-#: femlliga/templates/femlliga/agreements.html:64
+#: femlliga/templates/femlliga/agreements.html:67
 #: femlliga/templates/femlliga/index.html:80
-#: femlliga/templates/femlliga/matches.html:69
-#: femlliga/templates/femlliga/search.html:67
+#: femlliga/templates/femlliga/matches.html:57
+#: femlliga/templates/femlliga/search.html:70
 msgid "Carregant..."
 msgstr "Carregant..."
 
-#: femlliga/templates/femlliga/agreements.html:72
+#: femlliga/templates/femlliga/agreements.html:75
 msgid "peticions enviades"
 msgstr "peticions enviades"
 
-#: femlliga/templates/femlliga/agreements.html:76
+#: femlliga/templates/femlliga/agreements.html:79
 msgid "peticions rebudes"
 msgstr "peticions rebudes"
 
-#: femlliga/templates/femlliga/agreements.html:84
+#: femlliga/templates/femlliga/agreements.html:87
 msgid "peticions"
 msgstr "peticions"
 
-#: femlliga/templates/femlliga/agreements.html:90
+#: femlliga/templates/femlliga/agreements.html:93
 msgid "Totes les peticions"
 msgstr "Totes les peticions"
 
-#: femlliga/templates/femlliga/agreements.html:91
+#: femlliga/templates/femlliga/agreements.html:94
 msgid "peticions enviades o rebudes"
 msgstr "peticions enviades o rebudes"
 
-#: femlliga/templates/femlliga/agreements.html:101
+#: femlliga/templates/femlliga/agreements.html:104
 msgid "Encara no heu enviat ni rebut peticions"
 msgstr "Encara no heu enviat ni rebut peticions"
 
-#: femlliga/templates/femlliga/agreements.html:102
+#: femlliga/templates/femlliga/agreements.html:105
 msgid ""
 "En podeu enviar des de la pàgina de «Has lligat?» o des de la pàgina de "
 "«Descobreix»."
@@ -1667,48 +1757,48 @@ msgstr ""
 "En podeu enviar des de la pàgina de «Has lligat?» o des de la pàgina de "
 "«Descobreix»."
 
-#: femlliga/templates/femlliga/agreements.html:131
-#: femlliga/templates/femlliga/agreements.html:137
+#: femlliga/templates/femlliga/agreements.html:134
+#: femlliga/templates/femlliga/agreements.html:140
 msgid "Petició de"
 msgstr "Petició de"
 
-#: femlliga/templates/femlliga/agreements.html:133
+#: femlliga/templates/femlliga/agreements.html:136
 msgid "enviada a"
 msgstr "enviada a"
 
-#: femlliga/templates/femlliga/agreements.html:139
+#: femlliga/templates/femlliga/agreements.html:142
 msgid "rebuda de"
 msgstr "rebuda de"
 
-#: femlliga/templates/femlliga/agreements.html:145
+#: femlliga/templates/femlliga/agreements.html:150
 msgid "Missatge que vau enviar el"
 msgstr "Missatge que vau enviar el"
 
-#: femlliga/templates/femlliga/agreements.html:146
+#: femlliga/templates/femlliga/agreements.html:151
 msgid "Missatge que va enviar"
 msgstr "Missatge que va enviar"
 
-#: femlliga/templates/femlliga/agreements.html:146
+#: femlliga/templates/femlliga/agreements.html:151
 msgid "el"
 msgstr "el"
 
-#: femlliga/templates/femlliga/agreements.html:151
+#: femlliga/templates/femlliga/agreements.html:156
 msgid "encara no ha acceptat ni declinat la conversa per correu."
 msgstr "encara no ha acceptat ni declinat la conversa per correu."
 
-#: femlliga/templates/femlliga/agreements.html:152
+#: femlliga/templates/femlliga/agreements.html:157
 msgid "Encara no heu acceptat ni declinat la conversa per correu."
 msgstr "Encara no heu acceptat ni declinat la conversa per correu."
 
-#: femlliga/templates/femlliga/agreements.html:156
+#: femlliga/templates/femlliga/agreements.html:161
 msgid "Inicia la conversa per correu"
 msgstr "Inicia la conversa per correu"
 
-#: femlliga/templates/femlliga/agreements.html:159
+#: femlliga/templates/femlliga/agreements.html:164
 msgid "Declina la conversa per correu"
 msgstr "Declina la conversa per correu"
 
-#: femlliga/templates/femlliga/agreements.html:161
+#: femlliga/templates/femlliga/agreements.html:166
 msgid ""
 "Per favor, indiqueu si accepteu iniciar una conversa per correu. En cas que si, "
 "s'iniciarà una cadena de correus electrònics entre les dues parts en la qual "
@@ -1720,36 +1810,36 @@ msgstr ""
 "podreu parlar de la possible col·laboració. Iniciar la conversa per correu no us "
 "obliga a arribar a cap acord."
 
-#: femlliga/templates/femlliga/agreements.html:165
-#: femlliga/templates/femlliga/agreements.html:193
+#: femlliga/templates/femlliga/agreements.html:170
+#: femlliga/templates/femlliga/agreements.html:198
 msgid "Actualitzant..."
 msgstr "Actualitzant..."
 
-#: femlliga/templates/femlliga/agreements.html:172
+#: femlliga/templates/femlliga/agreements.html:177
 msgid "va declinar la conversa per correu"
 msgstr "va declinar la conversa per correu"
 
-#: femlliga/templates/femlliga/agreements.html:173
+#: femlliga/templates/femlliga/agreements.html:178
 msgid "Vau declinar la conversa per correu"
 msgstr "Vau declinar la conversa per correu"
 
-#: femlliga/templates/femlliga/agreements.html:178
+#: femlliga/templates/femlliga/agreements.html:183
 msgid "va iniciar la conversa per correu"
 msgstr "va iniciar la conversa per correu"
 
-#: femlliga/templates/femlliga/agreements.html:179
+#: femlliga/templates/femlliga/agreements.html:184
 msgid "Vau iniciar la conversa per correu"
 msgstr "Vau iniciar la conversa per correu"
 
-#: femlliga/templates/femlliga/agreements.html:184
+#: femlliga/templates/femlliga/agreements.html:189
 msgid "S'ha arribat a un acord"
 msgstr "S'ha arribat a un acord"
 
-#: femlliga/templates/femlliga/agreements.html:187
+#: femlliga/templates/femlliga/agreements.html:192
 msgid "No s'ha arribat a un acord"
 msgstr "No s'ha arribat a un acord"
 
-#: femlliga/templates/femlliga/agreements.html:189
+#: femlliga/templates/femlliga/agreements.html:194
 msgid ""
 "Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. "
 "Aquesta informació es farà servir només a nivell estadístic"
@@ -1757,11 +1847,11 @@ msgstr ""
 "Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. "
 "Aquesta informació es farà servir només a nivell estadístic"
 
-#: femlliga/templates/femlliga/agreements.html:199
+#: femlliga/templates/femlliga/agreements.html:204
 msgid "No es va arribar a un acord"
 msgstr "No es va arribar a un acord"
 
-#: femlliga/templates/femlliga/agreements.html:203
+#: femlliga/templates/femlliga/agreements.html:208
 msgid "Es va arribar a un acord"
 msgstr "Es va arribar a un acord"
 
@@ -2266,61 +2356,39 @@ msgstr ""
 "tornar a intentar entrar d'ací a una hora."
 
 #: femlliga/templates/femlliga/matches.html:6
-#: femlliga/templates/femlliga/matches.html:35
+#: femlliga/templates/femlliga/matches.html:20
 msgid "Has lligat!"
 msgstr "Has lligat!"
 
-#: femlliga/templates/femlliga/matches.html:15
-msgid "Has acabat el procés d'alta!"
-msgstr "Has acabat el procés d'alta!"
-
-#: femlliga/templates/femlliga/matches.html:19
-msgid ""
-"Has acabat d'introduir la informació de la teua organització. A partir d'ara "
-"podeu buscar i contactar amb altres organitzacions, i altres organitzacions "
-"també poden entrar en contacte amb vosaltres."
-msgstr ""
-"Has acabat d'introduir la informació de la teua organització. A partir d'ara "
-"podeu buscar i contactar amb altres organitzacions, i altres organitzacions "
-"també poden entrar en contacte amb vosaltres."
-
-#: femlliga/templates/femlliga/matches.html:20
-msgid "En aquesta mateixa pàgina podeu veure amb qui heu fet lliga."
-msgstr "En aquesta mateixa pàgina podeu veure amb qui heu fet lliga."
-
-#: femlliga/templates/femlliga/matches.html:21
-msgid "No us oblideu de anar revisant les dades cada cert temps!"
-msgstr "No us oblideu de anar revisant les dades cada cert temps!"
-
-#: femlliga/templates/femlliga/matches.html:38
+#: femlliga/templates/femlliga/matches.html:25
 msgid "Que necessiteu?"
 msgstr "Que necessiteu?"
 
-#: femlliga/templates/femlliga/matches.html:52
+#: femlliga/templates/femlliga/matches.html:39
 msgid "Entitats que ofereixen o necessiten recursos"
 msgstr "Entitats que ofereixen o necessiten recursos"
 
-#: femlliga/templates/femlliga/matches.html:76
-#: femlliga/templates/femlliga/matches.html:83
-#: femlliga/templates/femlliga/search.html:75
-#: femlliga/templates/femlliga/search.html:79
-#: femlliga/templates/femlliga/search.html:87
-#: femlliga/templates/femlliga/search.html:94
+#: femlliga/templates/femlliga/matches.html:64
+#: femlliga/templates/femlliga/matches.html:71
+#: femlliga/templates/femlliga/search.html:78
+#: femlliga/templates/femlliga/search.html:82
+#: femlliga/templates/femlliga/search.html:90
+#: femlliga/templates/femlliga/search.html:97
 msgid "resultats"
 msgstr "resultats"
 
-#: femlliga/templates/femlliga/matches.html:82
-#: femlliga/templates/femlliga/search.html:93
+#: femlliga/templates/femlliga/matches.html:70
+#: femlliga/templates/femlliga/search.html:96
 msgid "Tot"
 msgstr "Tot"
 
-#: femlliga/templates/femlliga/matches.html:95
-#: femlliga/templates/femlliga/search.html:107
+#: femlliga/templates/femlliga/matches.html:83
+#: femlliga/templates/femlliga/search.html:110
 msgid "Sembla que no hi ha sort..."
 msgstr "Sembla que no hi ha sort..."
 
-#: femlliga/templates/femlliga/matches.html:96
-#: femlliga/templates/femlliga/search.html:108
+#: femlliga/templates/femlliga/matches.html:84
+#: femlliga/templates/femlliga/search.html:111
 msgid ""
 "No cal patir! Amb el temps s'incorporaran noves entitats que probablement "
 "compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-"
@@ -2329,6 +2397,32 @@ msgstr ""
 "No cal patir! Amb el temps s'incorporaran noves entitats que probablement "
 "compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-"
 "ho en uns dies."
+
+#: femlliga/templates/femlliga/matches.html:96
+msgid "Acaba"
+msgstr "Acaba"
+
+#: femlliga/templates/femlliga/matches.html:100
+msgid "Has acabat el procés d'alta!"
+msgstr "Has acabat el procés d'alta!"
+
+#: femlliga/templates/femlliga/matches.html:101
+msgid ""
+"Has acabat d'introduir la informació de la teua organització. A partir d'ara "
+"podeu buscar i contactar amb altres organitzacions, i altres organitzacions "
+"també poden entrar en contacte amb vosaltres."
+msgstr ""
+"Has acabat d'introduir la informació de la teua organització. A partir d'ara "
+"podeu buscar i contactar amb altres organitzacions, i altres organitzacions "
+"també poden entrar en contacte amb vosaltres."
+
+#: femlliga/templates/femlliga/matches.html:104
+msgid "Això és tot!"
+msgstr "Això és tot!"
+
+#: femlliga/templates/femlliga/matches.html:105
+msgid "No us oblideu d'anar revisant les dades cada cert temps!"
+msgstr "No us oblideu d'anar revisant les dades cada cert temps!"
 
 #: femlliga/templates/femlliga/preferences.html:18
 msgid "General"
@@ -2352,15 +2446,19 @@ msgstr "(correus pendents de validar: %(emails)s)"
 msgid "Idioma de l'aplicació"
 msgstr "Idioma de l'aplicació"
 
-#: femlliga/templates/femlliga/preferences.html:43
+#: femlliga/templates/femlliga/preferences.html:44
+msgid "Distància màxima per a les lligues"
+msgstr "Distància màxima per a les lligues"
+
+#: femlliga/templates/femlliga/preferences.html:54
 msgid "Notificacions immediates"
 msgstr "Notificacions immediates"
 
-#: femlliga/templates/femlliga/preferences.html:44
+#: femlliga/templates/femlliga/preferences.html:55
 msgid "Accepta automàticament les peticions"
 msgstr "Accepta automàticament les peticions"
 
-#: femlliga/templates/femlliga/preferences.html:44
+#: femlliga/templates/femlliga/preferences.html:55
 msgid ""
 "Si una organització us fa una petició, us enviarem un correu electrònic a les "
 "dos organitzacions perquè us comuniqueu"
@@ -2368,11 +2466,11 @@ msgstr ""
 "Si una organització us fa una petició, us enviarem un correu electrònic a les "
 "dos organitzacions perquè us comuniqueu"
 
-#: femlliga/templates/femlliga/preferences.html:45
+#: femlliga/templates/femlliga/preferences.html:56
 msgid "Informa immediatament de les peticions rebudes"
 msgstr "Informa immediatament de les peticions rebudes"
 
-#: femlliga/templates/femlliga/preferences.html:45
+#: femlliga/templates/femlliga/preferences.html:56
 msgid ""
 "Si us envien una petició i no teniu l'opció d'acceptar-la automàticament, us "
 "enviarem un correu perquè la pugueu revisar"
@@ -2380,11 +2478,11 @@ msgstr ""
 "Si us envien una petició i no teniu l'opció d'acceptar-la automàticament, us "
 "enviarem un correu perquè la pugueu revisar"
 
-#: femlliga/templates/femlliga/preferences.html:46
+#: femlliga/templates/femlliga/preferences.html:57
 msgid "Informa immediatament de les peticions rebutjades"
 msgstr "Informa immediatament de les peticions rebutjades"
 
-#: femlliga/templates/femlliga/preferences.html:46
+#: femlliga/templates/femlliga/preferences.html:57
 msgid ""
 "Si envieu una petició i l'altra organització la rebutja, us enviarem un correu "
 "perquè ho sapigueu"
@@ -2392,35 +2490,35 @@ msgstr ""
 "Si envieu una petició i l'altra organització la rebutja, us enviarem un correu "
 "perquè ho sapigueu"
 
-#: femlliga/templates/femlliga/preferences.html:50
+#: femlliga/templates/femlliga/preferences.html:61
 msgid "Notificacions periòdiques"
 msgstr "Notificacions periòdiques"
 
-#: femlliga/templates/femlliga/preferences.html:52
+#: femlliga/templates/femlliga/preferences.html:63
 msgid "Freqüència de les notificacions"
 msgstr "Freqüència de les notificacions"
 
-#: femlliga/templates/femlliga/preferences.html:52
+#: femlliga/templates/femlliga/preferences.html:63
 msgid ""
 "Us enviarem un únic correu amb la informació seleccionada només si hi ha novetats"
 msgstr ""
 "Us enviarem un únic correu amb la informació seleccionada només si hi ha novetats"
 
-#: femlliga/templates/femlliga/preferences.html:54
+#: femlliga/templates/femlliga/preferences.html:65
 msgid "Peticions pendents"
 msgstr "Peticions pendents"
 
-#: femlliga/templates/femlliga/preferences.html:54
+#: femlliga/templates/femlliga/preferences.html:65
 msgid ""
 "Informa de peticions que us han fet i que estan pendents d'acceptar o rebutjar"
 msgstr ""
 "Informa de peticions que us han fet i que estan pendents d'acceptar o rebutjar"
 
-#: femlliga/templates/femlliga/preferences.html:55
+#: femlliga/templates/femlliga/preferences.html:66
 msgid "Acords pendents"
 msgstr "Acords pendents"
 
-#: femlliga/templates/femlliga/preferences.html:55
+#: femlliga/templates/femlliga/preferences.html:66
 msgid ""
 "Informa de peticions en les que s'ha establert comunicació per correu, però que "
 "estan pendents d'informar si hi ha hagut acord o no"
@@ -2428,7 +2526,7 @@ msgstr ""
 "Informa de peticions en les que s'ha establert comunicació per correu, però que "
 "estan pendents d'informar si hi ha hagut acord o no"
 
-#: femlliga/templates/femlliga/preferences.html:56
+#: femlliga/templates/femlliga/preferences.html:67
 msgid ""
 "Informa de recursos que podeu intercanviar i organitzacions properes amb les que "
 "podeu contactar segons els vostres interessos"
@@ -2436,11 +2534,11 @@ msgstr ""
 "Informa de recursos que podeu intercanviar i organitzacions properes amb les que "
 "podeu contactar segons els vostres interessos"
 
-#: femlliga/templates/femlliga/preferences.html:57
+#: femlliga/templates/femlliga/preferences.html:68
 msgid "Recursos nous"
 msgstr "Recursos nous"
 
-#: femlliga/templates/femlliga/preferences.html:57
+#: femlliga/templates/femlliga/preferences.html:68
 msgid ""
 "Informa de recursos afegits recentment que no consten encara als vostres "
 "interessos"
@@ -2448,9 +2546,30 @@ msgstr ""
 "Informa de recursos afegits recentment que no consten encara als vostres "
 "interessos"
 
-#: femlliga/templates/femlliga/preferences.html:60
+#: femlliga/templates/femlliga/preferences.html:71
 msgid "Actualitza les preferències"
 msgstr "Actualitza les preferències"
+
+#: femlliga/templates/femlliga/preferences.html:74
+msgid "Segur que vols esborrar el compte? L'acció no es pot desfer"
+msgstr "Segur que vols esborrar el compte? L'acció no es pot desfer"
+
+#: femlliga/templates/femlliga/preferences.html:79
+msgid "Gestiona el compte"
+msgstr "Gestiona el compte"
+
+#: femlliga/templates/femlliga/preferences.html:82
+#: femlliga/templates/femlliga/preferences.html:86
+msgid "Esborra el compte"
+msgstr "Esborra el compte"
+
+#: femlliga/templates/femlliga/preferences.html:83
+msgid ""
+"Aquesta acció esborrarà la organització i l'usuari amb què has iniciat sessió. "
+"L'acció no es pot desfer"
+msgstr ""
+"Aquesta acció esborrarà la organització i l'usuari amb què has iniciat sessió. "
+"L'acció no es pot desfer"
 
 #: femlliga/templates/femlliga/report.html:47
 msgid "Informe d'activitat de la plataforma"
@@ -2521,27 +2640,27 @@ msgstr "necessitat"
 msgid "oferiment"
 msgstr "oferiment"
 
-#: femlliga/templates/femlliga/resources-wizard.html:66
+#: femlliga/templates/femlliga/resources-wizard.html:79
 msgid "Selecciona les opcions que necessiteu:"
 msgstr "Selecciona les opcions que necessiteu:"
 
-#: femlliga/templates/femlliga/resources-wizard.html:68
+#: femlliga/templates/femlliga/resources-wizard.html:81
 msgid "Selecciona les opcions que oferiu:"
 msgstr "Selecciona les opcions que oferiu:"
 
-#: femlliga/templates/femlliga/resources-wizard.html:95
+#: femlliga/templates/femlliga/resources-wizard.html:117
 msgid "Observacions o aclariments"
 msgstr "Observacions o aclariments"
 
-#: femlliga/templates/femlliga/resources-wizard.html:130
+#: femlliga/templates/femlliga/resources-wizard.html:152
 msgid "Torna sense fer canvis"
 msgstr "Torna sense fer canvis"
 
-#: femlliga/templates/femlliga/resources-wizard.html:138
+#: femlliga/templates/femlliga/resources-wizard.html:160
 msgid "Desa els canvis"
 msgstr "Desa els canvis"
 
-#: femlliga/templates/femlliga/resources-wizard.html:140
+#: femlliga/templates/femlliga/resources-wizard.html:162
 msgid "Comprova si has lligat!"
 msgstr "Comprova si has lligat!"
 
@@ -2550,23 +2669,23 @@ msgstr "Comprova si has lligat!"
 msgid "Descobreix tot el que hi ha a Fem lliga!"
 msgstr "Descobreix tot el que hi ha a Fem lliga!"
 
-#: femlliga/templates/femlliga/search.html:34
+#: femlliga/templates/femlliga/search.html:36
 msgid "Ofereixen"
 msgstr "Ofereixen"
 
-#: femlliga/templates/femlliga/search.html:35
+#: femlliga/templates/femlliga/search.html:37
 msgid "Entitats que ofereixen recursos"
 msgstr "Entitats que ofereixen recursos"
 
-#: femlliga/templates/femlliga/search.html:36
+#: femlliga/templates/femlliga/search.html:38
 msgid "Necessiten"
 msgstr "Necessiten"
 
-#: femlliga/templates/femlliga/search.html:37
+#: femlliga/templates/femlliga/search.html:39
 msgid "Entitats que necessiten recursos"
 msgstr "Entitats que necessiten recursos"
 
-#: femlliga/templates/femlliga/search.html:52
+#: femlliga/templates/femlliga/search.html:54
 msgid "Recursos que fan lliga"
 msgstr "Recursos que fan lliga"
 
@@ -2825,3 +2944,15 @@ msgstr ""
 #~ "han actualitzat els recursos que ofereixen. Us enviem un recull de les "
 #~ "novetats, que potser us poden interessar ara encara que en el seu moment no "
 #~ "estigueren disponibles o no les seleccionareu. Son les següents:"
+
+#~ msgid "Cal indicar la posició o l'adreça"
+#~ msgstr "Cal indicar la posició o l'adreça"
+
+#~ msgid ""
+#~ "heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que "
+#~ "ho ofereixen</strong>. Podeu contactar amb elles per concretar la manera de "
+#~ "col·laborar."
+#~ msgstr ""
+#~ "heu indicat que <strong>necessiteu %(name)s, i hi ha %(count)s entitats que "
+#~ "ho ofereixen</strong>. Podeu contactar amb elles per concretar la manera de "
+#~ "col·laborar."
