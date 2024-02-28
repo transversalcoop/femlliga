@@ -1484,10 +1484,12 @@ def count_word_freqs(s):
 
 def get_relationships_graph():
     agreements = Agreement.objects.all().prefetch_related("solicitor", "solicitee")
-    relations = {}
+    relations, labels = {}, {}
     for a in agreements:
         if not a.solicitor or not a.solicitee:
             continue
+        labels[a.solicitor.id] = a.solicitor.name
+        labels[a.solicitee.id] = a.solicitee.name
         key = (a.solicitor.id, a.solicitee.id)
         if key not in relations.keys():
             relations[key] = 1
@@ -1500,7 +1502,7 @@ def get_relationships_graph():
 
     DG = nx.DiGraph()
     DG.add_weighted_edges_from(edges)
-    return Graph(DG)
+    return Graph(DG, labels)
 
 
 def sort_by_name(l):

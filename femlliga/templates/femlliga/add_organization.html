@@ -205,8 +205,8 @@ Vue.createApp({
       totalSocialMedias: +document.getElementById("id_social_media-TOTAL_FORMS").value,
       mediaTypesPlaceholdersMap: mediaTypesPlaceholdersMap,
       address: "",
-      lat: "{% if form.cleaned_data %}{{ form.cleaned_data["lat"] }}{% endif %}",
-      lng: "{% if form.cleaned_data %}{{ form.cleaned_data["lng"] }}{% endif %}",
+      lat: "{% if form.cleaned_data and form.cleaned_data["lat"] %}{{ form.cleaned_data["lat"] }}{% endif %}",
+      lng: "{% if form.cleaned_data and form.cleaned_data["lng"] %}{{ form.cleaned_data["lng"] }}{% endif %}",
       debounceAddress: createDebounce(),
       addresses: [],
       noAddresses: false,
@@ -260,8 +260,8 @@ Vue.createApp({
       });
     },
     setAddress(address) {
-      this.lat = address.lat;
-      this.lng = address.lon;
+      this.lat = address.lat.slice(0, 10);
+      this.lng = address.lon.slice(0, 10);
       if (marker) { marker.remove(); }
       marker = L.marker({lat: +this.lat, lng: +this.lng}).addTo(map);
       map.setView([+this.lat, +this.lng], 15);

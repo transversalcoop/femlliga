@@ -390,12 +390,15 @@ class Timeline:
 
 
 class Graph:
-    def __init__(self, graph):
+    def __init__(self, graph, labels):
         self.graph = graph
+        self.labels = labels
 
     def plot(self):
         plt.switch_backend("AGG")
-        nx.draw_kamada_kawai(self.graph)
+        pos = nx.kamada_kawai_layout(self.graph)
+        nx.draw_networkx_labels(self.graph, pos, self.labels)
+        nx.draw(self.graph, pos=pos)
         return plot()
 
 

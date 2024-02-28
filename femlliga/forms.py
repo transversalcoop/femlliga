@@ -77,9 +77,8 @@ class MessageForm(forms.Form):
             return self.cleaned_data
 
         if len(self.cleaned_data.get("options", [])) == 0:
-            self._errors["options"] = self.error_class(
-                [_("Cal indicar una opció com a mínim")]
-            )
+            self.add_error("options", _("Cal indicar una opció com a mínim"))
+
         return self.cleaned_data
 
 

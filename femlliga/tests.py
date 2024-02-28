@@ -555,7 +555,7 @@ class IntegrationTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         save_email(mail.outbox[0], "periodic_notification.html")
         for s in [
-            "T'han fet una petició de col·laboració...",
+            "Us han fet una petició de col·laboració...",
             "Heu arribat a fer l'intercanvi finalment?",
             "Possibles lligues",
             "Novetats a la plataforma",
