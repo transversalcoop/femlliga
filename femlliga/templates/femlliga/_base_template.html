@@ -24,11 +24,31 @@
   {% if not user.is_anonymous %}
     {% set organization = request.user.get_organization() %}
     {% if organization %}
-    <li>{{ menu_url(_("Entitat"), "app") }}</li>
-    <li>{{ menu_url(_("Has lligat?"), "matches", [organization.id]) }}</li>
-    <li>{{ menu_url(_("Descobreix"), "search", [organization.id]) }}</li>
+    <li
+      data-tg-order="1"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu canviar les dades donades durant l'alta") }}</p>"
+    >
+      {{ menu_url(_("Entitat"), "app") }}
+    </li>
+    <li
+      data-tg-order="2"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu veure amb qui heu fet lliga i podeu intercanviar recursos") }}</p>"
+    >
+      {{ menu_url(_("Has lligat?"), "matches", [organization.id]) }}
+    </li>
+    <li
+      data-tg-order="3"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu trobar altres organitzacions de la plataforma") }}</p>"
+    >
+      {{ menu_url(_("Descobreix"), "search", [organization.id]) }}
+    </li>
     {% set pending_sent, pending_received = organization.pending_agreements() %}
-    <li>{{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}</li>
+    <li
+      data-tg-order="4"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu veure els intercanvis que heu fet anteriorment") }}</p>"
+    >
+      {{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}
+    </li>
     {% endif %}
   {% endif %}
   {% if user.is_staff %}

@@ -6,28 +6,13 @@
 {{ _("Has lligat!") }}
 {% endblock %}
 
-{% block content %}
+{% block css %}
 {% if wizard_finished %}
-<div id="wizard-finished-modal" class="modal modal-lg fade" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title">{{ _("Has acabat el procés d'alta!") }}</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
-      </div>
-      <div class="modal-body">
-        <p>{{ _("Has acabat d'introduir la informació de la teua organització. A partir d'ara podeu buscar i contactar amb altres organitzacions, i altres organitzacions també poden entrar en contacte amb vosaltres.") }}</p>
-        <p>{{ _("En aquesta mateixa pàgina podeu veure amb qui heu fet lliga.") }}</p>
-        <p>{{ _("No us oblideu de anar revisant les dades cada cert temps!") }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Tanca") }}</button>
-      </div>
-    </div>
-  </div>
-</div>
+<link rel="stylesheet" href="https://unpkg.com/@sjmc11/tourguidejs/dist/css/tour.min.css">
 {% endif %}
+{% endblock %}
 
+{% block content %}
 {% if len(json_data.matches) > 0 %}
 <main id="content" class="container-fluid">
   <div id="app" class="row">
@@ -102,16 +87,34 @@
 {% endblock %}
 
 {% block js %}
-{{ vue_js() }}
-<script>
 {% if wizard_finished %}
-const modal = new bootstrap.Modal('#wizard-finished-modal')
-modal.show()
+<script src="https://unpkg.com/@sjmc11/tourguidejs/dist/tour.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+const tg = new tourguide.TourGuideClient({
+  nextLabel: "{{ _("Següent") }}",
+  prevLabel: "{{ _("Anterior") }}",
+  finishLabel: "{{ _("Acaba") }}",
+})
+
+tg.addSteps([{
+  title: "{{ _("Has acabat el procés d'alta!") }}",
+  content: "<p>{{ _("Has acabat d'introduir la informació de la teua organització. A partir d'ara podeu buscar i contactar amb altres organitzacions, i altres organitzacions també poden entrar en contacte amb vosaltres.") }}</p>",
+  order: 0,
+}, {
+  title: "{{ _("Això és tot!") }}",
+  content: "<p>{{ _("No us oblideu d'anar revisant les dades cada cert temps!") }}</p>",
+  order: 999,
+}])
+
+tg.start()
+
 if (history.replaceState) {
   history.replaceState(null, "", "?wizard_finished=false")
 }
+</script>
 {% endif %}
-
+{{ vue_js() }}
+<script>
 var jsonData = getJsonData();
 
 {{ match_contains_func_js() }}
