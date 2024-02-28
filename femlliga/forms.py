@@ -54,6 +54,7 @@ class ResourceForm(forms.Form):
     options = forms.MultipleChoiceField(choices=const.RESOURCE_OPTIONS, required=False)
     comments = forms.CharField(required=False)
     charge = forms.BooleanField(required=False)
+    place_accessible = forms.BooleanField(required=False)
 
 
 class ImageForm(forms.Form):

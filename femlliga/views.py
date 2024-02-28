@@ -403,6 +403,7 @@ def get_resource_form(org, resource_type, resource):
         }
         try:
             data["charge"] = r.charge
+            data["place_accessible"] = r.place_accessible
         except:
             pass  # field only exists for offers
         form = ResourceForm(data)
@@ -486,6 +487,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
             m.comments = form.cleaned_data["comments"]
             m.has_resource = len(options) > 0 or len(m.comments) > 0
             m.charge = form.cleaned_data["charge"]
+            m.place_accessible = form.cleaned_data["place_accessible"]
             m.save()
             if resource_type == "offers":
                 imageformset.save()

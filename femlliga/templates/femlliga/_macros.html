@@ -51,6 +51,9 @@
     {% if resource.charge %}
       <span class="badge bg-light" title="{{ _("Producte o servei remunerat") }}">€</span>
     {% endif %}
+    {% if resource.place_accessible %}
+      <span class="badge bg-light" title="{{ _("Local accessible") }}"><i class="bi-universal-access"></i></span>
+    {% endif %}
     {% for option in resource.options.all() %}
       <span class="badge bg-light">{{ option }}</span>
     {% endfor %}
@@ -449,6 +452,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     </div>
     <div class="mb-2">
       <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Producte o servei remunerat") }}">€</span>
+      <span v-if="result.place_accessible" class="badge bg-light me-2" title="{{ _("Local accessible") }}"><i class="bi-universal-access"></i></span>
       <span
         {% if needs %}
         class="badge me-2" :class="{ 'bg-light': optionMatches(result.resource, option, {{ needs }}), 'bg-secondary': !optionMatches(result.resource, option, {{ needs }}) }"

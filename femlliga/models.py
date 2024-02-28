@@ -532,6 +532,7 @@ class Offer(BaseResource):
         related_name="offers",
     )
     charge = models.BooleanField(default=False)
+    place_accessible = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
@@ -564,6 +565,7 @@ class Offer(BaseResource):
             )
         j["images"] = [i.json() for i in self.images.all()]
         j["charge"] = self.charge
+        j["place_accessible"] = self.place_accessible
         return j
 
     def last_message_declined(self, agreement_declined_map):
