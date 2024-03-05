@@ -143,6 +143,8 @@ class Page(models.Model):
 
     class Meta:
         unique_together = (("name", "language"),)
+        verbose_name = _("Pàgina")
+        verbose_name_plural = _("Pàgines")
 
     def __str__(self):
         return f"[{self.language}] {self.name}"
@@ -185,8 +187,12 @@ class Organization(models.Model):
         null=True,
     )
 
+    class Meta:
+        verbose_name = _("Organització")
+        verbose_name_plural = _("Organitzacions")
+
     def __str__(self):
-        return f"(Entitat) {self.name}"
+        return self.name
 
     @classmethod
     def deleted_organization(cls):
@@ -294,6 +300,9 @@ class Organization(models.Model):
             communication_accepted=True, agreement_successful=None
         )
         return len(sent) > 0, len(received0) > 0 or len(received1) > 0
+
+    def creator__email(self):
+        return self.creator.email
 
 
 class SocialMedia(models.Model):
@@ -588,28 +597,36 @@ class Agreement(models.Model):
         Organization,
         on_delete=models.SET_NULL,
         related_name="sent_agreements",
+        verbose_name=_("Qui sol·licita"),
         null=True,
     )
     solicitee = models.ForeignKey(
         Organization,
         on_delete=models.SET_NULL,
         related_name="received_agreements",
+        verbose_name=_("A qui li sol·liciten"),
         null=True,
     )
-    message = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
-    resource = models.CharField(max_length=100, choices=const.RESOURCES)
+    message = models.TextField(verbose_name=_("Missatge"))
+    date = models.DateTimeField(auto_now_add=True, verbose_name=_("Petició enviada el"))
+    resource = models.CharField(max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs"))
     resource_type = models.CharField(
-        max_length=10, choices=[("need", "need"), ("offer", "offer")]
+        max_length=10,
+        choices=[("need", _("Necessitat")), ("offer", _("Oferiment"))],
+        verbose_name=_("Tipus de lliga"),
     )
-    options = models.ManyToManyField(ResourceOption)
-    communication_accepted = models.BooleanField(null=True)
-    communication_date = models.DateTimeField(null=True, blank=True)
-    agreement_successful = models.BooleanField(null=True)
-    successful_date = models.DateTimeField(null=True, blank=True)
+    options = models.ManyToManyField(ResourceOption, verbose_name=_("Opcions"))
+    communication_accepted = models.BooleanField(null=True, verbose_name=_("Conversa per correu"))
+    communication_date = models.DateTimeField(null=True, blank=True, verbose_name=_("Correu enviat el"))
+    agreement_successful = models.BooleanField(null=True, verbose_name=_("S'ha arribat a un acord"))
+    successful_date = models.DateTimeField(null=True, blank=True, verbose_name=_("Acord registrat el"))
+
+    class Meta:
+        verbose_name = _("Petició")
+        verbose_name_plural = _("Peticions")
 
     def __str__(self):
-        return f"[{self.id}] {self.solicitor} sol·licita {self.resource} a {self.solicitee}"
+        return f"«{self.solicitor}» sol·licita «{resource_name(self.resource)}» a «{self.solicitee}»"
 
     def solicitor_safe(self):
         if self.solicitor:
@@ -651,9 +668,16 @@ class Contact(models.Model):
     email = models.EmailField()
     content = models.TextField()
 
+    class Meta:
+        verbose_name = _("Contacte")
+
 
 class ContactDenyList(models.Model):
     email = models.EmailField()
+
+    class Meta:
+        verbose_name = _("Contacte bloquejat")
+        verbose_name_plural = _("Contactes bloquejats")
 
     def __str__(self):
         return self.email
