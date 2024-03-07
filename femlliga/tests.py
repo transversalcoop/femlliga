@@ -1,22 +1,21 @@
-from decimal import Decimal
 from datetime import datetime, timedelta
+from decimal import Decimal
 
-from django.core import mail
-from django.urls import reverse
+from allauth.account.models import EmailAddress
+from bs4 import BeautifulSoup
 from django.conf import settings
-from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+from django.core import mail
+from django.test import TestCase, override_settings
+from django.urls import reverse
 
-from bs4 import BeautifulSoup
-from allauth.account.models import EmailAddress
-
-from .models import *
 from .constants import *
+from .models import *
 from .utils import (
-    send_periodic_notification,
-    get_periodic_notification_data,
     get_ordered_needs_and_offers,
+    get_periodic_notification_data,
+    send_periodic_notification,
 )
 
 AUTH_BACKENDS = settings.AUTHENTICATION_BACKENDS[1:]

@@ -1,12 +1,13 @@
-import pytz
 import time
 
+import pytz
 from django.conf import settings
-from django.utils import timezone, translation
 from django.contrib import messages
-from django.shortcuts import redirect
-from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.views import redirect_to_login
+from django.shortcuts import redirect
+from django.utils import timezone, translation
+from django.utils.translation import gettext_lazy as _
+
 
 class TimezoneMiddleware:
     def __init__(self, get_response):

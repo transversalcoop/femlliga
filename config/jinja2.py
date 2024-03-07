@@ -1,19 +1,16 @@
 import bleach
-
-from django.urls import reverse
+from allauth.socialaccount.adapter import get_adapter
+from allauth.utils import get_request_param
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
+from django.templatetags.static import static
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import json_script
-from django.utils.translation import gettext, ngettext, get_language_from_request
-from django.templatetags.static import static
-from django.contrib.sites.shortcuts import get_current_site
-
+from django.utils.translation import get_language_from_request, gettext, ngettext
 from jinja2 import Environment
-from allauth.utils import get_request_param
-from allauth.socialaccount.adapter import get_adapter
 
 import femlliga.constants
-
 from femlliga.models import *
 from femlliga.utils import wizard_url
 

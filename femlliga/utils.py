@@ -1,27 +1,26 @@
-import json
-import urllib
 import decimal
+import json
 import unicodedata
-
+import urllib
 from datetime import timedelta
-from operator import attrgetter
 from distutils.util import strtobool
+from operator import attrgetter
 
+from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage
+from django.db.models import F, Func, Q
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models import Q, Func, F
-from django.core.mail import EmailMessage
-from django.contrib.auth import get_user_model
-from django.template.loader import render_to_string
 
-from femlliga.models import Organization, Agreement, Need, Offer, sort_resources
 from femlliga.constants import (
     FROM_EMAIL,
-    RESOURCES,
-    RESOURCES_ORDER,
     RESOURCE_OPTIONS_MAP,
     RESOURCE_OPTIONS_READABLE_MAP,
+    RESOURCES,
+    RESOURCES_ORDER,
 )
+from femlliga.models import Agreement, Need, Offer, Organization, sort_resources
 
 # Emails and notifications
 

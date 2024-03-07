@@ -4,17 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('femlliga', '0005_alter_agreement_resource_alter_need_resource_and_more'),
+        ("femlliga", "0005_alter_agreement_resource_alter_need_resource_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ContactDenyList',
+            name="ContactDenyList",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('email', models.EmailField(max_length=254)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("email", models.EmailField(max_length=254)),
             ],
         ),
     ]

@@ -1,38 +1,57 @@
-import exif
 import json
-import time
-import uuid
-import urllib
 import logging
+import time
 import unicodedata
-import networkx as nx
-
+import urllib
+import uuid
+from functools import cmp_to_key, reduce
 from io import BytesIO
 from pathlib import Path
-from functools import cmp_to_key, reduce
 
-from django.urls import reverse
-from django.http import Http404, JsonResponse
-from django.forms import inlineformset_factory
-from django.utils import timezone
-from django.contrib import messages
-from django.dispatch import receiver
-from django.db.models import Prefetch
-from django.shortcuts import render, redirect, get_object_or_404
-from django.core.mail import mail_managers
-from django.views.static import serve
-from django.forms.models import model_to_dict
-from django.core.exceptions import PermissionDenied
-from django.template.loader import render_to_string
-from django.utils.translation import get_language_from_request, gettext_lazy as _
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.files.uploadedfile import InMemoryUploadedFile
-
+import exif
+import networkx as nx
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import PermissionDenied
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.mail import mail_managers
+from django.db.models import Prefetch
+from django.dispatch import receiver
+from django.forms import inlineformset_factory
+from django.forms.models import model_to_dict
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.translation import get_language_from_request
+from django.utils.translation import gettext_lazy as _
+from django.views.static import serve
 
 from config.settings import MEDIA_ROOT
+
+from .constants import (
+    ORG_SCOPES,
+    ORG_TYPES,
+    RESOURCE_ICONS_MAP,
+    RESOURCE_NAMES_MAP,
+    RESOURCE_OPTIONS_DEF_MAP,
+    RESOURCE_OPTIONS_MAP,
+    RESOURCES,
+    RESOURCES_LIST,
+    RESOURCES_ORDER,
+    SOCIAL_MEDIA_TYPES,
+)
+from .forms import (
+    ContactForm,
+    MessageForm,
+    OrganizationForm,
+    PreferencesForm,
+    ResourceForm,
+)
 from .models import (
     Agreement,
     Contact,
@@ -55,31 +74,12 @@ from .models import (
     org_type_name,
     resource_name,
 )
-from .constants import (
-    ORG_SCOPES,
-    ORG_TYPES,
-    RESOURCES,
-    RESOURCES_LIST,
-    RESOURCES_ORDER,
-    RESOURCE_ICONS_MAP,
-    RESOURCE_NAMES_MAP,
-    RESOURCE_OPTIONS_MAP,
-    RESOURCE_OPTIONS_DEF_MAP,
-    SOCIAL_MEDIA_TYPES,
-)
-from .forms import (
-    ContactForm,
-    MessageForm,
-    OrganizationForm,
-    PreferencesForm,
-    ResourceForm,
-)
 from .utils import (
     clean_form_email,
-    get_own_needs,
-    get_next_resource,
-    get_resource_index,
     get_json_body,
+    get_next_resource,
+    get_own_needs,
+    get_resource_index,
     http_get,
     limit_organizations_distance,
     send_email,

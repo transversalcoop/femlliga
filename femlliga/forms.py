@@ -1,13 +1,12 @@
 import json
 
 import django.forms as forms
-from django.utils.translation import gettext_lazy as _
-
-from django_recaptcha.fields import ReCaptchaField
 from allauth.account.forms import LoginForm, SignupForm
+from django.utils.translation import gettext_lazy as _
+from django_recaptcha.fields import ReCaptchaField
 
-from .models import CustomUser, Organization, Contact
 from . import constants as const
+from .models import Contact, CustomUser, Organization
 
 
 class PreferencesForm(forms.ModelForm):

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('femlliga', '0011_customuser_distance_limit_km_and_more'),
+        ("femlliga", "0011_customuser_distance_limit_km_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='offer',
-            name='place_accessible',
+            model_name="offer",
+            name="place_accessible",
             field=models.BooleanField(default=False),
         ),
     ]
