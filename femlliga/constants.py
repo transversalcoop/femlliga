@@ -126,7 +126,10 @@ RESOURCE_OPTIONS_MAP = {
         ("TRAINING_HISTORICAL_MEMORY", _("Memòria històrica")),
     ),
     "SERVICE": (
-        ("COMMUNITY_MANAGER", _("Gestió de la comunicació (web, xarxes socials, etc.)")),
+        (
+            "COMMUNITY_MANAGER",
+            _("Gestió de la comunicació (web, xarxes socials, etc.)"),
+        ),
         ("INSURANCE", _("Assegurança")),
         ("AGENCY", _("Gestoria")),
         ("PROJECT_WRITING", _("Redacció de projectes")),
@@ -149,18 +152,26 @@ RESOURCE_OPTIONS_MAP = {
 RESOURCE_OPTIONS_READABLE_MAP = {
     ("PLACE", "DAILY_USAGE"): _("local per a ús diari"),
     ("PLACE", "PUNCTUAL_USAGE"): _("local per a ús puntual"),
-    ("PLACE", "PUNCTUAL_MEETINGS"): _("local per fer servir puntualment per a reunions"),
+    ("PLACE", "PUNCTUAL_MEETINGS"): _(
+        "local per fer servir puntualment per a reunions"
+    ),
     ("PLACE", "PUNCTUAL_EVENTS"): _("local per fer servir puntualment per a actes"),
     ("TRAINING", "TRAINING_DIGITAL"): _("formació en digitalització"),
-    ("TRAINING", "TRAINING_BUREAUCRACY"): _("formació en relacions amb l'administració"),
+    ("TRAINING", "TRAINING_BUREAUCRACY"): _(
+        "formació en relacions amb l'administració"
+    ),
     ("TRAINING", "TRAINING_EQUALITY"): _("formació en igualtat"),
     ("TRAINING", "TRAINING_ENERGY_SAVING"): _("formació en estalvi energètic"),
     ("TRAINING", "TRAINING_HISTORICAL_MEMORY"): _("formació en memòria històrica"),
-    ("SERVICE", "COMMUNITY_MANAGER"): _("ajuda amb la gestió de la comunicació (web, xarxes socials, etc.)"),
+    ("SERVICE", "COMMUNITY_MANAGER"): _(
+        "ajuda amb la gestió de la comunicació (web, xarxes socials, etc.)"
+    ),
     ("SERVICE", "INSURANCE"): _("servei d'assegurança"),
     ("SERVICE", "AGENCY"): _("servei de gestoria"),
     ("SERVICE", "PROJECT_WRITING"): _("ajuda amb la redacció de projectes"),
-    ("SERVICE", "DIGITAL_BUREAUCRACY"): _("ajuda amb les relacions digitals amb l'administració"),
+    ("SERVICE", "DIGITAL_BUREAUCRACY"): _(
+        "ajuda amb les relacions digitals amb l'administració"
+    ),
     ("EQUIPMENT", "SOUND_SYSTEM_ACOUSTIC"): _("equip de so per a xerrades"),
     ("EQUIPMENT", "SOUND_SYSTEM_CONCERT"): _("equip de so per a concerts"),
     ("EQUIPMENT", "PROJECTOR"): _("projector"),
@@ -198,4 +209,3 @@ RESOURCE_OPTIONS_QUESTION_MAP = {
     "TRAINING": _("De quins temes us interessa formar-vos?"),
     "EQUIPMENT": _("Quina d'aquestes coses necessiteu?"),
 }
-

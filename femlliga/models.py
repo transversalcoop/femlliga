@@ -609,17 +609,27 @@ class Agreement(models.Model):
     )
     message = models.TextField(verbose_name=_("Missatge"))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Petició enviada el"))
-    resource = models.CharField(max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs"))
+    resource = models.CharField(
+        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
+    )
     resource_type = models.CharField(
         max_length=10,
         choices=[("need", _("Necessitat")), ("offer", _("Oferiment"))],
         verbose_name=_("Tipus de lliga"),
     )
     options = models.ManyToManyField(ResourceOption, verbose_name=_("Opcions"))
-    communication_accepted = models.BooleanField(null=True, verbose_name=_("Conversa per correu"))
-    communication_date = models.DateTimeField(null=True, blank=True, verbose_name=_("Correu enviat el"))
-    agreement_successful = models.BooleanField(null=True, verbose_name=_("S'ha arribat a un acord"))
-    successful_date = models.DateTimeField(null=True, blank=True, verbose_name=_("Acord registrat el"))
+    communication_accepted = models.BooleanField(
+        null=True, verbose_name=_("Conversa per correu")
+    )
+    communication_date = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Correu enviat el")
+    )
+    agreement_successful = models.BooleanField(
+        null=True, verbose_name=_("S'ha arribat a un acord")
+    )
+    successful_date = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Acord registrat el")
+    )
 
     class Meta:
         verbose_name = _("Petició")

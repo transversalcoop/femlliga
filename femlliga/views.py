@@ -585,7 +585,9 @@ def matches(request, organization_id):
         for x in own_needs
     ]
     agreement_declined_map = get_last_agreement_declined_map(organization)
-    offer_matches, need_matches = get_organization_matches(request.user, organization, own_needs)
+    offer_matches, need_matches = get_organization_matches(
+        request.user, organization, own_needs
+    )
     organization_matches = group_matches_by_organization(
         organization, offer_matches, need_matches
     )
@@ -598,7 +600,8 @@ def matches(request, organization_id):
                 agreement_declined_map=agreement_declined_map,
             )
             for l in organization_matches
-            for m in l if m.resource == need
+            for m in l
+            if m.resource == need
         ]
     return render_matches_page(
         request, "femlliga/matches.html", organization, matches, needs_json
@@ -747,7 +750,11 @@ def get_model_matches(
         .distinct()
     )
     # limit distance in python, so exactly the appropriate results are returned
-    results = [r for r in results if r.organization.distance(organization) < user.distance_limit_km]
+    results = [
+        r
+        for r in results
+        if r.organization.distance(organization) < user.distance_limit_km
+    ]
     return sorted(results, key=lambda r: r.organization.distance(organization))
 
 
@@ -918,7 +925,9 @@ def delete_account(request):
     if request.method == "POST" and request.user.organizations.count() == 1:
         request.user.organizations.first().delete()
         request.user.delete()
-        messages.info(request, _("S'ha esborrat el compte i la organització"), extra_tags="show")
+        messages.info(
+            request, _("S'ha esborrat el compte i la organització"), extra_tags="show"
+        )
         return redirect("index")
 
     return redirect("preferences")

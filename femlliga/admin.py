@@ -2,24 +2,30 @@ from django.contrib import admin
 
 from .models import *
 
+
 class NeedsInline(admin.StackedInline):
     model = Need
     extra = 0
+
 
 class OffersInline(admin.StackedInline):
     model = Offer
     extra = 0
 
+
 class SocialMediaInline(admin.StackedInline):
     model = SocialMedia
     extra = 0
+
 
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ["name", "date", "creator__email"]
     inlines = [NeedsInline, OffersInline, SocialMediaInline]
 
+
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ["email", "date_joined", "language", "distance_limit_km"]
+
 
 class AgreementAdmin(admin.ModelAdmin):
     list_display = [
@@ -57,8 +63,14 @@ class AgreementAdmin(admin.ModelAdmin):
         ("date", "solicitor", "solicitee"),
         ("resource", "resource_type", "options"),
         ("message",),
-        ("communication_accepted", "communication_date", "agreement_successful", "successful_date"),
+        (
+            "communication_accepted",
+            "communication_date",
+            "agreement_successful",
+            "successful_date",
+        ),
     )
+
 
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
