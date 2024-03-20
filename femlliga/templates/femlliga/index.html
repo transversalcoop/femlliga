@@ -33,6 +33,22 @@
   </div>
 </div>
 
+<div class="container landing-container text-center">
+  <h2 class="fw-black text-center">Guia metodològica</h2>
+  <div class="divider-1"></div>
+  <div class="row">
+    <div class="col-6 col-xs-12">
+      <p>A partir de l’experiència acumulada, hem elaborat esta guia metodològica que té com a objectiu recollir una sèrie de recomanacions útils per a enfortir els vincles d’un veïnat a través de l’enxarxament de les entitats presents en un territori concret. Al llarg del document es fa èmfasi en les possibilitats que ofereix la utilització de la plataforma Fem Lliga!, una ferramenta de suport als processos de dinamització comunitària.</p>
+    </div>
+
+    <div class="col-6 col-xs-12">
+      <a type="button" class="btn btn-custom fw-bold p-2 px-4 fs-4" href="{{ static("guia-metodologica-femlliga.pdf") }}" download>
+        Descarrega la guia
+      </a>
+    </div>
+  </div>
+</div>
+
 <div class="container landing-container">
   <h2 class="fw-black text-center">Vols saber si podries fer lliga?</h2>
   <div class="divider-1"></div>
@@ -103,37 +119,8 @@
   </div>
 </div>
 
-<div class="container landing-container">
-  <h2 class="fw-black text-center">Què pots trobar dins de l'aplicació?</h2>
-  <div class="divider-1"></div>
-  <p class="text-center">
-    A sota podeu veure captures de com es veu l'aplicació per dins, com és el procés d'alta, la pàgina de la vostra organització, i el procés de fer lliga amb altres entitats.
-  </p>
-  <div class="container">
-    <div class="row mt-3">
-      <div id="carousel-screenshots" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-padding">
-          <div class="carousel-inner overflow-hidden" style=" padding: 0 0 30px 0;">
-            {% for i in range(1, 7) %}
-            <div class="carousel-item{% if i == 1 %} active{% endif %}">
-              <img src="{{ static("screenshots-carousel/"+str(i)+".png") }}" class="d-none d-md-block w-100" alt="" loading="lazy">
-              <img src="{{ static("screenshots-carousel/"+str(i)+"_mobil.png") }}" class="d-block d-md-none w-100" alt="" loading="lazy">
-            </div>
-            {% endfor %}
-          </div>
-
-          <button class="carousel-control-prev" type="button" data-bs-target="#carousel-screenshots" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carousel-screenshots" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="container landing-container text-center">
+  <iframe class="max-w-100" width="560" height="315" src="https://www.youtube.com/embed/XlhE8N3b1qM?si=qHpuJC7mieJy2ZA6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </div>
 
 <div class="container landing-container">
