@@ -157,10 +157,10 @@
       <span v-else>{{ _("Encara no heu acceptat ni declinat la conversa per correu.") }}</span>
       <div v-if="!agreementSent(result)">
         <div v-if="!agreementsLoading[result.id]">
-          <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2">
+          <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2 mb-2">
             {{ _("Inicia la conversa per correu") }}
           </button>
-          <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2">
+          <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2 mb-2">
             {{ _("Declina la conversa per correu") }}
           </button>
           {{ info_tooltip(_("Per favor, indiqueu si accepteu iniciar una conversa per correu. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la conversa per correu no us obliga a arribar a cap acord.")) }}
@@ -185,10 +185,10 @@
       <span v-if="result.communication_date" class="ms-2">(${ formatDateTime(result.communication_date) })</span>
       <div v-if="result.agreement_successful === null && agreementsResolved[result.id] === undefined">
         <div v-if="!agreementsLoading[result.id]">
-          <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2">
+          <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2 mb-2">
             {{ _("S'ha arribat a un acord") }}
           </button>
-          <button @click="updateAgreement(result, 'successful', 'no')" class="btn btn-sm btn-danger me-2">
+          <button @click="updateAgreement(result, 'successful', 'no')" class="btn btn-sm btn-danger me-2 mb-2">
             {{ _("No s'ha arribat a un acord") }}
           </button>
           {{ info_tooltip(_("Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. Aquesta informació es farà servir només a nivell estadístic")) }}

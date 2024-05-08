@@ -504,35 +504,8 @@ nav .nav-link.active {
     padding: 0 120px;
 }
 
-@media (max-width: 768px) {
-    .carousel-padding {
-        padding: 0 20px;
-    }
-}
-
-
 .columns {
     columns: 3;
-}
-
-@media (max-width: 768px) {
-    .columns {
-        columns: 2;
-    }
-}
-
-@media (max-width: 576px) {
-    .columns {
-        columns: 1;
-    }
-}
-
-.landing-container {
-    margin: 100px auto;
-}
-
-#djDebug #djDebugToolbarHandle {
-    top: 60px !important;
 }
 
 .resources-title {
@@ -542,6 +515,37 @@ nav .nav-link.active {
     text-align: left;
     padding: 0 5px 0 20px;
     line-height: 1em;
+}
+
+@media (max-width: 768px) {
+    .columns {
+        columns: 2;
+    }
+
+    .carousel-padding {
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .columns {
+        columns: 1;
+    }
+}
+
+@media (max-width: 320px) {
+    .resources-title {
+        font-size: 1.9em;
+        padding: 1px;
+    }
+}
+
+.landing-container {
+    margin: 100px auto;
+}
+
+#djDebug #djDebugToolbarHandle {
+    top: 60px !important;
 }
 
 .resource-matches-title {
@@ -743,4 +747,16 @@ nav .nav-link.active {
 
 .clickable {
     cursor: pointer;
+}
+
+.badge.universal-access-icon {
+    padding: 0.3em 0.5em 0.1em 0.5em;
+}
+
+.badge.universal-access-icon img {
+    height: 1.4em;
+}
+
+.badge.universal-access-icon.sm img {
+    height: 1.3em;
 }

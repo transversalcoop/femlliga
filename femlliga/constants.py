@@ -95,6 +95,7 @@ RESOURCES = [
     ("TRAINING", _("Formació")),
     ("SERVICE", _("Servei")),
     ("EQUIPMENT", _("Equipaments")),
+    ("ALLIANCES", _("Aliances")),
     ("OTHER", _("Altres")),
 ]
 
@@ -108,6 +109,7 @@ RESOURCE_ICONS_MAP = {
     "SERVICE": "bi-person-check-fill",
     "TRAINING": "bi-book-half",
     "EQUIPMENT": "bi-gear-fill",
+    "ALLIANCES": "bi-people-fill",
     "OTHER": "bi-three-dots",
 }
 
@@ -146,6 +148,10 @@ RESOURCE_OPTIONS_MAP = {
         ("KITCHEN_EQUIPMENT", _("Material de cuina")),
         ("CAMPING_EQUIPMENT", _("Material d'acampada")),
     ),
+    "ALLIANCES": (
+        ("PROJECT_COLLABORATION", _("Col·laboració en projectes")),
+        ("VOLUNTEERING", _("Voluntariat")),
+    ),
     "OTHER": (),
 }
 
@@ -181,6 +187,8 @@ RESOURCE_OPTIONS_READABLE_MAP = {
     ("EQUIPMENT", "DISHES"): _("plats, gots i coberts"),
     ("EQUIPMENT", "KITCHEN_EQUIPMENT"): _("material de cuina"),
     ("EQUIPMENT", "CAMPING_EQUIPMENT"): _("material d'acampada"),
+    ("ALLIANCES", "PROJECT_COLLABORATION"): _("col·laboració en projectes"),
+    ("ALLIANCES", "VOLUNTEERING"): _("voluntariat"),
 }
 
 RESOURCES_LIST, RESOURCE_OPTIONS = [], []
@@ -200,6 +208,7 @@ RESOURCE_ADD_IMAGE_LABEL = {
     "SERVICE": _("Afegeix imatge del servei"),
     "TRAINING": _("Afegeix imatge de la formació"),
     "EQUIPMENT": _("Afegeix imatge d'aquestes coses"),
+    "ALLIANCES": _("Afegeix imatge d'aquestes coses"),
     "OTHER": _("Afegeix imatge del que oferiu"),
 }
 
@@ -208,4 +217,5 @@ RESOURCE_OPTIONS_QUESTION_MAP = {
     "SERVICE": _("Quins serveis concrets necessiteu?"),
     "TRAINING": _("De quins temes us interessa formar-vos?"),
     "EQUIPMENT": _("Quina d'aquestes coses necessiteu?"),
+    "ALLIANCES": _("Quina d'aquestes coses necessiteu?"),
 }

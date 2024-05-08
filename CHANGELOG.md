@@ -22,6 +22,7 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - S'ha afegit l'opció de canviar el correu electrònic amb el que es va fer el
   registre
 - S'ha afegit una forma jurídica addicional
+- S'ha afegit una nova categoria amb dos noves etiquetes
 - S'han afegit notificacions immediates quan se sol·liciten o rebutgen peticions
 - S'ha afegit més contingut a les notificacions periòdiques
 - Arxius bàsics per a una _Progressive Web APP_

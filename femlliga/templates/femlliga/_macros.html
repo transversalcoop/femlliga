@@ -46,13 +46,15 @@
     {% endfor %}
 {% endmacro %}
 
+{% macro universal_access_icon() %}<img src="{{ static("icons/universal-access.svg") }}">{% endmacro %}
+
 {% macro resource_details(resource, match_type) %}
-  <div style="margin-bottom: 10px;">
+  <div class="mb-2">
     {% if resource.charge %}
       <span class="badge bg-light" title="{{ _("Producte o servei remunerat") }}">€</span>
     {% endif %}
     {% if resource.place_accessible %}
-      <span class="badge bg-light" title="{{ _("Local accessible") }}"><i class="bi-universal-access"></i></span>
+      <span class="badge bg-light universal-access-icon" title="{{ _("Local accessible") }}">{{ universal_access_icon() }}</span>
     {% endif %}
     {% for option in resource.options.all() %}
       <span class="badge bg-light">{{ option }}</span>
@@ -452,10 +454,10 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     </div>
     <div class="mb-2">
       <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Producte o servei remunerat") }}">€</span>
-      <span v-if="result.place_accessible" class="badge bg-light me-2" title="{{ _("Local accessible") }}"><i class="bi-universal-access"></i></span>
+      <span v-if="result.place_accessible" class="badge bg-light universal-access-icon sm me-2" title="{{ _("Local accessible") }}">{{ universal_access_icon() }}</span>
       <span
         {% if needs %}
-        class="badge me-2" :class="{ 'bg-light': optionMatches(result.resource, option, {{ needs }}), 'bg-secondary': !optionMatches(result.resource, option, {{ needs }}) }"
+        class="badge bg-light me-2" :class="{ 'text-body-secondary': !optionMatches(result.resource, option, {{ needs }}) }"
         {% else %}
         class="badge bg-light me-2"
         {% endif %}

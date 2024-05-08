@@ -104,3 +104,24 @@ function get(url, csrfToken, body) {
 function getJsonData() {
     return JSON.parse(document.getElementById('django-json-data').textContent);
 }
+
+var toastWrapper = document.getElementById("toastWrapper");
+
+function showToast(message) {
+    var el = document.createElement("div");
+    el.setAttribute("class", "toast mb-2");
+    el.setAttribute("role", "alert");
+    el.setAttribute("aria-live", "assertive");
+    el.setAttribute("aria-atomic", "true");
+    var inner = document.createElement("div");
+    inner.setAttribute("class", "toast-body");
+    inner.innerHTML = message;
+    el.appendChild(inner);
+    toastWrapper.appendChild(el);
+    var toast = new bootstrap.Toast(el);
+    toast.show();
+    setTimeout(() => {
+        toast.hide();
+        setTimeout(() => { el.remove() }, 1000);
+    }, 5000);
+}

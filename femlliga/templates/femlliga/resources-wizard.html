@@ -75,10 +75,12 @@
     {{ resource }}
   </h2>
   <p>
+    {% if resource.code != "OTHER" %}
     {% if resource_type == "needs" %}
     {{ _("Selecciona les opcions que necessiteu:") }}
     {% else %}
     {{ _("Selecciona les opcions que oferiu:") }}
+    {% endif %}
     {% endif %}
   </p>
 
