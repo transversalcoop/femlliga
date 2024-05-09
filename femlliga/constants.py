@@ -95,6 +95,7 @@ RESOURCES = [
     ("TRAINING", _("Formació")),
     ("SERVICE", _("Servei")),
     ("EQUIPMENT", _("Equipaments")),
+    ("ALLIANCES", _("Aliances")),
     ("OTHER", _("Altres")),
 ]
 
@@ -108,6 +109,7 @@ RESOURCE_ICONS_MAP = {
     "SERVICE": "bi-person-check-fill",
     "TRAINING": "bi-book-half",
     "EQUIPMENT": "bi-gear-fill",
+    "ALLIANCES": "bi-people-fill",
     "OTHER": "bi-three-dots",
 }
 
@@ -126,7 +128,10 @@ RESOURCE_OPTIONS_MAP = {
         ("TRAINING_HISTORICAL_MEMORY", _("Memòria històrica")),
     ),
     "SERVICE": (
-        ("COMMUNITY_MANAGER", _("Gestió de la comunicació (web, xarxes socials, etc.)")),
+        (
+            "COMMUNITY_MANAGER",
+            _("Gestió de la comunicació (web, xarxes socials, etc.)"),
+        ),
         ("INSURANCE", _("Assegurança")),
         ("AGENCY", _("Gestoria")),
         ("PROJECT_WRITING", _("Redacció de projectes")),
@@ -143,24 +148,36 @@ RESOURCE_OPTIONS_MAP = {
         ("KITCHEN_EQUIPMENT", _("Material de cuina")),
         ("CAMPING_EQUIPMENT", _("Material d'acampada")),
     ),
+    "ALLIANCES": (
+        ("PROJECT_COLLABORATION", _("Col·laboració en projectes")),
+        ("VOLUNTEERING", _("Voluntariat")),
+    ),
     "OTHER": (),
 }
 
 RESOURCE_OPTIONS_READABLE_MAP = {
     ("PLACE", "DAILY_USAGE"): _("local per a ús diari"),
     ("PLACE", "PUNCTUAL_USAGE"): _("local per a ús puntual"),
-    ("PLACE", "PUNCTUAL_MEETINGS"): _("local per fer servir puntualment per a reunions"),
+    ("PLACE", "PUNCTUAL_MEETINGS"): _(
+        "local per fer servir puntualment per a reunions"
+    ),
     ("PLACE", "PUNCTUAL_EVENTS"): _("local per fer servir puntualment per a actes"),
     ("TRAINING", "TRAINING_DIGITAL"): _("formació en digitalització"),
-    ("TRAINING", "TRAINING_BUREAUCRACY"): _("formació en relacions amb l'administració"),
+    ("TRAINING", "TRAINING_BUREAUCRACY"): _(
+        "formació en relacions amb l'administració"
+    ),
     ("TRAINING", "TRAINING_EQUALITY"): _("formació en igualtat"),
     ("TRAINING", "TRAINING_ENERGY_SAVING"): _("formació en estalvi energètic"),
     ("TRAINING", "TRAINING_HISTORICAL_MEMORY"): _("formació en memòria històrica"),
-    ("SERVICE", "COMMUNITY_MANAGER"): _("ajuda amb la gestió de la comunicació (web, xarxes socials, etc.)"),
+    ("SERVICE", "COMMUNITY_MANAGER"): _(
+        "ajuda amb la gestió de la comunicació (web, xarxes socials, etc.)"
+    ),
     ("SERVICE", "INSURANCE"): _("servei d'assegurança"),
     ("SERVICE", "AGENCY"): _("servei de gestoria"),
     ("SERVICE", "PROJECT_WRITING"): _("ajuda amb la redacció de projectes"),
-    ("SERVICE", "DIGITAL_BUREAUCRACY"): _("ajuda amb les relacions digitals amb l'administració"),
+    ("SERVICE", "DIGITAL_BUREAUCRACY"): _(
+        "ajuda amb les relacions digitals amb l'administració"
+    ),
     ("EQUIPMENT", "SOUND_SYSTEM_ACOUSTIC"): _("equip de so per a xerrades"),
     ("EQUIPMENT", "SOUND_SYSTEM_CONCERT"): _("equip de so per a concerts"),
     ("EQUIPMENT", "PROJECTOR"): _("projector"),
@@ -170,6 +187,8 @@ RESOURCE_OPTIONS_READABLE_MAP = {
     ("EQUIPMENT", "DISHES"): _("plats, gots i coberts"),
     ("EQUIPMENT", "KITCHEN_EQUIPMENT"): _("material de cuina"),
     ("EQUIPMENT", "CAMPING_EQUIPMENT"): _("material d'acampada"),
+    ("ALLIANCES", "PROJECT_COLLABORATION"): _("col·laboració en projectes"),
+    ("ALLIANCES", "VOLUNTEERING"): _("voluntariat"),
 }
 
 RESOURCES_LIST, RESOURCE_OPTIONS = [], []
@@ -189,6 +208,7 @@ RESOURCE_ADD_IMAGE_LABEL = {
     "SERVICE": _("Afegeix imatge del servei"),
     "TRAINING": _("Afegeix imatge de la formació"),
     "EQUIPMENT": _("Afegeix imatge d'aquestes coses"),
+    "ALLIANCES": _("Afegeix imatge d'aquestes coses"),
     "OTHER": _("Afegeix imatge del que oferiu"),
 }
 
@@ -197,5 +217,5 @@ RESOURCE_OPTIONS_QUESTION_MAP = {
     "SERVICE": _("Quins serveis concrets necessiteu?"),
     "TRAINING": _("De quins temes us interessa formar-vos?"),
     "EQUIPMENT": _("Quina d'aquestes coses necessiteu?"),
+    "ALLIANCES": _("Quina d'aquestes coses necessiteu?"),
 }
-

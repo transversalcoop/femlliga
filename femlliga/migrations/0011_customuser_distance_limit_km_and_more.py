@@ -5,71 +5,93 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('femlliga', '0010_alter_customuser_language_alter_page_name_and_more'),
+        ("femlliga", "0010_alter_customuser_language_alter_page_name_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='distance_limit_km',
+            model_name="customuser",
+            name="distance_limit_km",
             field=models.DecimalField(decimal_places=1, default=100, max_digits=6),
         ),
         migrations.AddField(
-            model_name='customuser',
-            name='last_long_notification_date',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="customuser",
+            name="last_long_notification_date",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='customuser',
-            name='notify_agreement_communication_pending',
+            model_name="customuser",
+            name="notify_agreement_communication_pending",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='customuser',
-            name='notify_agreement_success_pending',
+            model_name="customuser",
+            name="notify_agreement_success_pending",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='customuser',
-            name='notify_immediate_communications_received',
+            model_name="customuser",
+            name="notify_immediate_communications_received",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='customuser',
-            name='notify_immediate_communications_rejected',
+            model_name="customuser",
+            name="notify_immediate_communications_rejected",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='customuser',
-            name='notify_matches',
+            model_name="customuser",
+            name="notify_matches",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='customuser',
-            name='notify_new_resources',
+            model_name="customuser",
+            name="notify_new_resources",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='need',
-            name='last_updated_on',
+            model_name="need",
+            name="last_updated_on",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AddField(
-            model_name='offer',
-            name='last_updated_on',
+            model_name="offer",
+            name="last_updated_on",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AlterField(
-            model_name='customuser',
-            name='notifications_frequency',
-            field=models.CharField(choices=[('DAILY', 'Diàriament'), ('WEEKLY', 'Setmanalment'), ('MONTHLY', 'Mensualment'), ('NEVER', 'Mai')], default='WEEKLY', max_length=50),
+            model_name="customuser",
+            name="notifications_frequency",
+            field=models.CharField(
+                choices=[
+                    ("DAILY", "Diàriament"),
+                    ("WEEKLY", "Setmanalment"),
+                    ("MONTHLY", "Mensualment"),
+                    ("NEVER", "Mai"),
+                ],
+                default="WEEKLY",
+                max_length=50,
+            ),
         ),
         migrations.AlterField(
-            model_name='socialmedia',
-            name='media_type',
-            field=models.CharField(choices=[('EMAIL', 'Correu electrònic'), ('WEBSITE', 'Lloc web'), ('FACEBOOK', 'Facebook'), ('INSTAGRAM', 'Instagram'), ('TWITTER', 'Twitter'), ('LINKEDIN', 'Linkedin'), ('WHATSAPP', 'Whatsapp'), ('PHONE', 'Telèfon')], max_length=30),
+            model_name="socialmedia",
+            name="media_type",
+            field=models.CharField(
+                choices=[
+                    ("EMAIL", "Correu electrònic"),
+                    ("WEBSITE", "Lloc web"),
+                    ("FACEBOOK", "Facebook"),
+                    ("INSTAGRAM", "Instagram"),
+                    ("TWITTER", "Twitter"),
+                    ("LINKEDIN", "Linkedin"),
+                    ("WHATSAPP", "Whatsapp"),
+                    ("PHONE", "Telèfon"),
+                ],
+                max_length=30,
+            ),
         ),
     ]

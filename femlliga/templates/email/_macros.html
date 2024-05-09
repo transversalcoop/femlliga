@@ -1,0 +1,19 @@
+{% macro agreement_action(a, alternative=None) %}
+  {% if a.resource_type == "need" %}
+    {{ _("buscar conjuntament") }}
+  {% else %}
+    {% if a.resource in ("TRAINING", "SERVICE") %}
+      {% if alternative %}
+        {{ alternative }}
+      {% else %}
+        {% if a.resource == "TRAINING" %}
+          {{ _("una") }}
+        {% else %}
+          {{ _("un") }}
+        {% endif %}
+      {% endif %}
+    {% else %}
+      {{ _("compartir") }}
+    {% endif %}
+  {% endif %}
+{% endmacro %}

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('femlliga', '0007_organization_logo'),
+        ("femlliga", "0007_organization_logo"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='accept_communications_automatically',
+            model_name="customuser",
+            name="accept_communications_automatically",
             field=models.BooleanField(default=True),
         ),
     ]

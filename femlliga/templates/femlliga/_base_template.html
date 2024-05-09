@@ -8,16 +8,47 @@
 <a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}" {% if pending %} title="{{ _("Teniu peticions pendents d'atendre") }}"{% endif %}>{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
 {% endmacro %}
 
+{% macro logout_form(classes) %}
+<li>
+  <form method="post" action="{{ url("account_logout") }}">
+    {{ csrf_input }}
+    <button class="{{ classes }}" type="submit">
+      {{ _("Surt") }}
+    </button>
+  </form>
+</li>
+{% endmacro %}
+
 {% block primary_navigation %}
   <ul class="navbar-nav me-auto mb-lg-0">
   {% if not user.is_anonymous %}
     {% set organization = request.user.get_organization() %}
     {% if organization %}
-    <li>{{ menu_url(_("Entitat"), "app") }}</li>
-    <li>{{ menu_url(_("Has lligat?"), "matches", [organization.id]) }}</li>
-    <li>{{ menu_url(_("Descobreix"), "search", [organization.id]) }}</li>
+    <li
+      data-tg-order="1"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu canviar les dades donades durant l'alta") }}</p>"
+    >
+      {{ menu_url(_("Entitat"), "app") }}
+    </li>
+    <li
+      data-tg-order="2"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu veure amb qui heu fet lliga i podeu intercanviar recursos") }}</p>"
+    >
+      {{ menu_url(_("Has lligat?"), "matches", [organization.id]) }}
+    </li>
+    <li
+      data-tg-order="3"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu trobar altres organitzacions de la plataforma") }}</p>"
+    >
+      {{ menu_url(_("Descobreix"), "search", [organization.id]) }}
+    </li>
     {% set pending_sent, pending_received = organization.pending_agreements() %}
-    <li>{{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}</li>
+    <li
+      data-tg-order="4"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu veure els intercanvis que heu fet anteriorment") }}</p>"
+    >
+      {{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}
+    </li>
     {% endif %}
   {% endif %}
   {% if user.is_staff %}
@@ -26,7 +57,9 @@
   {% endif %}
 {% block menu %}{% endblock %}
   </ul>
-  <ul class="navbar-nav">
+
+  {# menu for large screens #}
+  <ul class="navbar-nav d-none d-md-block">
   {% if user.is_anonymous %}
     <li>{{ menu_url(_("Entra"), "account_login") }}</li>
   {% else %}
@@ -45,16 +78,23 @@
         <li><a class="dropdown-item" href="{{ url("profile", args=[organization.id]) }}">{{ _("Perfil") }}</a></li>
         {% endif %}
         <li><a class="dropdown-item" href="{{ url("preferences") }}">{{ _("Preferències") }}</a></li>
-        <li>
-          <form method="post" action="{{ url("account_logout") }}">
-            {{ csrf_input }}
-            <button class="dropdown-item invisible-button" type="submit">
-              {{ _("Surt") }}
-            </button>
-          </form>
-        </li>
+        {{ logout_form("dropdown-item invisible-button") }}
       </ul>
     </li>
+  {% endif %}
+  </ul>
+
+  {# menu for small screens #}
+  <ul class="navbar-nav d-md-none d-block">
+    <hr />
+  {% if user.is_anonymous %}
+    <li>{{ menu_url(_("Entra"), "account_login") }}</li>
+  {% else %}
+    {% if organization %}
+    <li>{{ menu_url(_("Perfil"), "profile", [organization.id]) }}</li>
+    {% endif %}
+    <li>{{ menu_url(_("Preferències"), "preferences") }}</li>
+    {{ logout_form("nav-link") }}
   {% endif %}
   </ul>
 {% endblock %}

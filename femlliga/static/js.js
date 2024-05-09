@@ -91,6 +91,43 @@ function post(url, csrfToken, body) {
   }).then(response => response.json());
 }
 
+function get(url, csrfToken, body) {
+  return fetch(url, {
+    body: JSON.stringify(body),
+    headers: {
+      "content-type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+  }).then(response => response.json());
+}
+
 function getJsonData() {
     return JSON.parse(document.getElementById('django-json-data').textContent);
+}
+
+var toastWrapper = document.getElementById("toastWrapper");
+
+function createToastElement() {
+    var el = document.createElement("div");
+    el.setAttribute("class", "toast mb-2");
+    el.setAttribute("role", "alert");
+    el.setAttribute("aria-live", "assertive");
+    el.setAttribute("aria-atomic", "true");
+    var inner = document.createElement("div");
+    inner.setAttribute("class", "toast-body");
+    el.appendChild(inner);
+    return el;
+}
+
+function showToast(message) {
+    var el = createToastElement();
+    toastWrapper.appendChild(el);
+
+    el.children[0].innerHTML = message;
+    var toast = new bootstrap.Toast(el);
+    toast.show();
+    setTimeout(() => {
+        toast.hide();
+        setTimeout(() => { el.remove(); }, 1000);
+    }, 5000);
 }

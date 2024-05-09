@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js %}
+{% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js, sidebar_filter_show_link %}
 
 {% block title %}{{ _("Peticions") }}{% endblock %}
 
@@ -10,52 +10,55 @@
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
       <h1>{{ _("Peticions enviades i rebudes") }}</h1>
-      <div class="btn-group w-100 mb-2" role="group" aria-label="{{ _("Selecciona si mostrar els resultats agrupats per recurs o per organització") }}">
-        <button
-          type="button"
-          class="btn"
-          @click="setShowBy('resources')"
-          :class="{'btn-warning': showBy === 'resources', 'btn-light': showBy !== 'resources'}">
-          {{ _("Recursos") }}
-        </button>
-        <button
-          type="button"
-          class="btn"
-          @click="setShowBy('organizations')"
-          :class="{'btn-warning': showBy === 'organizations', 'btn-light': showBy !== 'organizations'}">
-          {{ _("Organitzacions") }}
-        </button>
-      </div>
-      <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
-      <ul class="nav nav-pills flex-column mb-auto mt-2">
-        <template v-if="showBy === 'resources'">
-          <h2 class="resource-matches-title background-yellow">{{ _("Enviades") }}</h2>
-          {{ request_filter_row_vue("sent", _("Peticions enviades")) }}
-          <h2 class="resource-matches-title background-yellow-dark">{{ _("Rebudes") }}</h2>
-          {{ request_filter_row_vue("received", _("Peticions rebudes")) }}
-        </template>
-        <template v-else>
-          <li class="nav-item" v-for="x in organizationsWithRequests" :key="x.organization.id">
-            <button
-              @click="selectOrganization(x.organization)"
-              class="nav-link w-100 text-start"
-              :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
-              type="button"
-              role="tab"
-              aria-selected="false"
-              aria-current="page">
-              <span class="float-end">
-                <span
-                  class="badge ms-2 bg-light"
-                  title="{{ _("Peticions") }}">
-                  ${ x.agreements.length }
+      {{ sidebar_filter_show_link() }}
+      <div class="collapse show" id="sidebar-filter">
+        <div class="btn-group w-100 mb-2" role="group" aria-label="{{ _("Selecciona si mostrar els resultats agrupats per recurs o per organització") }}">
+          <button
+            type="button"
+            class="btn"
+            @click="setShowBy('resources')"
+            :class="{'btn-warning': showBy === 'resources', 'btn-light': showBy !== 'resources'}">
+            {{ _("Recursos") }}
+          </button>
+          <button
+            type="button"
+            class="btn"
+            @click="setShowBy('organizations')"
+            :class="{'btn-warning': showBy === 'organizations', 'btn-light': showBy !== 'organizations'}">
+            {{ _("Organitzacions") }}
+          </button>
+        </div>
+        <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
+        <ul class="nav nav-pills flex-column mb-auto mt-2">
+          <template v-if="showBy === 'resources'">
+            <h2 class="resource-matches-title background-yellow">{{ _("Enviades") }}</h2>
+            {{ request_filter_row_vue("sent", _("Peticions enviades")) }}
+            <h2 class="resource-matches-title background-yellow-dark">{{ _("Rebudes") }}</h2>
+            {{ request_filter_row_vue("received", _("Peticions rebudes")) }}
+          </template>
+          <template v-else>
+            <li class="nav-item" v-for="x in organizationsWithRequests" :key="x.organization.id">
+              <button
+                @click="selectOrganization(x.organization)"
+                class="nav-link w-100 text-start"
+                :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-current="page">
+                <span class="float-end">
+                  <span
+                    class="badge ms-2 bg-light"
+                    title="{{ _("Peticions") }}">
+                    ${ x.agreements.length }
+                  </span>
                 </span>
-              </span>
-              <span v-html="highlightSearch(x.organization.name, search)"></span>
-            </button>
-          </li>
-        </template>
-      </ul>
+                <span v-html="highlightSearch(x.organization.name, search)"></span>
+              </button>
+            </li>
+          </template>
+        </ul>
+      </div>
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
@@ -140,7 +143,9 @@
     <a :href="result.solicitor.href" v-html="highlightSearch(result.solicitor.name, search)"></a>
   </h3>
   <div class="mb-2">
-    <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Producte o servei remunerat") }}">€</span>
+    {# no offer details (like charge or accessible) because agreement is not
+    tied to a particular offer (which has that information), but has just a
+    copy of the resource and options selected when the message was sent #}
     <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
     <p v-if="agreementSent(result)">{{ _("Missatge que vau enviar el") }} ${ formatDateTime(result.date) }:</p>
     <p v-else>{{ _("Missatge que va enviar") }} ${ result.solicitor.name } {{ _("el") }} ${ formatDateTime(result.date) }:</p>
@@ -152,10 +157,10 @@
       <span v-else>{{ _("Encara no heu acceptat ni declinat la conversa per correu.") }}</span>
       <div v-if="!agreementSent(result)">
         <div v-if="!agreementsLoading[result.id]">
-          <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2">
+          <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2 mb-2">
             {{ _("Inicia la conversa per correu") }}
           </button>
-          <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2">
+          <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2 mb-2">
             {{ _("Declina la conversa per correu") }}
           </button>
           {{ info_tooltip(_("Per favor, indiqueu si accepteu iniciar una conversa per correu. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la conversa per correu no us obliga a arribar a cap acord.")) }}
@@ -180,10 +185,10 @@
       <span v-if="result.communication_date" class="ms-2">(${ formatDateTime(result.communication_date) })</span>
       <div v-if="result.agreement_successful === null && agreementsResolved[result.id] === undefined">
         <div v-if="!agreementsLoading[result.id]">
-          <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2">
+          <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2 mb-2">
             {{ _("S'ha arribat a un acord") }}
           </button>
-          <button @click="updateAgreement(result, 'successful', 'no')" class="btn btn-sm btn-danger me-2">
+          <button @click="updateAgreement(result, 'successful', 'no')" class="btn btn-sm btn-danger me-2 mb-2">
             {{ _("No s'ha arribat a un acord") }}
           </button>
           {{ info_tooltip(_("Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. Aquesta informació es farà servir només a nivell estadístic")) }}

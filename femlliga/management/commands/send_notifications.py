@@ -1,11 +1,14 @@
 from django.conf import settings
-from django.utils import translation
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 from femlliga.models import Organization
-from femlliga.utils import get_users_to_notify, send_periodic_notification, get_periodic_notification_data, get_ordered_needs_and_offers
+from femlliga.utils import (get_ordered_needs_and_offers,
+                            get_periodic_notification_data,
+                            get_users_to_notify, send_periodic_notification)
+
 
 class Command(BaseCommand):
     help = """./manage.py send_notifications
@@ -24,7 +27,7 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
         sent_count = 0
         for user in users:
             org = Organization.objects.get(creator = user)
-            needs, offers = get_ordered_needs_and_offers(org)
+            needs, offers = get_ordered_needs_and_offers(org, user.distance_limit_km)
             context = get_periodic_notification_data(site, user, needs, offers)
             if context:
                 print(f"Sending email to {user.email}...", end="")

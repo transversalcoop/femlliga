@@ -46,10 +46,15 @@
     {% endfor %}
 {% endmacro %}
 
+{% macro universal_access_icon() %}<img src="{{ static("icons/universal-access.svg") }}">{% endmacro %}
+
 {% macro resource_details(resource, match_type) %}
-  <div style="margin-bottom: 10px;">
+  <div class="mb-2">
     {% if resource.charge %}
       <span class="badge bg-light" title="{{ _("Producte o servei remunerat") }}">€</span>
+    {% endif %}
+    {% if resource.place_accessible %}
+      <span class="badge bg-light universal-access-icon" title="{{ _("Local accessible") }}">{{ universal_access_icon() }}</span>
     {% endif %}
     {% for option in resource.options.all() %}
       <span class="badge bg-light">{{ option }}</span>
@@ -316,6 +321,8 @@ function clickOption(element) {
       {% for choice in form.fields[field_name].choices %}
       <option value="{{ choice[0] }}"
           {% if field.value() and field.value() == choice[0] %}selected{% endif %}
+          {% if not field.value() and choice[0] == "" %}selected{% endif %}
+          {% if choice[0] == "" %}disabled{% endif %}
       >
           {{ choice[1] }}
       </option>
@@ -447,9 +454,10 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     </div>
     <div class="mb-2">
       <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Producte o servei remunerat") }}">€</span>
+      <span v-if="result.place_accessible" class="badge bg-light universal-access-icon sm me-2" title="{{ _("Local accessible") }}">{{ universal_access_icon() }}</span>
       <span
         {% if needs %}
-        class="badge me-2" :class="{ 'bg-light': optionMatches(result.resource, option, {{ needs }}), 'bg-secondary': !optionMatches(result.resource, option, {{ needs }}) }"
+        class="badge bg-light me-2" :class="{ 'text-body-secondary': !optionMatches(result.resource, option, {{ needs }}) }"
         {% else %}
         class="badge bg-light me-2"
         {% endif %}
@@ -637,3 +645,10 @@ function matchContains(search) {
 {% endmacro %}
 
 {% macro render_resource(r, options) %}{{ resource_name(r) }}{% if len(options) > 0 %} ({{ display_list(options) }}){% endif %}{% endmacro %}
+
+{% macro sidebar_filter_show_link() %}
+<a href="#sidebar-filter" class="text-toggle d-md-none" data-bs-toggle="collapse" aria-expanded="true">
+  <span class="text-collapsed">{{ _("Mostra el filtre") }}</span>
+  <span class="text-expanded">{{ _("Amaga el filtre") }}</span>
+</a>
+{% endmacro %}

@@ -12,10 +12,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 import re
-
-from pathlib import Path
 from datetime import timedelta
 from distutils.util import strtobool
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,80 +42,78 @@ CONTACT_LINKS = os.getenv("DJANGO_CONTACT_LINKS", "")
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
-
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'debug_toolbar',
-    'axes',
-    'django_recaptcha',
-
-    'femlliga',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "debug_toolbar",
+    "axes",
+    "django_recaptcha",
+    "femlliga",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'csp.middleware.CSPMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.common.BrokenLinkEmailsMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'femlliga.middleware.middleware.LocaleMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'femlliga.middleware.middleware.SessionTimeoutMiddleware',
-    'femlliga.middleware.middleware.TimezoneMiddleware',
-    'axes.middleware.AxesMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.common.BrokenLinkEmailsMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "femlliga.middleware.middleware.LocaleMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "femlliga.middleware.middleware.SessionTimeoutMiddleware",
+    "femlliga.middleware.middleware.TimezoneMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.jinja2.Jinja2',
-        'DIRS': [
-            BASE_DIR / 'femlliga/templates',
+        "BACKEND": "django.template.backends.jinja2.Jinja2",
+        "DIRS": [
+            BASE_DIR / "femlliga/templates",
         ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'environment': 'config.jinja2.environment',
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "environment": "config.jinja2.environment",
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database
@@ -125,20 +122,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 database = os.getenv("DJANGO_DATABASE", "sqlite")
 if database == "sqlite":
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv("DJANGO_DB_NAME", ''),
-            'USER': os.getenv("DJANGO_DB_USER", ''),
-            'PASSWORD': os.getenv("DJANGO_DB_PASSWORD", ''),
-            'HOST': os.getenv("DJANGO_DB_HOST", '127.0.0.1'),
-            'PORT': '5432',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DJANGO_DB_NAME", ""),
+            "USER": os.getenv("DJANGO_DB_USER", ""),
+            "PASSWORD": os.getenv("DJANGO_DB_PASSWORD", ""),
+            "HOST": os.getenv("DJANGO_DB_HOST", "127.0.0.1"),
+            "PORT": "5432",
         }
     }
 
@@ -148,16 +145,16 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -165,76 +162,83 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'ca'
+LANGUAGE_CODE = "ca"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
 USE_TZ = True
 
 LANGUAGES = [
-    ('ca', 'Català'),
-    ('es', 'Castellano'),
+    ("ca", "Català"),
+    ("es", "Castellano"),
 ]
 
-LOCALE_PATHS = ['locale']
+LOCALE_PATHS = ["locale"]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'static'
-MEDIA_URL = '/uploads/'
-MEDIA_ROOT = BASE_DIR / 'uploads'
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
+MEDIA_URL = "/uploads/"
+MEDIA_ROOT = BASE_DIR / "uploads"
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    }
+    },
 }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # User model stuff
-AUTH_USER_MODEL = 'femlliga.CustomUser'
+AUTH_USER_MODEL = "femlliga.CustomUser"
 SITE_ID = 1
 AUTHENTICATION_BACKENDS = (
-    'axes.backends.AxesBackend',
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "axes.backends.AxesBackend",
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
-EMAIL_BACKEND = os.getenv("DJANGO_EMAIL_BACKEND", 'django.core.mail.backends.smtp.EmailBackend')
-LOGIN_REDIRECT_URL = 'app'
-ACCOUNT_LOGOUT_REDIRECT = 'index'
+EMAIL_BACKEND = os.getenv(
+    "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+)
+LOGIN_REDIRECT_URL = "app"
+ACCOUNT_LOGOUT_REDIRECT = "index"
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https")
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = None
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv(
+    "DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https"
+)
+ACCOUNT_RATE_LIMITS = False
 ACCOUNT_FORMS = {
     "login": "femlliga.forms.CaptchaLoginForm",
     "signup": "femlliga.forms.CaptchaSignupForm",
 }
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/app"
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'EMAIL_AUTHENTICATION': True, # allows register with email and later login with Google
-        'SCOPE': [
-            'profile',
-            'email',
+    "google": {
+        "EMAIL_AUTHENTICATION": True,  # allows register with email and later login with Google
+        "SCOPE": [
+            "profile",
+            "email",
         ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
     }
 }
 
@@ -249,23 +253,29 @@ EMAIL_USE_TLS = True
 
 # security and deployment checks
 CSRF_COOKIE_SECURE = bool(strtobool(os.getenv("DJANGO_CSRF_COOKIE_SECURE", "true")))
-SESSION_COOKIE_SECURE = bool(strtobool(os.getenv("DJANGO_SESSION_COOKIE_SECURE", "true")))
+SESSION_COOKIE_SECURE = bool(
+    strtobool(os.getenv("DJANGO_SESSION_COOKIE_SECURE", "true"))
+)
 CONN_MAX_AGE = int(os.getenv("DJANGO_CONN_MAX_AGE", "0"))
 SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "86400"))
-SECURE_HSTS_INCLUDE_SUBDOMAINS = bool(strtobool(os.getenv("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", "true")))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = bool(
+    strtobool(os.getenv("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", "true"))
+)
 SECURE_HSTS_PRELOAD = bool(strtobool(os.getenv("DJANGO_SECURE_HSTS_PRELOAD", "true")))
 SECURE_SSL_REDIRECT = bool(strtobool(os.getenv("DJANGO_SECURE_SSL_REDIRECT", "true")))
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-CSP_DEFAULT_SRC = ("'self'", )
-CSP_STYLE_SRC = ("'self'",
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = (
+    "'self'",
     "'unsafe-inline'",
     "cdn.jsdelivr.net",
     "unpkg.com",
     "fonts.googleapis.com",
     "fonts.gstatic.com",
 )
-CSP_SCRIPT_SRC = ("'self'",
+CSP_SCRIPT_SRC = (
+    "'self'",
     "'unsafe-inline'",
     "'unsafe-eval'",
     "unpkg.com",
@@ -273,80 +283,87 @@ CSP_SCRIPT_SRC = ("'self'",
     "www.google.com",
     "www.gstatic.com",
 )
-CSP_IMG_SRC = ("'self'",
+CSP_IMG_SRC = (
+    "'self'",
     "tile.openstreetmap.org",
     "unpkg.com",
     "data:",
 )
-CSP_FONT_SRC = ("'self'",
+CSP_FONT_SRC = (
+    "'self'",
     "fonts.gstatic.com",
     "cdn.jsdelivr.net",
 )
-CSP_CONNECT_SRC = ("'self'", )
-CSP_OBJECT_SRC = ("'self'", )
-CSP_BASE_URI = ("'self'", )
-CSP_FRAME_SRC = ("'self'",
+CSP_CONNECT_SRC = ("'self'",)
+CSP_OBJECT_SRC = ("'self'",)
+CSP_BASE_URI = ("'self'",)
+CSP_FRAME_SRC = (
+    "'self'",
     "www.google.com",
     "www.youtube.com",
 )
-CSP_FRAME_ANCESTORS = ("'self'", )
-CSP_FORM_ACTION = ("'self'",
+CSP_FRAME_ANCESTORS = ("'self'",)
+CSP_FORM_ACTION = (
+    "'self'",
     "accounts.google.com",
 )
-CSP_INCLUDE_NONCE_IN = ('script-src', )
-CSP_MANIFEST_SRC = ("'self'", )
-CSP_WORKER_SRC = ("'self'", )
-CSP_MEDIA_SRC = ("'self'", )
+CSP_INCLUDE_NONCE_IN = ("script-src",)
+CSP_MANIFEST_SRC = ("'self'",)
+CSP_WORKER_SRC = ("'self'",)
+CSP_MEDIA_SRC = ("'self'",)
 
 if not DEBUG:
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "filters": {
+            "require_debug_false": {
+                "()": "django.utils.log.RequireDebugFalse",
             },
         },
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
             },
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True
-            }
+            "mail_admins": {
+                "level": "ERROR",
+                "class": "django.utils.log.AdminEmailHandler",
+                "include_html": True,
+            },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console', 'mail_admins'],
-                'level': 'INFO',
+        "loggers": {
+            "django": {
+                "handlers": ["console", "mail_admins"],
+                "level": "INFO",
             },
-        }
+        },
     }
 
 IGNORABLE_404_URLS = [
-    re.compile(r'^/apple-touch-icon.*\.png$'),
-    re.compile(r'^/favicon\.ico$'),
-    re.compile(r'^/robots\.txt$'),
-    re.compile(r'^/.*\.xml$'),
-    re.compile(r'^/.*\.php$'),
-    re.compile(r'^/.*\.php.bak$'),
+    re.compile(r"^/apple-touch-icon.*\.png$"),
+    re.compile(r"^/favicon\.ico$"),
+    re.compile(r"^/robots\.txt$"),
+    re.compile(r"^/.*\.xml$"),
+    re.compile(r"^/.*\.php$"),
+    re.compile(r"^/.*\.php.bak$"),
 ]
 
 admins_str = os.getenv("DJANGO_ADMINS", "")
 if admins_str != "":
-    ADMINS = [(x.split(':')[0], x.split(':')[1]) for x in admins_str.strip().split(";")]
+    ADMINS = [(x.split(":")[0], x.split(":")[1]) for x in admins_str.strip().split(";")]
 
 managers_str = os.getenv("DJANGO_MANAGERS", "")
 if admins_str != "":
-    MANAGERS = [(x.split(':')[0], x.split(':')[1]) for x in admins_str.strip().split(";")]
+    MANAGERS = [
+        (x.split(":")[0], x.split(":")[1]) for x in admins_str.strip().split(";")
+    ]
 
 # debug toolbar
 if DEBUG:
     import socket  # only if you haven't already imported this
+
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[:-1] + '1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
+    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(hours=1)
@@ -358,4 +375,4 @@ if recaptcha_public != "" and recaptcha_private != "":
     RECAPTCHA_PUBLIC_KEY = recaptcha_public
     RECAPTCHA_PRIVATE_KEY = recaptcha_private
 else:
-    SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
+    SILENCED_SYSTEM_CHECKS = ["django_recaptcha.recaptcha_test_key_error"]
