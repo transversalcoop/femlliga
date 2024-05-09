@@ -306,7 +306,10 @@ class IntegrationTests(TestCase):
         )
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "EQUIPMENT"])
-        self.aux_wizard(needs_url, "EQUIPMENT", [], "", "Altres")
+        self.aux_wizard(needs_url, "EQUIPMENT", [], "", "Aliances")
+
+        needs_url = reverse("resources-wizard", args=[o.id, "needs", "ALLIANCES"])
+        self.aux_wizard(needs_url, "ALLIANCES", [], "", "Altres")
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "OTHER"])
         self.aux_wizard(
@@ -348,7 +351,10 @@ class IntegrationTests(TestCase):
         )
 
         offers_url = reverse("resources-wizard", args=[o.id, "offers", "EQUIPMENT"])
-        self.aux_wizard(offers_url, "EQUIPMENT", [], "", "Altres", charge=True)
+        self.aux_wizard(offers_url, "EQUIPMENT", [], "", "Aliances", charge=True)
+
+        offers_url = reverse("resources-wizard", args=[o.id, "offers", "ALLIANCES"])
+        self.aux_wizard(offers_url, "ALLIANCES", [], "", "Altres", charge=True)
 
         offers_url = reverse("resources-wizard", args=[o.id, "offers", "OTHER"])
         self.aux_wizard(

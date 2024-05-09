@@ -107,7 +107,7 @@ function getJsonData() {
 
 var toastWrapper = document.getElementById("toastWrapper");
 
-function showToast(message) {
+function createToastElement() {
     var el = document.createElement("div");
     el.setAttribute("class", "toast mb-2");
     el.setAttribute("role", "alert");
@@ -115,13 +115,19 @@ function showToast(message) {
     el.setAttribute("aria-atomic", "true");
     var inner = document.createElement("div");
     inner.setAttribute("class", "toast-body");
-    inner.innerHTML = message;
     el.appendChild(inner);
+    return el;
+}
+
+function showToast(message) {
+    var el = createToastElement();
     toastWrapper.appendChild(el);
+
+    el.children[0].innerHTML = message;
     var toast = new bootstrap.Toast(el);
     toast.show();
     setTimeout(() => {
         toast.hide();
-        setTimeout(() => { el.remove() }, 1000);
+        setTimeout(() => { el.remove(); }, 1000);
     }, 5000);
 }
