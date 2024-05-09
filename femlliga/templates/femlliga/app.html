@@ -79,7 +79,7 @@
   {% endif %}
 
   <div class="row">
-    {{ resources(_("Què necessiteu?"), "needs", sort_resources(needs), org.needs_missing(), ) }}
+    {{ resources(_("Què necessiteu?"), "needs", sort_resources(needs), org.needs_missing()) }}
     {{ resources(_("Què oferiu?"), "offers", sort_resources(offers), org.offers_missing()) }}
   </div>
 </div>
