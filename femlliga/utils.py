@@ -300,7 +300,7 @@ def get_resource_index(resource_type, resource):
         if resource == RESOURCES[i][0]:
             if resource_type == "needs":
                 return i + 1
-            return i + 6
+            return i + len(RESOURCES) + 1
     return 0
 
 

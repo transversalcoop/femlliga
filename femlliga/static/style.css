@@ -531,6 +531,10 @@ nav .nav-link.active {
     .columns {
         columns: 1;
     }
+
+    .w-sm-100 {
+        width: 100%;
+    }
 }
 
 @media (max-width: 320px) {
@@ -749,14 +753,6 @@ nav .nav-link.active {
     cursor: pointer;
 }
 
-.badge.universal-access-icon {
-    padding: 0.3em 0.5em 0.1em 0.5em;
-}
-
-.badge.universal-access-icon img {
-    height: 1.4em;
-}
-
-.badge.universal-access-icon.sm img {
-    height: 1.3em;
+.universal-access-icon img {
+    height: 2em;
 }
