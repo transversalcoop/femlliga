@@ -883,20 +883,11 @@ def save_preferences(request):
         request.user.notifications_frequency = form.cleaned_data[
             "notifications_frequency"
         ]
-        request.user.accept_communications_automatically = form.cleaned_data[
-            "accept_communications_automatically"
-        ]
         request.user.notify_immediate_communications_received = form.cleaned_data[
             "notify_immediate_communications_received"
         ]
-        request.user.notify_immediate_communications_rejected = form.cleaned_data[
-            "notify_immediate_communications_rejected"
-        ]
         request.user.notify_agreement_communication_pending = form.cleaned_data[
             "notify_agreement_communication_pending"
-        ]
-        request.user.notify_agreement_success_pending = form.cleaned_data[
-            "notify_agreement_success_pending"
         ]
         request.user.notify_matches = form.cleaned_data["notify_matches"]
         request.user.notify_new_resources = form.cleaned_data["notify_new_resources"]
@@ -948,23 +939,22 @@ def send_message(request, organization_id, organization_to, resource_type, resou
     post = get_json_body(request)
     form = MessageForm(post, resource=r)
     if form.is_valid():
-        a = Agreement(
+        a = Agreement.objects.create(
             solicitor=organization,
             solicitee=other,
             message=form.cleaned_data["message"],
             resource=resource,
             resource_type=resource_type,
+            communication_accepted=True,
+            communication_date=timezone.now(),
         )
-        a.save()
         for option in form.cleaned_data["options"]:
             # avoid clash with _ translation function
             ro, _created = ResourceOption.objects.get_or_create(name=option)
             a.options.add(ro)
 
-        if other.creator.accept_communications_automatically:
-            do_agreement_connect(request, a, True)
-        elif other.creator.notify_immediate_communications_received:
-            subject = _("T'han enviat una petició per compartir %(resource)s") % {
+        if other.creator.notify_immediate_communications_received:
+            subject = _("T'han enviat una petició per intercanviar %(resource)s") % {
                 "resource": resource_name(a.resource),
             }
             send_notification(
@@ -1079,54 +1069,6 @@ def agreement_successful(request, organization_id, agreement_id):
     a.save()
 
     return JsonResponse({"ok": True})
-
-
-@login_required
-@require_own_agreement
-def agreement_connect(request, organization_id, agreement_id):
-    if request.method != "POST":
-        return JsonResponse({})
-
-    a = get_object_or_404(Agreement, pk=agreement_id)
-    organization = get_object_or_404(Organization, pk=organization_id)
-    post = get_json_body(request)
-    if organization != a.solicitee:
-        # user owns organization; only solicitee organization should be able to accept
-        return
-
-    if not a.solicitor or not a.solicitee:
-        return JsonResponse({"ok": False})
-
-    do_agreement_connect(request, a, post["connect"] == "yes")
-
-    return JsonResponse({"ok": True})
-
-
-# already checked that a.solicitor and a.solicitee exist
-def do_agreement_connect(request, a, communication_accepted):
-    a.communication_accepted = communication_accepted
-    a.communication_date = timezone.now()
-    a.save()
-    context = {
-        "a": a,
-        "current_site": get_current_site(request),
-    }
-    if a.communication_accepted:
-        subject = _("Comunicació iniciada per compartir %(resource)s") % {
-            "resource": resource_name(a.resource),
-        }
-        send_email(
-            to=[a.solicitor.creator.email, a.solicitee.creator.email],
-            subject=subject,
-            body=render_to_string("email/agreement_connect.html", context),
-        )
-    elif a.solicitor and a.solicitor.creator.notify_immediate_communications_rejected:
-        send_notification(
-            user=a.solicitor.creator,
-            subject=_("Us han declinat una petició"),
-            template="email/notify_communication_rejected.html",
-            context=context,
-        )
 
 
 def get_city_from_coordinates(lat, lng):

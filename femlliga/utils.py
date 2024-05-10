@@ -63,15 +63,6 @@ def get_periodic_notification_data(site, user, needs, offers):
                 "total_agreements": len(pa),
             }
 
-    if user.notify_agreement_success_pending:
-        pa = org_pending_success_agreements(org)
-        if len(pa) > 0:
-            context["agreement_success_pending"] = {
-                "organization": org,
-                "agreements": pa[:EMAIL_ITEMS_LIMIT],
-                "total_agreements": len(pa),
-            }
-
     time_from_last_long_notification = timezone.now() - user.last_long_notification_date
     long_notification_ready = time_from_last_long_notification > timedelta(days=30 * 6)
     send_long_notification = False
@@ -98,18 +89,6 @@ def get_periodic_notification_data(site, user, needs, offers):
 def org_pending_agreements(o):
     try:
         a = Agreement.objects.filter(solicitee=o, communication_accepted=None)
-        return list(a)
-    except:
-        return []
-
-
-def org_pending_success_agreements(o):
-    try:
-        a = Agreement.objects.filter(
-            Q(solicitee=o) | Q(solicitor=o),
-            communication_accepted=True,
-            agreement_successful=None,
-        )
         return list(a)
     except:
         return []
@@ -265,6 +244,12 @@ def send_email(to, subject, body):
     msg = EmailMessage(subject=subject, body=body, from_email=FROM_EMAIL, to=to)
     msg.content_subtype = "html"
     msg.send()
+
+    try:
+        sent_to = ",".join(to)
+    except:
+        sent_to = str(to)
+    EmailSent.objects.create(sent_to=sent_to, subject=subject, body=body)
 
 
 # Other

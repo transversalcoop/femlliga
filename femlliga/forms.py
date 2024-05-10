@@ -18,11 +18,8 @@ class PreferencesForm(forms.ModelForm):
             "language",
             "distance_limit_km",
             "notifications_frequency",
-            "accept_communications_automatically",
             "notify_immediate_communications_received",
-            "notify_immediate_communications_rejected",
             "notify_agreement_communication_pending",
-            "notify_agreement_success_pending",
             "notify_matches",
             "notify_new_resources",
         ]
