@@ -1,0 +1,25 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import sidebar_filter_show_link %}
+
+{% block title %}{{ _("Petició d'intercanvi") }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div id="app" class="row">
+    <div class="col-md-4 d-md-block bg-light sidebar">
+      {% if a.solicitor == org %}
+        <h1>{{ _("Petició de %(resource)s enviada a %(org)s", resource=resource_name(a.resource), org=a.solicitee_safe().name) }}</h1>
+      {% else %}
+        <h1>{{ _("Petició de %(resource)s rebuda de %(org)s", resource=resource_name(a.resource), org=a.solicitor_safe().name) }}</h1>
+      {% endif %}
+
+      {{ sidebar_filter_show_link() }}
+      <div class="collapse show" id="sidebar-filter">
+        TODO resta de la informació, etc.
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

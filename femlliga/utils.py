@@ -88,8 +88,14 @@ def get_periodic_notification_data(site, user, needs, offers):
 
 def org_pending_agreements(o):
     try:
-        a = Agreement.objects.filter(solicitee=o, communication_accepted=None)
-        return list(a)
+        agreements = Agreement.objects.filter(
+            solicitee=o, communication_accepted=True, agreement_successful=None
+        )
+        return [
+            a
+            for a in agreements
+            if a.messages.count() == 0 or a.messages.last().sent_by != o
+        ]
     except:
         return []
 

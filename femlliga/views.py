@@ -90,7 +90,7 @@ from .utils import (
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
-        organization = Organization.objects.get(pk=organization_id)
+        organization = get_object_or_404(Organization, pk=organization_id)
         if request.user != organization.creator:
             raise PermissionDenied()
 
@@ -101,11 +101,11 @@ def require_own_organization(func):
 
 def require_own_agreement(func):
     def decorated(request, organization_id, agreement_id, *args, **kwargs):
-        organization = Organization.objects.get(pk=organization_id)
+        organization = get_object_or_404(Organization, pk=organization_id)
         if request.user != organization.creator:
             raise PermissionDenied()
 
-        a = Agreement.objects.get(pk=agreement_id)
+        a = get_object_or_404(Agreement, pk=agreement_id)
         if a.solicitor != organization and a.solicitee != organization:
             raise PermissionDenied()
 
@@ -1015,6 +1015,14 @@ def agreements(request, organization_id):
             },
         },
     )
+
+
+@login_required
+@require_own_agreement
+def agreement(request, organization_id, agreement_id):
+    a = get_object_or_404(Agreement, pk=agreement_id)
+    org = get_object_or_404(Organization, pk=organization_id)
+    return render(request, "femlliga/agreement.html", {"a": a, "org": org})
 
 
 def requested_resources(agreements):

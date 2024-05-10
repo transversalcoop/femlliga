@@ -45,9 +45,9 @@
     {% set pending_sent, pending_received = organization.pending_agreements() %}
     <li
       data-tg-order="4"
-      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu veure els intercanvis que heu fet anteriorment") }}</p>"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu veure les peticions d'intercanvi que heu enviat i rebut") }}</p>"
     >
-      {{ menu_url(_("Intercanvis"), "agreements", [organization.id], pending=pending_sent or pending_received) }}
+      {{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}
     </li>
     {% endif %}
   {% endif %}

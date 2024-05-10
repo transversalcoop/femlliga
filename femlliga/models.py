@@ -664,10 +664,19 @@ class Agreement(models.Model):
             "communication_date": self.communication_date,
             "agreement_successful": self.agreement_successful,
             "successful_date": self.successful_date,
+            "href": reverse(
+                "agreement",
+                kwargs={"organization_id": organization_id, "agreement_id": self.id},
+            ),
         }
 
 
 class Message(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
     sent_on = models.DateTimeField(auto_now_add=True, verbose_name=_("Enviat el"))
     sent_by = models.ForeignKey(
         Organization,
@@ -680,6 +689,9 @@ class Message(models.Model):
     agreement = models.ForeignKey(
         Agreement, on_delete=models.CASCADE, related_name="messages"
     )
+
+    class Meta:
+        ordering = ["sent_on"]
 
 
 class Contact(models.Model):
