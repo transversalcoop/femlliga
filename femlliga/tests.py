@@ -113,7 +113,6 @@ class SmokeTests(TestCase):
             ("send_message", [org.id, org2.id, "offer", "SERVICE"]),
             ("matches", [org.id]),
             ("agreements", [org.id]),
-            ("agreement_connect", [org.id, org.id]),
             ("agreement_successful", [org.id, org.id]),
             ("uploads", ["path"]),
             ("report", []),
@@ -429,7 +428,6 @@ class IntegrationTests(TestCase):
 
         # send message
         o2 = Organization.objects.get(name="Second example organization")
-        o2.creator.accept_communications_automatically = False
         o2.creator.save()
         send_message_url = reverse("send_message", args=[o.id, o2.id, "offer", "PLACE"])
         test_msg_1 = "missatge de test per al primer missatge"
@@ -446,21 +444,8 @@ class IntegrationTests(TestCase):
         # check received
         self.client.login(email="test2@example.com", password=PASS_FOR_TESTS)
         response = self.client.get(reverse("agreements", args=[o2.id]))
-        for s in ["Peticions enviades i rebudes", test_msg_1]:
+        for s in ["Peticions d'intercanvi enviades i rebudes", test_msg_1]:
             self.assertContains(response, s)
-
-        a = Agreement.objects.get(solicitor=o, solicitee=o2)
-        response = self.client.post(
-            reverse("agreement_connect", args=[o2.id, a.id]),
-            {
-                "return_url": "received",
-                "connect": "yes",
-            },
-            follow=True,
-        )
-        self.assertJSONEqual(response.content, {"ok": True})
-        self.assertEqual(len(mail.outbox), 2)
-        save_email(mail.outbox[1], "agreement_connect.html")
 
         # check sent
         self.client.login(email=email3, password=PASS_FOR_TESTS)
@@ -529,9 +514,7 @@ class IntegrationTests(TestCase):
         org1 = self.aux_create_org("Nom entitat de test 6", email6)
         user1 = CustomUser.objects.get(email=email6)
         user2 = CustomUser.objects.get(email=email7)
-        user1.notify_immediate_communications_rejected = False
         user1.save()
-        user2.accept_communications_automatically = False
         user2.notify_immediate_communications_received = False
         user2.save()
         offer = Offer.objects.create(
@@ -557,21 +540,7 @@ class IntegrationTests(TestCase):
         self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 0)
 
-        self.client.login(email=email7, password=PASS_FOR_TESTS)
-        a = Agreement.objects.filter(solicitee=org2).first()
-        connect_url = reverse("agreement_connect", args=[org2.id, a.id])
-        response = self.client.post(
-            connect_url,
-            {
-                "connect": "no",
-            },
-        )
-        self.assertJSONEqual(response.content, {"ok": True})
-        self.assertEqual(len(mail.outbox), 0)
-
         # activate immediate notifications and check they are received
-        a.delete()  # delete previous agreement to make simpler next queries
-        user1.notify_immediate_communications_rejected = True
         user1.save()
         user2.notify_immediate_communications_received = True
         user2.save()
@@ -589,20 +558,6 @@ class IntegrationTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         save_email(mail.outbox[0], "notify_communication_received.html")
         self.assertIn("T'han enviat una petició per compartir", mail.outbox[0].subject)
-
-        self.client.login(email=email7, password=PASS_FOR_TESTS)
-        a = Agreement.objects.filter(solicitee=org2).first()
-        connect_url = reverse("agreement_connect", args=[org2.id, a.id])
-        response = self.client.post(
-            connect_url,
-            {
-                "connect": "no",
-            },
-        )
-        self.assertJSONEqual(response.content, {"ok": True})
-        self.assertEqual(len(mail.outbox), 2)
-        save_email(mail.outbox[1], "notify_communication_rejected.html")
-        self.assertIn("Us han declinat una petició", mail.outbox[1].subject)
 
     @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
     def test_periodic_notifications(self):
@@ -654,11 +609,6 @@ class IntegrationTests(TestCase):
                 "send_long_notification": True,
                 "agreement_communication_pending": {
                     "agreements": [a1],
-                    "total_agreements": 1,
-                },
-                "agreement_success_pending": {
-                    "organization": org1,
-                    "agreements": [a2],
                     "total_agreements": 1,
                 },
                 "matches": {

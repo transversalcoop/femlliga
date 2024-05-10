@@ -103,8 +103,10 @@ class CustomUser(AbstractUser):
     )  # from 0.0 to 99999.9
 
     # immediate notifications
+    # DEPRECATED
     accept_communications_automatically = models.BooleanField(default=True)
     notify_immediate_communications_received = models.BooleanField(default=True)
+    # DEPRECATED
     notify_immediate_communications_rejected = models.BooleanField(default=True)
 
     # periodic notifications
@@ -114,6 +116,7 @@ class CustomUser(AbstractUser):
         max_length=50, choices=const.NOTIFICATION_CHOICES, default="WEEKLY"
     )
     notify_agreement_communication_pending = models.BooleanField(default=True)
+    # DEPRECATED
     notify_agreement_success_pending = models.BooleanField(default=True)
     notify_matches = models.BooleanField(default=True)
     notify_new_resources = models.BooleanField(default=True)
@@ -661,15 +664,22 @@ class Agreement(models.Model):
             "communication_date": self.communication_date,
             "agreement_successful": self.agreement_successful,
             "successful_date": self.successful_date,
-            "href_connect": reverse(
-                "agreement_connect",
-                kwargs={"organization_id": organization_id, "agreement_id": self.id},
-            ),
-            "href_successful": reverse(
-                "agreement_successful",
-                kwargs={"organization_id": organization_id, "agreement_id": self.id},
-            ),
         }
+
+
+class Message(models.Model):
+    sent_on = models.DateTimeField(auto_now_add=True, verbose_name=_("Enviat el"))
+    sent_by = models.ForeignKey(
+        Organization,
+        on_delete=models.SET_NULL,
+        related_name="messages_sent",
+        verbose_name=_("Enviat per"),
+        null=True,
+    )
+    message = models.TextField(verbose_name=_("Missatge"))
+    agreement = models.ForeignKey(
+        Agreement, on_delete=models.CASCADE, related_name="messages"
+    )
 
 
 class Contact(models.Model):
@@ -679,6 +689,13 @@ class Contact(models.Model):
 
     class Meta:
         verbose_name = _("Contacte")
+
+
+class EmailSent(models.Model):
+    sent_on = models.DateTimeField(auto_now_add=True)
+    sent_to = models.TextField()
+    subject = models.TextField()
+    body = models.TextField()
 
 
 class ContactDenyList(models.Model):

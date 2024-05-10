@@ -491,7 +491,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       <button type="button" class="btn-close float-end" aria-label="Close" @click="closeMessage(result.message_href)"></button>
       <div>
         <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
-          {{ _("S'ha enviat el missatge correctament.") }} ${ result.organization.name } {{ _("podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic.") }}
+          {{ _("S'ha enviat el missatge correctament.") }}
         </div>
         <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
           {{ _("Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb") }} {{ settings.CONTACT_EMAIL }}.
@@ -533,7 +533,6 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
             <i class="bi-send fs-6 me-2"></i>
             <span v-if="messagesOpen[result.message_href]">
               {{ _("Envia el missatge") }}
-              {{ info_tooltip(_("Se li enviarà un missatge a ") + "${ result.organization.name }" + _(", que podrà acceptar o rebutjar la comunicació. Si l'accepta, s'iniciarà una conversa per correu electrònic")) }}
             </span>
           </span>
         </button>

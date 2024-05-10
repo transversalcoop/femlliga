@@ -59,9 +59,7 @@
 
     <div class="preferences-section">
       <h2 class="preferences-section-title">{{ _("Notificacions immediates") }}</h2>
-      {{ preferences_switch(form, "accept_communications_automatically", _("Accepta automàticament les peticions"), _("Si una organització us fa una petició, us enviarem un correu electrònic a les dos organitzacions perquè us comuniqueu")) }}
-      {{ preferences_switch(form, "notify_immediate_communications_received", _("Informa immediatament de les peticions rebudes"), _("Si us envien una petició i no teniu l'opció d'acceptar-la automàticament, us enviarem un correu perquè la pugueu revisar")) }}
-      {{ preferences_switch(form, "notify_immediate_communications_rejected", _("Informa immediatament de les peticions rebutjades"), _("Si envieu una petició i l'altra organització la rebutja, us enviarem un correu perquè ho sapigueu")) }}
+      {{ preferences_switch(form, "notify_immediate_communications_received", _("Informa immediatament de les peticions d'intercanvi rebudes"), _("Si us envien una petició d'intercanvi, us enviarem un correu perquè la pugueu revisar de seguida")) }}
     </div>
 
     <div class="preferences-section">
@@ -70,7 +68,6 @@
         {{ render_select(form, "notifications_frequency", _("Freqüència de les notificacions"), extra_label=_("Us enviarem un únic correu amb els continguts seleccionats a continuació, i només si hi ha informació a comunicar"), cols=[8, 4]) }}
       </div>
       {{ preferences_switch(form, "notify_agreement_communication_pending", _("Peticions pendents"), _("Informa de peticions que us han fet i que estan pendents d'acceptar o rebutjar. La notificació es repeteix fins que es resol")) }}
-      {{ preferences_switch(form, "notify_agreement_success_pending", _("Acords pendents"), _("Informa de peticions en les que s'ha establert comunicació per correu, però que estan pendents d'informar si hi ha hagut acord o no. La notificació es repeteix fins que es resol")) }}
       {{ preferences_switch(form, "notify_matches", _("Possibles lligues"), _("Informa semestralment de recursos que podeu intercanviar i organitzacions properes amb les que podeu contactar segons els vostres interessos")) }}
       {{ preferences_switch(form, "notify_new_resources", _("Nous recursos a la plataforma"), _("Informa semestralment de recursos afegits recentment que no consten encara als vostres interessos")) }}
     </div>
