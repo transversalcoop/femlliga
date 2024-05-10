@@ -36,9 +36,9 @@
     <h1 style="margin: 20px 0 0 0;">{{ _("Us han fet una petició de col·laboració...") }}</h1>
 
     <p style="margin-top: 0;">
-      {{ _("Hi ha organitzacions que us han fet una petició a través de la plataforma i estan esperant la vostra resposta.") }}
+      {{ _("Hi ha organitzacions que us han fet una petició d'intercanvi a través de la plataforma i estan esperant la vostra resposta.") }}
       {{ ngettext("Teniu una petició pendent, no els feu ", "Teniu %(num)d peticions pendents, no els feu ", c.total_agreements) }}
-      {{ _("esperar més i entreu a <a href='%(url)s'>%(name)s</a> per a contestar si accepteu la petició o no:", url="https://" + current_site.domain, name=current_site.name) }}
+      {{ _("esperar més i entreu a <a href='%(url)s'>%(name)s</a> per seguir la conversa:", url="https://" + current_site.domain, name=current_site.name) }}
     </p>
 
     <ul>

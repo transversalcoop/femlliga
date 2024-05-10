@@ -70,7 +70,12 @@ urlpatterns = [
         name="agreements",
     ),
     path(
-        "organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/successful/",
+        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/",
+        views.agreement,
+        name="agreement",
+    ),
+    path(
+        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/successful/",
         views.agreement_successful,
         name="agreement_successful",
     ),

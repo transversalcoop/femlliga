@@ -2,7 +2,7 @@
 
 {% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js, sidebar_filter_show_link %}
 
-{% block title %}{{ _("Intercanvis") }}{% endblock %}
+{% block title %}{{ _("Peticions") }}{% endblock %}
 
 {% block content %}
 {% if len(agreements.sent) > 0 or len(agreements.received) > 0 %}
@@ -164,7 +164,7 @@
         </div>
       </div>
       <div class="col-12 col-sm-4">
-        <button class="btn btn-warning w-100">{{ _("Visualitza la conversa") }}</button>
+        <a class="btn btn-warning w-100" :href="result.href">{{ _("Visualitza la conversa") }}</a>
       </div>
     </div>
   </div>
