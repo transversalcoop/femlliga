@@ -664,6 +664,7 @@ class Agreement(models.Model):
             "communication_date": self.communication_date,
             "agreement_successful": self.agreement_successful,
             "successful_date": self.successful_date,
+            "messages_count": self.messages.count() + 1,
             "href": reverse(
                 "agreement",
                 kwargs={"organization_id": organization_id, "agreement_id": self.id},

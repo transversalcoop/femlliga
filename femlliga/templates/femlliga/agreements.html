@@ -150,21 +150,31 @@
 
     <div class="row">
       <div class="col-12 col-sm-8">
-        <p>{{ _("Petició enviada el") }} ${ formatDateTime(result.date) }:</p>
+        <p class="mt-2 mb-0">
+          <i class="bi-send"></i>
+          {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }:
+        </p>
 
-        <p>{{ _("Hi ha") }} ${ result.messages } {{ _("missatges en la conversa") }}</p>
+        <p v-if="result.messages_count === 1" class="mb-0">
+          <i class="bi-chat"></i>
+          {{ _("Hi ha un missatge en la conversa") }}
+        </p>
+        <p v-else class="mb-0">
+          <i class="bi-chat"></i>
+          {{ _("Hi ha") }} ${ result.messages_count } {{ _("missatges en la conversa") }}
+        </p>
 
         <div v-if="result.agreement_successful === false">
-          <i class="bi-x-lg text-danger fs-4"></i>
+          <i class="bi-x-lg text-danger"></i>
           {{ _("No es va arribar a un acord") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
         </div>
         <div v-else-if="result.agreement_successful === true">
-          <i class="bi-check2 text-success fs-4"></i>
+          <i class="bi-check2 text-success"></i>
           {{ _("Es va arribar a un acord") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
         </div>
       </div>
       <div class="col-12 col-sm-4">
-        <a class="btn btn-warning w-100" :href="result.href">{{ _("Visualitza la conversa") }}</a>
+        <a class="btn btn-warning w-100 mt-2" :href="result.href">{{ _("Visualitza la conversa") }}</a>
       </div>
     </div>
   </div>

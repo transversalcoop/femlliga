@@ -20,7 +20,14 @@ from femlliga.constants import (
     RESOURCES,
     RESOURCES_ORDER,
 )
-from femlliga.models import Agreement, Need, Offer, Organization, sort_resources
+from femlliga.models import (
+    Agreement,
+    EmailSent,
+    Need,
+    Offer,
+    Organization,
+    sort_resources,
+)
 
 # Emails and notifications
 

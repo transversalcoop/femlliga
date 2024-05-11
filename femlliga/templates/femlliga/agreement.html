@@ -1,7 +1,5 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import sidebar_filter_show_link %}
-
 {% block title %}{{ _("Petició d'intercanvi") }}{% endblock %}
 
 {% block content %}
@@ -14,12 +12,81 @@
         <h1>{{ _("Petició de %(resource)s rebuda de %(org)s", resource=resource_name(a.resource), org=a.solicitor_safe().name) }}</h1>
       {% endif %}
 
-      {{ sidebar_filter_show_link() }}
       <div class="collapse show" id="sidebar-filter">
-        TODO resta de la informació, etc.
+        <div>
+        {% for option in a.options.all() %}
+          <span class="badge bg-light me-2">{{ option }}</span>
+        {% endfor %}
+        </div>
+        <p class="mt-2">
+          <i class="bi-send"></i>
+          {{ _("Petició enviada el %(time)s", time=format_time(a.date)) }}
+        </p>
+        {% if a.agreement_successful == True %}
+        <p>
+          <i class="bi-check2 text-success"></i>
+          {{ _("Es va arribar a un acord") }}
+        </p>
+        {% elif a.agreement_successful == False %}
+        <p>
+          <i class="bi-x-lg text-danger"></i>
+          {{ _("No es va arribar a un acord") }}
+        </p>
+        {% else %}
+        <p>{{ _("Heu realitzat l'intercanvi?") }}</p>
+        <div>
+          <button class="btn btn-warning w-100 mb-2">{{ _("Si, hem realitzat l'intercanvi!") }}</button>
+          <button class="btn btn-brown w-100">{{ _("No, finalment no hem realitzat l'intercanvi...") }}</button>
+        </div>
+        {% endif %}
       </div>
     </div>
 
+    <div class="col-md-8">
+      <div class="alert alert-warning mt-2">
+        TODO missatge inicial, guió 1 -> 2 -> 3 -> 4 amb els passos a seguir
+      </div>
+
+      {% for m in a.messages.all() %}
+      <div class="row">
+      {% if m.sent_by == org %}
+        <div class="col-9 offset-3 col-lg-6 offset-lg-6">
+          <p class="fs-7 mb-0"><em>Missatge enviat el {{ format_time(m.sent_on) }}</em></p>
+          <div class="alert alert-success">
+            {{ m.message }}
+          </div>
+        </div>
+      {% else %}
+        <div class="col-9 offset-3 col-lg-6 offset-lg-6">
+          <p class="fs-7 mb-0"><em>Missatge rebut el {{ format_time(m.sent_on) }}</em></p>
+          <div class="alert alert-secondary">
+            {{ m.message }}
+          </div>
+        </div>
+      {% endif %}
+      </div>
+      {% endfor %}
+
+      {% if a.agreement_successful == None %}
+      <form method="post" action="{{ url("send_agreement_message", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}">
+        {{ csrf_input }}
+        <textarea class="form-control" name="message"></textarea>
+        <button class="btn btn-warning mt-2">Envia</button>
+      </form>
+      {% else %}
+      <div class="row">
+        <div class="col-12 col-lg-8 offset-lg-2">
+          <div class="alert alert-warning">
+            {% if a.agreement_successful == True %}
+            TODO fer bé S'ha arribat a un acord
+            {% else %}
+            TODO fer bé No S'ha arribat a un acord
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
   </div>
 </div>
 {% endblock %}
