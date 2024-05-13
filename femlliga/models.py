@@ -590,6 +590,12 @@ class Offer(BaseResource):
 
 
 class Agreement(models.Model):
+    ORIGIN_CHOICES = [
+        ("UNKNOWN", _("Origen desconegut")),
+        ("MATCHES", _("Pàgina «Has lligat?»")),
+        ("SEARCH", _("Pàgina «Descobreix»")),
+    ]
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -611,6 +617,12 @@ class Agreement(models.Model):
     )
     message = models.TextField(verbose_name=_("Missatge"))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Petició enviada el"))
+    origin = models.CharField(
+        max_length=10,
+        choices=ORIGIN_CHOICES,
+        verbose_name=_("Origen de la petició"),
+        default="UNKNOWN",
+    )
     resource = models.CharField(
         max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
     )

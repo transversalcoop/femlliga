@@ -59,6 +59,7 @@ class ImageForm(forms.Form):
 
 class MessageForm(forms.Form):
     message = forms.CharField(min_length=1)
+    origin = forms.ChoiceField(choices=Agreement.ORIGIN_CHOICES)
     options = forms.MultipleChoiceField(choices=const.RESOURCE_OPTIONS, required=False)
 
     def __init__(self, *args, **kwargs):

@@ -46,6 +46,7 @@ class AgreementAdmin(admin.ModelAdmin):
         "solicitor",
         "resource",
         "solicitee",
+        "origin",
         "communication_accepted",
         "communication_date",
         "agreement_successful",
@@ -54,6 +55,7 @@ class AgreementAdmin(admin.ModelAdmin):
 
     list_filter = [
         "resource",
+        "origin",
         "communication_accepted",
         "agreement_successful",
     ]

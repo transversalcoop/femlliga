@@ -445,7 +445,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 </span>
 {% endmacro %}
 
-{% macro show_matches_vue(matches, needs = None) %}
+{% macro show_matches_vue(matches, needs = None, origin = "search") %}
 <div v-for="result in {{ matches }}" :key="result" class="row match-box">
   <div class="p-2">
     <h3 class="my-0">
@@ -483,7 +483,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       </div>
     </div>
 
-    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result)" class="btn btn-custom mt-2">
+    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}')" class="btn btn-custom mt-2">
       <i class="bi-send fs-6 me-2"></i>
       {{ _("Contacta") }}
     </button>
@@ -525,7 +525,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
         </div>
       </div>
       <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error">
-        <button @click="sendMessage(result)" class="btn btn-custom mt-2">
+        <button @click="sendMessage(result, '{{ origin }}')" class="btn btn-custom mt-2">
           <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
             Enviant
             <div class="spinner-border spinner-border-sm" role="status">
@@ -593,7 +593,7 @@ function matchContains(search) {
         return "";
       }).filter(v => v);
     },
-    sendMessage(result) {
+    sendMessage(result, origin) {
       var href = result.message_href;
       var m = this.messagesOpen[href];
       if (!this.messagesOpen[href]) {
@@ -615,7 +615,11 @@ function matchContains(search) {
       post(
         href,
         "{{ csrf_token }}",
-        { message: m.message, options: this.extractSelectedOptions(m.options) },
+        {
+          message: m.message,
+          origin: origin,
+          options: this.extractSelectedOptions(m.options)
+        },
       ).then(response => {
         if (!response.ok) {
           throw "Bad response";

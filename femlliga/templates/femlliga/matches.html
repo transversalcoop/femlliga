@@ -62,14 +62,14 @@
           <div class="col-12">
             <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
             <div class="matches-count"><span>${ matches[resourceSelected].length } {{ _("resultats") }}</span></div>
-            {{ show_matches_vue("matches[resourceSelected]", needs="needs") }}
+            {{ show_matches_vue("matches[resourceSelected]", needs="needs", origin="matches") }}
           </div>
         </div>
         <div v-else class="row mt-3">
           <div class="col-12">
             <h2 class="match-resource-title">{{ _("Tot") }}</h2>
             <div class="matches-count"><span>${ concatenateMatches(matches).length } {{ _("resultats") }}</span></div>
-            {{ show_matches_vue("concatenateMatches(matches)", needs="needs") }}
+            {{ show_matches_vue("concatenateMatches(matches)", needs="needs", origin="matches") }}
           </div>
         </div>
       </div>
