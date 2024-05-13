@@ -6,98 +6,97 @@
 
 {% block title %}
 {% if edit %}
-Edita l'entitat
+{{ _("Edita l'entitat") }}
 {% else %}
-Crea una entitat
+{{ _("Crea una entitat") }}
 {% endif %}
 {% endblock %}
 
 {% block content %}
 <div class="container">
 {% if edit %}
-<h1>Edita la informació de l'entitat</h1>
+<h1>{{ _("Edita la informació de l'entitat") }}</h1>
 {% else %}
 <div class="alert alert-primary mt-2" role="alert">
-  Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les dades de sota per crear-la. Podràs modificar i afegir més informació després.
+  {{ _("Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les dades de sota per crear-la. Podràs modificar i afegir més informació després.") }}
 </div>
 {% endif %}
 
 {% if form.errors %}
 <div class="alert alert-warning mt-2" role="alert">
-  Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo.
+  {{ _("Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo.") }}
 </div>
 {% endif %}
 <form method="post" enctype="multipart/form-data" class="mb-2">
-    {{ csrf_input }}
-    {{ form_feedback(form) }}
+  {{ csrf_input }}
+  {{ form_feedback(form) }}
 
-    <div class="py-3">
-      <label for="id_name"><strong>Nom de l'entitat</strong></label>
-      <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="Nom" id="id_name" {{ input_value(form, "name") }} required>
-      {{ input_feedback(form, "name") }}
-    </div>
+  <div class="py-3">
+    <label for="id_name"><strong>{{ _("Nom de l'entitat") }}</strong></label>
+    <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="Nom" id="id_name" {{ input_value(form, "name") }} required>
+    {{ input_feedback(form, "name") }}
+  </div>
 
-    {# here because if not vuejs does not render it before it calls document.getElementById... #}
-    {{ social_media_forms.management_form }}
-    <div id="vuejs">
-      <div v-if="hasLogo" class="row py-3">
-        <div class="col-6">
-          {% if org and org.logo %}
-            <img class="organization-logo" src="{{ org.logo.url }}" />
-          {% endif %}
-        </div>
-        <div class="col-6">
-          <button class="btn btn-custom" @click.prevent="deleteLogo" :disabled="loading">
-            <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
-              <span class="visually-hidden">Esborrant...</span>
-            </div>
-            <span v-else>Esborra la imatge</span>
-          </button>
-        </div>
+  {# here because if not vuejs does not render it before it calls document.getElementById... #}
+  {{ social_media_forms.management_form }}
+  <div id="vuejs">
+    <div v-if="hasLogo" class="row py-3">
+      <div class="col-6">
+        {% if org and org.logo %}
+          <img class="organization-logo" src="{{ org.logo.url }}" />
+        {% endif %}
       </div>
-      <div v-else class="py-3">
-        <label for="id_logo"><strong>Logo o imatge de l'entitat</strong> (opcional)</label>
-        <input type="file" {{ input_classes(form, "logo") }} name="logo" autocomplete="Logo" id="id_logo" {{ input_value(form, "logo") }}>
-        {{ input_feedback(form, "logo") }}
-      </div>
-
-      <div class="py-3">
-        <label for="id_description"><strong>Descripció de l'activitat de l'entitat</strong> (opcional)</label>
-        <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description">{{ textarea_value(form, "description") }}</textarea>
-        {{ input_feedback(form, "description") }}
-      </div>
-
-      <div class="py-3">
-        <p class="mb-1"><strong>Xarxes socials i contacte</strong></p>
-        {% for i, mform in enumerate(social_media_forms) %}
-          {{ form_feedback(mform) }}
-          <div
-            class="row mb-2 social-media-wrapper {% if not mform.media_type.value() and not mform.value.value() %}d-none{% endif %}"
-            id="social-media-wrapper-{{ i }}"
-          >
-            <div class="col-4">
-              {{ render_formset_select(mform, mform.media_type, "media_type", "", handler='@change="setMediaType($event)"') }}
-            </div>
-            <div class="col-4">
-              {{ render_formset_field(mform, mform.value, "value", "text", "", placeholder=media_type_placeholder(mform.media_type.value())) }}
-            </div>
-            <div class="col-4">
-              {{ render_formset_delete_vue(mform.DELETE, "deleteSocialMedia(" + str(i) + ")") }}
-              {{ mform.id }}
-              {{ mform.organization }}
-            </div>
+      <div class="col-6">
+        <button class="btn btn-custom" @click.prevent="deleteLogo" :disabled="loading">
+          <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">{{ _("Esborrant...") }}</span>
           </div>
-        {% endfor %}
-        <div>
-          <a v-if="socialMediasAddIndex < totalSocialMedias" @click.prevent="addSocialMedia" class="btn btn-custom" href="#">
-            <i class="bi-plus-lg"></i> Afegeix xarxa social
-          </a>
+          <span v-else>{{ _("Esborra la imatge") }}</span>
+        </button>
+      </div>
+    </div>
+    <div v-else class="py-3">
+      <label for="id_logo"><strong>{{ _("Logo o imatge de l'entitat") }}</strong> ({{ _("opcional") }})</label>
+      <input type="file" {{ input_classes(form, "logo") }} name="logo" autocomplete="Logo" id="id_logo" {{ input_value(form, "logo") }}>
+      {{ input_feedback(form, "logo") }}
+    </div>
+
+    <div class="py-3">
+      <label for="id_description"><strong>{{ _("Descripció de l'activitat de l'entitat") }}</strong> ({{ _("opcional") }})</label>
+      <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description">{{ textarea_value(form, "description") }}</textarea>
+      {{ input_feedback(form, "description") }}
+    </div>
+
+    <div class="py-3">
+      <p class="mb-1"><strong>{{ _("Xarxes socials i contacte") }}</strong></p>
+      {% for i, mform in enumerate(social_media_forms) %}
+        {{ form_feedback(mform) }}
+        <div
+          class="row mb-2 social-media-wrapper {% if not mform.media_type.value() and not mform.value.value() %}d-none{% endif %}"
+          id="social-media-wrapper-{{ i }}"
+        >
+          <div class="col-4">
+            {{ render_formset_select(mform, mform.media_type, "media_type", "", handler='@change="setMediaType($event)"') }}
+          </div>
+          <div class="col-4">
+            {{ render_formset_field(mform, mform.value, "value", "text", "", placeholder=media_type_placeholder(mform.media_type.value())) }}
+          </div>
+          <div class="col-4">
+            {{ render_formset_delete_vue(mform.DELETE, "deleteSocialMedia(" + str(i) + ")") }}
+            {{ mform.id }}
+            {{ mform.organization }}
+          </div>
         </div>
+      {% endfor %}
+      <div>
+        <a v-if="socialMediasAddIndex < totalSocialMedias" @click.prevent="addSocialMedia" class="btn btn-custom" href="#">
+          <i class="bi-plus-lg"></i> {{ _("Afegeix xarxa social") }}
+        </a>
       </div>
     </div>
 
     <div class="py-3">
-      {{ render_select(form, "org_type", "Forma jurídica", strong_label=True) }}
+      {{ render_select(form, "org_type", _("Forma jurídica"), strong_label=True) }}
     </div>
 
     <div class="py-3">
@@ -105,27 +104,45 @@ Crea una entitat
     </div>
 
     <div class="py-3">
-      <label for="id_name"><strong>Ubicació</strong>. Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça aproximada:</label>
-      <input type="text" {{ input_classes(form, "address") }} name="address" autocomplete="Adreça" id="id_address" {{ input_value(form, "address") }} placeholder="Nom del carrer, número, codi postal, població, país">
+      <label for="id_address"><strong>{{ _("Ubicació.") }}</strong> {{ _("Indica en el mapa la posició aproximada de l'entitat, o escriu-ne l'adreça aproximada:") }}</label>
+      <div class="input-group">
+        <input type="text" {{ input_classes(form, "address") }} name="address" autocomplete="Adreça" id="id_address" placeholder="{{ _("Nom del carrer, número, codi postal, població, país") }}" v-model="address">
+        <div class="input-group-text">
+          <div v-if="loadingAddresses" class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">{{ _("Carregant adreces...") }}</span>
+          </div>
+          <i v-else class="bi-hourglass"></i>
+        </div>
+      </div>
     </div>
 
-    {% if form.errors.lat or form.errors.lng or form.errors.address %}
-    <div class="invalid-feedback d-block">
-      <ul><li>És necessari indicar la posició o l'adreça de l'entitat</li></ul>
+    <div v-if="noAddresses">
+      {{ _("No s'ha trobat cap lloc coincident amb l'adreça indicada. Per favor, indiqueu-ne una altra o concreteu-la més.") }}
     </div>
+    <ul v-if="addresses.length > 0">
+      <li v-for="address of addresses" :key="address.place_id">
+        <a @click="setAddress(address)" class="link-underline-class clickable">{{ _("Selecciona l'adreça:") }}</a> ${ address.display_name }
+      </li>
+    </ul>
+
+    <input type="hidden" id="lat" name="lat" v-model="lat">
+    <input type="hidden" id="lng" name="lng" v-model="lng">
+  </div>
+
+  {% if form.errors.lat or form.errors.lng %}
+  <div class="invalid-feedback d-block">
+    <ul><li>{{ _("És necessari indicar la posició de l'entitat") }}</li></ul>
+  </div>
+  {% endif %}
+  <div id="citymap" class="map-height"></div>
+
+  <button type="submit" class="btn btn-custom mt-2">
+    {% if edit %}
+    {{ _("Desa") }}
+    {% else %}
+    {{ _("Crea l'entitat") }}
     {% endif %}
-    <div id="citymap" class="map-height"></div>
-
-    <input type="hidden" id="lat" name="lat" {{ input_value(form, "lat") }}>
-    <input type="hidden" id="lng" name="lng" {{ input_value(form, "lng") }}>
-
-    <button type="submit" class="btn btn-custom mt-2">
-      {% if edit %}
-      Desa
-      {% else %}
-      Crea l'entitat
-      {% endif %}
-    </button>
+  </button>
 </form>
 </div>
 {% endblock %}
@@ -143,23 +160,9 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 var marker;
-map.on('click', function(e) {
-    if (marker) { marker.remove(); }
-    marker = L.marker(e.latlng).addTo(map);
-    document.getElementById("lat").value = ("" + e.latlng.lat).slice(0, 10);
-    document.getElementById("lng").value = ("" + e.latlng.lng).slice(0, 10);
-});
-
 {% if form.cleaned_data and form.cleaned_data["lat"] and form.cleaned_data["lng"] %}
 marker = L.marker([{{ form.cleaned_data["lat"] }}, {{ form.cleaned_data["lng"] }}]).addTo(map);
 {% endif %}
-
-var addressInput = document.getElementById("id_address");
-addressInput.addEventListener("change", function() {
-    if (marker) { marker.remove(); }
-    document.getElementById("lat").value = "";
-    document.getElementById("lng").value = "";
-})
 
 function addSocialMedia(event) {
     var className = "social-media-wrapper";
@@ -176,16 +179,43 @@ function addSocialMedia(event) {
     }
 }
 
+function createDebounce() {
+  let timeout = null;
+  return function(f, delayMS) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      f();
+    }, delayMS || 500);
+  };
+}
+
 Vue.createApp({
   delimiters: ["${", "}"],
   data() {
+    map.on('click', (e) => {
+      if (marker) { marker.remove(); }
+      marker = L.marker(e.latlng).addTo(map);
+      this.updateCoordinates(e);
+    });
+
     return {
       hasLogo: {{ js_bool(org and org.logo) }},
       loading: false,
       socialMediasAddIndex: +document.getElementById("id_social_media-INITIAL_FORMS").value,
       totalSocialMedias: +document.getElementById("id_social_media-TOTAL_FORMS").value,
       mediaTypesPlaceholdersMap: mediaTypesPlaceholdersMap,
+      address: "",
+      lat: "{% if form.cleaned_data and form.cleaned_data["lat"] %}{{ form.cleaned_data["lat"] }}{% endif %}",
+      lng: "{% if form.cleaned_data and form.cleaned_data["lng"] %}{{ form.cleaned_data["lng"] }}{% endif %}",
+      debounceAddress: createDebounce(),
+      addresses: [],
+      noAddresses: false,
     };
+  },
+  mounted() {
+    if (this.lat && this.lng) {
+      map.setView([+this.lat, +this.lng], 15);
+    }
   },
   methods: {
     deleteLogo() {
@@ -195,7 +225,6 @@ Vue.createApp({
         "{{ csrf_token }}",
         {},
       ).then(response => {
-        console.log("RESPONSE:", response);
         this.hasLogo = false;
         this.loading = false;
       });
@@ -215,6 +244,38 @@ Vue.createApp({
     },
     setMediaType(e) {
       document.getElementById(e.target.id.replace("media_type", "value")).placeholder = this.mediaTypePlaceholder(e.target.value);
+    },
+    updateCoordinates(e) {
+      this.lat = ("" + e.latlng.lat).slice(0, 10);
+      this.lng = ("" + e.latlng.lng).slice(0, 10);
+    },
+    searchAddresses() {
+      this.noAddresses = false;
+      get("{{ url("search_address") }}?address=" + this.address).then(res => {
+        this.addresses = res.addresses;
+        this.loadingAddresses = false;
+        if (this.addresses.length === 0) {
+          this.noAddresses = true;
+        }
+      });
+    },
+    setAddress(address) {
+      this.lat = address.lat.slice(0, 10);
+      this.lng = address.lon.slice(0, 10);
+      if (marker) { marker.remove(); }
+      marker = L.marker({lat: +this.lat, lng: +this.lng}).addTo(map);
+      map.setView([+this.lat, +this.lng], 15);
+    },
+  },
+  watch: {
+    address() {
+      this.loadingAddresses = true;
+      this.debounceAddress(() => {
+        if (marker) { marker.remove(); }
+        this.lat = "";
+        this.lng = "";
+        this.searchAddresses();
+      });
     },
   },
 }).mount("#vuejs");

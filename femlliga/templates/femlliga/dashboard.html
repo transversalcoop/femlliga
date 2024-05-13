@@ -4,13 +4,13 @@
 
 {% block content %}
 <div class="container">
-  <h1>Dashboard</h1>
+  <h1>{{ _("Dashboard") }}</h1>
 
-  <p>Vista general:</p>
+  <p>{{ _("Vista general:") }}</p>
   <ul>
-    <li>Organizations: {{ organizations }}</li>
-    <li>Peticions: {{ agreements }}</li>
-    <li>Contactes rebuts: {{ contacts }}</li>
+    <li>{{ _("Organitzacions") }}: {{ organizations }}</li>
+    <li>{{ _("Peticions") }}: {{ agreements }}</li>
+    <li>{{ _("Contactes rebuts") }}: {{ contacts }}</li>
   </ul>
 </div>
 {% endblock %}

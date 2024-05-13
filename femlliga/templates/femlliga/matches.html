@@ -1,9 +1,15 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import render_select_raw, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, vue_js, show_matches_vue, match_contains_func_js, matches_methods_vue %}
+{% from 'femlliga/_macros.html' import render_select_raw, organization_link, images_modal_vue, info_tooltip, match_filter_row_vue, vue_js, show_matches_vue, match_contains_func_js, matches_methods_vue, sidebar_filter_show_link %}
 
 {% block title %}
-Has lligat!
+{{ _("Has lligat!") }}
+{% endblock %}
+
+{% block css %}
+{% if wizard_finished %}
+<link rel="stylesheet" href="https://unpkg.com/@sjmc11/tourguidejs/dist/css/tour.min.css">
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -11,56 +17,59 @@ Has lligat!
 <main id="content" class="container-fluid">
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
-      <h1>Has lligat!</h1>
-      <input v-model="search" type="text" class="form-control" placeholder="Cerca recursos o organitzacions">
-      <ul class="nav nav-pills flex-column mb-auto mt-2">
-        <h2 class="resource-matches-title background-yellow">Que necessiteu?</h2>
-        <template v-for="resource of matched_needs" :key="resource">
-          <li v-if="resource.resource in matches" class="nav-item">
-            <button
-              @click="selectResource(resource.resource)"
-              class="nav-link w-100 text-start"
-              :class="{active: resourceSelected === resource.resource}"
-              type="button"
-              role="tab"
-              aria-selected="false"
-              aria-current="page">
-              <span
-                v-if="resource.resource in matches"
-                class="float-end badge ms-2 bg-light"
-                title="Entitats que ofereixen o necessiten recursos">
-                ${ matches[resource.resource].length }
-              </span>
-              <i class="me-2" :class="resourceIconsMap[resource.resource]"></i>
-              ${ resourceNamesMap[resource.resource] }
+      <h1>{{ _("Has lligat!") }}</h1>
+      {{ sidebar_filter_show_link() }}
+      <div class="collapse show" id="sidebar-filter">
+        <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
+        <ul class="nav nav-pills flex-column mb-auto mt-2">
+          <h2 class="resource-matches-title background-yellow">{{ _("Que necessiteu?") }}</h2>
+          <template v-for="resource of matched_needs" :key="resource">
+            <li v-if="resource.resource in matches" class="nav-item">
+              <button
+                @click="selectResource(resource.resource)"
+                class="nav-link w-100 text-start"
+                :class="{active: resourceSelected === resource.resource}"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-current="page">
+                <span
+                  v-if="resource.resource in matches"
+                  class="float-end badge ms-2 bg-light"
+                  title="{{ _("Entitats que ofereixen o necessiten recursos") }}">
+                  ${ matches[resource.resource].length }
+                </span>
+                <i class="me-2" :class="resourceIconsMap[resource.resource]"></i>
+                ${ resourceNamesMap[resource.resource] }
 
-              <br />
-              <span class="badge bg-light me-2" v-for="option in resource.options" :key="option">${ optionNamesMap[option] }</span>
-            </button>
-          </li>
-        </template>
-      </ul>
+                <br />
+                <span class="badge bg-light me-2" v-for="option in resource.options" :key="option">${ optionNamesMap[option] }</span>
+              </button>
+            </li>
+          </template>
+        </ul>
+      </div>
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
       <div v-if="initialLoading" class="mt-4 text-center">
         <div class="spinner-border" role="status">
-          <span class="visually-hidden">Carregant...</span>
+          <span class="visually-hidden">{{ _("Carregant...") }}</span>
         </div>
       </div>
       <template v-else>
         <div v-if="resourceSelected" class="row mt-3">
           <div class="col-12">
             <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
-            <div class="matches-count"><span>${ matches[resourceSelected].length } resultats</span></div>
-            {{ show_matches_vue("matches[resourceSelected]") }}
+            <div class="matches-count"><span>${ matches[resourceSelected].length } {{ _("resultats") }}</span></div>
+            {{ show_matches_vue("matches[resourceSelected]", needs="needs") }}
           </div>
         </div>
         <div v-else class="row mt-3">
           <div class="col-12">
-            <h2 class="match-resource-title">Tot</h2>
-            <div class="matches-count"><span>${ concatenateMatches(matches).length } resultats</span></div>
-            {{ show_matches_vue("concatenateMatches(matches)") }}
+            <h2 class="match-resource-title">{{ _("Tot") }}</h2>
+            <div class="matches-count"><span>${ concatenateMatches(matches).length } {{ _("resultats") }}</span></div>
+            {{ show_matches_vue("concatenateMatches(matches)", needs="needs") }}
           </div>
         </div>
       </div>
@@ -71,13 +80,39 @@ Has lligat!
 </main>
 {% else %}
 <div class="container text-center pt-4">
-  <h1>Sembla que no hi ha sort...</h1>
-  <p>No cal patir! Amb el temps s'incorporaran noves entitats que probablement compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-ho en uns dies.</p>
+  <h1>{{ _("Sembla que no hi ha sort...") }}</h1>
+  <p>{{ _("No cal patir! Amb el temps s'incorporaran noves entitats que probablement compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-ho en uns dies.") }}</p>
 </div>
 {% endif %}
 {% endblock %}
 
 {% block js %}
+{% if wizard_finished %}
+<script src="https://unpkg.com/@sjmc11/tourguidejs/dist/tour.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+const tg = new tourguide.TourGuideClient({
+  nextLabel: "{{ _("Següent") }}",
+  prevLabel: "{{ _("Anterior") }}",
+  finishLabel: "{{ _("Acaba") }}",
+})
+
+tg.addSteps([{
+  title: "{{ _("Has acabat el procés d'alta!") }}",
+  content: "<p>{{ _("Has acabat d'introduir la informació de la teua organització. A partir d'ara podeu buscar i contactar amb altres organitzacions, i altres organitzacions també poden entrar en contacte amb vosaltres.") }}</p>",
+  order: 0,
+}, {
+  title: "{{ _("Això és tot!") }}",
+  content: "<p>{{ _("No us oblideu d'anar revisant les dades cada cert temps!") }}</p>",
+  order: 999,
+}])
+
+tg.start()
+
+if (history.replaceState) {
+  history.replaceState(null, "", "?wizard_finished=false")
+}
+</script>
+{% endif %}
 {{ vue_js() }}
 <script>
 var jsonData = getJsonData();
@@ -102,10 +137,21 @@ Vue.createApp({
   methods: {
     highlightSearch: highlightSearch,
     selectResource(resource) {
-      this.resourceSelected = resource;
+      if (this.resourceSelected === resource) {
+        this.resourceSelected = "";
+      } else {
+        this.resourceSelected = resource;
+      }
     },
     setCarouselImages(images) {
       this.carouselImages = images;
+    },
+    optionMatches(resource, option, needs) {
+      let need = needs.find(n => n.resource === resource);
+      if (need) {
+        return need.options.indexOf(option) !== -1;
+      }
+      return false;
     },
     {{ matches_methods_vue(csrf_token) }}
   },

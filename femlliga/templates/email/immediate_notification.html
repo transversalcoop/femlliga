@@ -1,0 +1,11 @@
+{% extends "email/_base_template.html" %}
+
+{% block final_note %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; font-size: 12px; color: gray; padding: 0 20px 20px 20px;">
+    {{ _("Si voleu deixar de rebre aquestes notificacions, ho podeu configurar <a href='%(url)s'>dins de l'aplicació</a>, a la pàgina de Preferències, secció de Notificacions immediates.", url="https://" + current_site.domain + url("preferences")) }}
+  </td>
+</tr>
+{% endblock %}
+
+

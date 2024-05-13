@@ -1,0 +1,26 @@
+{% extends "email/immediate_notification.html" %}
+
+{% from 'email/_macros.html' import agreement_action %}
+{% from 'femlliga/_macros.html' import render_resource %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {{ _("Us enviem aquest missatge des de %(name)s ja que <strong>%(solicitor)s</strong> us ha demanat", name=current_site.name, solicitor=a.solicitor_safe().name) }}
+    {{ agreement_action(a) }}
+    {{ render_resource(a.resource, a.options.all()) }}, {{ _("amb aquest missatge:") }}
+  </td>
+</tr>
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    <pre style="padding: 20px 0 20px 20px; max-width: 590px; font-weight: bold;">{{ a.message }}</pre>
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {{ _("Podeu entrar a <a href='%(url)s'>%(site)s</a> per acceptar o declinar la petició.", url="https://"+current_site.domain + url("agreements", kwargs={'organization_id': a.solicitee.id}), site=current_site.name) }}
+  </td>
+</tr>
+{% endblock %}
+

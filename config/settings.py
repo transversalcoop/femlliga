@@ -12,10 +12,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 import re
-
-from pathlib import Path
 from datetime import timedelta
 from distutils.util import strtobool
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", None)
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(strtobool(os.getenv("DJANGO_DEBUG", "false")))
 
 allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", ".localhost,127.0.0.1,[::1]")
@@ -57,7 +55,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     "debug_toolbar",
     "axes",
-    "captcha",
+    "django_recaptcha",
     "femlliga",
 ]
 
@@ -66,10 +64,12 @@ MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "femlliga.middleware.middleware.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -170,6 +170,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+LANGUAGES = [
+    ("ca", "Català"),
+    ("es", "Castellano"),
+]
+
+LOCALE_PATHS = ["locale"]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -214,11 +220,14 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv(
     "DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https"
 )
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = None
+ACCOUNT_RATE_LIMITS = False
 ACCOUNT_FORMS = {
     "login": "femlliga.forms.CaptchaLoginForm",
     "signup": "femlliga.forms.CaptchaSignupForm",
 }
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/app"
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -366,4 +375,4 @@ if recaptcha_public != "" and recaptcha_private != "":
     RECAPTCHA_PUBLIC_KEY = recaptcha_public
     RECAPTCHA_PRIVATE_KEY = recaptcha_private
 else:
-    SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS = ["django_recaptcha.recaptcha_test_key_error"]

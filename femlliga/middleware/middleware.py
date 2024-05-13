@@ -1,11 +1,13 @@
-import pytz
 import time
 
+import pytz
 from django.conf import settings
-from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.views import redirect_to_login
 from django.shortcuts import redirect
+from django.utils import timezone, translation
+from django.utils.translation import gettext_lazy as _
+
 
 class TimezoneMiddleware:
     def __init__(self, get_response):
@@ -16,6 +18,20 @@ class TimezoneMiddleware:
         return self.get_response(request)
 
 SESSION_TIMEOUT_KEY = "_session_init_timestamp_"
+
+class LocaleMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if not hasattr(request, "session") or request.session.is_empty():
+            return self.get_response(request)
+
+        if request.user and hasattr(request.user, "language"):
+            translation.activate(request.user.language)
+            request.LANGUAGE_CODE = translation.get_language()
+
+        return self.get_response(request)
 
 class SessionTimeoutMiddleware:
     def __init__(self, get_response):
@@ -34,7 +50,7 @@ class SessionTimeoutMiddleware:
 
         if session_is_expired:
             request.session.flush()
-            messages.success(request, "S'ha tancat la sessió per inactivitat")
+            messages.success(request, _("S'ha tancat la sessió per inactivitat"))
             return redirect_to_login(next=request.path, login_url="/admin/login/")
 
         grace_period = 1

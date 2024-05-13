@@ -10,4 +10,5 @@ RUN pip install pipenv && pipenv install --system
 
 COPY config /code/config/
 COPY femlliga /code/femlliga/
+COPY locale /code/locale/
 COPY manage.py /code/

@@ -1,30 +1,140 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import form_feedback, render_select %}
+{% from 'femlliga/_macros.html' import form_feedback, input_classes, input_value, input_feedback, render_select, vue_js %}
 
-{% block title %}Preferències{% endblock %}
+{% block title %}{{ _("Preferències") }}{% endblock %}
+
+{% block content_classes %}background-grey{% endblock %}
 
 {% block content %}
 <div class="container">
-  <h1>Preferències</h1>
+  <form method="post">
+    <div class="row">
+      <div class="col-12 col-sm-6">
+        <h1>{{ _("Preferències") }}</h1>
+      </div>
+      <div class="col-12 col-sm-6 text-end">
+        <button type="submit" class="btn btn-warning mt-2 w-sm-100">{{ _("Actualitza les preferències") }}</button>
+      </div>
+    </div>
 
-  <form method="post" class="mt-2">
     {{ csrf_input }}
     {{ form_feedback(form) }}
 
-    <div class="mt-3">
-      {{ render_select(form, "notifications_frequency", "Configura cada quant de temps vols rebre notificacions. Només te n'enviarem en cas que tingues peticions pendents de respondre.") }}
+    <div class="preferences-section mt-2">
+      <h2 class="preferences-section-title">{{ _("General") }}</h2>
+      <div class="row preferences-row">
+        <div class="col-md-8">
+          <label for="email">
+            <strong>{{ _("Adreça de correu electrònic") }}</strong>
+              <div>
+              {{ _("Si la modifiqueu, el canvi s'aplicarà quan valideu la nova adreça de correu") }}
+              {% if other_emails %}
+              {{ _("(correus pendents de validar: %(emails)s)", emails=other_emails) }}
+              {% endif %}
+              </div>
+          </label>
+        </div>
+        <div class="col-md-4">
+          <input type="text" {{ input_classes(form, "email") }} name="email" autocomplete="{{ _("Nom") }}" {{ input_value(form, "email") }} required>
+          {{ input_feedback(form, "email") }}
+        </div>
+      </div>
+
+      <div class="row preferences-row">
+        {{ render_select(form, "language", _("Idioma de l'aplicació"), strong_label=True, cols=[8, 4]) }}
+      </div>
+
+      <div id="vue-app" class="row preferences-row">
+        <div class="col-12">
+          <label for="id_distance_log">
+            <strong>{{ _("Distància màxima per a les lligues") }}</strong>
+            (${ distance } km)
+          </label>
+          <input v-model="distanceLog" name="distance_log" type="range" class="form-range" min="0" max="3" step="0.25" id="id_distance_log">
+          <input type="hidden" name="distance_limit_km" :value="distance">
+        </div>
+      </div>
     </div>
 
-    <div class="form-check mt-3">
-      <input class="form-check-input" type="checkbox" id="accept_communications_automatically" name="accept_communications_automatically"
-             {% if form and form.cleaned_data and form.cleaned_data["accept_communications_automatically"] %}checked{% endif %}>
-      <label class="form-check-label" for="accept_communications_automatically">
-        Marca aquest camp si vols iniciar conversa per correu automàticament per a totes les peticions de comunicació
-      </label>
+    <div class="preferences-section">
+      <h2 class="preferences-section-title">{{ _("Notificacions immediates") }}</h2>
+      {{ preferences_switch(form, "accept_communications_automatically", _("Accepta automàticament les peticions"), _("Si una organització us fa una petició, us enviarem un correu electrònic a les dos organitzacions perquè us comuniqueu")) }}
+      {{ preferences_switch(form, "notify_immediate_communications_received", _("Informa immediatament de les peticions rebudes"), _("Si us envien una petició i no teniu l'opció d'acceptar-la automàticament, us enviarem un correu perquè la pugueu revisar")) }}
+      {{ preferences_switch(form, "notify_immediate_communications_rejected", _("Informa immediatament de les peticions rebutjades"), _("Si envieu una petició i l'altra organització la rebutja, us enviarem un correu perquè ho sapigueu")) }}
     </div>
 
-    <button type="submit" class="btn btn-custom mt-2">Desa</button>
+    <div class="preferences-section">
+      <h2 class="preferences-section-title">{{ _("Notificacions periòdiques") }}</h2>
+      <div class="row preferences-row">
+        {{ render_select(form, "notifications_frequency", _("Freqüència de les notificacions"), extra_label=_("Us enviarem un únic correu amb els continguts seleccionats a continuació, i només si hi ha informació a comunicar"), cols=[8, 4]) }}
+      </div>
+      {{ preferences_switch(form, "notify_agreement_communication_pending", _("Peticions pendents"), _("Informa de peticions que us han fet i que estan pendents d'acceptar o rebutjar. La notificació es repeteix fins que es resol")) }}
+      {{ preferences_switch(form, "notify_agreement_success_pending", _("Acords pendents"), _("Informa de peticions en les que s'ha establert comunicació per correu, però que estan pendents d'informar si hi ha hagut acord o no. La notificació es repeteix fins que es resol")) }}
+      {{ preferences_switch(form, "notify_matches", _("Possibles lligues"), _("Informa semestralment de recursos que podeu intercanviar i organitzacions properes amb les que podeu contactar segons els vostres interessos")) }}
+      {{ preferences_switch(form, "notify_new_resources", _("Nous recursos a la plataforma"), _("Informa semestralment de recursos afegits recentment que no consten encara als vostres interessos")) }}
+    </div>
   </form>
+
+  <div id="delete-question" class="d-none">{{ _("Segur que vols esborrar el compte? L'acció no es pot desfer") }}</div>
+  <form method="post" action="{{ url("delete_account") }}" onsubmit="return confirm(document.getElementById('delete-question').textContent)" class="mt-2">
+    {{ csrf_input }}
+
+    <div class="preferences-section">
+      <h2 class="preferences-section-title">{{ _("Gestiona el compte") }}</h2>
+      <div class="row preferences-row">
+        <div class="col-md-8">
+          <strong>{{ _("Esborra el compte") }}</strong>
+          <div>{{ _("Aquesta acció esborrarà la organització i l'usuari amb què has iniciat sessió. L'acció no es pot desfer") }}</div>
+        </div>
+        <div class="col-md-4 text-end">
+          <button type="submit" class="btn btn-danger">{{ _("Esborra el compte") }}</button>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}
+
+{% macro preferences_switch(form, name, label, sublabel=None) %}
+<div class="row preferences-row">
+  <div class="col-9 col-lg-11 col-md-10">
+    <label class="form-check-label" for="{{ name }}">
+      <strong>{{ label }}</strong>
+      {% if sublabel %}<div>{{ sublabel }}</div>{% endif %}
+    </label>
+  </div>
+  <div class="col-3 col-lg-1 col-md-2 form-switch form-check-reverse">
+    <input class="form-check-input" type="checkbox" name="{{ name }}"
+         {% if form and form.cleaned_data and form.cleaned_data[name] %}checked{% endif %}>
+  </div>
+</div>
+{% endmacro %}
+
+{% block js %}
+{{ vue_js() }}
+<script>
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      distanceLog: Math.log10(jsonData.distance),
+    };
+  },
+  computed: {
+    distance() {
+      let v = Math.pow(10, this.distanceLog);
+      if (v < 10) {
+        v = Math.round(v);
+      } else if (v < 100) {
+        v = 10 * Math.round(v / 10);
+      } else if (v < 1000) {
+        v = 100 * Math.round(v / 100);
+      }
+      return v;
+    },
+  },
+}).mount("#vue-app");
+</script>
+{% endblock %}
+

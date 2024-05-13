@@ -4,20 +4,55 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('femlliga', '0001_initial'),
+        ("femlliga", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='organization',
-            name='address',
+            model_name="organization",
+            name="address",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
         migrations.AlterField(
-            model_name='organizationscope',
-            name='name',
-            field=models.CharField(choices=[('EQUALITY', 'Dona/Igualtat/Feminismes'), ('EDUCATION', 'Educació'), ('OLDER_PEOPLE', 'Persones majors'), ('NEIGHBORHOOD', 'Veïnal'), ('SPORTS', 'Activitat física i esportiva'), ('CULTURE', 'Cultura, patrimoni, territori, llengua...'), ('YOUTH', 'Infància, adolescència i joventut'), ('SOCIAL_ASSISTANCE', 'Benestar social'), ('COOPERATION', 'Cooperació i sensibilització'), ('ENVIRONMENT', 'Medi ambient i mobilitat sostenible'), ('TRADITIONS', 'Festa i tradicions'), ('RELIGIOUS', 'Religiosa'), ('PARTICIPATION', 'Participació ciutadana i dinamització comunitària'), ('DESIGN', 'Disseny i comunicació'), ('TRAINING', 'Formació i recerca'), ('HOUSING', 'Habitatge i gestió de l’entorn'), ('FOOD', 'Alimentació, restauració i hosteleria'), ('LOGISTICS', 'Logística i subministraments'), ('FINANCE', 'Finançament i Moneda Social'), ('PRODUCTION', 'Producció'), ('TRADE', 'Comerç'), ('HEALTH', 'Salut i Cures'), ('TECHNOLOGY', 'Tecnologia i electrònica'), ('TEXTILE', 'Textil'), ('ACCESSIBILITY', 'Accessibilitat'), ('FUNCTIONAL_DIVERSITY', 'Diversitat funcional'), ('OTHER', 'Altres')], max_length=100, primary_key=True, serialize=False),
+            model_name="organizationscope",
+            name="name",
+            field=models.CharField(
+                choices=[
+                    ("EQUALITY", "Dona/Igualtat/Feminismes"),
+                    ("EDUCATION", "Educació"),
+                    ("OLDER_PEOPLE", "Persones majors"),
+                    ("NEIGHBORHOOD", "Veïnal"),
+                    ("SPORTS", "Activitat física i esportiva"),
+                    ("CULTURE", "Cultura, patrimoni, territori, llengua..."),
+                    ("YOUTH", "Infància, adolescència i joventut"),
+                    ("SOCIAL_ASSISTANCE", "Benestar social"),
+                    ("COOPERATION", "Cooperació i sensibilització"),
+                    ("ENVIRONMENT", "Medi ambient i mobilitat sostenible"),
+                    ("TRADITIONS", "Festa i tradicions"),
+                    ("RELIGIOUS", "Religiosa"),
+                    (
+                        "PARTICIPATION",
+                        "Participació ciutadana i dinamització comunitària",
+                    ),
+                    ("DESIGN", "Disseny i comunicació"),
+                    ("TRAINING", "Formació i recerca"),
+                    ("HOUSING", "Habitatge i gestió de l’entorn"),
+                    ("FOOD", "Alimentació, restauració i hosteleria"),
+                    ("LOGISTICS", "Logística i subministraments"),
+                    ("FINANCE", "Finançament i Moneda Social"),
+                    ("PRODUCTION", "Producció"),
+                    ("TRADE", "Comerç"),
+                    ("HEALTH", "Salut i Cures"),
+                    ("TECHNOLOGY", "Tecnologia i electrònica"),
+                    ("TEXTILE", "Textil"),
+                    ("ACCESSIBILITY", "Accessibilitat"),
+                    ("FUNCTIONAL_DIVERSITY", "Diversitat funcional"),
+                    ("OTHER", "Altres"),
+                ],
+                max_length=100,
+                primary_key=True,
+                serialize=False,
+            ),
         ),
     ]

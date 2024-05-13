@@ -25,6 +25,8 @@ django-axes = "*"
 django-recaptcha = "*"
 typing-extensions = "*"
 beautifulsoup4 = "*"
+babel = "*"
+pyarrow = "*"
 
 [dev-packages]
 

@@ -1,1 +1,1 @@
-Per favor confirma la teua adreça de correu electrònic
+{{ _("Per favor confirma la teua adreça de correu electrònic") }}
