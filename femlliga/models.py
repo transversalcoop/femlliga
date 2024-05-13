@@ -470,7 +470,7 @@ class ResourceOption(models.Model):
 class BaseResource(models.Model):
     last_updated_on = models.DateTimeField(auto_now=True)
     resource = models.CharField(max_length=100, choices=const.RESOURCES)
-    options = models.ManyToManyField(ResourceOption)
+    options = models.ManyToManyField(ResourceOption, blank=True)
     comments = models.TextField(null=True, blank=True)
     has_resource = models.BooleanField(default=False)
 
