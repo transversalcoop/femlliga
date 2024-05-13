@@ -9,8 +9,14 @@
 {% block content %}
 <div class="container">
   <form method="post">
-    <button type="submit" class="btn btn-warning float-end">{{ _("Actualitza les preferències") }}</button>
-    <h1>{{ _("Preferències") }}</h1>
+    <div class="row">
+      <div class="col-12 col-sm-6">
+        <h1>{{ _("Preferències") }}</h1>
+      </div>
+      <div class="col-12 col-sm-6 text-end">
+        <button type="submit" class="btn btn-warning mt-2 w-sm-100">{{ _("Actualitza les preferències") }}</button>
+      </div>
+    </div>
 
     {{ csrf_input }}
     {{ form_feedback(form) }}

@@ -69,17 +69,19 @@
 
 <div class="container mb-4">
   {% if org.needs_not_set() or org.offers_not_set() %}
-  <div class="alert alert-primary mt-3" role="alert">
-    {{ _("Pareix que encara no heu completat el procés d'alta. Voleu fer-ho ara?") }}
-    <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" class="float-end">
+  <div class="alert alert-primary mt-3 row" role="alert">
+    <div class="col-12 col-sm-8">
+      <span class="align-middle">{{ _("Encara no heu completat el procés d'alta, o hem afegit opcions noves des de que ho vau fer. Voleu completar les dades ara?") }}</span>
+    </div>
+    <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" class="col-12 col-sm-4 mt-2 text-center">
         {{ csrf_input }}
-        <button class="btn btn-sm btn-custom">{{ _("Completa l'alta") }}</button>
+        <button class="btn btn-sm btn-custom">{{ _("Completa les dades") }}</button>
     </form>
   </div>
   {% endif %}
 
   <div class="row">
-    {{ resources(_("Què necessiteu?"), "needs", sort_resources(needs), org.needs_missing(), ) }}
+    {{ resources(_("Què necessiteu?"), "needs", sort_resources(needs), org.needs_missing()) }}
     {{ resources(_("Què oferiu?"), "offers", sort_resources(offers), org.offers_missing()) }}
   </div>
 </div>

@@ -50,15 +50,17 @@
 
 {% macro resource_details(resource, match_type) %}
   <div class="mb-2">
-    {% if resource.charge %}
-      <span class="badge bg-light" title="{{ _("Producte o servei remunerat") }}">€</span>
-    {% endif %}
-    {% if resource.place_accessible %}
-      <span class="badge bg-light universal-access-icon" title="{{ _("Local accessible") }}">{{ universal_access_icon() }}</span>
-    {% endif %}
     {% for option in resource.options.all() %}
       <span class="badge bg-light">{{ option }}</span>
     {% endfor %}
+  </div>
+  <div class="mb-2">
+    {% if resource.charge %}
+      <span class="me-3"><span class="fs-4 align-middle">€</span> {{ _("Producte o servei remunerat") }}</span>
+    {% endif %}
+    {% if resource.place_accessible %}
+      <span class="universal-access-icon" title="">{{ universal_access_icon() }} {{ _("Local accessible") }}</span>
+    {% endif %}
   </div>
   {% if resource.comments %}
   <p>{% if resource.resource != "OTHER" %}<strong>{{ _("Observacions:") }}</strong>{% endif %} {{ resource.comments }}</p>
@@ -443,7 +445,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 {% macro show_matches_vue(matches, needs = None) %}
 <div v-for="result in {{ matches }}" :key="result" class="row match-box">
   <div class="p-2">
-    <h3 class="mt-0">
+    <h3 class="my-0">
       <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
       <span v-if="result.type === 'offer'" class="ms-2 background-yellow">{{ _("ofereix") }}</span>
       <span v-if="result.type === 'need'" class="ms-2 background-yellow-dark">{{ _("necessita") }}</span>
@@ -453,11 +455,9 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } {{ _("de vosaltres") }}</span>
     </div>
     <div class="mb-2">
-      <span v-if="result.charge" class="badge bg-light me-2" title="{{ _("Producte o servei remunerat") }}">€</span>
-      <span v-if="result.place_accessible" class="badge bg-light universal-access-icon sm me-2" title="{{ _("Local accessible") }}">{{ universal_access_icon() }}</span>
       <span
         {% if needs %}
-        class="badge bg-light me-2" :class="{ 'text-body-secondary': !optionMatches(result.resource, option, {{ needs }}) }"
+        class="badge bg-light me-2" :class="{ 'text-body-tertiary': !optionMatches(result.resource, option, {{ needs }}) }"
         {% else %}
         class="badge bg-light me-2"
         {% endif %}
@@ -465,6 +465,10 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
         :key="option"
         v-html="highlightSearch(optionNamesMap[option], search)">
       </span>
+    </div>
+    <div class="mb-2">
+      <span v-if="result.charge" class="me-3"><span class="fs-4 align-middle">€</span> {{ _("Producte o servei remunerat") }}</span>
+      <span v-if="result.place_accessible" class="universal-access-icon">{{ universal_access_icon() }} {{ _("Local accessible") }}</span>
     </div>
     <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">{{ _("Observacions:") }}</strong><span v-html="highlightSearch(result.comments, search)"></span></p>
 
