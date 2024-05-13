@@ -13,21 +13,6 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global{% if not settings.DEBUG %}.prod{% endif %}.js"></script>
 {% endmacro %}
 
-{% macro page_heading(heading, subheading) %}
-<section style="background-color: transparent; background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);">
-  <div style="padding-top: 100px;" class="container">
-    <h1 style="font-weight: 900; font-size: 3.75em; color: #000;" class="text-center">{{ heading }}</h1>
-  </div>
-</section>
-<div class="container">
-  <div class="divider-1"></div>
-  <h3 style="font-weight: 700; color: gray; font-size: 1.125em;" class="text-center">{{ subheading }}</h3>
-  <div>
-    <img src="{{ static("decorations/heading-bird.png") }}" alt="" style="margin: 30px 0 30px 250px;" loading="lazy">
-  </div>
-</div>
-{% endmacro %}
-
 {% macro show_password_message() %}{{ _("Mostra la contrasenya com a text pla. Avís: això deixarà veure la teua contrasenya en la pantalla.") }}{% endmacro %}
 
 {% macro toggle_password_button() %}
