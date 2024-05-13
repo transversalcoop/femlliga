@@ -2,7 +2,7 @@
 
 {% from "femlliga/_macros.html" import leaflet_css, leaflet_js %}
 
-{% block css %}{{ leaflet_css() }}{% endblock %}
+{% block css %}{{ leaflet_css(markercluster=True) }}{% endblock %}
 
 {% block title %}{{ _("Mapes compartits") }}{% endblock %}
 
@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block js %}
-{{ leaflet_js() }}
+{{ leaflet_js(markercluster=True) }}
 <script>
 var organizations = getJsonData().organizations;
 var searchInput = document.getElementById("search");
@@ -32,7 +32,7 @@ var showTornallom = document.getElementById("show-tornallom");
 var showSobiraniaAlimentariaPV = document.getElementById("show-sobiraniaalimentariapv");
 var showPamapam = document.getElementById("show-pamapam");
 var map = L.map("citymap").setView([39.46755210639808, -0.3794678565158268], 8);
-var layerGroup;
+var markerCluster;
 function icon(url) {
   return L.icon({
     iconUrl: "/static/icons/" + url,
@@ -55,8 +55,8 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 function showOrganizations() {
-  if (layerGroup) {
-    layerGroup.remove();
+  if (markerCluster) {
+    markerCluster.remove();
   }
   let orgs = organizations.filter(o => {
     return (o.origin === "femlliga" && showFemlliga.checked) ||
@@ -72,12 +72,13 @@ function showOrganizations() {
     }
     return true;
   });
-  layerGroup = L.layerGroup(orgs.map(o => {
+  markerCluster = L.markerClusterGroup();
+  orgs.forEach(o => {
     let marker = L.marker([o.lat, o.lng], { icon: icons[o.origin] });
     marker.bindPopup(o.name);
-    return marker
-  }));
-  layerGroup.addTo(map);
+    markerCluster.addLayer(marker);
+  });
+  map.addLayer(markerCluster);
 }
 showOrganizations()
 searchInput.addEventListener("input", showOrganizations);
