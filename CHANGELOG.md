@@ -14,7 +14,7 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 
 
 
-## [1.1.0] - 2024-XX-XX
+## [1.1.0] - 2024-05-13
 
 ### Added
 
