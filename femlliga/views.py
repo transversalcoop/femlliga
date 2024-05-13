@@ -1052,8 +1052,7 @@ def send_agreement_message(request, organization_id, agreement_id):
             )
 
     return redirect(
-        "agreement",
-        kwargs={"organization_id": organization_id, "agreement_id": agreement_id},
+        "agreement", organization_id=organization_id, agreement_id=agreement_id
     )
 
 

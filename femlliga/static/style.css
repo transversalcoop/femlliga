@@ -299,6 +299,10 @@ pre {
     white-space: pre-wrap;
 }
 
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
 .welcome-block {
     background-color: var(--lightgrey2);
     margin-top: 20px;

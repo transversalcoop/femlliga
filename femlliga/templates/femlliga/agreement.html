@@ -7,9 +7,9 @@
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
       {% if a.solicitor == org %}
-        <h1>{{ _("Petició de %(resource)s enviada a %(org)s", resource=resource_name(a.resource), org=a.solicitee_safe().name) }}</h1>
+      <h1>{{ _("Petició de %(resource)s enviada a <em>%(org)s</em>", resource=resource_name(a.resource), org=a.solicitee_safe().name) }}</h1>
       {% else %}
-        <h1>{{ _("Petició de %(resource)s rebuda de %(org)s", resource=resource_name(a.resource), org=a.solicitor_safe().name) }}</h1>
+      <h1>{{ _("Petició de %(resource)s rebuda de <em>%(org)s</em>", resource=resource_name(a.resource), org=a.solicitor_safe().name) }}</h1>
       {% endif %}
 
       <div class="collapse show" id="sidebar-filter">
@@ -33,7 +33,7 @@
           {{ _("No es va arribar a un acord") }}
         </p>
         {% else %}
-        <p>{{ _("Heu realitzat l'intercanvi?") }}</p>
+        <p class="mt-5">{{ _("Heu realitzat l'intercanvi?") }}</p>
         <div>
           <button class="btn btn-warning w-100 mb-2">{{ _("Si, hem realitzat l'intercanvi!") }}</button>
           <button class="btn btn-brown w-100">{{ _("No, finalment no hem realitzat l'intercanvi...") }}</button>
@@ -47,31 +47,29 @@
         TODO missatge inicial, guió 1 -> 2 -> 3 -> 4 amb els passos a seguir
       </div>
 
-      {% for m in a.messages.all() %}
+      {% for m in a.all_messages() %}
       <div class="row">
       {% if m.sent_by == org %}
         <div class="col-9 offset-3 col-lg-6 offset-lg-6">
           <p class="fs-7 mb-0"><em>Missatge enviat el {{ format_time(m.sent_on) }}</em></p>
-          <div class="alert alert-success">
-            {{ m.message }}
-          </div>
+          <div class="alert alert-success pre-wrap">{{ m.message }}</div>
         </div>
       {% else %}
-        <div class="col-9 offset-3 col-lg-6 offset-lg-6">
+        <div class="col-9 col-lg-6">
           <p class="fs-7 mb-0"><em>Missatge rebut el {{ format_time(m.sent_on) }}</em></p>
-          <div class="alert alert-secondary">
-            {{ m.message }}
-          </div>
+          <div class="alert alert-secondary pre-wrap">{{ m.message }}</div>
         </div>
       {% endif %}
       </div>
       {% endfor %}
 
-      {% if a.agreement_successful == None %}
+      {% if not a.solicitor or not a.solicitee %}
+      <p><em>{{ _("No es poden enviar més missatges en aquesta conversa perquè l'altra organització ja no existeix") }}</em></p>
+      {% elif a.agreement_successful == None %}
       <form method="post" action="{{ url("send_agreement_message", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}">
         {{ csrf_input }}
         <textarea class="form-control" name="message"></textarea>
-        <button class="btn btn-warning mt-2">Envia</button>
+        <button class="btn btn-warning mt-2">{{ _("Envia") }}</button>
       </form>
       {% else %}
       <div class="row">

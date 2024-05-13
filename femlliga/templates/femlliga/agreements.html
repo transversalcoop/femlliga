@@ -37,7 +37,7 @@
             {{ request_filter_row_vue("received", _("Peticions rebudes")) }}
           </template>
           <template v-else>
-            <li class="nav-item" v-for="x in organizationsWithRequests" :key="x.organization.id">
+            <li class="nav-item" v-for="x in organizationsWithAgreements" :key="x.organization.id">
               <button
                 @click="selectOrganization(x.organization)"
                 class="nav-link w-100 text-start"
@@ -84,8 +84,8 @@
         <div v-else-if="organizationSelected" class="row mt-3">
           <div class="col-12">
             <h2 class="match-resource-title">${ organizationSelected.name }</h2>
-            <div class="matches-count agreements-count"><span>${ organizationRequests.length } {{ _("peticions") }}</span></div>
-            {{ show_agreements_vue("organizationRequests") }}
+            <div class="matches-count agreements-count"><span>${ organizationAgreements.length } {{ _("peticions") }}</span></div>
+            {{ show_agreements_vue("organizationAgreements") }}
           </div>
         </div>
         <div v-else class="row mt-3">
@@ -234,8 +234,6 @@ Vue.createApp({
       resourceSelected: "",
       requestTypeSelected: "",
       organizationSelected: null,
-      agreementsLoading: {},
-      communicationsResolved: {},
     };
   },
   methods: {
@@ -271,14 +269,6 @@ Vue.createApp({
       }
       return m;
     },
-    extractSelectedOptions(optionsMap) {
-      return Object.keys(optionsMap).map(k => {
-        if (optionsMap[k]) {
-          return k;
-        }
-        return "";
-      }).filter(v => v);
-    },
     agreementSent(a) {
       return a.solicitor.id === this.organizationID;
     },
@@ -293,7 +283,7 @@ Vue.createApp({
     concatenatedAgreements() {
       return this.allConcatenatedAgreements.filter(agreementContains(this.search));
     },
-    organizationsWithRequests() {
+    organizationsWithAgreements() {
       return this.allOrganizations.map(o => {
         return {
           organization: o.organization,
@@ -301,7 +291,7 @@ Vue.createApp({
         };
       }).filter(o => o.agreements.length > 0);
     },
-    organizationRequests() {
+    organizationAgreements() {
       var org = this.allOrganizations.find(o => o.organization.id === this.organizationSelected.id);
       return org ? org.agreements.filter(agreementContains(this.search)) : [];
     },

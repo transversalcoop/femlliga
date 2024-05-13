@@ -650,6 +650,15 @@ class Agreement(models.Model):
             return self.solicitee
         return Organization.deleted_organization()
 
+    def all_messages(self):
+        return [
+            {
+                "message": self.message,
+                "sent_on": self.date,
+                "sent_by": self.solicitor,
+            }
+        ] + list(self.messages.all())
+
     def json(self, organization_id):
         return {
             "id": self.id,
