@@ -45,6 +45,7 @@ from .constants import (
     RESOURCES_ORDER,
     SOCIAL_MEDIA_TYPES,
 )
+
 from .forms import (
     ContactForm,
     MessageForm,
@@ -52,6 +53,7 @@ from .forms import (
     PreferencesForm,
     ResourceForm,
 )
+
 from .models import (
     Agreement,
     Contact,
@@ -75,6 +77,7 @@ from .models import (
     org_type_name,
     resource_name,
 )
+
 from .utils import (
     clean_form_email,
     get_json_body,
@@ -86,6 +89,12 @@ from .utils import (
     send_email,
     send_notification,
     str_to_bool,
+)
+
+from .maps import (
+    get_tornallom_organizations,
+    get_pamapam_organizations,
+    get_sobiraniaalimentariapv_organizations,
 )
 
 
@@ -1545,6 +1554,22 @@ def contact(request):
     return render(
         request, "femlliga/contact.html", {"form": form, "form_sent": form_sent}
     )
+
+
+def maps(request):
+    orgs = [
+        {
+            "name": o.name,
+            "lat": o.lat,
+            "lng": o.lng,
+            "origin": "femlliga",
+        }
+        for o in Organization.objects.all()
+    ]
+    orgs += get_tornallom_organizations()
+    orgs += get_pamapam_organizations()
+    orgs += get_sobiraniaalimentariapv_organizations()
+    return render(request, "femlliga/maps.html", {"json_data": {"organizations": orgs}})
 
 
 @login_required

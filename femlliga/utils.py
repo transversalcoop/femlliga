@@ -2,7 +2,9 @@ import decimal
 import json
 import unicodedata
 import urllib
+
 from datetime import timedelta
+from functools import wraps
 from distutils.util import strtobool
 from operator import attrgetter
 
@@ -325,3 +327,36 @@ def http_get(url):
     with urllib.request.urlopen(url) as f:
         res = json.loads(f.read().decode("utf-8"))
     return res
+
+
+def cache(timedelta):
+    def decorator(func):
+        value = None
+        last_execution = None
+
+        @wraps(func)
+        def decorated():
+            nonlocal value
+            nonlocal last_execution
+
+            # first execution, must call func
+            if value is None:
+                value = func()
+                last_execution = timezone.now()
+                return value
+
+            # value outdated, update it, but if it fails, use old value
+            if (timezone.now() - last_execution) > timedelta:
+                try:
+                    value = func()
+                    last_execution = timezone.now()
+                    return value
+                except:
+                    return value
+
+            # value cached
+            return value
+
+        return decorated
+
+    return decorator
