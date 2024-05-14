@@ -23,7 +23,7 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
 
     def handle(self, *args, **options):
         if not options["send"]:
-            print("Dry run, set '--send=true' to actually send emails")
+            print("{timezone.now()} Dry run, set '--send=true' to actually send emails")
 
         users = get_users_to_notify()
         site = Site.objects.get(id=settings.SITE_ID)
@@ -54,4 +54,4 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
                     print(" not sent")
 
             else:
-                print(f"No content for {user.email}")
+                print(f"{timezone.now()} No content for {user.email}")
