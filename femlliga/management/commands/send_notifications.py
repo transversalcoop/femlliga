@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from django.utils import translation
+from django.utils import translation, timezone
 from django.utils.translation import gettext_lazy as _
 
 from femlliga.models import Organization
@@ -33,7 +33,7 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
             needs, offers = get_ordered_needs_and_offers(org, user.distance_limit_km)
             context = get_periodic_notification_data(site, user, needs, offers)
             if context:
-                print(f"Sending email to {user.email}...", end="")
+                print(f"{timezone.now()} Sending email to {user.email}...", end="")
                 if user.language:
                     translation.activate(user.language)
 
