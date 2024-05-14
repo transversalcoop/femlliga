@@ -27,7 +27,7 @@ from femlliga.models import Agreement, Need, Offer, Organization, sort_resources
 
 def get_users_to_notify():
     users = get_user_model().objects.exclude(notifications_frequency="NEVER")
-    return [u for u in users if user_ready_to_notify(u)]
+    return [u for u in users if u.organizations.count() > 0 and user_ready_to_notify(u)]
 
 
 def user_ready_to_notify(user):
