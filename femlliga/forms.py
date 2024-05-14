@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django_recaptcha.fields import ReCaptchaField
 
 from . import constants as const
-from .models import Contact, CustomUser, Organization
+from .models import Agreement, Contact, CustomUser, Organization
 
 
 class PreferencesForm(forms.ModelForm):

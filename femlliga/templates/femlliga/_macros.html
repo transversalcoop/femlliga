@@ -430,7 +430,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 </span>
 {% endmacro %}
 
-{% macro show_matches_vue(matches, needs = None, origin = "search") %}
+{% macro show_matches_vue(matches, needs = None, origin = "SEARCH") %}
 <div v-for="result in {{ matches }}" :key="result" class="row match-box">
   <div class="p-2">
     <h3 class="my-0">
@@ -478,16 +478,13 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     <div class="bg-light my-2 p-2 rounded-3">
       <button type="button" class="btn-close float-end" aria-label="Close" @click="closeMessage(result.message_href)"></button>
       <div>
-        <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-2 mb-0">
+        <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-4 mb-0">
           {{ _("S'ha enviat el missatge correctament.") }}
         </div>
-        <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-2 mb-0">
+        <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-4 mb-0">
           {{ _("Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb") }} {{ settings.CONTACT_EMAIL }}.
         </div>
         <div v-else>
-          <div v-if="result.last_message_declined" class="alert alert-warning mt-2">
-            {{ _("La darrera vegada que us vau posar en contacte amb aquesta entitat, van declinar la comunicació.") }}
-          </div>
           <div v-if="result.options.length > 0">
             <p class="mt-1 mb-1 fw-bold">{{ _("Quines opcions vos interessen concretament?") }}</p>
             <div class="multi-select p-0 text-start">
@@ -606,6 +603,7 @@ function matchContains(search) {
           options: this.extractSelectedOptions(m.options)
         },
       ).then(response => {
+      console.log("RESPONSE:", response)
         if (!response.ok) {
           throw "Bad response";
         }

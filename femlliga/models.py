@@ -507,19 +507,13 @@ class Need(BaseResource):
             ),
         ]
 
-    def json(
-        self, current_organization=None, include_org=True, agreement_declined_map=None
-    ):
+    def json(self, current_organization=None, include_org=True):
         j = super().json()
         j["type"] = "need"
         if include_org:
             j["organization"] = self.organization.json()
         if current_organization:
             j["distance"] = current_organization.distance_text(self.organization)
-            if agreement_declined_map:
-                j["last_message_declined"] = self.last_message_declined(
-                    agreement_declined_map
-                )
             j["message_href"] = reverse(
                 "send_message",
                 args=[
@@ -531,12 +525,6 @@ class Need(BaseResource):
             )
         j["images"] = [i.json() for i in self.images.all()]
         return j
-
-    def last_message_declined(self, agreement_declined_map):
-        try:
-            return agreement_declined_map["need"][self.resource][self.organization.id]
-        except KeyError:
-            return False
 
 
 class Offer(BaseResource):
@@ -555,19 +543,13 @@ class Offer(BaseResource):
             ),
         ]
 
-    def json(
-        self, current_organization=None, include_org=True, agreement_declined_map=None
-    ):
+    def json(self, current_organization=None, include_org=True):
         j = super().json()
         j["type"] = "offer"
         if include_org:
             j["organization"] = self.organization.json()
         if current_organization:
             j["distance"] = current_organization.distance_text(self.organization)
-            if agreement_declined_map:
-                j["last_message_declined"] = self.last_message_declined(
-                    agreement_declined_map
-                )
             j["message_href"] = reverse(
                 "send_message",
                 args=[
@@ -581,12 +563,6 @@ class Offer(BaseResource):
         j["charge"] = self.charge
         j["place_accessible"] = self.place_accessible
         return j
-
-    def last_message_declined(self, agreement_declined_map):
-        try:
-            return agreement_declined_map["offer"][self.resource][self.organization.id]
-        except KeyError:
-            return False
 
 
 class Agreement(models.Model):
