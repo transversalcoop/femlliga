@@ -435,6 +435,7 @@ class IntegrationTests(TestCase):
             send_message_url,
             {
                 "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "origin": "MATCHES",
                 "message": test_msg_1,
             },
         )
@@ -448,6 +449,7 @@ class IntegrationTests(TestCase):
             self.assertContains(response, s)
 
         # check sent
+        a = Agreement.objects.get(solicitor=o, solicitee=o2)
         self.client.login(email=email3, password=PASS_FOR_TESTS)
         response = self.client.get(reverse("agreements", args=[o.id]))
         save_response(response)
@@ -463,7 +465,7 @@ class IntegrationTests(TestCase):
             follow=True,
         )
         self.assertJSONEqual(response.content, {"ok": True})
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 1)
 
     def aux_send_message(self, o1_id, o2_id):
         send_message_url = reverse(
@@ -473,6 +475,7 @@ class IntegrationTests(TestCase):
             send_message_url,
             {
                 "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "origin": "MATCHES",
                 "message": "test message",
             },
         )
@@ -482,57 +485,57 @@ class IntegrationTests(TestCase):
     def test_deleted_organizations(self):
         email4 = "test4@example.com"
         email5 = "test5@example.com"
-        org1 = self.aux_create_org("Nom entitat de test 4", email4)
-        org2 = self.aux_create_org("Nom entitat de test 5", email5)
-        Offer.objects.create(resource="PLACE", organization=org1)
-        Offer.objects.create(resource="PLACE", organization=org2)
+        org4 = self.aux_create_org("Nom entitat de test 4", email4)
+        org5 = self.aux_create_org("Nom entitat de test 5", email5)
+        Offer.objects.create(resource="PLACE", organization=org4)
+        Offer.objects.create(resource="PLACE", organization=org5)
 
-        o1id, o2id = org1.id, org2.id
+        o4id, o5id = org4.id, org5.id
         self.client.login(email=email5, password=PASS_FOR_TESTS)
-        self.aux_send_message(o2id, o1id)
+        self.aux_send_message(o5id, o4id)
 
         self.client.login(email=email4, password=PASS_FOR_TESTS)
-        self.aux_send_message(o1id, o2id)
-        self.assertEqual(Agreement.objects.filter(solicitor=org1).count(), 1)
-        self.assertEqual(Agreement.objects.filter(solicitee=org1).count(), 1)
+        self.aux_send_message(o4id, o5id)
+        self.assertEqual(Agreement.objects.filter(solicitor=org4).count(), 1)
+        self.assertEqual(Agreement.objects.filter(solicitee=org4).count(), 1)
 
-        org2.delete()  # delete org so Agreement's have None fields
+        org5.delete()  # delete org so Agreement's have None fields
 
-        # org2 deleted, no new message is sent
-        self.aux_send_message(o1id, o2id)
-        self.assertEqual(Agreement.objects.filter(solicitor=org1).count(), 1)
+        # org5 deleted, no new message is sent
+        self.aux_send_message(o4id, o5id)
+        self.assertEqual(Agreement.objects.filter(solicitor=org4).count(), 1)
 
-        self.client.get(reverse("agreements", args=[o1id]))
-        self.client.get(reverse("matches", args=[o1id]))
-        self.client.get(reverse("search", args=[o1id]))
+        self.client.get(reverse("agreements", args=[o4id]))
+        self.client.get(reverse("matches", args=[o4id]))
+        self.client.get(reverse("search", args=[o4id]))
 
     @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
     def test_immediate_notifications(self):
         email6 = "test6@example.com"
         email7 = "test7@example.com"
-        org2 = self.aux_create_org("Nom entitat de test 7", email7)
-        org1 = self.aux_create_org("Nom entitat de test 6", email6)
-        user1 = CustomUser.objects.get(email=email6)
-        user2 = CustomUser.objects.get(email=email7)
-        user1.save()
-        user2.notify_immediate_communications_received = False
-        user2.save()
+        org6 = self.aux_create_org("Nom entitat de test 6", email6)
+        org7 = self.aux_create_org("Nom entitat de test 7", email7)
+        user7 = CustomUser.objects.get(email=email7)
+        user7.notify_immediate_communications_received = False
+        user7.save()
         offer = Offer.objects.create(
-            organization=org2,
+            organization=org7,
             resource="PLACE",
             has_resource=True,
         )
         option, _ = ResourceOption.objects.get_or_create(name="DAILY_USAGE")
         offer.options.add(option)
 
+        self.client.login(email=email6, password=PASS_FOR_TESTS)
         send_message_url = reverse(
-            "send_message", args=[org1.id, org2.id, "offer", "PLACE"]
+            "send_message", args=[org6.id, org7.id, "offer", "PLACE"]
         )
         test_msg_1 = "missatge de test per al primer missatge"
         response = self.client.post(
             send_message_url,
             {
                 "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "origin": "MATCHES",
                 "message": test_msg_1,
             },
         )
@@ -541,67 +544,63 @@ class IntegrationTests(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
         # activate immediate notifications and check they are received
-        user1.save()
-        user2.notify_immediate_communications_received = True
-        user2.save()
+        user7.notify_immediate_communications_received = True
+        user7.save()
 
-        self.client.login(email=email6, password=PASS_FOR_TESTS)
         test_msg_2 = "missatge de test per al segon missatge"
         response = self.client.post(
             send_message_url,
             {
                 "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "origin": "MATCHES",
                 "message": test_msg_2,
             },
         )
         self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 1)
         save_email(mail.outbox[0], "notify_communication_received.html")
-        self.assertIn("T'han enviat una petició per compartir", mail.outbox[0].subject)
+        self.assertIn(
+            "T'han enviat una petició per intercanviar", mail.outbox[0].subject
+        )
 
     @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
     def test_periodic_notifications(self):
-        org3 = self.aux_create_org("Nom entitat de test 10", "test10@example.com")
-        org2 = self.aux_create_org("Nom entitat de test 9", "test9@example.com")
-        org1 = self.aux_create_org("Nom entitat de test 8", "test8@example.com")
+        org10 = self.aux_create_org("Nom entitat de test 10", "test10@example.com")
+        org9 = self.aux_create_org("Nom entitat de test 9", "test9@example.com")
+        org8 = self.aux_create_org("Nom entitat de test 8", "test8@example.com")
 
         Need.objects.all().delete()
         Offer.objects.all().delete()
-        self.aux_create_resource(Need, org1, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"])
-        self.aux_create_resource(Need, org1, "TRAINING", ["TRAINING_DIGITAL"])
-        self.aux_create_resource(Need, org2, "PLACE", ["DAILY_USAGE"])
+        self.aux_create_resource(Need, org8, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"])
+        self.aux_create_resource(Need, org8, "TRAINING", ["TRAINING_DIGITAL"])
+        self.aux_create_resource(Need, org9, "PLACE", ["DAILY_USAGE"])
         self.aux_create_resource(
-            Offer, org2, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"]
+            Offer, org9, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"]
         )
         self.aux_create_resource(
-            Offer, org3, "PLACE", ["PUNCTUAL_MEETINGS", "PUNCTUAL_EVENTS"]
+            Offer, org10, "PLACE", ["PUNCTUAL_MEETINGS", "PUNCTUAL_EVENTS"]
         )
         self.aux_create_resource(
-            Offer, org2, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_BUREAUCRACY"]
+            Offer, org9, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_BUREAUCRACY"]
         )
         self.aux_create_resource(
-            Offer, org3, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_EQUALITY"]
+            Offer, org10, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_EQUALITY"]
         )
 
-        org1.creator.last_notification_date = timezone.now() - timedelta(days=30 * 12)
-        org1.creator.last_long_notification_date = timezone.now() - timedelta(
+        org8.creator.last_notification_date = timezone.now() - timedelta(days=30 * 12)
+        org8.creator.last_long_notification_date = timezone.now() - timedelta(
             days=30 * 12
         )
         a1 = Agreement.objects.create(
-            solicitor=org2,
-            solicitee=org1,
-            resource="PLACE",
-        )
-        a2 = Agreement.objects.create(
-            solicitor=org1,
-            solicitee=org2,
+            solicitor=org9,
+            solicitee=org8,
             resource="PLACE",
             communication_accepted=True,
         )
 
-        needs, offers = get_ordered_needs_and_offers(org1, 100)
+        needs, offers = get_ordered_needs_and_offers(org8, 100)
         site = Site.objects.first()
-        context = get_periodic_notification_data(site, org1.creator, needs, offers)
+        context = get_periodic_notification_data(site, org8.creator, needs, offers)
         self.assertEqual(
             context,
             {
@@ -638,14 +637,13 @@ class IntegrationTests(TestCase):
         send_periodic_notification(
             "subject",
             "email/periodic_notification.html",
-            org1.creator,
+            org8.creator,
             context,
         )
         self.assertEqual(len(mail.outbox), 1)
         save_email(mail.outbox[0], "periodic_notification.html")
         for s in [
             "Us han fet una petició de col·laboració...",
-            "Heu arribat a fer l'intercanvi finalment?",
             "Possibles lligues",
             "Novetats a la plataforma",
         ]:
