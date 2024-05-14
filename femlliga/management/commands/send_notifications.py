@@ -5,9 +5,12 @@ from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 from femlliga.models import Organization
-from femlliga.utils import (get_ordered_needs_and_offers,
-                            get_periodic_notification_data,
-                            get_users_to_notify, send_periodic_notification)
+from femlliga.utils import (
+    get_ordered_needs_and_offers,
+    get_periodic_notification_data,
+    get_users_to_notify,
+    send_periodic_notification,
+)
 
 
 class Command(BaseCommand):
@@ -26,7 +29,7 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
         site = Site.objects.get(id=settings.SITE_ID)
         sent_count = 0
         for user in users:
-            org = Organization.objects.get(creator = user)
+            org = Organization.objects.get(creator=user)
             needs, offers = get_ordered_needs_and_offers(org, user.distance_limit_km)
             context = get_periodic_notification_data(site, user, needs, offers)
             if context:
@@ -36,7 +39,7 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
 
                 if options["send"]:
                     sent = send_periodic_notification(
-                        _("Novetats de %(name)s") % { "name": site.name},
+                        _("Novetats de %(name)s") % {"name": site.name},
                         "email/periodic_notification.html",
                         user,
                         context,
@@ -52,4 +55,3 @@ vol rebre. Només s'enviaran les notificacions si ha passat el temps configurat 
 
             else:
                 print(f"No content for {user.email}")
-
