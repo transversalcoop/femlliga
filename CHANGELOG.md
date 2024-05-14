@@ -13,6 +13,33 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 ### Changed
 
 
+## [1.2.0] - 2024-05-XX
+
+### Added
+
+- S'han afegit converses tipus xat dins de l'aplicació, en substitució del funcionament
+  fins al moment, corresponent a fer les converses per correu electrònic
+- Es registra la pàgina d'origen de les peticions («Has lliga?» i «Descobreix») per poder
+  saber quina es fa servir més a la pràctica
+- Es registren tots els correus electrònics enviats per poder validar-ne el contingut
+
+### Changed
+
+- Les converses s'accepten automàticament, donat que es fan dins de l'aplicació i no
+  impliquen els correus electrònics dels participants
+- Les converses que estaven pendents d'acceptar s'accepten
+- Les converses que s'havien rebutjat es marquen com a que no es va arribar a un acord
+
+### Removed
+
+- S'han retirat totes les referències a converses per correu electrònic
+- S'han retirat totes les referències a converses rebutjades
+- S'han retirat les opcions de preferències relacionades amb acceptar converses
+
+### Fixed
+
+- Substituïts alguns usos de `style` en línia per classes CSS
+
 
 ## [1.1.0] - 2024-05-13
 
