@@ -1,5 +1,7 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import vue_js %}
+
 {% block title %}{{ _("Petició d'intercanvi") }}{% endblock %}
 
 {% block content %}
@@ -42,33 +44,29 @@
       </div>
     </div>
 
-    <div class="col-md-8">
+    <div id="vue-app" class="col-md-8">
       <div class="alert alert-warning mt-2">
         TODO missatge inicial, guió 1 -> 2 -> 3 -> 4 amb els passos a seguir
+        TODO traduïr totes les cadenes
       </div>
 
-      {% for m in a.all_messages() %}
-      <div class="row">
-      {% if m.sent_by == org %}
-        <div class="col-9 offset-3 col-lg-6 offset-lg-6">
-          <p class="fs-7 mb-0"><em>Missatge enviat el {{ format_time(m.sent_on) }}</em></p>
-          <div class="alert alert-success pre-wrap">{{ m.message }}</div>
+      <div v-for="m of messages" class="row">
+        <div v-if="m.sent_by === org_id" class="col-9 offset-3 col-lg-6 offset-lg-6">
+          <p class="fs-7 mb-0"><em>Missatge enviat el ${ formatDateTime(m.sent_on) }</em></p>
+          <div class="alert alert-success pre-wrap">${ m.message }</div>
         </div>
-      {% else %}
-        <div class="col-9 col-lg-6">
-          <p class="fs-7 mb-0"><em>Missatge rebut el {{ format_time(m.sent_on) }}</em></p>
-          <div class="alert alert-secondary pre-wrap">{{ m.message }}</div>
+        <div v-else class="col-9 col-lg-6">
+          <p class="fs-7 mb-0"><em>Missatge rebut el ${ formatDateTime(m.sent_on) }</em></p>
+          <div class="alert alert-secondary pre-wrap">${ m.message }</div>
         </div>
-      {% endif %}
       </div>
-      {% endfor %}
 
       {% if not a.solicitor or not a.solicitee %}
       <p><em>{{ _("No es poden enviar més missatges en aquesta conversa perquè l'altra organització ja no existeix") }}</em></p>
       {% elif a.agreement_successful == None %}
-      <form method="post" action="{{ url("send_agreement_message", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}">
+      <form method="post" action="{{ url("send_agreement_message", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" @submit="send">
         {{ csrf_input }}
-        <textarea class="form-control" name="message"></textarea>
+        <textarea v-model="message" class="form-control" name="message"></textarea>
         <button class="btn btn-warning mt-2">{{ _("Envia") }}</button>
       </form>
       {% else %}
@@ -87,4 +85,52 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block js %}
+{{ vue_js() }}
+<script>
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    const jsonData = getJsonData();
+    console.log("JSON DATA:", jsonData);
+    return {
+      agreement_id: jsonData.agreement_id,
+      org_id: jsonData.org_id,
+      messages: jsonData.messages,
+      message: "",
+    };
+  },
+  mounted() {
+    try {
+      let protocol = "wss";
+      if (window.location.protocol === "http:") {
+        protocol = "ws";
+      }
+      let url = `${protocol}://${window.location.host}/ws/organization/${this.org_id}/agreements/${this.agreement_id}/`;
+      this.socket = new WebSocket(url);
+      this.socket.onmessage = function(e) {
+        this.messages.push(JSON.parse(e.data));
+      };
+      this.socket.onclose = function(e) {
+        console.error("Chat connection closed");
+      };
+    } catch(e) {
+      this.socket = undefined;
+    }
+  },
+  methods: {
+    formatDateTime: formatDateTime,
+    send(e) {
+      // if socket not working, form is sent normally and page reloaded
+      if (this.socket) {
+        e.preventDefault();
+        this.socket.send(JSON.stringify({ "message": this.message }));
+        this.message = "";
+      }
+    }
+  },
+}).mount("#app");
+</script>
 {% endblock %}

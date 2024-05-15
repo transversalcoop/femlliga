@@ -27,6 +27,9 @@ typing-extensions = "*"
 beautifulsoup4 = "*"
 babel = "*"
 pyarrow = "*"
+channels = {extras = ["daphne"], version = "*"}
+channels-redis = "*"
+requests = "*"
 
 [dev-packages]
 

@@ -985,16 +985,28 @@ def agreements(request, organization_id):
 def agreement(request, organization_id, agreement_id):
     a = get_object_or_404(Agreement, pk=agreement_id)
     org = get_object_or_404(Organization, pk=organization_id)
-    return render(request, "femlliga/agreement.html", {"a": a, "org": org})
+    return render(
+        request,
+        "femlliga/agreement.html",
+        {
+            "a": a,
+            "org": org,
+            "json_data": {
+                "agreement_id": a.id,
+                "org_id": org.id,
+                "messages": a.all_messages_json(),
+            },
+        },
+    )
 
 
 @login_required
 @require_own_agreement
 def send_agreement_message(request, organization_id, agreement_id):
     # TODO better error handling, and do not send message if agreement is already resolved
+    # TODO refactor with WS consumer
     if request.method == "POST":
         message = request.POST.get("message", "")
-        print("SEND AGREEMENT MESSAGE:", message)
         if message:
             a = get_object_or_404(Agreement, pk=agreement_id)
             org = get_object_or_404(Organization, pk=organization_id)
