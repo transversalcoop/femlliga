@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 
 from .models import *
@@ -21,6 +22,7 @@ class SocialMediaInline(admin.TabularInline):
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ["name", "date", "creator__email"]
     inlines = [SocialMediaInline, NeedsInline, OffersInline]
+    readonly_fields = ("creator",)
     fields = (
         ("name", "creator", "logo"),
         ("description", "scopes"),

@@ -278,6 +278,18 @@ function clickOption(element) {
   {% endif %}
 {% endmacro %}
 
+{% macro initial_loading_vue() %}
+{# it _must_ be paired with <template v-else>...</template>
+it works because of a glitch: inexistentInitialLoadingVariable does not exist,
+so when vue is fuly loaded the v-else, which was hidden because it's inside of
+a <template> tag, gets shown #}
+<div v-if="inexistentInitialLoadingVariable" class="mt-4 text-center">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">{{ _("Carregant...") }}</span>
+  </div>
+</div>
+{% endmacro %}
+
 {% macro render_social_media_vue() %}
 <div v-if="socialMedia.length > 0">
   <p class="mt-1 mb-0"><strong>{{ _("Xarxes socials") }}</strong></p>

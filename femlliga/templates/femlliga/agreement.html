@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import vue_js %}
+{% from 'femlliga/_macros.html' import vue_js, initial_loading_vue %}
 
 {% block title %}{{ _("Petició d'intercanvi") }}{% endblock %}
 
@@ -50,16 +50,19 @@
         TODO traduïr totes les cadenes
       </div>
 
-      <div v-for="m of messages" class="row">
-        <div v-if="m.sent_by === org_id" class="col-9 offset-3 col-lg-6 offset-lg-6">
-          <p class="fs-7 mb-0"><em>Missatge enviat el ${ formatDateTime(m.sent_on) }</em></p>
-          <div class="alert alert-success pre-wrap">${ m.message }</div>
+      {{ initial_loading_vue() }}
+      <template v-else>
+        <div v-for="m of messages" class="row">
+          <div v-if="m.sent_by === org_id" class="col-9 offset-3 col-lg-6 offset-lg-6">
+            <p class="fs-7 mb-0"><em>Missatge enviat el ${ formatDateTime(m.sent_on) }</em></p>
+            <div class="alert alert-success pre-wrap">${ m.message }</div>
+          </div>
+          <div v-else class="col-9 col-lg-6">
+            <p class="fs-7 mb-0"><em>Missatge rebut el ${ formatDateTime(m.sent_on) }</em></p>
+            <div class="alert alert-secondary pre-wrap">${ m.message }</div>
+          </div>
         </div>
-        <div v-else class="col-9 col-lg-6">
-          <p class="fs-7 mb-0"><em>Missatge rebut el ${ formatDateTime(m.sent_on) }</em></p>
-          <div class="alert alert-secondary pre-wrap">${ m.message }</div>
-        </div>
-      </div>
+      </template>
 
       {% if not a.solicitor or not a.solicitee %}
       <p><em>{{ _("No es poden enviar més missatges en aquesta conversa perquè l'altra organització ja no existeix") }}</em></p>
@@ -110,10 +113,10 @@ Vue.createApp({
       }
       let url = `${protocol}://${window.location.host}/ws/organization/${this.org_id}/agreements/${this.agreement_id}/`;
       this.socket = new WebSocket(url);
-      this.socket.onmessage = function(e) {
+      this.socket.onmessage = (e) => {
         this.messages.push(JSON.parse(e.data));
       };
-      this.socket.onclose = function(e) {
+      this.socket.onclose = (e) => {
         console.error("Chat connection closed");
       };
     } catch(e) {
