@@ -619,6 +619,7 @@ def matches(request, organization_id):
 def render_matches_page(
     request, template, organization, matches, needs_json, organization_matches=None
 ):
+    matches = { k: v for k, v in matches.items() if len(v) > 0 }
     json_data = {
         "matches": matches,
         "needs": needs_json,

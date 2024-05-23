@@ -11,7 +11,7 @@
       ],
       "ports": [
         "127.0.0.1:8000:8000",
-        "192.168.1.138:8000:8000",
+        "192.168.0.17:8000:8000",
       ],
       "environment": [
         "PYTHONDONTWRITEBYTECODE=true",
@@ -19,7 +19,7 @@
         "WEB_RELOAD=true",
         "DJANGO_SECRET_KEY=insecure_key_for_dev",
         "DJANGO_DEBUG=true",
-        "DJANGO_ALLOWED_HOSTS=.localhost,127.0.0.1,[::1],192.168.0.21,192.168.1.138",
+        "DJANGO_ALLOWED_HOSTS=.localhost,127.0.0.1,[::1],192.168.0.21,192.168.1.138,192.168.0.17",
         "DJANGO_DATABASE=sqlite",
         # for console emails
         "DJANGO_EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend",
