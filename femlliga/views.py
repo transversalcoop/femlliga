@@ -1003,6 +1003,20 @@ def agreement(request, organization_id, agreement_id):
 
 @login_required
 @require_own_agreement
+def view_agreement_email(request, organization_id, agreement_id):
+    a = get_object_or_404(Agreement, pk=agreement_id)
+    return render(
+        request,
+        "email/notify_communication_received.html",
+        {
+            "a": a,
+            "current_site": get_current_site(request),
+        },
+    )
+
+
+@login_required
+@require_own_agreement
 def send_agreement_message(request, organization_id, agreement_id):
     # TODO FL103 better error handling, and do not send message if agreement is already resolved
     # TODO FL103 refactor with WS consumer

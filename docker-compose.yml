@@ -21,7 +21,14 @@
         "DJANGO_DEBUG=true",
         "DJANGO_ALLOWED_HOSTS=.localhost,127.0.0.1,[::1],192.168.0.21,192.168.1.138,192.168.0.17",
         "DJANGO_DATABASE=sqlite",
+        # for console emails
         "DJANGO_EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend",
+        # for real emails
+        # "DJANGO_DEFAULT_FROM_EMAIL=${DJANGO_FROM_EMAIL}",
+        # "DJANGO_EMAIL_HOST=${DJANGO_EMAIL_HOST}",
+        # "DJANGO_EMAIL_HOST_USER=${DJANGO_EMAIL_USER}",
+        # "DJANGO_EMAIL_HOST_PASSWORD=${DJANGO_EMAIL_PASSWORD}",
+
         "DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL=http",
         "DJANGO_CSRF_COOKIE_SECURE=false",
         "DJANGO_SESSION_COOKIE_SECURE=false",
