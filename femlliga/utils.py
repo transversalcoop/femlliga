@@ -81,7 +81,6 @@ def get_periodic_notification_data(site, user, needs, offers):
             context["matches"] = {"need": need, "offer": offer}
             send_long_notification = True
 
-    # TODO FL090 consider only resources within distance_limit_km
     if user.notify_new_resources and long_notification_ready:
         offers = org_offers_not_matching(org, user)
         if len(offers) > 0:

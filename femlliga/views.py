@@ -1004,8 +1004,8 @@ def agreement(request, organization_id, agreement_id):
 @login_required
 @require_own_agreement
 def send_agreement_message(request, organization_id, agreement_id):
-    # TODO better error handling, and do not send message if agreement is already resolved
-    # TODO refactor with WS consumer
+    # TODO FL103 better error handling, and do not send message if agreement is already resolved
+    # TODO FL103 refactor with WS consumer
     if request.method == "POST":
         message = request.POST.get("message", "")
         if message:
