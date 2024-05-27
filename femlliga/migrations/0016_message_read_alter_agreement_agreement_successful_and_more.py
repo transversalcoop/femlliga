@@ -2,6 +2,8 @@
 
 from django.db import migrations, models
 
+import femlliga.constants as consts
+
 
 def create_resource_options(apps, schema_editor):
     ResourceOption = apps.get_model("femlliga", "ResourceOption")
@@ -227,5 +229,14 @@ class Migration(migrations.Migration):
                 primary_key=True,
                 serialize=False,
             ),
+        ),
+        migrations.RunPython(
+            create_resource_options, reverse_code=migrations.RunPython.noop
+        ),
+        migrations.RunPython(
+            migrate_resource_options, reverse_code=migrations.RunPython.noop
+        ),
+        migrations.RunPython(
+            delete_resource_options, reverse_code=migrations.RunPython.noop
         ),
     ]
