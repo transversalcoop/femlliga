@@ -11,7 +11,7 @@
       ],
       "ports": [
         "127.0.0.1:8000:8000",
-        "192.168.0.17:8000:8000",
+        #        "192.168.0.17:8000:8000",
       ],
       "environment": [
         "PYTHONDONTWRITEBYTECODE=true",
@@ -43,6 +43,7 @@
         "DJANGO_CONTACT_EMAIL=contacte@femlliga.org",
         "DJANGO_CONTACT_SOCIAL=femlliga",
         "DJANGO_CONTACT_LINKS=https://links.transversalcoop.org/@femlliga/",
+        "DJANGO_REDIS_HOST=redis",
       ]
     }
   }
