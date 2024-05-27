@@ -1031,6 +1031,19 @@ def send_agreement_message(request, organization_id, agreement_id):
     )
 
 
+@login_required
+@require_own_agreement
+def mark_message_read(request, organization_id, agreement_id, message_id):
+    if request.method == "POST":
+        m = get_object_or_404(Message, pk=message_id)
+        if m.agreement != get_object_or_404(Agreement, pk=agreement_id):
+            return JsonResponse({"ok": False})
+        m.read = True
+        m.save()
+
+    return JsonResponse({"ok": True})
+
+
 def requested_resources(agreements):
     return sorted(set([a.resource for a in agreements]))
 

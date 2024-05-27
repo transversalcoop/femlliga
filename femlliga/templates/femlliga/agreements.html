@@ -148,7 +148,7 @@
       <div class="col-12 col-sm-8">
         <p class="mt-2 mb-0">
           <i class="bi-send"></i>
-          {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }:
+          {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }<span v-if="result.last_message_on">, {{ _("últim missatge el") }} ${ formatDateTime(result.last_message_on) }</span>
         </p>
 
         <p v-if="result.messages_count === 1" class="mb-0">
@@ -158,6 +158,9 @@
         <p v-else class="mb-0">
           <i class="bi-chat"></i>
           {{ _("Hi ha") }} ${ result.messages_count } {{ _("missatges en la conversa") }}
+          <span v-if="result.messages_not_read > 0">
+            (${ result.messages_not_read } {{ _("sense llegir") }})
+          </span>
         </p>
 
         <div v-if="result.agreement_successful === false">
@@ -167,6 +170,10 @@
         <div v-else-if="result.agreement_successful === true">
           <i class="bi-check2 text-success"></i>
           {{ _("Es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
+        </div>
+        <div v-else>
+          <i class="bi-clock-history"></i>
+          {{ _("Encara no s'ha indicat si s'ha realitzat l'intercanvi") }}
         </div>
       </div>
       <div class="col-12 col-sm-4">
@@ -199,7 +206,6 @@ function agreementContains(search) {
     const targets = [
       sanitize(m.solicitor.name),
       sanitize(m.solicitee.name),
-      sanitize(m.message),
       sanitize(resourceNamesMap[m.resource]),
     ];
     for (var option of m.options) {

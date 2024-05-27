@@ -18,15 +18,27 @@ def migrate_resource_options(apps, schema_editor):
     Offer = apps.get_model("femlliga", "Offer")
     # Agreement, Need, Offer
 
-    origin_1 = [
-        ResourceOption.objects.get(name="SOUND_SYSTEM_ACOUSTIC"),
-        ResourceOption.objects.get(name="SOUND_SYSTEM_CONCERT"),
-        ResourceOption.objects.get(name="PROJECTOR"),
-        ResourceOption.objects.get(name="STAGE"),
-    ]
-    destination_1 = ResourceOption.objects.get(name="EQUIPMENT_EVENTS")
-    origin_2 = [ResourceOption.objects.get(name="DISHES")]
-    destination_2 = ResourceOption.objects.get(name="KITCHEN_EQUIPMENT")
+    origin_1 = []
+    for option in [
+        "SOUND_SYSTEM_ACOUSTIC",
+        "SOUND_SYSTEM_CONCERT",
+        "PROJECTOR",
+        "STAGE",
+    ]:
+        try:
+            origin_1.append(ResourceOption.objects.get(name=option))
+        except:
+            pass
+
+    destination_1, _ = ResourceOption.objects.get_or_create(name="EQUIPMENT_EVENTS")
+
+    origin_2 = []
+    for option in ["DISHES"]:
+        try:
+            origin_2.append(ResourceOption.objects.get(name=option))
+        except:
+            pass
+    destination_2, _ = ResourceOption.objects.get_or_create(name="KITCHEN_EQUIPMENT")
 
     for a in Agreement.objects.all():
         merge_resource_options(a, origin_1, destination_1)

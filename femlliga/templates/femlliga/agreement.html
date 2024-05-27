@@ -35,7 +35,7 @@
           {{ _("No es va realitzar l'intercanvi (%(time)s)", time=format_time(a.successful_date)) }}
         </p>
         {% else %}
-        <p class="mt-5">{{ _("Heu realitzat l'intercanvi?") }}</p>
+        <p class="mt-5">{{ _("Heu realitzat l'intercanvi? Indiqueu-ho per donar per acabada la conversa.") }}</p>
         <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}">
           {{ csrf_input }}
           <input type="hidden" name="successful" value="yes">
@@ -123,7 +123,9 @@ Vue.createApp({
     };
   },
   mounted() {
-    // TODO FL103 iterate over this.messages and send read post for those received and not read
+    for (let message of this.messages) {
+      this.markRead(message);
+    }
     try {
       let protocol = "wss";
       if (window.location.protocol === "http:") {
@@ -132,8 +134,9 @@ Vue.createApp({
       let url = `${protocol}://${window.location.host}/ws/organization/${this.org_id}/agreements/${this.agreement_id}/`;
       this.socket = new WebSocket(url);
       this.socket.onmessage = (e) => {
-        this.messages.push(JSON.parse(e.data));
-        // TODO FL103 insert as read, send post to set message as read if received
+        let message = JSON.parse(e.data);
+        this.messages.push(message);
+        this.markRead(message);
       };
       this.socket.onclose = (e) => {
         console.error("Chat connection closed");
@@ -151,7 +154,13 @@ Vue.createApp({
         this.socket.send(JSON.stringify({ "message": this.message }));
         this.message = "";
       }
-    }
+    },
+    markRead(message) {
+      if (!message.read && message.sent_by !== this.org_id) { // received
+        let url = `/organization/${this.org_id}/agreements/${this.agreement_id}/messages/${message.id}/mark-read/`;
+        post(url, "{{ csrf_token }}", {});
+      }
+    },
   },
 }).mount("#app");
 </script>

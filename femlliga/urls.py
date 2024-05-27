@@ -82,9 +82,14 @@ urlpatterns = [
     #        name="view_agreement_email",
     #    ),
     path(
-        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/message/send/",
+        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/messages/send/",
         views.send_agreement_message,
         name="send_agreement_message",
+    ),
+    path(
+        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/messages/<uuid:message_id>/mark-read/",
+        views.mark_message_read,
+        name="mark_message_read",
     ),
     path(
         "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/successful/",

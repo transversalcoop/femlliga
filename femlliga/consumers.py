@@ -44,6 +44,7 @@ class AgreementConsumer(AsyncWebsocketConsumer):
                 self.agreement_id,
                 {
                     "type": "chat.message",
+                    "id": str(m.id),
                     "message": message,
                     "sent_on": m.sent_on.isoformat(),
                     "sent_by": str(self.organization.id),
@@ -54,9 +55,11 @@ class AgreementConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=json.dumps(
                 {
+                    "id": event["id"],
                     "message": event["message"],
                     "sent_on": event["sent_on"],
                     "sent_by": event["sent_by"],
+                    "read": False,
                 }
             )
         )

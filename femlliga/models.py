@@ -296,12 +296,11 @@ class Organization(models.Model):
     def pending_agreements(self):
         sent = self.sent_agreements.filter(
             communication_accepted=True, agreement_successful=None
-        )
-        received0 = self.received_agreements.filter(communication_accepted=None)
-        received1 = self.received_agreements.filter(
+        ).count()
+        received = self.received_agreements.filter(
             communication_accepted=True, agreement_successful=None
-        )
-        return len(sent) > 0, len(received0) > 0 or len(received1) > 0
+        ).count()
+        return sent > 0, received > 0
 
     def creator__email(self):
         return self.creator.email
@@ -644,23 +643,29 @@ class Agreement(models.Model):
                 "message": self.message,
                 "sent_on": self.date,
                 "sent_by": self.solicitor.id,
+                "read": True,
             }
         ] + [
             {
+                "id": m.id,
                 "message": m.message,
                 "sent_on": m.sent_on,
                 "sent_by": m.sent_by.id,
+                "read": m.read,
             }
             for m in self.messages.all()
         ]
 
     def json(self, organization_id):
+        queryset = self.messages.all()
+        last_message_on = None
+        if queryset.count() > 0:
+            last_message_on = queryset.order_by("-sent_on").first().sent_on
         return {
             "id": self.id,
             "solicitor": self.solicitor_safe().json(),
             "solicitee": self.solicitee_safe().json(),
             "date": self.date,
-            "message": self.message,
             "options": [o.name for o in self.options.all()],
             "resource": self.resource,
             "resource_type": self.resource_type,
@@ -669,6 +674,10 @@ class Agreement(models.Model):
             "agreement_successful": self.agreement_successful,
             "successful_date": self.successful_date,
             "messages_count": self.messages.count() + 1,
+            "messages_not_read": self.messages.filter(read=False)
+            .exclude(sent_by__id=organization_id)
+            .count(),
+            "last_message_on": last_message_on,
             "href": reverse(
                 "agreement",
                 kwargs={"organization_id": organization_id, "agreement_id": self.id},

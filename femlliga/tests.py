@@ -301,7 +301,7 @@ class IntegrationTests(TestCase):
             "SERVICE",
             ["AGENCY"],
             "comentaris de necessita servei de test",
-            "Equipaments",
+            "Materials",
         )
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "EQUIPMENT"])
@@ -345,7 +345,7 @@ class IntegrationTests(TestCase):
             "SERVICE",
             [],
             "comentaris de ofereix serveis de test",
-            "Equipaments",
+            "Materials",
             charge=True,
         )
 
@@ -379,7 +379,7 @@ class IntegrationTests(TestCase):
         matches = BeautifulSoup(response.content.decode(), "html.parser").find(
             "script", {"id": "django-json-data"}
         )
-        for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
+        for s in ["PLACE", "Servei", "Formació", "Materials", "Altres"]:
             self.assertNotIn(s, matches)
 
         # app main page
@@ -390,7 +390,7 @@ class IntegrationTests(TestCase):
             "Local",
             "Servei",
             "Formació",
-            "Equipaments",
+            "Materials",
             "Altres",
             "comentaris de necessita local de test",
             "comentaris de necessita servei de test",
@@ -445,16 +445,19 @@ class IntegrationTests(TestCase):
         # check received
         self.client.login(email="test2@example.com", password=PASS_FOR_TESTS)
         response = self.client.get(reverse("agreements", args=[o2.id]))
-        for s in ["Peticions d'intercanvi enviades i rebudes", test_msg_1]:
-            self.assertContains(response, s)
+        self.assertContains(response, "Peticions d'intercanvi enviades i rebudes")
+
+        a = Agreement.objects.get(solicitor=o, solicitee=o2)
+        response = self.client.get(reverse("agreement", args=[o2.id, a.id]))
+        self.assertContains(response, test_msg_1)
 
         # check sent
-        a = Agreement.objects.get(solicitor=o, solicitee=o2)
         self.client.login(email=email3, password=PASS_FOR_TESTS)
         response = self.client.get(reverse("agreements", args=[o.id]))
-        save_response(response)
-        for s in [test_msg_1, '"communication_accepted": true']:
-            self.assertContains(response, s)
+        self.assertContains(response, '"communication_accepted": true')
+
+        response = self.client.get(reverse("agreement", args=[o.id, a.id]))
+        self.assertContains(response, test_msg_1)
 
         response = self.client.post(
             reverse("agreement_successful", args=[o.id, a.id]),
@@ -464,8 +467,49 @@ class IntegrationTests(TestCase):
             },
             follow=True,
         )
-        self.assertJSONEqual(response.content, {"ok": True})
+        self.assertContains(response, "Es va realitzar l'intercanvi")
         self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
+    def test_agreement_conversation(self):
+        email11 = "test11@example.com"
+        email12 = "test12@example.com"
+        org11 = self.aux_create_org("Nom entitat de test 11", email11)
+        org12 = self.aux_create_org("Nom entitat de test 12", email12)
+        Offer.objects.create(resource="PLACE", organization=org11)
+        Offer.objects.create(resource="PLACE", organization=org12)
+
+        self.client.login(email=email11, password=PASS_FOR_TESTS)
+        self.aux_send_message(org11.id, org12.id)
+
+        response = self.client.get(reverse("agreements", args=[org11.id]))
+        save_response(response)
+        self.assertNotContains(response, "test message")
+        self.assertContains(response, "Hi ha un missatge en la conversa")
+
+        a = Agreement.objects.get(solicitor=org11)
+        response = self.client.get(reverse("agreement", args=[org11.id, a.id]))
+        self.assertContains(response, "test message")
+        self.assertNotContains(response, "test message 2")
+
+        response = self.client.post(
+            reverse("send_agreement_message", args=[org11.id, a.id]),
+            {"message": "test message 2"},
+            follow=True,
+        )
+        self.assertContains(response, "test message")
+        self.assertContains(response, "test message 2")
+        self.assertNotContains(response, "test message 3")
+
+        self.client.login(email=email12, password=PASS_FOR_TESTS)
+        response = self.client.post(
+            reverse("send_agreement_message", args=[org12.id, a.id]),
+            {"message": "test message 3"},
+            follow=True,
+        )
+        self.assertContains(response, "test message")
+        self.assertContains(response, "test message 2")
+        self.assertContains(response, "test message 3")
 
     def aux_send_message(self, o1_id, o2_id):
         send_message_url = reverse(
