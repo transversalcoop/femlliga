@@ -12,7 +12,7 @@ class AgreementConsumer(AsyncWebsocketConsumer):
         self.organization_id = kwargs["organization_id"]
         self.agreement_id = kwargs["agreement_id"]
 
-        # TODO check user logged in and owns organization and agreement
+        # TODO FL103 check user logged in and owns organization and agreement
         if True:
             self.agreement = await aget_object_or_404(Agreement, pk=self.agreement_id)
             self.organization = await aget_object_or_404(
