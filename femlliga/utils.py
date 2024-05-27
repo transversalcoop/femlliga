@@ -25,6 +25,7 @@ from femlliga.constants import (
 from femlliga.models import (
     Agreement,
     EmailSent,
+    Message,
     Need,
     Offer,
     Organization,
@@ -359,3 +360,15 @@ def cache(timedelta):
         return decorated
 
     return decorator
+
+
+async def create_agreement_message(agreement, organization, message):
+    if not message or agreement.agreement_successful is not None:
+        return
+
+    m = await Message.objects.acreate(
+        sent_by=organization,
+        message=message,
+        agreement=agreement,
+    )
+    return m

@@ -27,38 +27,54 @@
         {% if a.agreement_successful == True %}
         <p>
           <i class="bi-check2 text-success"></i>
-          {{ _("Es va arribar a un acord") }}
+          {{ _("Es va realitzar l'intercanvi (%(time)s)", time=format_time(a.successful_date)) }}
         </p>
         {% elif a.agreement_successful == False %}
         <p>
           <i class="bi-x-lg text-danger"></i>
-          {{ _("No es va arribar a un acord") }}
+          {{ _("No es va realitzar l'intercanvi (%(time)s)", time=format_time(a.successful_date)) }}
         </p>
         {% else %}
         <p class="mt-5">{{ _("Heu realitzat l'intercanvi?") }}</p>
-        <div>
+        <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}">
+          {{ csrf_input }}
+          <input type="hidden" name="successful" value="yes">
           <button class="btn btn-warning w-100 mb-2">{{ _("Si, hem realitzat l'intercanvi!") }}</button>
+        </form>
+        <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}">
+          {{ csrf_input }}
+          <input type="hidden" name="successful" value="no">
           <button class="btn btn-brown w-100">{{ _("No, finalment no hem realitzat l'intercanvi...") }}</button>
-        </div>
+        </form>
         {% endif %}
       </div>
     </div>
 
     <div id="vue-app" class="col-md-8">
-      <div class="alert alert-warning mt-2">
-        TODO FL103 missatge inicial, guió 1 -> 2 -> 3 -> 4 amb els passos a seguir
-        TODO FL103 traduïr totes les cadenes
+      <div class="alert alert-warning mt-2 text-center">
+        <div class="row">
+          <div class="col-3"><span class="fs-1">1</span></div>
+          <div class="col-3"><span class="fs-1">2</span></div>
+          <div class="col-3"><span class="fs-1">3</span></div>
+          <div class="col-3"><span class="fs-1">4</span></div>
+        </div>
+        <div class="row">
+          <div class="col-3">{{ _("Has fet una petició d'un recurs") }}</div>
+          <div class="col-3">{{ _("Entrem en contacte? Parlem!") }}</div>
+          <div class="col-3">{{ _("Concretem dia i hora per trobar-nos?") }}</div>
+          <div class="col-3">{{ _("Realitzem l'intercanvi!") }}</div>
+        </div>
       </div>
 
       {{ initial_loading_vue() }}
       <template v-else>
         <div v-for="m of messages" class="row">
           <div v-if="m.sent_by === org_id" class="col-9 offset-3 col-lg-6 offset-lg-6">
-            <p class="fs-7 mb-0"><em>Missatge enviat el ${ formatDateTime(m.sent_on) }</em></p>
+            <p class="fs-7 mb-0"><em>{{ _("Missatge enviat el") }} ${ formatDateTime(m.sent_on) }</em></p>
             <div class="alert alert-success pre-wrap">${ m.message }</div>
           </div>
           <div v-else class="col-9 col-lg-6">
-            <p class="fs-7 mb-0"><em>Missatge rebut el ${ formatDateTime(m.sent_on) }</em></p>
+            <p class="fs-7 mb-0"><em>{{ _("Missatge rebut el") }} ${ formatDateTime(m.sent_on) }</em></p>
             <div class="alert alert-secondary pre-wrap">${ m.message }</div>
           </div>
         </div>
@@ -77,10 +93,12 @@
         <div class="col-12 col-lg-8 offset-lg-2">
           <div class="alert alert-warning">
             {% if a.agreement_successful == True %}
-            TODO FL103 fer bé S'ha arribat a un acord
+            {{ _("Es va indicar que s'havia realitzat l'intercanvi el %(time)s", time=format_time(a.successful_date)) }}
             {% else %}
-            TODO FL103 fer bé No S'ha arribat a un acord
+            {{ _("Es va indicar que <strong>no</strong> s'havia realitzat l'intercanvi el %(time)s", time=format_time(a.successful_date)) }}
             {% endif %}
+            <br />
+            {{ _("Ja no es poden enviar més missatges en aquesta conversa. Si voleu realitzar un intercanvi de nou, podeu sol·licitar-ho a través de les pàgines de «Has lligat?» o «Descobreix»") }}
           </div>
         </div>
       </div>
@@ -97,7 +115,6 @@ Vue.createApp({
   delimiters: ["${", "}"],
   data() {
     const jsonData = getJsonData();
-    console.log("JSON DATA:", jsonData);
     return {
       agreement_id: jsonData.agreement_id,
       org_id: jsonData.org_id,
@@ -106,6 +123,7 @@ Vue.createApp({
     };
   },
   mounted() {
+    // TODO FL103 iterate over this.messages and send read post for those received and not read
     try {
       let protocol = "wss";
       if (window.location.protocol === "http:") {
@@ -115,6 +133,7 @@ Vue.createApp({
       this.socket = new WebSocket(url);
       this.socket.onmessage = (e) => {
         this.messages.push(JSON.parse(e.data));
+        // TODO FL103 insert as read, send post to set message as read if received
       };
       this.socket.onclose = (e) => {
         console.error("Chat connection closed");

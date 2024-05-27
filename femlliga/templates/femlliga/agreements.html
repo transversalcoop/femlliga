@@ -162,11 +162,11 @@
 
         <div v-if="result.agreement_successful === false">
           <i class="bi-x-lg text-danger"></i>
-          {{ _("No es va arribar a un acord") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
+          {{ _("No es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
         </div>
         <div v-else-if="result.agreement_successful === true">
           <i class="bi-check2 text-success"></i>
-          {{ _("Es va arribar a un acord") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
+          {{ _("Es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
         </div>
       </div>
       <div class="col-12 col-sm-4">

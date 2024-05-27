@@ -615,10 +615,10 @@ class Agreement(models.Model):
         null=True, blank=True, verbose_name=_("Correu enviat el")
     )
     agreement_successful = models.BooleanField(
-        null=True, verbose_name=_("S'ha arribat a un acord")
+        null=True, verbose_name=_("S'ha realitzat l'intercanvi")
     )
     successful_date = models.DateTimeField(
-        null=True, blank=True, verbose_name=_("Acord registrat el")
+        null=True, blank=True, verbose_name=_("Intercanvi registrat el")
     )
 
     class Meta:
@@ -694,6 +694,7 @@ class Message(models.Model):
     agreement = models.ForeignKey(
         Agreement, on_delete=models.CASCADE, related_name="messages"
     )
+    read = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["sent_on"]

@@ -7,6 +7,7 @@ import uuid
 from functools import cmp_to_key, reduce
 from io import BytesIO
 from pathlib import Path
+from asgiref.sync import async_to_sync
 
 import exif
 import networkx as nx
@@ -89,6 +90,7 @@ from .utils import (
     send_email,
     send_notification,
     str_to_bool,
+    create_agreement_message,
 )
 
 from .maps import (
@@ -619,7 +621,7 @@ def matches(request, organization_id):
 def render_matches_page(
     request, template, organization, matches, needs_json, organization_matches=None
 ):
-    matches = { k: v for k, v in matches.items() if len(v) > 0 }
+    matches = {k: v for k, v in matches.items() if len(v) > 0}
     json_data = {
         "matches": matches,
         "needs": needs_json,
@@ -1018,18 +1020,11 @@ def view_agreement_email(request, organization_id, agreement_id):
 @login_required
 @require_own_agreement
 def send_agreement_message(request, organization_id, agreement_id):
-    # TODO FL103 better error handling, and do not send message if agreement is already resolved
-    # TODO FL103 refactor with WS consumer
     if request.method == "POST":
+        a = get_object_or_404(Agreement, pk=agreement_id)
+        org = get_object_or_404(Organization, pk=organization_id)
         message = request.POST.get("message", "")
-        if message:
-            a = get_object_or_404(Agreement, pk=agreement_id)
-            org = get_object_or_404(Organization, pk=organization_id)
-            Message.objects.create(
-                sent_by=org,
-                message=message,
-                agreement=a,
-            )
+        async_to_sync(create_agreement_message)(a, org, message)
 
     return redirect(
         "agreement", organization_id=organization_id, agreement_id=agreement_id
@@ -1078,16 +1073,15 @@ def agreement_other_organization(agreement, organization_id):
 @login_required
 @require_own_agreement
 def agreement_successful(request, organization_id, agreement_id):
-    if request.method != "POST":
-        return JsonResponse({})
+    if request.method == "POST":
+        a = get_object_or_404(Agreement, pk=agreement_id)
+        a.agreement_successful = request.POST.get("successful", "no") == "yes"
+        a.successful_date = timezone.now()
+        a.save()
 
-    a = get_object_or_404(Agreement, pk=agreement_id)
-    post = get_json_body(request)
-    a.agreement_successful = post["successful"] == "yes"
-    a.successful_date = timezone.now()
-    a.save()
-
-    return JsonResponse({"ok": True})
+    return redirect(
+        "agreement", organization_id=organization_id, agreement_id=agreement_id
+    )
 
 
 def get_city_from_coordinates(lat, lng):

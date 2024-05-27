@@ -74,6 +74,9 @@
     <i class="{{ resource_icon(resource.code) }}"></i>
     {{ resource }}
   </h2>
+  {% if resource_description(resource.code) %}
+  <p><em>{{ resource_description(resource.code) }}</em></p>
+  {% endif %}
   <p>
     {% if resource.code != "OTHER" %}
     {% if resource_type == "needs" %}

@@ -13,7 +13,7 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 ### Changed
 
 
-## [1.2.0] - 2024-05-XX
+## [1.2.0] - 2024-06-XX
 
 ### Added
 
@@ -28,7 +28,8 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - Les converses s'accepten automàticament, donat que es fan dins de l'aplicació i no
   impliquen els correus electrònics dels participants
 - Les converses que estaven pendents d'acceptar s'accepten
-- Les converses que s'havien rebutjat es marquen com a que no es va arribar a un acord
+- Les converses que s'havien rebutjat es marquen com a que no es va realitzar un
+  intercanvi
 
 ### Removed
 

@@ -9,7 +9,7 @@ from django.utils.html import json_script
 from django.utils.translation import get_language_from_request, gettext, ngettext
 from jinja2 import Environment
 
-import femlliga.constants
+import femlliga.constants as consts
 from femlliga.models import *
 from femlliga.utils import wizard_url
 
@@ -118,9 +118,10 @@ def environment(**options):
             "org_type_name": org_type_name,
             "org_scope_name": org_scope_name,
             "format_time": format_time,
-            "consts": femlliga.constants,
+            "consts": consts,
             "enumerate": enumerate,
-            "resource_icon": lambda x: femlliga.constants.RESOURCE_ICONS_MAP[x],
+            "resource_icon": lambda x: consts.RESOURCE_ICONS_MAP[x],
+            "resource_description": lambda x: consts.RESOURCE_DESCRIPTIONS_MAP[x],
             "sort_resources": sort_resources,
             "sort_social_media": sort_social_media,
             "parent": path_parent,
