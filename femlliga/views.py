@@ -715,7 +715,7 @@ def get_model_matches(
     )
     results = (
         queryset.exclude(organization=organization)
-        .prefetch_related("organization", "images__image", "options")
+        .prefetch_related("organization", "images", "options")
         .distinct()
     )
     # limit distance in python, so exactly the appropriate results are returned
