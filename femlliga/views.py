@@ -715,7 +715,7 @@ def get_model_matches(
     )
     results = (
         queryset.exclude(organization=organization)
-        .prefetch_related("organization", "images", "options")
+        .prefetch_related("organization", "images__image", "options")
         .distinct()
     )
     # limit distance in python, so exactly the appropriate results are returned
@@ -941,8 +941,16 @@ def send_message(request, organization_id, organization_to, resource_type, resou
 @require_own_organization
 def agreements(request, organization_id):
     organization = get_object_or_404(Organization, pk=organization_id)
-    sent = sort_agreements(organization.sent_agreements.all())
-    received = sort_agreements(organization.received_agreements.all())
+    sent = sort_agreements(
+        organization.sent_agreements.all().prefetch_related(
+            "messages", "options", "solicitee"
+        )
+    )
+    received = sort_agreements(
+        organization.received_agreements.all().prefetch_related(
+            "messages", "options", "solicitee"
+        )
+    )
     agreements_by_organization = group_agreements_by_organizations(
         sort_agreements(sent + received), organization
     )

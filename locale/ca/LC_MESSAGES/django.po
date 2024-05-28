@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-27 11:47+0000\n"
-"PO-Revision-Date: 2024-05-27 13:48+0200\n"
+"POT-Creation-Date: 2024-05-28 09:31+0000\n"
+"PO-Revision-Date: 2024-05-28 11:31+0200\n"
 "Last-Translator: \n"
 "Language-Team: ca <LL@li.org>\n"
 "Language: ca\n"
@@ -2551,9 +2551,8 @@ msgid "Adreça de correu electrònic"
 msgstr "Adreça de correu electrònic"
 
 #: femlliga/templates/femlliga/preferences.html:31
-msgid "Si la modifiqueu, el canvi s'aplicarà quan valideu la nova adreça de correu"
-msgstr ""
-"Si la modifiqueu, el canvi s'aplicarà quan valideu la nova adreça de correu"
+msgid "Si la modifiqueu, el canvi no s'aplicarà fins que valideu la nova adreça"
+msgstr "Si la modifiqueu, el canvi no s'aplicarà fins que valideu la nova adreça"
 
 #: femlliga/templates/femlliga/preferences.html:33
 #, python-format
@@ -2606,11 +2605,11 @@ msgstr "Peticions pendents"
 
 #: femlliga/templates/femlliga/preferences.html:70
 msgid ""
-"Informa de peticions que us han fet i que estan pendents d'acceptar o rebutjar. "
-"La notificació es repeteix fins que es resol"
+"Informa de peticions d'intercanvi que us han fet i que encara tenen la conversa "
+"oberta. La notificació es repeteix fins que es tanca la conversa"
 msgstr ""
-"Informa de peticions que us han fet i que estan pendents d'acceptar o rebutjar. "
-"La notificació es repeteix fins que es resol"
+"Informa de peticions d'intercanvi que us han fet i que encara tenen la conversa "
+"oberta. La notificació es repeteix fins que es tanca la conversa"
 
 #: femlliga/templates/femlliga/preferences.html:71
 msgid ""

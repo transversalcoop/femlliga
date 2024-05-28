@@ -28,7 +28,7 @@
           <label for="email">
             <strong>{{ _("Adreça de correu electrònic") }}</strong>
               <div>
-              {{ _("Si la modifiqueu, el canvi s'aplicarà quan valideu la nova adreça de correu") }}
+              {{ _("Si la modifiqueu, el canvi no s'aplicarà fins que valideu la nova adreça") }}
               {% if other_emails %}
               {{ _("(correus pendents de validar: %(emails)s)", emails=other_emails) }}
               {% endif %}
@@ -67,7 +67,7 @@
       <div class="row preferences-row">
         {{ render_select(form, "notifications_frequency", _("Freqüència de les notificacions"), extra_label=_("Us enviarem un únic correu amb els continguts seleccionats a continuació, i només si hi ha informació a comunicar"), cols=[8, 4]) }}
       </div>
-      {{ preferences_switch(form, "notify_agreement_communication_pending", _("Peticions pendents"), _("Informa de peticions que us han fet i que estan pendents d'acceptar o rebutjar. La notificació es repeteix fins que es resol")) }}
+      {{ preferences_switch(form, "notify_agreement_communication_pending", _("Peticions pendents"), _("Informa de peticions d'intercanvi que us han fet i que encara tenen la conversa oberta. La notificació es repeteix fins que es tanca la conversa")) }}
       {{ preferences_switch(form, "notify_matches", _("Possibles lligues"), _("Informa semestralment de recursos que podeu intercanviar i organitzacions properes amb les que podeu contactar segons els vostres interessos")) }}
       {{ preferences_switch(form, "notify_new_resources", _("Nous recursos a la plataforma"), _("Informa semestralment de recursos afegits recentment que no consten encara als vostres interessos")) }}
     </div>

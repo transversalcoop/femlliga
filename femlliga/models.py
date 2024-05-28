@@ -660,7 +660,8 @@ class Agreement(models.Model):
         queryset = self.messages.all()
         last_message_on = None
         if queryset.count() > 0:
-            last_message_on = queryset.order_by("-sent_on").first().sent_on
+            messages = sorted(list(queryset), key=lambda m: m.sent_on)
+            last_message_on = list(messages)[-1].sent_on
         return {
             "id": self.id,
             "solicitor": self.solicitor_safe().json(),
@@ -674,9 +675,14 @@ class Agreement(models.Model):
             "agreement_successful": self.agreement_successful,
             "successful_date": self.successful_date,
             "messages_count": self.messages.count() + 1,
-            "messages_not_read": self.messages.filter(read=False)
-            .exclude(sent_by__id=organization_id)
-            .count(),
+            # use len, because using .filter() defeats the prefetch_related
+            "messages_not_read": len(
+                [
+                    m
+                    for m in self.messages.all()
+                    if not m.read and m.sent_by.id != organization_id
+                ]
+            ),
             "last_message_on": last_message_on,
             "href": reverse(
                 "agreement",
