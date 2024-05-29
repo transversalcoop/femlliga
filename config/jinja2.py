@@ -1,6 +1,5 @@
 import bleach
-from allauth.socialaccount.adapter import get_adapter
-from allauth.utils import get_request_param
+from allauth.socialaccount.templatetags.socialaccount import provider_login_url
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.templatetags.static import static
@@ -10,7 +9,7 @@ from django.utils.html import json_script
 from django.utils.translation import get_language_from_request, gettext, ngettext
 from jinja2 import Environment
 
-import femlliga.constants
+import femlliga.constants as consts
 from femlliga.models import *
 from femlliga.utils import wizard_url
 
@@ -50,26 +49,6 @@ def media_type_placeholder(media_type):
         return SOCIAL_MEDIA_TYPES_PLACEHOLDERS[media_type]
     except:
         return ""
-
-
-# would be great to use directly allauth.socialaccount.templatetags.socialaccount.provider_login_url, but there is no
-# way to use it directly in jinja2: explanation https://stackoverflow.com/questions/45174765/use-djangos-allauth-with-jinja2
-# and source code https://github.com/pennersr/django-allauth
-def provider_login_url(request, provider_id, **kwargs):
-    provider = get_adapter(request).get_provider(request, provider_id)
-    query = kwargs
-    process = query.get("process", None)
-    if "next" not in query:
-        next = get_request_param(request, "next")
-        if next:
-            query["next"] = next
-        elif process == "redirect":
-            query["next"] = request.get_full_path()
-    else:
-        if not query["next"]:
-            del query["next"]
-
-    return provider.get_login_url(request, **query)
 
 
 def clean(s, style=False):
@@ -120,6 +99,10 @@ def clean(s, style=False):
     )
 
 
+def provider_login_url_wrapper(request, provider, **params):
+    return provider_login_url({"request": request}, provider, **params)
+
+
 def environment(**options):
     env = Environment(extensions=["jinja2.ext.i18n"], **options)
     env.install_gettext_callables(gettext=gettext, ngettext=ngettext, newstyle=True)
@@ -135,13 +118,14 @@ def environment(**options):
             "org_type_name": org_type_name,
             "org_scope_name": org_scope_name,
             "format_time": format_time,
-            "consts": femlliga.constants,
+            "consts": consts,
             "enumerate": enumerate,
-            "resource_icon": lambda x: femlliga.constants.RESOURCE_ICONS_MAP[x],
+            "resource_icon": lambda x: consts.RESOURCE_ICONS_MAP[x],
+            "resource_description": lambda x: consts.RESOURCE_DESCRIPTIONS_MAP[x],
             "sort_resources": sort_resources,
             "sort_social_media": sort_social_media,
             "parent": path_parent,
-            "provider_login_url": provider_login_url,
+            "provider_login_url": provider_login_url_wrapper,
             "clean": clean,
             "add_http": add_http,
             "settings": settings,

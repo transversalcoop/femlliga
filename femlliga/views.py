@@ -7,6 +7,7 @@ import uuid
 from functools import cmp_to_key, reduce
 from io import BytesIO
 from pathlib import Path
+from asgiref.sync import async_to_sync
 
 import exif
 import networkx as nx
@@ -45,6 +46,7 @@ from .constants import (
     RESOURCES_ORDER,
     SOCIAL_MEDIA_TYPES,
 )
+
 from .forms import (
     ContactForm,
     MessageForm,
@@ -52,11 +54,13 @@ from .forms import (
     PreferencesForm,
     ResourceForm,
 )
+
 from .models import (
     Agreement,
     Contact,
     ContactDenyList,
     Graph,
+    Message,
     Need,
     NeedImage,
     Offer,
@@ -74,6 +78,7 @@ from .models import (
     org_type_name,
     resource_name,
 )
+
 from .utils import (
     clean_form_email,
     get_json_body,
@@ -85,12 +90,19 @@ from .utils import (
     send_email,
     send_notification,
     str_to_bool,
+    create_agreement_message,
+)
+
+from .maps import (
+    get_tornallom_organizations,
+    get_pamapam_organizations,
+    get_sobiraniaalimentariapv_organizations,
 )
 
 
 def require_own_organization(func):
     def decorated(request, organization_id, *args, **kwargs):
-        organization = Organization.objects.get(pk=organization_id)
+        organization = get_object_or_404(Organization, pk=organization_id)
         if request.user != organization.creator:
             raise PermissionDenied()
 
@@ -101,11 +113,11 @@ def require_own_organization(func):
 
 def require_own_agreement(func):
     def decorated(request, organization_id, agreement_id, *args, **kwargs):
-        organization = Organization.objects.get(pk=organization_id)
+        organization = get_object_or_404(Organization, pk=organization_id)
         if request.user != organization.creator:
             raise PermissionDenied()
 
-        a = Agreement.objects.get(pk=agreement_id)
+        a = get_object_or_404(Agreement, pk=agreement_id)
         if a.solicitor != organization and a.solicitee != organization:
             raise PermissionDenied()
 
@@ -584,7 +596,6 @@ def matches(request, organization_id):
         }
         for x in own_needs
     ]
-    agreement_declined_map = get_last_agreement_declined_map(organization)
     offer_matches, need_matches = get_organization_matches(
         request.user, organization, own_needs
     )
@@ -597,7 +608,6 @@ def matches(request, organization_id):
         matches[need] = [
             m.json(
                 current_organization=organization,
-                agreement_declined_map=agreement_declined_map,
             )
             for l in organization_matches
             for m in l
@@ -611,6 +621,7 @@ def matches(request, organization_id):
 def render_matches_page(
     request, template, organization, matches, needs_json, organization_matches=None
 ):
+    matches = {k: v for k, v in matches.items() if len(v) > 0}
     json_data = {
         "matches": matches,
         "needs": needs_json,
@@ -629,48 +640,6 @@ def render_matches_page(
             "wizard_finished": str_to_bool(request.GET.get("wizard_finished")),
         },
     )
-
-
-def get_last_agreement_declined_map(organization):
-    l = list(
-        Agreement.objects.prefetch_related("solicitee")
-        .filter(solicitor=organization)
-        .exclude(communication_accepted=None)
-    )
-    return {
-        "need": get_last_agreement_declined_map_resource(
-            list(filter(lambda x: x.resource_type == "need", l))
-        ),
-        "offer": get_last_agreement_declined_map_resource(
-            list(filter(lambda x: x.resource_type == "offer", l))
-        ),
-    }
-
-
-def get_last_agreement_declined_map_resource(l):
-    return {
-        k[0]: get_last_agreement_declined_map_organization(
-            list(filter(lambda x: x.resource == k[0], l))
-        )
-        for k in RESOURCES
-    }
-
-
-def get_last_agreement_declined_map_organization(l):
-    org_ids = set([x.solicitee.id for x in l if x.solicitee])
-    return {
-        id: get_last_agreement_declined(
-            list(filter(lambda x: x.solicitee and x.solicitee.id == id, l))
-        )
-        for id in org_ids
-    }
-
-
-def get_last_agreement_declined(l):
-    ll = list(sorted(l, key=lambda x: x.communication_date, reverse=True))
-    if len(ll) > 0:
-        return not ll[0].communication_accepted
-    return False
 
 
 def group_matches_by_organization(organization, offer_matches, need_matches):
@@ -783,13 +752,11 @@ def search(request, organization_id):
     organization_matches = group_matches_by_organization(
         organization, offer_matches, need_matches
     )
-    agreement_declined_map = get_last_agreement_declined_map(organization)
     matches = {
         "offerMatches": {
             k: [
                 m.json(
                     current_organization=organization,
-                    agreement_declined_map=agreement_declined_map,
                 )
                 for m in offer_matches[k]
             ]
@@ -799,7 +766,6 @@ def search(request, organization_id):
             k: [
                 m.json(
                     current_organization=organization,
-                    agreement_declined_map=agreement_declined_map,
                 )
                 for m in need_matches[k]
             ]
@@ -812,7 +778,6 @@ def search(request, organization_id):
             "matches": [
                 m.json(
                     current_organization=organization,
-                    agreement_declined_map=agreement_declined_map,
                 )
                 for m in l
             ],
@@ -883,20 +848,11 @@ def save_preferences(request):
         request.user.notifications_frequency = form.cleaned_data[
             "notifications_frequency"
         ]
-        request.user.accept_communications_automatically = form.cleaned_data[
-            "accept_communications_automatically"
-        ]
         request.user.notify_immediate_communications_received = form.cleaned_data[
             "notify_immediate_communications_received"
         ]
-        request.user.notify_immediate_communications_rejected = form.cleaned_data[
-            "notify_immediate_communications_rejected"
-        ]
         request.user.notify_agreement_communication_pending = form.cleaned_data[
             "notify_agreement_communication_pending"
-        ]
-        request.user.notify_agreement_success_pending = form.cleaned_data[
-            "notify_agreement_success_pending"
         ]
         request.user.notify_matches = form.cleaned_data["notify_matches"]
         request.user.notify_new_resources = form.cleaned_data["notify_new_resources"]
@@ -948,23 +904,23 @@ def send_message(request, organization_id, organization_to, resource_type, resou
     post = get_json_body(request)
     form = MessageForm(post, resource=r)
     if form.is_valid():
-        a = Agreement(
+        a = Agreement.objects.create(
             solicitor=organization,
             solicitee=other,
             message=form.cleaned_data["message"],
+            origin=form.cleaned_data["origin"],
             resource=resource,
             resource_type=resource_type,
+            communication_accepted=True,
+            communication_date=timezone.now(),
         )
-        a.save()
         for option in form.cleaned_data["options"]:
             # avoid clash with _ translation function
             ro, _created = ResourceOption.objects.get_or_create(name=option)
             a.options.add(ro)
 
-        if other.creator.accept_communications_automatically:
-            do_agreement_connect(request, a, True)
-        elif other.creator.notify_immediate_communications_received:
-            subject = _("T'han enviat una petició per compartir %(resource)s") % {
+        if other.creator.notify_immediate_communications_received:
+            subject = _("T'han enviat una petició per intercanviar %(resource)s") % {
                 "resource": resource_name(a.resource),
             }
             send_notification(
@@ -985,8 +941,16 @@ def send_message(request, organization_id, organization_to, resource_type, resou
 @require_own_organization
 def agreements(request, organization_id):
     organization = get_object_or_404(Organization, pk=organization_id)
-    sent = sort_agreements(organization.sent_agreements.all())
-    received = sort_agreements(organization.received_agreements.all())
+    sent = sort_agreements(
+        organization.sent_agreements.all().prefetch_related(
+            "messages", "options", "solicitee"
+        )
+    )
+    received = sort_agreements(
+        organization.received_agreements.all().prefetch_related(
+            "messages", "options", "solicitee"
+        )
+    )
     agreements_by_organization = group_agreements_by_organizations(
         sort_agreements(sent + received), organization
     )
@@ -1025,6 +989,67 @@ def agreements(request, organization_id):
             },
         },
     )
+
+
+@login_required
+@require_own_agreement
+def agreement(request, organization_id, agreement_id):
+    a = get_object_or_404(Agreement, pk=agreement_id)
+    org = get_object_or_404(Organization, pk=organization_id)
+    return render(
+        request,
+        "femlliga/agreement.html",
+        {
+            "a": a,
+            "org": org,
+            "json_data": {
+                "agreement_id": a.id,
+                "org_id": org.id,
+                "messages": a.all_messages_json(),
+            },
+        },
+    )
+
+
+@login_required
+@require_own_agreement
+def view_agreement_email(request, organization_id, agreement_id):
+    a = get_object_or_404(Agreement, pk=agreement_id)
+    return render(
+        request,
+        "email/notify_communication_received.html",
+        {
+            "a": a,
+            "current_site": get_current_site(request),
+        },
+    )
+
+
+@login_required
+@require_own_agreement
+def send_agreement_message(request, organization_id, agreement_id):
+    if request.method == "POST":
+        a = get_object_or_404(Agreement, pk=agreement_id)
+        org = get_object_or_404(Organization, pk=organization_id)
+        message = request.POST.get("message", "")
+        async_to_sync(create_agreement_message)(a, org, message)
+
+    return redirect(
+        "agreement", organization_id=organization_id, agreement_id=agreement_id
+    )
+
+
+@login_required
+@require_own_agreement
+def mark_message_read(request, organization_id, agreement_id, message_id):
+    if request.method == "POST":
+        m = get_object_or_404(Message, pk=message_id)
+        if m.agreement != get_object_or_404(Agreement, pk=agreement_id):
+            return JsonResponse({"ok": False})
+        m.read = True
+        m.save()
+
+    return JsonResponse({"ok": True})
 
 
 def requested_resources(agreements):
@@ -1069,64 +1094,15 @@ def agreement_other_organization(agreement, organization_id):
 @login_required
 @require_own_agreement
 def agreement_successful(request, organization_id, agreement_id):
-    if request.method != "POST":
-        return JsonResponse({})
+    if request.method == "POST":
+        a = get_object_or_404(Agreement, pk=agreement_id)
+        a.agreement_successful = request.POST.get("successful", "no") == "yes"
+        a.successful_date = timezone.now()
+        a.save()
 
-    a = get_object_or_404(Agreement, pk=agreement_id)
-    post = get_json_body(request)
-    a.agreement_successful = post["successful"] == "yes"
-    a.successful_date = timezone.now()
-    a.save()
-
-    return JsonResponse({"ok": True})
-
-
-@login_required
-@require_own_agreement
-def agreement_connect(request, organization_id, agreement_id):
-    if request.method != "POST":
-        return JsonResponse({})
-
-    a = get_object_or_404(Agreement, pk=agreement_id)
-    organization = get_object_or_404(Organization, pk=organization_id)
-    post = get_json_body(request)
-    if organization != a.solicitee:
-        # user owns organization; only solicitee organization should be able to accept
-        return
-
-    if not a.solicitor or not a.solicitee:
-        return JsonResponse({"ok": False})
-
-    do_agreement_connect(request, a, post["connect"] == "yes")
-
-    return JsonResponse({"ok": True})
-
-
-# already checked that a.solicitor and a.solicitee exist
-def do_agreement_connect(request, a, communication_accepted):
-    a.communication_accepted = communication_accepted
-    a.communication_date = timezone.now()
-    a.save()
-    context = {
-        "a": a,
-        "current_site": get_current_site(request),
-    }
-    if a.communication_accepted:
-        subject = _("Comunicació iniciada per compartir %(resource)s") % {
-            "resource": resource_name(a.resource),
-        }
-        send_email(
-            to=[a.solicitor.creator.email, a.solicitee.creator.email],
-            subject=subject,
-            body=render_to_string("email/agreement_connect.html", context),
-        )
-    elif a.solicitor and a.solicitor.creator.notify_immediate_communications_rejected:
-        send_notification(
-            user=a.solicitor.creator,
-            subject=_("Us han declinat una petició"),
-            template="email/notify_communication_rejected.html",
-            context=context,
-        )
+    return redirect(
+        "agreement", organization_id=organization_id, agreement_id=agreement_id
+    )
 
 
 def get_city_from_coordinates(lat, lng):
@@ -1574,6 +1550,22 @@ def contact(request):
     )
 
 
+def maps(request):
+    orgs = [
+        {
+            "name": o.name,
+            "lat": o.lat,
+            "lng": o.lng,
+            "origin": "femlliga",
+        }
+        for o in Organization.objects.all()
+    ]
+    orgs += get_tornallom_organizations()
+    orgs += get_pamapam_organizations()
+    orgs += get_sobiraniaalimentariapv_organizations()
+    return render(request, "femlliga/maps.html", {"json_data": {"organizations": orgs}})
+
+
 @login_required
 def uploads(request, path):
     return serve(request, path, MEDIA_ROOT)
@@ -1599,21 +1591,9 @@ def most_requested(resources):
 
 def sort_agreements(agreements):
     def f(a, b):
-        if a.communication_accepted is None:
-            return -1
-        if b.communication_accepted is None:
-            return 1
-        if a.communication_accepted is False:
-            return 1
-        if b.communication_accepted is False:
-            return -1
         if a.agreement_successful is None:
             return -1
         if b.agreement_successful is None:
-            return 1
-        if a.agreement_successful is True:
-            return -1
-        if b.agreement_successful is True:
             return 1
         return a.date < b.date
 

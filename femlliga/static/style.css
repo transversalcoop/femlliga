@@ -299,6 +299,10 @@ pre {
     white-space: pre-wrap;
 }
 
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
 .welcome-block {
     background-color: var(--lightgrey2);
     margin-top: 20px;
@@ -756,3 +760,42 @@ nav .nav-link.active {
 .universal-access-icon img {
     height: 2em;
 }
+
+.background-home {
+    background-image: url(/static/pages/home.png);
+}
+
+.background-dona {
+    background-image: url(/static/pages/dona.png);
+}
+
+.background-persones {
+    background-image: url(/static/pages/dos-personatges.png);
+}
+
+.page-section {
+    background-color: transparent;
+    background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);
+}
+
+.page-title {
+    font-weight: 900;
+    font-size: 3.75em;
+    color: #000;
+}
+
+.page-subheading {
+    font-weight: 700;
+    color: gray;
+    font-size: 1.125em;
+}
+
+.error-page-btn {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.mb--5 {
+    margin-bottom: -3rem;
+}
+

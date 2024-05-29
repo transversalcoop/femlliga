@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django_recaptcha.fields import ReCaptchaField
 
 from . import constants as const
-from .models import Contact, CustomUser, Organization
+from .models import Agreement, Contact, CustomUser, Organization
 
 
 class PreferencesForm(forms.ModelForm):
@@ -18,11 +18,8 @@ class PreferencesForm(forms.ModelForm):
             "language",
             "distance_limit_km",
             "notifications_frequency",
-            "accept_communications_automatically",
             "notify_immediate_communications_received",
-            "notify_immediate_communications_rejected",
             "notify_agreement_communication_pending",
-            "notify_agreement_success_pending",
             "notify_matches",
             "notify_new_resources",
         ]
@@ -62,6 +59,7 @@ class ImageForm(forms.Form):
 
 class MessageForm(forms.Form):
     message = forms.CharField(min_length=1)
+    origin = forms.ChoiceField(choices=Agreement.ORIGIN_CHOICES)
     options = forms.MultipleChoiceField(choices=const.RESOURCE_OPTIONS, required=False)
 
     def __init__(self, *args, **kwargs):

@@ -2,7 +2,9 @@ import decimal
 import json
 import unicodedata
 import urllib
+
 from datetime import timedelta
+from functools import wraps
 from distutils.util import strtobool
 from operator import attrgetter
 
@@ -20,7 +22,15 @@ from femlliga.constants import (
     RESOURCES,
     RESOURCES_ORDER,
 )
-from femlliga.models import Agreement, Need, Offer, Organization, sort_resources
+from femlliga.models import (
+    Agreement,
+    EmailSent,
+    Message,
+    Need,
+    Offer,
+    Organization,
+    sort_resources,
+)
 
 # Emails and notifications
 
@@ -63,15 +73,6 @@ def get_periodic_notification_data(site, user, needs, offers):
                 "total_agreements": len(pa),
             }
 
-    if user.notify_agreement_success_pending:
-        pa = org_pending_success_agreements(org)
-        if len(pa) > 0:
-            context["agreement_success_pending"] = {
-                "organization": org,
-                "agreements": pa[:EMAIL_ITEMS_LIMIT],
-                "total_agreements": len(pa),
-            }
-
     time_from_last_long_notification = timezone.now() - user.last_long_notification_date
     long_notification_ready = time_from_last_long_notification > timedelta(days=30 * 6)
     send_long_notification = False
@@ -81,7 +82,6 @@ def get_periodic_notification_data(site, user, needs, offers):
             context["matches"] = {"need": need, "offer": offer}
             send_long_notification = True
 
-    # TODO FL090 consider only resources within distance_limit_km
     if user.notify_new_resources and long_notification_ready:
         offers = org_offers_not_matching(org, user)
         if len(offers) > 0:
@@ -97,20 +97,14 @@ def get_periodic_notification_data(site, user, needs, offers):
 
 def org_pending_agreements(o):
     try:
-        a = Agreement.objects.filter(solicitee=o, communication_accepted=None)
-        return list(a)
-    except:
-        return []
-
-
-def org_pending_success_agreements(o):
-    try:
-        a = Agreement.objects.filter(
-            Q(solicitee=o) | Q(solicitor=o),
-            communication_accepted=True,
-            agreement_successful=None,
+        agreements = Agreement.objects.filter(
+            solicitee=o, communication_accepted=True, agreement_successful=None
         )
-        return list(a)
+        return [
+            a
+            for a in agreements
+            if a.messages.count() == 0 or a.messages.last().sent_by != o
+        ]
     except:
         return []
 
@@ -266,6 +260,12 @@ def send_email(to, subject, body):
     msg.content_subtype = "html"
     msg.send()
 
+    try:
+        sent_to = ",".join(to)
+    except:
+        sent_to = str(to)
+    EmailSent.objects.create(sent_to=sent_to, subject=subject, body=body)
+
 
 # Other
 
@@ -327,3 +327,48 @@ def http_get(url):
     with urllib.request.urlopen(url) as f:
         res = json.loads(f.read().decode("utf-8"))
     return res
+
+
+def cache(timedelta):
+    def decorator(func):
+        value = None
+        last_execution = None
+
+        @wraps(func)
+        def decorated():
+            nonlocal value
+            nonlocal last_execution
+
+            # first execution, must call func
+            if value is None:
+                value = func()
+                last_execution = timezone.now()
+                return value
+
+            # value outdated, update it, but if it fails, use old value
+            if (timezone.now() - last_execution) > timedelta:
+                try:
+                    value = func()
+                    last_execution = timezone.now()
+                    return value
+                except:
+                    return value
+
+            # value cached
+            return value
+
+        return decorated
+
+    return decorator
+
+
+async def create_agreement_message(agreement, organization, message):
+    if not message or agreement.agreement_successful is not None:
+        return
+
+    m = await Message.objects.acreate(
+        sent_by=organization,
+        message=message,
+        agreement=agreement,
+    )
+    return m

@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js, sidebar_filter_show_link %}
+{% from 'femlliga/_macros.html' import organization_link, info_tooltip, vue_js, sidebar_filter_show_link, initial_loading_vue %}
 
 {% block title %}{{ _("Peticions") }}{% endblock %}
 
@@ -9,7 +9,7 @@
 <div class="container-fluid">
   <div id="app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
-      <h1>{{ _("Peticions enviades i rebudes") }}</h1>
+      <h1>{{ _("Peticions d'intercanvi enviades i rebudes") }}</h1>
       {{ sidebar_filter_show_link() }}
       <div class="collapse show" id="sidebar-filter">
         <div class="btn-group w-100 mb-2" role="group" aria-label="{{ _("Selecciona si mostrar els resultats agrupats per recurs o per organització") }}">
@@ -37,7 +37,7 @@
             {{ request_filter_row_vue("received", _("Peticions rebudes")) }}
           </template>
           <template v-else>
-            <li class="nav-item" v-for="x in organizationsWithRequests" :key="x.organization.id">
+            <li class="nav-item" v-for="x in organizationsWithAgreements" :key="x.organization.id">
               <button
                 @click="selectOrganization(x.organization)"
                 class="nav-link w-100 text-start"
@@ -62,11 +62,7 @@
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
-      <div v-if="initialLoading" class="mt-4 text-center">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">{{ _("Carregant...") }}</span>
-        </div>
-      </div>
+      {{ initial_loading_vue() }}
       <template v-else>
         <div v-if="resourceSelected" class="row mt-3">
           <div class="col-12">
@@ -84,8 +80,8 @@
         <div v-else-if="organizationSelected" class="row mt-3">
           <div class="col-12">
             <h2 class="match-resource-title">${ organizationSelected.name }</h2>
-            <div class="matches-count agreements-count"><span>${ organizationRequests.length } {{ _("peticions") }}</span></div>
-            {{ show_agreements_vue("organizationRequests") }}
+            <div class="matches-count agreements-count"><span>${ organizationAgreements.length } {{ _("peticions") }}</span></div>
+            {{ show_agreements_vue("organizationAgreements") }}
           </div>
         </div>
         <div v-else class="row mt-3">
@@ -147,68 +143,43 @@
     tied to a particular offer (which has that information), but has just a
     copy of the resource and options selected when the message was sent #}
     <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
-    <p v-if="agreementSent(result)">{{ _("Missatge que vau enviar el") }} ${ formatDateTime(result.date) }:</p>
-    <p v-else>{{ _("Missatge que va enviar") }} ${ result.solicitor.name } {{ _("el") }} ${ formatDateTime(result.date) }:</p>
-    <pre class="quoted-message">${ result.message }</pre>
 
-    <div v-if="result.communication_accepted === null && communicationsResolved[result.id] === undefined">
-      <i class="bi-hourglass-split text-muted fs-4"></i>
-      <span v-if="agreementSent(result)">${ result.solicitee.name } {{ _("encara no ha acceptat ni declinat la conversa per correu.") }}</span>
-      <span v-else>{{ _("Encara no heu acceptat ni declinat la conversa per correu.") }}</span>
-      <div v-if="!agreementSent(result)">
-        <div v-if="!agreementsLoading[result.id]">
-          <button @click="updateAgreement(result, 'connect', 'yes')" class="btn btn-sm btn-success me-2 mb-2">
-            {{ _("Inicia la conversa per correu") }}
-          </button>
-          <button @click="updateAgreement(result, 'connect', 'no')" class="btn btn-sm btn-danger me-2 mb-2">
-            {{ _("Declina la conversa per correu") }}
-          </button>
-          {{ info_tooltip(_("Per favor, indiqueu si accepteu iniciar una conversa per correu. En cas que si, s'iniciarà una cadena de correus electrònics entre les dues parts en la qual podreu parlar de la possible col·laboració. Iniciar la conversa per correu no us obliga a arribar a cap acord.")) }}
+    <div class="row">
+      <div class="col-12 col-sm-8">
+        <p class="mt-2 mb-0">
+          <i class="bi-send"></i>
+          {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }<span v-if="result.last_message_on">, {{ _("últim missatge el") }} ${ formatDateTime(result.last_message_on) }</span>
+        </p>
+
+        <p v-if="result.messages_count === 1" class="mb-0">
+          <i class="bi-chat"></i>
+          {{ _("Hi ha un missatge en la conversa") }}
+        </p>
+        <p v-else class="mb-0">
+          <i class="bi-chat"></i>
+          {{ _("Hi ha") }} ${ result.messages_count } {{ _("missatges en la conversa") }}
+          <span v-if="result.messages_not_read > 0">
+            (${ result.messages_not_read } {{ _("sense llegir") }})
+          </span>
+        </p>
+
+        <div v-if="result.agreement_successful === false">
+          <i class="bi-x-lg text-danger"></i>
+          {{ _("No es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
+        </div>
+        <div v-else-if="result.agreement_successful === true">
+          <i class="bi-check2 text-success"></i>
+          {{ _("Es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
         </div>
         <div v-else>
-          <div class="spinner-border spinner-border-sm" role="status">
-            <span class="visually-hidden">{{ _("Actualitzant...") }}</span>
-          </div>
+          <i class="bi-clock-history"></i>
+          {{ _("Encara no s'ha indicat si s'ha realitzat l'intercanvi") }}
         </div>
       </div>
-    </div>
-    <div v-else-if="result.communication_accepted === false || communicationsResolved[result.id] === false">
-      <i class="bi-x-lg text-danger fs-4"></i>
-      <span v-if="agreementSent(result)">${ result.solicitee.name } {{ _("va declinar la conversa per correu") }}</span>
-      <span v-else>{{ _("Vau declinar la conversa per correu") }}</span>
-      <span v-if="result.communication_date" class="ms-2">(${ formatDateTime(result.communication_date) })</span>
-    </div>
-    <div v-else-if="result.communication_accepted === true || communicationsResolved[result.id] === true">
-      <i class="bi-check2 text-success fs-4"></i>
-      <span v-if="agreementSent(result)">${ result.solicitee.name } {{ _("va iniciar la conversa per correu") }}</span>
-      <span v-else>{{ _("Vau iniciar la conversa per correu") }}</span>
-      <span v-if="result.communication_date" class="ms-2">(${ formatDateTime(result.communication_date) })</span>
-      <div v-if="result.agreement_successful === null && agreementsResolved[result.id] === undefined">
-        <div v-if="!agreementsLoading[result.id]">
-          <button @click="updateAgreement(result, 'successful', 'yes')" class="btn btn-sm btn-success me-2 mb-2">
-            {{ _("S'ha arribat a un acord") }}
-          </button>
-          <button @click="updateAgreement(result, 'successful', 'no')" class="btn btn-sm btn-danger me-2 mb-2">
-            {{ _("No s'ha arribat a un acord") }}
-          </button>
-          {{ info_tooltip(_("Per favor, indiqueu si finalment s'ha arribat a un acord de col·laboració. Aquesta informació es farà servir només a nivell estadístic")) }}
-        </div>
-        <div v-else>
-          <div class="spinner-border spinner-border-sm" role="status">
-            <span class="visually-hidden">{{ _("Actualitzant...") }}</span>
-          </div>
-        </div>
-      </div>
-      <div v-else-if="result.agreement_successful === false || agreementsResolved[result.id] === false">
-        <i class="bi-x-lg text-danger fs-4"></i>
-        {{ _("No es va arribar a un acord") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
-      </div>
-      <div v-else-if="result.agreement_successful === true || agreementsResolved[result.id] === true">
-        <i class="bi-check2 text-success fs-4"></i>
-        {{ _("Es va arribar a un acord") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
+      <div class="col-12 col-sm-4">
+        <a class="btn btn-warning w-100 mt-2" :href="result.href">{{ _("Visualitza la conversa") }}</a>
       </div>
     </div>
-
   </div>
 </div>
 {% endmacro %}
@@ -235,7 +206,6 @@ function agreementContains(search) {
     const targets = [
       sanitize(m.solicitor.name),
       sanitize(m.solicitee.name),
-      sanitize(m.message),
       sanitize(resourceNamesMap[m.resource]),
     ];
     for (var option of m.options) {
@@ -266,9 +236,6 @@ Vue.createApp({
       resourceSelected: "",
       requestTypeSelected: "",
       organizationSelected: null,
-      agreementsLoading: {},
-      communicationsResolved: {},
-      agreementsResolved: {},
     };
   },
   methods: {
@@ -304,35 +271,6 @@ Vue.createApp({
       }
       return m;
     },
-    extractSelectedOptions(optionsMap) {
-      return Object.keys(optionsMap).map(k => {
-        if (optionsMap[k]) {
-          return k;
-        }
-        return "";
-      }).filter(v => v);
-    },
-    updateAgreement(agreement, field, value) {
-      var href = field === "connect" ? agreement.href_connect : agreement.href_successful;
-      this.agreementsLoading[agreement.id] = true;
-      post(
-        href,
-        "{{ csrf_token }}",
-        { [field]: value },
-      ).then(response => {
-        if (!response.ok) {
-          throw "Bad response";
-        }
-        if (field === "connect") {
-          this.communicationsResolved[agreement.id] = value === "yes";
-        } else {
-          this.agreementsResolved[agreement.id] = value === "yes";
-        }
-        this.agreementsLoading[agreement.id] = false;
-      }).catch(err => {
-        this.agreementsLoading[agreement.id] = false;
-      });
-    },
     agreementSent(a) {
       return a.solicitor.id === this.organizationID;
     },
@@ -347,7 +285,7 @@ Vue.createApp({
     concatenatedAgreements() {
       return this.allConcatenatedAgreements.filter(agreementContains(this.search));
     },
-    organizationsWithRequests() {
+    organizationsWithAgreements() {
       return this.allOrganizations.map(o => {
         return {
           organization: o.organization,
@@ -355,7 +293,7 @@ Vue.createApp({
         };
       }).filter(o => o.agreements.length > 0);
     },
-    organizationRequests() {
+    organizationAgreements() {
       var org = this.allOrganizations.find(o => o.organization.id === this.organizationSelected.id);
       return org ? org.agreements.filter(agreementContains(this.search)) : [];
     },

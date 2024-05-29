@@ -8,6 +8,7 @@ urlpatterns = [
     # no login required
     path("", views.index, name="index"),
     path("contact/", views.contact, name="contact"),
+    #    path("maps/", views.maps, name="maps"),
     path("check-matches/", views.check_matches, name="check_matches"),
     path("search-address/", views.search_address, name="search_address"),
     path("page/<slug:name>/", views.page, name="page"),
@@ -70,12 +71,28 @@ urlpatterns = [
         name="agreements",
     ),
     path(
-        "organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/connect/",
-        views.agreement_connect,
-        name="agreement_connect",
+        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/",
+        views.agreement,
+        name="agreement",
+    ),
+    # for debugging style
+    #    path(
+    #        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/email/view/",
+    #        views.view_agreement_email,
+    #        name="view_agreement_email",
+    #    ),
+    path(
+        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/messages/send/",
+        views.send_agreement_message,
+        name="send_agreement_message",
     ),
     path(
-        "organization/<uuid:organization_id>/agreement/<uuid:agreement_id>/successful/",
+        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/messages/<uuid:message_id>/mark-read/",
+        views.mark_message_read,
+        name="mark_message_read",
+    ),
+    path(
+        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/successful/",
         views.agreement_successful,
         name="agreement_successful",
     ),

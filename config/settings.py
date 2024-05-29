@@ -42,6 +42,7 @@ CONTACT_LINKS = os.getenv("DJANGO_CONTACT_LINKS", "")
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -114,6 +115,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(os.getenv("DJANGO_REDIS_HOST", None), 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -227,7 +237,7 @@ ACCOUNT_FORMS = {
 }
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/app"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/app/"
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -363,7 +373,11 @@ if DEBUG:
     import socket  # only if you haven't already imported this
 
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + [
+        "127.0.0.1",
+        "10.0.2.2",
+        "172.20.0.1",
+    ]
 
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(hours=1)

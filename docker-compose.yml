@@ -1,5 +1,8 @@
 {
   "services": {
+    "redis": {
+      "image": "redis",
+    },
     "web": {
       "build": ".",
       "command": "bash -c 'python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8000'",
@@ -8,7 +11,7 @@
       ],
       "ports": [
         "127.0.0.1:8000:8000",
-        "192.168.1.138:8000:8000",
+        #        "192.168.0.17:8000:8000",
       ],
       "environment": [
         "PYTHONDONTWRITEBYTECODE=true",
@@ -16,9 +19,16 @@
         "WEB_RELOAD=true",
         "DJANGO_SECRET_KEY=insecure_key_for_dev",
         "DJANGO_DEBUG=true",
-        "DJANGO_ALLOWED_HOSTS=.localhost,127.0.0.1,[::1],192.168.0.21,192.168.1.138",
+        "DJANGO_ALLOWED_HOSTS=.localhost,127.0.0.1,[::1],192.168.0.21,192.168.1.138,192.168.0.17",
         "DJANGO_DATABASE=sqlite",
+        # for console emails
         "DJANGO_EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend",
+        # for real emails
+        # "DJANGO_DEFAULT_FROM_EMAIL=${DJANGO_FROM_EMAIL}",
+        # "DJANGO_EMAIL_HOST=${DJANGO_EMAIL_HOST}",
+        # "DJANGO_EMAIL_HOST_USER=${DJANGO_EMAIL_USER}",
+        # "DJANGO_EMAIL_HOST_PASSWORD=${DJANGO_EMAIL_PASSWORD}",
+
         "DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL=http",
         "DJANGO_CSRF_COOKIE_SECURE=false",
         "DJANGO_SESSION_COOKIE_SECURE=false",
@@ -33,6 +43,7 @@
         "DJANGO_CONTACT_EMAIL=contacte@femlliga.org",
         "DJANGO_CONTACT_SOCIAL=femlliga",
         "DJANGO_CONTACT_LINKS=https://links.transversalcoop.org/@femlliga/",
+        "DJANGO_REDIS_HOST=redis",
       ]
     }
   }

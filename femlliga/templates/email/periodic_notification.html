@@ -13,10 +13,6 @@
 {{ show_agreement_communication_pending(agreement_communication_pending) }}
 {% endif %}
 
-{% if agreement_success_pending %}
-{{ show_agreement_success_pending(agreement_success_pending) }}
-{% endif %}
-
 {% if matches %}
 {{ show_matches(matches.need, matches.offer) }}
 {% endif %}
@@ -40,40 +36,14 @@
     <h1 style="margin: 20px 0 0 0;">{{ _("Us han fet una petició de col·laboració...") }}</h1>
 
     <p style="margin-top: 0;">
-      {{ _("Hi ha organitzacions que us han fet una petició a través de la plataforma i estan esperant la vostra resposta.") }}
+      {{ _("Hi ha organitzacions que us han fet una petició d'intercanvi a través de la plataforma i estan esperant la vostra resposta.") }}
       {{ ngettext("Teniu una petició pendent, no els feu ", "Teniu %(num)d peticions pendents, no els feu ", c.total_agreements) }}
-      {{ _("esperar més i entreu a <a href='%(url)s'>%(name)s</a> per a contestar si accepteu la petició o no:", url="https://" + current_site.domain, name=current_site.name) }}
+      {{ _("esperar més i entreu a <a href='%(url)s'>%(name)s</a> per seguir la conversa:", url="https://" + current_site.domain, name=current_site.name) }}
     </p>
 
     <ul>
       {% for a in c.agreements %}
       <li>{{ _("%(org)s sol·licita %(resource)s", org=a.solicitor_safe().name, resource=resource_name(a.resource)) }}</li>
-      {% endfor %}
-    </ul>
-  </td>
-</tr>
-{% endmacro %}
-
-{% macro show_agreement_success_pending(c) %}
-<tr>
-  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    <h1 style="margin: 20px 0 0 0;">{{ _("Heu arribat a fer l'intercanvi finalment?") }}</h1>
-
-    <p style="margin-top: 0;">
-      {{ _("Heu començat una conversa per correu per col·laborar amb algunes organitzacions, però que no heu indicat a la plataforma si heu arribat a un acord finalment. Aquesta informació ens pot ser molt útil per millorar la plataforma.") }}
-      {{ ngettext("<strong>Teniu una confirmació pendent</strong>,", "<strong>Teniu %(num)d confirmacions pendents</strong>,", c.total_agreements) }}
-      {{ _("<a href='%(url)s'>entreu</a> i informeu-nos!", url="https://" + current_site.domain) }}
-    </p>
-
-    <ul>
-      {% for a in c.agreements %}
-      <li>
-        {% if c.organization == a.solicitor %}
-        {{ _("Vau sol·licitar %(resource)s a %(org)s", org=a.solicitee_safe().name, resource=resource_name(a.resource)) }}
-        {% else %}
-        {{ _("%(org)s va sol·licitar %(resource)s", org=a.solicitor_safe().name, resource=resource_name(a.resource)) }}
-        {% endif %}
-      </li>
       {% endfor %}
     </ul>
   </td>

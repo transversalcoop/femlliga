@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 
 from .models import *
@@ -21,6 +22,7 @@ class SocialMediaInline(admin.TabularInline):
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ["name", "date", "creator__email"]
     inlines = [SocialMediaInline, NeedsInline, OffersInline]
+    readonly_fields = ("creator",)
     fields = (
         ("name", "creator", "logo"),
         ("description", "scopes"),
@@ -35,11 +37,18 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ("email", "language", "distance_limit_km")
 
 
+class MessageInline(admin.TabularInline):
+    model = Message
+    extra = 0
+
+
 class AgreementAdmin(admin.ModelAdmin):
+    inlines = [MessageInline]
     list_display = [
         "solicitor",
         "resource",
         "solicitee",
+        "origin",
         "communication_accepted",
         "communication_date",
         "agreement_successful",
@@ -48,6 +57,7 @@ class AgreementAdmin(admin.ModelAdmin):
 
     list_filter = [
         "resource",
+        "origin",
         "communication_accepted",
         "agreement_successful",
     ]
@@ -93,9 +103,14 @@ class PageAdmin(admin.ModelAdmin):
     )
 
 
+class EmailSentAdmin(admin.ModelAdmin):
+    list_display = ("sent_on", "sent_to", "subject", "body")
+
+
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Agreement, AgreementAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(ContactDenyList)
 admin.site.register(Page, PageAdmin)
+admin.site.register(EmailSent, EmailSentAdmin)

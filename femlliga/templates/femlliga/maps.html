@@ -1,0 +1,91 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from "femlliga/_macros.html" import leaflet_css, leaflet_js %}
+
+{% block css %}{{ leaflet_css(markercluster=True) }}{% endblock %}
+
+{% block title %}{{ _("Mapes compartits") }}{% endblock %}
+
+{% block content %}
+<div>
+  <label for="show-femlliga">Fem lliga!</label>
+  <input id="show-femlliga" type="checkbox" checked>
+  <label for="show-tornallom">Tornallom</label>
+  <input id="show-tornallom" type="checkbox" checked>
+  <label for="show-sobiraniaalimentariapv">Sobirania alimentària PV</label>
+  <input id="show-sobiraniaalimentariapv" type="checkbox" checked>
+  <label for="show-pamapam">Pam a Pam</label>
+  <input id="show-pamapam" type="checkbox" checked>
+  <input id="search" type="text" placeholder="Cerca">
+</div>
+<div id="citymap" class="map-height-big"></div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ leaflet_js(markercluster=True) }}
+<script>
+var organizations = getJsonData().organizations;
+var searchInput = document.getElementById("search");
+var showFemlliga = document.getElementById("show-femlliga");
+var showTornallom = document.getElementById("show-tornallom");
+var showSobiraniaAlimentariaPV = document.getElementById("show-sobiraniaalimentariapv");
+var showPamapam = document.getElementById("show-pamapam");
+var map = L.map("citymap").setView([39.46755210639808, -0.3794678565158268], 8);
+var markerCluster;
+function icon(url) {
+  return L.icon({
+    iconUrl: "/static/icons/" + url,
+    shadowUrl: "/static/icons/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+}
+var icons = {
+  femlliga: icon("marker-icon-gold.png"),
+  tornallom: icon("marker-icon-orange.png"),
+  sobiraniaalimentariapv: icon("marker-icon-green.png"),
+  pamapam: icon("marker-icon-red.png"),
+};
+
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+function showOrganizations() {
+  if (markerCluster) {
+    markerCluster.remove();
+  }
+  let orgs = organizations.filter(o => {
+    return (o.origin === "femlliga" && showFemlliga.checked) ||
+           (o.origin === "tornallom" && showTornallom.checked) ||
+           (o.origin === "sobiraniaalimentariapv" && showSobiraniaAlimentariaPV.checked) ||
+           (o.origin === "pamapam" && showPamapam.checked);
+  }).filter(o => {
+    const parts = sanitize(searchInput.value).split(" ").filter(x => x !== "");
+    for (var part of parts) {
+      if (!contains(sanitize(o.name), part)) {
+        return false;
+      }
+    }
+    return true;
+  });
+  markerCluster = L.markerClusterGroup();
+  orgs.forEach(o => {
+    let marker = L.marker([o.lat, o.lng], { icon: icons[o.origin] });
+    marker.bindPopup(o.name);
+    markerCluster.addLayer(marker);
+  });
+  map.addLayer(markerCluster);
+}
+showOrganizations()
+searchInput.addEventListener("input", showOrganizations);
+showFemlliga.addEventListener("change", showOrganizations);
+showTornallom.addEventListener("change", showOrganizations);
+showSobiraniaAlimentariaPV.addEventListener("change", showOrganizations);
+showPamapam.addEventListener("change", showOrganizations);
+</script>
+{% endblock %}
+
