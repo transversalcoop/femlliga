@@ -491,7 +491,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       <button type="button" class="btn-close float-end" aria-label="Close" @click="closeMessage(result.message_href)"></button>
       <div>
         <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-4 mb-0">
-          {{ _("S'ha enviat el missatge correctament.") }}
+          {{ _("S'ha enviat el missatge correctament.") }} <a :href="messagesOpen[result.message_href].agreement_url">{{ _("Ves a la conversa") }}</a>.
         </div>
         <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-4 mb-0">
           {{ _("Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb") }} {{ settings.CONTACT_EMAIL }}.
@@ -615,11 +615,11 @@ function matchContains(search) {
           options: this.extractSelectedOptions(m.options)
         },
       ).then(response => {
-      console.log("RESPONSE:", response)
         if (!response.ok) {
           throw "Bad response";
         }
         m.result = true;
+        m.agreement_url = response.agreement_url;
         m.loading = false;
       }).catch(err => {
         m.error = true;

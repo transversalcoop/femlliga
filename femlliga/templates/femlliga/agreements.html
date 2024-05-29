@@ -148,20 +148,26 @@
       <div class="col-12 col-sm-8">
         <p class="mt-2 mb-0">
           <i class="bi-send"></i>
-          {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }<span v-if="result.last_message_on">, {{ _("últim missatge el") }} ${ formatDateTime(result.last_message_on) }</span>
+          {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }
         </p>
 
-        <p v-if="result.messages_count === 1" class="mb-0">
+        <p v-if="result.last_message_on" class="mb-0">
           <i class="bi-chat"></i>
-          {{ _("Hi ha un missatge en la conversa") }}
+          {{ _("Últim missatge enviat el") }} ${ formatDateTime(result.last_message_on) }
         </p>
-        <p v-else class="mb-0">
-          <i class="bi-chat"></i>
-          {{ _("Hi ha") }} ${ result.messages_count } {{ _("missatges en la conversa") }}
-          <span v-if="result.messages_not_read > 0">
-            (${ result.messages_not_read } {{ _("sense llegir") }})
-          </span>
+
+        <p v-if="result.messages_not_read === 1" class="mb-0">
+          <i class="bi-circle-fill text-danger"></i>
+          {{ _("Hi ha un missatge pendent de llegir") }}
         </p>
+        <p v-else-if="result.messages_not_read > 1" class="mb-0">
+          <i class="bi-circle-fill text-danger"></i>
+          {{ _("Hi ha") }} ${ result.messages_not_read } {{ _("missatges pendents de llegir") }}
+        </p>
+        <div v-else-if="result.agreement_successful === null">
+          <i class="bi-circle-fill text-danger"></i>
+          {{ _("Encara no s'ha indicat si s'ha realitzat l'intercanvi") }}
+        </div>
 
         <div v-if="result.agreement_successful === false">
           <i class="bi-x-lg text-danger"></i>
@@ -170,10 +176,6 @@
         <div v-else-if="result.agreement_successful === true">
           <i class="bi-check2 text-success"></i>
           {{ _("Es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
-        </div>
-        <div v-else>
-          <i class="bi-clock-history"></i>
-          {{ _("Encara no s'ha indicat si s'ha realitzat l'intercanvi") }}
         </div>
       </div>
       <div class="col-12 col-sm-4">

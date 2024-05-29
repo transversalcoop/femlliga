@@ -4,7 +4,7 @@ import time
 import unicodedata
 import urllib
 import uuid
-from functools import cmp_to_key, reduce
+from functools import reduce
 from io import BytesIO
 from pathlib import Path
 from asgiref.sync import async_to_sync
@@ -933,7 +933,15 @@ def send_message(request, organization_id, organization_to, resource_type, resou
                 },
             )
 
-        return JsonResponse({"ok": True})
+        return JsonResponse(
+            {
+                "ok": True,
+                "agreement_url": reverse(
+                    "agreement",
+                    kwargs={"organization_id": organization_id, "agreement_id": a.id},
+                ),
+            }
+        )
     return JsonResponse({"ok": False})
 
 
@@ -1590,11 +1598,11 @@ def most_requested(resources):
 
 
 def sort_agreements(agreements):
-    def f(a, b):
-        if a.agreement_successful is None:
-            return -1
-        if b.agreement_successful is None:
-            return 1
-        return a.date < b.date
+    def f(a):
+        a_date = a.date
+        a_messages = list(a.messages.all())
+        if len(a_messages) > 0:
+            a_date = a_messages[-1].sent_on
+        return a_date
 
-    return sorted(agreements, key=cmp_to_key(f))
+    return sorted(agreements, key=f, reverse=True)

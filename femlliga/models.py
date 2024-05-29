@@ -674,7 +674,6 @@ class Agreement(models.Model):
             "communication_date": self.communication_date,
             "agreement_successful": self.agreement_successful,
             "successful_date": self.successful_date,
-            "messages_count": self.messages.count() + 1,
             # use len, because using .filter() defeats the prefetch_related
             "messages_not_read": len(
                 [
