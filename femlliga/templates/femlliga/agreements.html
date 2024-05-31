@@ -29,6 +29,10 @@
           </button>
         </div>
         <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
+        <div class="form-check form-switch mt-2">
+          <input class="form-check-input" type="checkbox" role="switch" id="showClosedSwitch" v-model="showClosed">
+          <label class="form-check-label" for="showClosedSwitch">{{ _("Mostra peticions tancades") }}</label>
+        </div>
         <ul class="nav nav-pills flex-column mb-auto mt-2">
           <template v-if="showBy === 'resources'">
             <h2 class="resource-matches-title background-yellow">{{ _("Enviades") }}</h2>
@@ -125,7 +129,7 @@
 {% endmacro %}
 
 {% macro show_agreements_vue(agreements) %}
-<div v-for="result in {{ agreements }}" :key="result" class="row match-box">
+<div v-for="result in {{ agreements }}" :key="result" class="row match-box" :class="{'agreement-closed': result.agreement_successful !== null}">
   <h3 v-if="agreementSent(result)" class="mt-2">
     <span class="me-2">{{ _("Petició de") }}</span>
     <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
@@ -238,6 +242,7 @@ Vue.createApp({
       resourceSelected: "",
       requestTypeSelected: "",
       organizationSelected: null,
+      showClosed: false,
     };
   },
   methods: {
@@ -269,12 +274,15 @@ Vue.createApp({
     filterAgreements(agreements) {
       var m = {};
       for (var k in agreements) {
-        m[k] = agreements[k].filter(agreementContains(this.search));
+        m[k] = agreements[k].filter(this.filterClosed).filter(agreementContains(this.search));
       }
       return m;
     },
     agreementSent(a) {
       return a.solicitor.id === this.organizationID;
+    },
+    filterClosed(a) {
+      return this.showClosed || a.agreement_successful === null;
     },
   },
   computed: {
@@ -285,19 +293,19 @@ Vue.createApp({
       };
     },
     concatenatedAgreements() {
-      return this.allConcatenatedAgreements.filter(agreementContains(this.search));
+      return this.allConcatenatedAgreements.filter(this.filterClosed).filter(agreementContains(this.search));
     },
     organizationsWithAgreements() {
       return this.allOrganizations.map(o => {
         return {
           organization: o.organization,
-          agreements: o.agreements.filter(agreementContains(this.search)),
+          agreements: o.agreements.filter(this.filterClosed).filter(agreementContains(this.search)),
         };
       }).filter(o => o.agreements.length > 0);
     },
     organizationAgreements() {
       var org = this.allOrganizations.find(o => o.organization.id === this.organizationSelected.id);
-      return org ? org.agreements.filter(agreementContains(this.search)) : [];
+      return org ? org.agreements.filter(this.filterClosed).filter(agreementContains(this.search)) : [];
     },
   },
 }).mount("#app");

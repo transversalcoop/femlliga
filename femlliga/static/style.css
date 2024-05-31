@@ -799,3 +799,6 @@ nav .nav-link.active {
     margin-bottom: -3rem;
 }
 
+.agreement-closed {
+    opacity: 70%;
+}
