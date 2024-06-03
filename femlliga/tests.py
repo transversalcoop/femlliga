@@ -439,7 +439,11 @@ class IntegrationTests(TestCase):
                 "message": test_msg_1,
             },
         )
-        self.assertJSONEqual(response.content, {"ok": True})
+        a = Agreement.objects.order_by("-date").first()
+        self.assertJSONEqual(
+            response.content,
+            {"ok": True, "agreement_url": reverse("agreement", args=[o.id, a.id])},
+        )
         self.assertEqual(len(mail.outbox), 1)
 
         # check received
@@ -467,7 +471,9 @@ class IntegrationTests(TestCase):
             },
             follow=True,
         )
-        self.assertContains(response, "Es va realitzar l'intercanvi")
+        self.assertContains(
+            response, "Es va indicar que s'havia realitzat l'intercanvi"
+        )
         self.assertEqual(len(mail.outbox), 1)
 
     @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
@@ -483,9 +489,7 @@ class IntegrationTests(TestCase):
         self.aux_send_message(org11.id, org12.id)
 
         response = self.client.get(reverse("agreements", args=[org11.id]))
-        save_response(response)
         self.assertNotContains(response, "test message")
-        self.assertContains(response, "Hi ha un missatge en la conversa")
 
         a = Agreement.objects.get(solicitor=org11)
         response = self.client.get(reverse("agreement", args=[org11.id, a.id]))
@@ -584,7 +588,14 @@ class IntegrationTests(TestCase):
             },
         )
         save_response(response)
-        self.assertJSONEqual(response.content, {"ok": True})
+        a = Agreement.objects.order_by("-date").first()
+        self.assertJSONEqual(
+            response.content,
+            {
+                "ok": True,
+                "agreement_url": reverse("agreement", args=[org6.id, a.id]),
+            },
+        )
         self.assertEqual(len(mail.outbox), 0)
 
         # activate immediate notifications and check they are received
@@ -600,7 +611,11 @@ class IntegrationTests(TestCase):
                 "message": test_msg_2,
             },
         )
-        self.assertJSONEqual(response.content, {"ok": True})
+        a = Agreement.objects.order_by("-date").first()
+        self.assertJSONEqual(
+            response.content,
+            {"ok": True, "agreement_url": reverse("agreement", args=[org6.id, a.id])},
+        )
         self.assertEqual(len(mail.outbox), 1)
         save_email(mail.outbox[0], "notify_communication_received.html")
         self.assertIn(

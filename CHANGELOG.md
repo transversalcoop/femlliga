@@ -30,6 +30,7 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - Les converses que estaven pendents d'acceptar s'accepten
 - Les converses que s'havien rebutjat es marquen com a que no es va realitzar un
   intercanvi
+- S'han afegit noves categories i etiquetes de recursos, mentre que altres s'han reagrupat
 
 ### Removed
 
