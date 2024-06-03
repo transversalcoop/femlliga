@@ -8,7 +8,7 @@ urlpatterns = [
     # no login required
     path("", views.index, name="index"),
     path("contact/", views.contact, name="contact"),
-    #    path("maps/", views.maps, name="maps"),
+    path("maps/", views.maps, name="maps"),
     path("check-matches/", views.check_matches, name="check_matches"),
     path("search-address/", views.search_address, name="search_address"),
     path("page/<slug:name>/", views.page, name="page"),

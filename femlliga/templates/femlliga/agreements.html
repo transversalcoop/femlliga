@@ -57,6 +57,9 @@
                     ${ x.agreements.length }
                   </span>
                 </span>
+                <span v-if="agreementsPending(x.agreements)" class="float-end">
+                  <i class="bi-circle-fill text-danger"></i>
+                </span>
                 <span v-html="highlightSearch(x.organization.name, search)"></span>
               </button>
             </li>
@@ -122,6 +125,9 @@
       class="float-end badge ms-2 bg-light"
       title="{{ title }}">
       ${ agreements.{{ request_type }}[resource].length }
+    </span>
+    <span v-if="agreementsPending(agreements.{{ request_type }}[resource])" class="float-end">
+      <i class="bi-circle-fill text-danger"></i>
     </span>
     ${ resourceNamesMap[resource] }
   </button>
@@ -283,6 +289,9 @@ Vue.createApp({
     },
     filterClosed(a) {
       return this.showClosed || a.agreement_successful === null;
+    },
+    agreementsPending(agreements) {
+      return agreements.some(a => a.agreement_successful === null || a.messages_not_read > 0);
     },
   },
   computed: {

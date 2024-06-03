@@ -32,7 +32,7 @@ from django.utils.translation import get_language_from_request
 from django.utils.translation import gettext_lazy as _
 from django.views.static import serve
 
-from config.settings import MEDIA_ROOT
+from config.settings import MEDIA_ROOT, STAGING_ENVIRONMENT_NAME
 
 from .constants import (
     ORG_SCOPES,
@@ -1559,6 +1559,10 @@ def contact(request):
 
 
 def maps(request):
+    # novel functionality, only available in dev
+    if not STAGING_ENVIRONMENT_NAME:
+        raise PermissionDenied()
+
     orgs = [
         {
             "name": o.name,

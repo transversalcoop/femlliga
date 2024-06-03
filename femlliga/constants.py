@@ -114,14 +114,14 @@ RESOURCE_ICONS_MAP = {
 }
 
 RESOURCE_DESCRIPTIONS_MAP = {
-    "PLACE": _(""),
-    "SERVICE": _(""),
+    "PLACE": _("Espais on poder celebrar actes o desenvolupar l'activitat diària"),
+    "SERVICE": _("Serveis necessaris per desenvolupar l'activitat"),
     "TRAINING": _("Formacions, assessoraments i acompanyaments"),
     "EQUIPMENT": _(
         "Material pedagògic i de sensibilització, d'exposicions, de fires, bibliogràfic, pamflets, cartells, material esportiu, de cuina, mobles, ferramentes o d'altres"
     ),
     "ALLIANCES": _("Intercooperació, col·laboracions i creació de xarxes"),
-    "OTHER": _(""),
+    "OTHER": _("Altres possibilitats que no encaixen en les categories anteriors"),
 }
 
 RESOURCE_OPTIONS_MAP = {
@@ -164,6 +164,7 @@ RESOURCE_OPTIONS_MAP = {
     "ALLIANCES": (
         ("PROJECT_COLLABORATION", _("Col·laboració en projectes")),
         ("VOLUNTEERING", _("Voluntariat")),
+        ("PUBLICITY", _("Difusió")),
     ),
     "OTHER": (),
 }
@@ -209,6 +210,7 @@ RESOURCE_OPTIONS_READABLE_MAP = {
     ("EQUIPMENT", "EQUIPMENT_EDUCATION"): _("material pedagògic i de sensibilització"),
     ("ALLIANCES", "PROJECT_COLLABORATION"): _("col·laboració en projectes"),
     ("ALLIANCES", "VOLUNTEERING"): _("voluntariat"),
+    ("ALLIANCES", "PUBLICITY"): _("difusió"),
 }
 
 RESOURCES_LIST, RESOURCE_OPTIONS = [], []
