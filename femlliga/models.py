@@ -498,6 +498,12 @@ class Need(BaseResource):
         on_delete=models.CASCADE,
         related_name="needs",
     )
+    need_options = models.ManyToManyField(
+        ResourceOption,
+        through="NeedOptionThrough",
+        related_name="needs",
+        blank=True,
+    )
 
     class Meta:
         constraints = [
@@ -505,6 +511,9 @@ class Need(BaseResource):
                 "organization", "resource", name="unique_organization_need"
             ),
         ]
+
+    def get_options(self):
+        return self.need_options.all()
 
     def json(self, current_organization=None, include_org=True):
         j = super().json()
@@ -526,11 +535,24 @@ class Need(BaseResource):
         return j
 
 
+class NeedOptionThrough(models.Model):
+    need = models.ForeignKey(Need, on_delete=models.CASCADE)
+    option = models.ForeignKey(ResourceOption, on_delete=models.CASCADE)
+    comments = models.TextField(null=True, blank=True)
+    public = models.BooleanField(default=False)
+
+
 class Offer(BaseResource):
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
         related_name="offers",
+    )
+    offer_options = models.ManyToManyField(
+        ResourceOption,
+        through="OfferOptionThrough",
+        related_name="offers",
+        blank=True,
     )
     charge = models.BooleanField(default=False)
     place_accessible = models.BooleanField(default=False)
@@ -541,6 +563,9 @@ class Offer(BaseResource):
                 "organization", "resource", name="unique_organization_offer"
             ),
         ]
+
+    def get_options(self):
+        return self.offer_options.all()
 
     def json(self, current_organization=None, include_org=True):
         j = super().json()
@@ -562,6 +587,11 @@ class Offer(BaseResource):
         j["charge"] = self.charge
         j["place_accessible"] = self.place_accessible
         return j
+
+
+class OfferOptionThrough(models.Model):
+    offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
+    option = models.ForeignKey(ResourceOption, on_delete=models.CASCADE)
 
 
 class Agreement(models.Model):

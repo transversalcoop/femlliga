@@ -8,8 +8,6 @@ def extract_data(response, origin):
     if response["status"] != 200:
         raise Exception("Bad response")
 
-    if origin == "pamapam":
-        print( response["response"][0]["properties"])
     orgs = []
     for o in response["response"]:
         org = {
@@ -26,6 +24,7 @@ def extract_data(response, origin):
         if origin == "pamapam" and "id" in o:
             org["url"] = f"https://pamapam.cat/directori/{o['id']}/"
         orgs.append(org)
+
     return orgs
 
 

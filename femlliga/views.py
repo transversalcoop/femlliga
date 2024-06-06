@@ -1138,8 +1138,8 @@ def organization_prefetches(queryset, include_missing_resources=False):
     return queryset.prefetch_related(
         "scopes",
         "social_media",
-        "needs__options",
-        "offers__options",
+        "needs__need_options",
+        "offers__offer_options",
         "needs__images",
         "offers__images",
         "sent_agreements__options",
@@ -1579,7 +1579,12 @@ def maps(request):
     tornallom = get_tornallom_organizations()
     orgs += tornallom
     maps.append(
-        {"name": "Tornallom", "code": "tornallom", "color": "orange", "count": len(tornallom)}
+        {
+            "name": "Tornallom",
+            "code": "tornallom",
+            "color": "orange",
+            "count": len(tornallom),
+        }
     )
 
     pamapam = get_pamapam_organizations()
@@ -1591,12 +1596,21 @@ def maps(request):
     sobirania = get_sobiraniaalimentariapv_organizations()
     orgs += sobirania
     maps.append(
-        {"name": "Sobirania alimentària PV", "code": "sobiraniaalimentariapv", "color": "green", "count": len(sobirania)}
+        {
+            "name": "Sobirania alimentària PV",
+            "code": "sobiraniaalimentariapv",
+            "color": "green",
+            "count": len(sobirania),
+        }
     )
-    return render(request, "femlliga/maps.html", {
-        "maps": maps,
-        "json_data": {"organizations": orgs, "maps": maps},
-    })
+    return render(
+        request,
+        "femlliga/maps.html",
+        {
+            "maps": maps,
+            "json_data": {"organizations": orgs, "maps": maps},
+        },
+    )
 
 
 @login_required
