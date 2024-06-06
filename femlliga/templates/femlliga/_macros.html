@@ -480,7 +480,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       </div>
     </div>
 
-    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}')" class="btn btn-custom mt-2">
+    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}', {{ needs or '""' }})" class="btn btn-custom mt-2">
       <i class="bi-send fs-6 me-2"></i>
       {{ _("Contacta") }}
     </button>
@@ -580,18 +580,23 @@ function matchContains(search) {
       return l;
     },
     extractSelectedOptions(optionsMap) {
-      return Object.keys(optionsMap).map(k => {
-        if (optionsMap[k]) {
-          return k;
-        }
-        return "";
-      }).filter(v => v);
+      return Object.keys(optionsMap).filter(k => optionsMap[k]);
     },
-    sendMessage(result, origin) {
+    sendMessage(result, origin, needs) {
       var href = result.message_href;
       var m = this.messagesOpen[href];
       if (!this.messagesOpen[href]) {
-        this.messagesOpen[href] = {message: "", options: {}};
+        let options = {};
+        for (let option of result.options) {
+          if (needs) {
+            if (this.optionMatches(result.resource, option, needs)) {
+              options[option] = true;
+            }
+          } else {
+            options[option] = true;
+          }
+        }
+        this.messagesOpen[href] = {message: "", options: options};
         return;
       }
       if (!this.messageFormOk(result)) {

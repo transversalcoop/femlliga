@@ -1572,10 +1572,31 @@ def maps(request):
         }
         for o in Organization.objects.all()
     ]
-    orgs += get_tornallom_organizations()
-    orgs += get_pamapam_organizations()
-    orgs += get_sobiraniaalimentariapv_organizations()
-    return render(request, "femlliga/maps.html", {"json_data": {"organizations": orgs}})
+    maps = [
+        {"name": "Fem lliga!", "code": "femlliga", "color": "gold", "count": len(orgs)},
+    ]
+
+    tornallom = get_tornallom_organizations()
+    orgs += tornallom
+    maps.append(
+        {"name": "Tornallom", "code": "tornallom", "color": "orange", "count": len(tornallom)}
+    )
+
+    pamapam = get_pamapam_organizations()
+    orgs += pamapam
+    maps.append(
+        {"name": "Pam a Pam", "code": "pamapam", "color": "red", "count": len(pamapam)}
+    )
+
+    sobirania = get_sobiraniaalimentariapv_organizations()
+    orgs += sobirania
+    maps.append(
+        {"name": "Sobirania alimentària PV", "code": "sobiraniaalimentariapv", "color": "green", "count": len(sobirania)}
+    )
+    return render(request, "femlliga/maps.html", {
+        "maps": maps,
+        "json_data": {"organizations": orgs, "maps": maps},
+    })
 
 
 @login_required

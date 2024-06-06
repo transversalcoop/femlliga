@@ -390,7 +390,7 @@ nav .nav-link.active {
 
 @media (min-width: 768px) {
     .sidebar {
-        min-height: 100vh;
+        min-height: 90vh;
     }
 }
 
@@ -479,7 +479,7 @@ nav .nav-link.active {
 }
 
 .map-height-big {
-    height: 700px;
+    height: 90vh;
 }
 
 .card-carousel-triple {
