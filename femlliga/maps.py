@@ -2,6 +2,7 @@ import datetime
 import requests
 
 from .utils import cache
+from .models import Organization
 
 
 def extract_data(response, origin):
@@ -16,17 +17,32 @@ def extract_data(response, origin):
             "lng": o["geometry"]["coordinates"][0],
             "origin": origin,
         }
-        o = o["properties"]
-        if origin == "tornallom" and "normalizedName" in o:
-            org["url"] = f"https://tornallom.org/ca/directori/{o['normalizedName']}/"
-        if origin == "sobiraniaalimentariapv" and "slug" in o:
-            org["url"] = f"https://mapa.sobiranialimentariapv.org/?id={o['slug']}"
-        if origin == "pamapam" and "id" in o:
-            org["url"] = f"https://pamapam.cat/directori/{o['id']}/"
+        org["url"] = get_url(origin, o["properties"])
         orgs.append(org)
 
     return orgs
 
+def get_url(origin, o):
+    maps = {
+        "tornallom": {"key": "normalizedName", "url": "https://tornallom.org/ca/directori/{}/"},
+        "sobiraniaalimentariapv": {"key": "slug", "url": "https://mapa.sobiranialimentariapv.org/?id={}"},
+        "pamapam": {"key": "id", "url": "https://pamapam.cat/directori/{}/"},
+    }
+    try:
+        return maps[origin]["url"].format(o[maps[origin]["key"]])
+    except:
+        pass
+
+def get_femlliga_organizations():
+    return [
+        {
+            "name": o.name,
+            "lat": o.lat,
+            "lng": o.lng,
+            "origin": "femlliga",
+        }
+        for o in Organization.objects.all()
+    ]
 
 @cache(datetime.timedelta(days=1))
 def get_tornallom_organizations():

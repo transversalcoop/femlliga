@@ -94,6 +94,7 @@ from .utils import (
 )
 
 from .maps import (
+    get_femlliga_organizations,
     get_tornallom_organizations,
     get_pamapam_organizations,
     get_sobiraniaalimentariapv_organizations,
@@ -1563,46 +1564,39 @@ def maps(request):
     if not STAGING_ENVIRONMENT_NAME:
         raise PermissionDenied()
 
-    orgs = [
+    orgs, maps = [], [
         {
-            "name": o.name,
-            "lat": o.lat,
-            "lng": o.lng,
-            "origin": "femlliga",
-        }
-        for o in Organization.objects.all()
+            "name": "Fem lliga!",
+            "code": "femlliga",
+            "color": "gold",
+            "func": get_femlliga_organizations,
+        },
+#        {
+#            "name": "Tornallom",
+#            "code": "tornallom",
+#            "color": "orange",
+#            "func": get_tornallom_organizations,
+#        },
+#        {
+#            "name": "Pam a Pam",
+#            "code": "pamapam",
+#            "color": "red",
+#            "func": get_pamapam_organizations,
+#        },
+#        {
+#            "name": "Sobirania alimentària PV",
+#            "code": "sobiraniaalimentariapv",
+#            "color": "green",
+#            "func": get_sobiraniaalimentariapv_organizations,
+#        },
     ]
-    maps = [
-        {"name": "Fem lliga!", "code": "femlliga", "color": "gold", "count": len(orgs)},
-    ]
 
-    tornallom = get_tornallom_organizations()
-    orgs += tornallom
-    maps.append(
-        {
-            "name": "Tornallom",
-            "code": "tornallom",
-            "color": "orange",
-            "count": len(tornallom),
-        }
-    )
+    for m in maps:
+        map_orgs = m["func"]()
+        m["count"] = len(map_orgs)
+        orgs += map_orgs
+        del m["func"]
 
-    pamapam = get_pamapam_organizations()
-    orgs += pamapam
-    maps.append(
-        {"name": "Pam a Pam", "code": "pamapam", "color": "red", "count": len(pamapam)}
-    )
-
-    sobirania = get_sobiraniaalimentariapv_organizations()
-    orgs += sobirania
-    maps.append(
-        {
-            "name": "Sobirania alimentària PV",
-            "code": "sobiraniaalimentariapv",
-            "color": "green",
-            "count": len(sobirania),
-        }
-    )
     return render(
         request,
         "femlliga/maps.html",
