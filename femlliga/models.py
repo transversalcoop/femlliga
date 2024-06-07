@@ -480,7 +480,7 @@ class BaseResource(models.Model):
         return str(Resource.resource(self.resource))
 
     def get_options(self):
-        options = [(x.name, str(x)) for x in self.options.all()]
+        options = [(x.name, str(x)) for x in self.new_options.all()]
         return options
 
     def json(self):
@@ -488,7 +488,7 @@ class BaseResource(models.Model):
             "id": self.id,
             "resource": self.resource,
             "comments": self.comments,
-            "options": [o.name for o in self.options.all()],
+            "options": [o.name for o in self.new_options.all()],
         }
 
 
@@ -498,7 +498,7 @@ class Need(BaseResource):
         on_delete=models.CASCADE,
         related_name="needs",
     )
-    need_options = models.ManyToManyField(
+    new_options = models.ManyToManyField(
         ResourceOption,
         through="NeedOptionThrough",
         related_name="needs",
@@ -511,9 +511,6 @@ class Need(BaseResource):
                 "organization", "resource", name="unique_organization_need"
             ),
         ]
-
-    def get_options(self):
-        return self.need_options.all()
 
     def json(self, current_organization=None, include_org=True):
         j = super().json()
@@ -548,7 +545,7 @@ class Offer(BaseResource):
         on_delete=models.CASCADE,
         related_name="offers",
     )
-    offer_options = models.ManyToManyField(
+    new_options = models.ManyToManyField(
         ResourceOption,
         through="OfferOptionThrough",
         related_name="offers",
@@ -563,9 +560,6 @@ class Offer(BaseResource):
                 "organization", "resource", name="unique_organization_offer"
             ),
         ]
-
-    def get_options(self):
-        return self.offer_options.all()
 
     def json(self, current_organization=None, include_org=True):
         j = super().json()

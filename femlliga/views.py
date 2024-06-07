@@ -170,10 +170,10 @@ def check_matches(request):
     option = post.get("option", "")
 
     needs = Need.objects.filter(
-        resource=resource, has_resource=True, options__name__in=[option]
+        resource=resource, has_resource=True, new_options__name__in=[option]
     ).count()
     offers = Offer.objects.filter(
-        resource=resource, has_resource=True, options__name__in=[option]
+        resource=resource, has_resource=True, new_options__name__in=[option]
     ).count()
     return JsonResponse({"needs": needs, "offers": offers})
 
@@ -409,7 +409,7 @@ def get_resource_form(org, resource_type, resource):
         r = model.objects.get(organization=org, resource=resource)
         data = {
             "resource": resource,
-            "options": list(map(lambda x: x.name, r.options.all())),
+            "options": list(map(lambda x: x.name, r.new_options.all())),
             "has_resource": r.has_resource,
             "comments": r.comments,
         }
@@ -492,9 +492,9 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
                 # avoid clash with _ translation function
                 ro, _created = ResourceOption.objects.get_or_create(name=option)
                 if option in options:
-                    m.options.add(ro)
+                    m.new_options.add(ro)
                 else:
-                    m.options.remove(ro)
+                    m.new_options.remove(ro)
 
             m.comments = form.cleaned_data["comments"]
             m.has_resource = len(options) > 0 or len(m.comments) > 0
@@ -592,7 +592,7 @@ def matches(request, organization_id):
     needs_json = [
         {
             "resource": x.resource,
-            "options": [o.name for o in x.options.all()],
+            "options": [o.name for o in x.new_options.all()],
         }
         for x in own_needs
     ]
@@ -662,7 +662,7 @@ def group_matches_by_organization(organization, offer_matches, need_matches):
 def get_organization_matches(user, organization, own_needs):
     offer_matches, need_matches = {}, {}
     for need in own_needs:
-        need_options = [n.name for n in need.options.all()]
+        need_options = [n.name for n in need.new_options.all()]
         offers = get_model_matches(
             user,
             organization,
@@ -700,7 +700,7 @@ def get_model_matches(
         queryset = model.objects.filter(
             resource=resource,
             has_resource=True,
-            options__name__in=need_options,
+            new_options__name__in=need_options,
         )
 
     if not include_other:
@@ -715,7 +715,7 @@ def get_model_matches(
     )
     results = (
         queryset.exclude(organization=organization)
-        .prefetch_related("organization", "images", "options")
+        .prefetch_related("organization", "images", "new_options")
         .distinct()
     )
     # limit distance in python, so exactly the appropriate results are returned
@@ -1138,8 +1138,8 @@ def organization_prefetches(queryset, include_missing_resources=False):
     return queryset.prefetch_related(
         "scopes",
         "social_media",
-        "needs__need_options",
-        "offers__offer_options",
+        "needs__new_options",
+        "offers__new_options",
         "needs__images",
         "offers__images",
         "sent_agreements__options",
@@ -1293,12 +1293,12 @@ def report(request):
             for o in organizations:
                 for x in o.needs.all():
                     if x.resource == resource and option[0] in [
-                        op.name for op in x.options.all()
+                        op.name for op in x.new_options.all()
                     ]:
                         needs.append(x)
                 for x in o.offers.all():
                     if x.resource == resource and option[0] in [
-                        op.name for op in x.options.all()
+                        op.name for op in x.new_options.all()
                     ]:
                         offers.append(x)
             resource_options.append(

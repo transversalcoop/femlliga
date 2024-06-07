@@ -169,6 +169,10 @@ RESOURCE_OPTIONS_MAP = {
     "OTHER": (),
 }
 
+NEEDS_PUBLISHABLE_OPTIONS_MAP = {
+    "ALLIANCES": ("VOLUNTEERING",),
+}
+
 RESOURCE_OPTIONS_READABLE_MAP = {
     ("PLACE", "DAILY_USAGE"): _("local per a ús diari"),
     ("PLACE", "PUNCTUAL_USAGE"): _("local per a ús puntual"),

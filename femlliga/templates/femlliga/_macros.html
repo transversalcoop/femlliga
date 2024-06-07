@@ -38,7 +38,7 @@
 
 {% macro resource_details(resource, match_type) %}
   <div class="mb-2">
-    {% for option in resource.options.all() %}
+    {% for option in resource.new_options.all() %}
       <span class="badge bg-light">{{ option }}</span>
     {% endfor %}
   </div>

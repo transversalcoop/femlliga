@@ -572,7 +572,7 @@ class IntegrationTests(TestCase):
             has_resource=True,
         )
         option, _ = ResourceOption.objects.get_or_create(name="DAILY_USAGE")
-        offer.options.add(option)
+        offer.new_options.add(option)
 
         self.client.login(email=email6, password=PASS_FOR_TESTS)
         send_message_url = reverse(
@@ -716,4 +716,4 @@ class IntegrationTests(TestCase):
         )
         for option in options:
             ro, _ = ResourceOption.objects.get_or_create(name=option)
-            offer.options.add(ro)
+            offer.new_options.add(ro)
