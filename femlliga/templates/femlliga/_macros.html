@@ -183,65 +183,6 @@
   {% endif %}
 {% endmacro %}
 
-{% macro render_multiple_tags(form, name, label, options = [], show_empty=True) %}
-    {% if form.fields[name] and (show_empty or (not show_empty and len(options) > 0))%}
-        {% set choices = form.fields[name].choices %}
-        {% if len(options) > 0 %}
-            {% set choices = options %}
-        {% endif %}
-        {% if label %}
-        <label for="id_{{ name }}">{{ label }}</label>
-        {% endif %}
-        <div class="multi-select">
-            {% for choice in choices %}
-            {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}
-              {% set selected=True %}
-            {% endif %}
-            <button class="btn multi-select-choice {% if selected %}selected{% endif %}"
-                  type="button"
-                  role="switch"
-                  value="{{ choice[0] }}"
-                  onclick="clickOption(this);"
-                  {% if selected %}selected="true"{% endif %}>
-                {{ choice[1] }}
-            </button>
-            {% endfor %}
-        </div>
-        <select
-          id="id_{{ name }}"
-          name="{{ name }}"
-          style="display: none;"
-          class="multi-select {% if form.errors[name] %} is-invalid{% endif %}"
-          multiple>
-            {% for choice in choices %}
-            <option value="{{ choice[0] }}"
-                {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}selected{% endif %}>
-                {{ choice[1] }}
-            </option>
-            {% endfor %}
-        </select>
-        {{ input_feedback(form, name) }}
-
-        <script>
-function clickOption(element) {
-    if (element.getAttribute("selected") === "true") {
-        element.setAttribute("selected", "false");
-        element.classList.remove("selected");
-    } else {
-        element.setAttribute("selected", "true");
-        element.classList.add("selected");
-    }
-    var s = document.getElementById("id_{{ name }}");
-    for (var i = 0; i < s.children.length; i++) {
-        if (s.children[i].value === element.getAttribute("value")) {
-            s.children[i].selected = !s.children[i].selected;
-        }
-    }
-}
-        </script>
-    {% endif %}
-{% endmacro %}
-
 {% macro render_select_raw(name, options, value="") %}
     <select id="id_{{ name }}" name="{{ name }}" class="form-select" value="{{ value }}">
         {% for option in options %}

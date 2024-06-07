@@ -447,6 +447,10 @@ def render_wizard(
         imageforms = inlineformset_factory(
             model, imagemodel, fields=("image",), extra=6
         )()
+    try:
+        selected_options = form.cleaned_data["options"]
+    except:
+        selected_options = [o.name for o in db_resource.new_options.all()]
     return render(
         request,
         "femlliga/resources-wizard.html",
@@ -460,6 +464,9 @@ def render_wizard(
             "total": len(RESOURCES) * 2,
             "count": get_resource_index(resource_type, resource),
             "editing": editing,
+            "json_data": {
+                "selected": selected_options,
+            },
         },
     )
 

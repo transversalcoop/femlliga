@@ -612,7 +612,7 @@ nav .nav-link.active {
 }
 
 .css-tooltip .tooltiptext {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: normal;
   font-style: normal;
   visibility: hidden;
@@ -801,4 +801,9 @@ nav .nav-link.active {
 
 .agreement-closed {
     opacity: 70%;
+}
+
+.multi-select-choice.share-button {
+    padding-left: 8px;
+    border-left: none;
 }
