@@ -63,6 +63,7 @@ from .models import (
     Message,
     Need,
     NeedImage,
+    NeedOptionThrough,
     Offer,
     OfferImage,
     Organization,
@@ -496,13 +497,25 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
             forms_valid = form.is_valid() and imageformset.is_valid()
         if forms_valid:
             options = form.cleaned_data["options"]
+            resource_options = []
             for option, _ignore in Resource.resource(resource).options():
-                # avoid clash with _ translation function
-                ro, _created = ResourceOption.objects.get_or_create(name=option)
+                ro, _ignore = ResourceOption.objects.get_or_create(name=option)
                 if option in options:
-                    m.new_options.add(ro)
-                else:
-                    m.new_options.remove(ro)
+                    resource_options.append(ro)
+
+            if model is Need:
+                m.new_options.clear()
+                for ro in resource_options:
+                    public = False
+                    comments = ""
+                    if ro.name in form.cleaned_data["published"]:
+                        public = True
+                        comments = form.cleaned_data["published"][ro.name]
+                    NeedOptionThrough.objects.create(
+                        need=m, option=ro, public=public, comments=comments
+                    )
+            else:
+                m.new_options.set(resource_options)
 
             m.comments = form.cleaned_data["comments"]
             m.has_resource = len(options) > 0 or len(m.comments) > 0
@@ -1578,24 +1591,24 @@ def maps(request):
             "color": "gold",
             "func": get_femlliga_organizations,
         },
-#        {
-#            "name": "Tornallom",
-#            "code": "tornallom",
-#            "color": "orange",
-#            "func": get_tornallom_organizations,
-#        },
-#        {
-#            "name": "Pam a Pam",
-#            "code": "pamapam",
-#            "color": "red",
-#            "func": get_pamapam_organizations,
-#        },
-#        {
-#            "name": "Sobirania alimentària PV",
-#            "code": "sobiraniaalimentariapv",
-#            "color": "green",
-#            "func": get_sobiraniaalimentariapv_organizations,
-#        },
+        #        {
+        #            "name": "Tornallom",
+        #            "code": "tornallom",
+        #            "color": "orange",
+        #            "func": get_tornallom_organizations,
+        #        },
+        #        {
+        #            "name": "Pam a Pam",
+        #            "code": "pamapam",
+        #            "color": "red",
+        #            "func": get_pamapam_organizations,
+        #        },
+        #        {
+        #            "name": "Sobirania alimentària PV",
+        #            "code": "sobiraniaalimentariapv",
+        #            "color": "green",
+        #            "func": get_sobiraniaalimentariapv_organizations,
+        #        },
     ]
 
     for m in maps:

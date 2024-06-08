@@ -51,6 +51,7 @@ class ResourceForm(forms.Form):
     comments = forms.CharField(required=False)
     charge = forms.BooleanField(required=False)
     place_accessible = forms.BooleanField(required=False)
+    published = forms.JSONField(required=False)
 
 
 class ImageForm(forms.Form):

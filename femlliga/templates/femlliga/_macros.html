@@ -38,8 +38,11 @@
 
 {% macro resource_details(resource, match_type) %}
   <div class="mb-2">
-    {% for option in resource.new_options.all() %}
-      <span class="badge bg-light">{{ option }}</span>
+    {% for option in resource.options_details() %}
+      <span class="badge bg-light">
+        {% if option.public %}<i class="bi-share"></i>{% endif %}
+        {{ option.option }}
+      </span>
     {% endfor %}
   </div>
   <div class="mb-2">
@@ -50,6 +53,11 @@
       <span class="universal-access-icon" title="">{{ universal_access_icon() }} {{ _("Local accessible") }}</span>
     {% endif %}
   </div>
+  {% for option in resource.options_details() %}
+    {% if option.public %}
+    <p>{{ option.comments }}</p>
+    {% endif %}
+  {% endfor %}
   {% if resource.comments %}
   <p>{% if resource.resource != "OTHER" %}<strong>{{ _("Observacions:") }}</strong>{% endif %} {{ resource.comments }}</p>
   {% endif %}

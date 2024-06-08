@@ -173,6 +173,12 @@ NEEDS_PUBLISHABLE_OPTIONS_MAP = {
     "ALLIANCES": ("VOLUNTEERING",),
 }
 
+NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP = {
+    ("ALLIANCES", "VOLUNTEERING"): _(
+        "Una bona descripció inclourà informació com on s'ha de desenvolupar el voluntariat, en quines dates, si hi ha algun tipus de requisit o inscripció necessària, i una breu descripció de la feina que es desenvoluparà"
+    ),
+}
+
 RESOURCE_OPTIONS_READABLE_MAP = {
     ("PLACE", "DAILY_USAGE"): _("local per a ús diari"),
     ("PLACE", "PUNCTUAL_USAGE"): _("local per a ús puntual"),

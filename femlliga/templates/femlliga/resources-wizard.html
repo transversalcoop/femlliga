@@ -51,7 +51,8 @@
     {% endif %}
   </p>
 
-  <form method="post" enctype="multipart/form-data" class="mb-1" id="vue-app" @submit="submit">
+  <div id="vue-app">
+    <form method="post" enctype="multipart/form-data" class="mb-1" @submit="submit">
       {{ csrf_input }}
       {{ form_feedback(form) }}
 
@@ -59,17 +60,13 @@
 
       {% set options = resource.options() %}
       {% if len(options) > 0 and form.fields["options"] %}
-        {% set choices = form.fields["options"].choices %}
-        {% if len(options) > 0 %}
-          {% set choices = options %}
-        {% endif %}
         <div class="multi-select">
-          {% for choice in choices %}
+          {% for choice in options %}
           {% if form and form.cleaned_data and choice[0] in form.cleaned_data["options"] %}
             {% set selected=True %}
           {% endif %}
           <div class="btn-group me-2 mb-1" role="group">
-            <button 
+            <button
               class="btn multi-select-choice m-0"
               :class="{'selected': selected.indexOf('{{ choice[0] }}') !== -1}"
               type="button"
@@ -82,17 +79,6 @@
               {% endif %}
               {{ choice[1] }}
             </button>
-            {% if option_is_publishable(resource_type, resource.code, choice[0]) %}
-            <button
-              class="btn multi-select-choice share-button m-0"
-              :class="{'selected': published['{{ choice[0] }}']}"
-              type="button"
-              v-if="selected.indexOf('{{ choice[0] }}') !== -1"
-              @click="togglePublish('{{ choice[0] }}')"
-            >
-              <i class="bi-share" title="{{ _("Publica") }}"></i>
-            </button>
-            {% endif %}
           </div>
           {% endfor %}
         </div>
@@ -103,7 +89,7 @@
           class="d-none multi-select {% if form.errors["options"] %} is-invalid{% endif %}"
           multiple
         >
-          {% for choice in choices %}
+          {% for choice in options %}
           <option value="{{ choice[0] }}">
             {{ choice[1] }}
           </option>
@@ -134,13 +120,33 @@
       <div class="spacing"></div>
 
       <template v-for="(value, key) in published">
-        <template v-if="value">
-          <label :for="'published-' + key">{{ _("Observacions per publicar") }} ${key}</label>
-          <textarea :id="'published-' + key" v-model="publishedComments[key]" class="form-control"></textarea>
-        </template>
       </template>
 
-      <label for="comments">{{ _("Observacions o aclariments") }}</label>
+      {% if len(options) > 0 and form.fields["options"] %}
+        {% for choice in options %}
+          {% if option_is_publishable(resource_type, resource.code, choice[0]) %}
+          <template v-if="selected.indexOf('{{ choice[0] }}') !== -1">
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" id="publish-{{ choice[0] }}" name="publish-{{ choice[0] }}" role="switch" v-model="published['{{ choice[0] }}']">
+              <label class="form-check-label" for="publish-{{ choice[0] }}">
+                {{ _("Publica la necessitat de %(name)s", name=choice[1]) }}
+              </label>
+            </div>
+          </template>
+
+          <template v-if="published['{{ choice[0] }}']">
+            {% set description = publishable_option_description(resource.code, choice[0]) %}
+            <label for="published-{{ choice[0] }}">
+              {% if description %}{{ info_tooltip(description) }}{% endif %}
+              {{ _("Descripció de la necessitat que apareixerà a la pàgina pública") }}
+            </label>
+            <textarea id="published-{{ choice[0] }}" v-model="publishedComments['{{ choice[0] }}']" class="form-control" required></textarea>
+          </template>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      <label class="mt-2" for="comments">{{ _("Observacions o aclariments per al conjunt de opcions") }}</label>
       <textarea id="comments" name="comments" rows="2" {{ input_classes(form, "comments") }}>{{ textarea_value(form, "comments") }}</textarea>
       {{ input_feedback(form, "comments") }}
 
@@ -192,8 +198,9 @@
           </button>
         </div>
       </div>
-      <textarea class="d-none" v-model="publishedCommentsString"></textarea>
-  </form>
+      <input type="hidden" v-model="publishedCommentsString" name="published">
+    </form>
+  </div>
   <div class="d-block d-md-none">
     {{ all_steps(resource_type, count, border=False) }}
   </div>

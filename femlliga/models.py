@@ -531,6 +531,9 @@ class Need(BaseResource):
         j["images"] = [i.json() for i in self.images.all()]
         return j
 
+    def options_details(self):
+        return NeedOptionThrough.objects.filter(need=self)
+
 
 class NeedOptionThrough(models.Model):
     need = models.ForeignKey(Need, on_delete=models.CASCADE)
@@ -581,6 +584,9 @@ class Offer(BaseResource):
         j["charge"] = self.charge
         j["place_accessible"] = self.place_accessible
         return j
+
+    def options_details(self):
+        return OfferOptionThrough.objects.filter(offer=self)
 
 
 class OfferOptionThrough(models.Model):

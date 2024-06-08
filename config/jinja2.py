@@ -106,11 +106,17 @@ def provider_login_url_wrapper(request, provider, **params):
 def option_is_publishable(resource_type, resource_code, option):
     try:
         return (
-            resource_type == "needs" and 
-            option in consts.NEEDS_PUBLISHABLE_OPTIONS_MAP[resource_code]
+            resource_type == "needs"
+            and option in consts.NEEDS_PUBLISHABLE_OPTIONS_MAP[resource_code]
         )
     except:
         return False
+
+
+def publishable_option_description(resource_code, option):
+    return consts.NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP.get(
+        (resource_code, option), ""
+    )
 
 
 def environment(**options):
@@ -147,6 +153,7 @@ def environment(**options):
             "get_current_site": get_current_site,
             "display_list": display_list,
             "option_is_publishable": option_is_publishable,
+            "publishable_option_description": publishable_option_description,
         }
     )
     return env
