@@ -25,8 +25,6 @@ def extract_data(response, origin):
 def get_url(origin, o):
     maps = {
         "tornallom": {"key": "normalizedName", "url": "https://tornallom.org/ca/directori/{}/"},
-        "sobiraniaalimentariapv": {"key": "slug", "url": "https://mapa.sobiranialimentariapv.org/?id={}"},
-        "pamapam": {"key": "id", "url": "https://pamapam.cat/directori/{}/"},
     }
     try:
         return maps[origin]["url"].format(o[maps[origin]["key"]])
@@ -56,18 +54,3 @@ def get_tornallom_organizations():
         },
     )
     return extract_data(response.json(), "tornallom")
-
-
-@cache(datetime.timedelta(days=1))
-def get_pamapam_organizations():
-    response = requests.post(
-        "https://pamapam.cat/services/searchEntitiesGeojson",
-        json={"text": "", "sectorIds": [], "refererDomain": None, "apiKey": None},
-    )
-    return extract_data(response.json(), "pamapam")
-
-
-@cache(datetime.timedelta(days=1))
-def get_sobiraniaalimentariapv_organizations():
-    response = requests.get("https://mapa.sobiranialimentariapv.org/map_points/?l=ca")
-    return extract_data(response.json(), "sobiraniaalimentariapv")

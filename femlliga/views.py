@@ -97,8 +97,6 @@ from .utils import (
 from .maps import (
     get_femlliga_organizations,
     get_tornallom_organizations,
-    get_pamapam_organizations,
-    get_sobiraniaalimentariapv_organizations,
 )
 
 
@@ -1591,24 +1589,12 @@ def maps(request):
             "color": "gold",
             "func": get_femlliga_organizations,
         },
-        #        {
-        #            "name": "Tornallom",
-        #            "code": "tornallom",
-        #            "color": "orange",
-        #            "func": get_tornallom_organizations,
-        #        },
-        #        {
-        #            "name": "Pam a Pam",
-        #            "code": "pamapam",
-        #            "color": "red",
-        #            "func": get_pamapam_organizations,
-        #        },
-        #        {
-        #            "name": "Sobirania alimentària PV",
-        #            "code": "sobiraniaalimentariapv",
-        #            "color": "green",
-        #            "func": get_sobiraniaalimentariapv_organizations,
-        #        },
+        {
+            "name": "Tornallom",
+            "code": "tornallom",
+            "color": "orange",
+            "func": get_tornallom_organizations,
+        },
     ]
 
     for m in maps:
