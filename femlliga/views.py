@@ -1587,21 +1587,20 @@ def maps(request):
             "name": "Fem lliga!",
             "code": "femlliga",
             "color": "gold",
-            "func": get_femlliga_organizations,
+            "orgs": get_femlliga_organizations(),
         },
         {
             "name": "Tornallom",
             "code": "tornallom",
             "color": "orange",
-            "func": get_tornallom_organizations,
+            "orgs": get_tornallom_organizations(),
         },
     ]
 
     for m in maps:
-        map_orgs = m["func"]()
-        m["count"] = len(map_orgs)
-        orgs += map_orgs
-        del m["func"]
+        m["count"] = len(m["orgs"])
+        orgs += m["orgs"]
+        del m["orgs"]
 
     return render(
         request,
@@ -1609,6 +1608,20 @@ def maps(request):
         {
             "maps": maps,
             "json_data": {"organizations": orgs, "maps": maps},
+        },
+    )
+
+
+def public_needs(request):
+    needs = NeedOptionThrough.objects.filter(
+        need__has_resource=True,
+        public=True,
+    ).prefetch_related("need__organization")
+    return render(
+        request,
+        "femlliga/public_needs.html",
+        {
+            "needs": needs,
         },
     )
 

@@ -7,7 +7,8 @@ from . import views
 urlpatterns = [
     # no login required
     path("", views.index, name="index"),
-    path("contact/", views.contact, name="contact"),
+    path("talk/", views.contact, name="contact"),
+    path("public-needs/", views.public_needs, name="public_needs"),
     path("maps/", views.maps, name="maps"),
     path("check-matches/", views.check_matches, name="check_matches"),
     path("search-address/", views.search_address, name="search_address"),
