@@ -60,6 +60,7 @@ from .models import (
     Contact,
     ContactDenyList,
     Graph,
+    ExternalContact,
     Message,
     Need,
     NeedImage,
@@ -1656,22 +1657,53 @@ def public_announcement(request, pk):
     if not announcement.public:
         raise PermissionDenied()
 
+    form = ContactForm()
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            org = announcement.need.organization
+            email = form.cleaned_data["email"]
+            content = form.cleaned_data["content"]
+            ExternalContact.objects.create(
+                organization=org,
+                email=email,
+                message=content,
+                resource=announcement.need.resource,
+                option=announcement.option,
+            )
+
+            subject = _("S'ha enviat el següent missatge a «%(name)s»") % {
+                "name": org.name
+            }
+            body = render_to_string(
+                "email/external_contact_sent.html",
+                {
+                    "content": content,
+                    "org": org,
+                    "current_site": get_current_site(request),
+                },
+            )
+            send_email(to=[email], subject=subject, body=body)
+            # TODO FL121 mark messages as read when contacts page visited
+            # TODO FL122 if preference set to receive email, send email to org too
+
+            msg = _(
+                "S'ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible"
+            )
+            messages.info(request, msg, extra_tags="show")
+            return redirect(reverse("public_announcement", args=[pk]))
+
     return render(
         request,
         "femlliga/public_announcement.html",
         {
+            "form": form,
             "announcement": announcement,
+            "json_data": {
+                "sending": request.method == "POST",
+            },
         },
     )
-
-
-# TODO FL120 implement
-def contact_public_announcement(request, pk):
-    announcement = get_object_or_404(NeedOptionThrough, pk=pk)
-    if not announcement.public:
-        raise PermissionDenied()
-
-    return redirect(reverse("public_announcement", args=[pk]))
 
 
 @login_required

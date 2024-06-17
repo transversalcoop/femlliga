@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from "femlliga/_macros.html" import leaflet_css, leaflet_js, organization_map_js %}
+{% from "femlliga/_macros.html" import leaflet_css, leaflet_js, organization_map_js, vue_js, initial_loading_vue, input_classes, input_value, textarea_value, input_feedback, form_feedback %}
 
 {% block css %}{{ leaflet_css() }}{% endblock %}
 
@@ -20,11 +20,36 @@
     {{ announcement.get_province().name }}
   </p>
   <p class="pre-wrap">{{ announcement.comments }}</p>
-  <div class="text-center">
-    <a href="{{ url("contact_public_announcement", args=[announcement.id]) }}" class="btn btn-custom">
-      {{ _("Contacta amb la organització") }}
-    </a>
-  </div>
+
+  <form method="POST" action="{{ url("public_announcement", args=[announcement.id]) }}" class="mb-4">
+    <div id="vue-app">
+      <div v-if="sending">
+        {{ csrf_input }}
+        {{ form_feedback(form) }}
+
+        <label for="id_email">{{ _("El teu correu electrònic. T'enviarem una còpia del missatge, i la organització el farà servir per posar-se en contacte amb tu.") }}</label>
+        <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="{{ _("Nom") }}" id="id_email" {{ input_value(form, "email") }} required>
+        {{ input_feedback(form, "email") }}
+
+        <label for="id_content" class="mt-2">{{ _("Missatge per a la organització") }}</label>
+        <textarea id="content" name="content" rows="8" {{ input_classes(form, "content") }} required>{{ textarea_value(form, "content") }}</textarea>
+        {{ input_feedback(form, "content") }}
+
+        <div class="mt-2"></div>
+      </div>
+      <div v-else>
+        <div class="text-center">
+          <a @click="open" class="btn btn-custom">
+            {{ _("Contacta amb la organització") }}
+          </a>
+        </div>
+      </div>
+    </div>
+    <div id="submitFooter" class="d-none">
+      {{ form.captcha }}
+      <button type="submit" class="btn btn-warning mt-2">{{ _("Envia") }}</button>
+    </div>
+  </form>
 
   <div id="citymap" class="map-height mt-2"></div>
 </main>
@@ -32,8 +57,29 @@
 
 {% block js %}
 {{ leaflet_js() }}
+{{ vue_js() }}
 <script>
 {{ organization_map_js(announcement.need.organization) }}
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      sending: jsonData.sending,
+    };
+  },
+  mounted() {
+    if (this.sending) {
+      this.open();
+    }
+  },
+  methods: {
+    open() {
+      this.sending = true;
+      document.getElementById("submitFooter").classList.remove("d-none");
+    }
+  },
+}).mount("#vue-app");
 </script>
 {% endblock %}
 

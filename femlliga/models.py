@@ -106,6 +106,9 @@ class CustomUser(AbstractUser):
     # DEPRECATED
     accept_communications_automatically = models.BooleanField(default=True)
     notify_immediate_communications_received = models.BooleanField(default=True)
+    notify_immediate_external_communications_received = models.BooleanField(
+        default=True
+    )
     # DEPRECATED
     notify_immediate_communications_rejected = models.BooleanField(default=True)
 
@@ -574,6 +577,33 @@ class NeedOptionThrough(models.Model):
         lat = self.need.organization.lat
         lng = self.need.organization.lng
         return get_province(lat, lng, spain_provinces["features"])
+
+
+class ExternalContact(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    received_on = models.DateTimeField(
+        auto_now_add=True, verbose_name=_("Contacte enviat el")
+    )
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.SET_NULL,
+        related_name="received_external_contacts",
+        verbose_name=_("Organització contactada"),
+        null=True,
+    )
+    email = models.EmailField()
+    message = models.TextField(verbose_name=_("Missatge"))
+    resource = models.CharField(
+        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
+    )
+    option = models.ForeignKey(
+        ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
+    )
+    read = models.BooleanField(default=False)
 
 
 class Offer(BaseResource):
