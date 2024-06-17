@@ -49,6 +49,9 @@
     >
       {{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}
     </li>
+    <li>
+      {{ menu_url(_("Contactes"), "external_contacts", [organization.id], pending=organization.pending_external_contacts()) }}
+    </li>
     {% endif %}
   {% endif %}
   {% if user.is_staff %}

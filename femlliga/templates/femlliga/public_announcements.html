@@ -20,25 +20,30 @@
       </select>
     </div>
 
-    <div v-for="a in announcements" class="col-12 col-sm-6 col-md-4 mt-2">
-      <div class="match-box p-2">
-        <h2 class="mt-0">
-          <span v-html="highlightSearch(a.need.organization.name, search)"></span>
-          {{ _("necessita") }}
-          <span v-html="highlightSearch(a.option, search)"></span>
-        </h2>
-        <p>
-          <strong>
-            {{ _("Província de") }}
-          </strong>
-          <span v-html="highlightSearch(a.need.organization.province.name, search)" class="pre-wrap"></span>
-        </p>
-        <p v-html="highlightSearch(a.comments, search)" class="pre-wrap"></p>
-        <div class="text-center">
-          <a :href="a.href" class="btn btn-custom">{{ _("Visualitza l'anunci complet") }}</a>
+    <template v-if="announcements.length > 0">
+      <div v-for="a in announcements" class="col-12 col-sm-6 col-md-4 mt-2">
+        <div class="match-box p-2">
+          <h2 class="mt-0">
+            <span v-html="highlightSearch(a.need.organization.name, search)"></span>
+            {{ _("necessita") }}
+            <span v-html="highlightSearch(a.option, search)"></span>
+          </h2>
+          <p>
+            <strong>
+              {{ _("Província de") }}
+            </strong>
+            <span v-html="highlightSearch(a.need.organization.province.name, search)" class="pre-wrap"></span>
+          </p>
+          <p v-html="highlightSearch(a.comments, search)" class="pre-wrap"></p>
+          <div class="text-center">
+            <a :href="a.href" class="btn btn-custom">{{ _("Visualitza l'anunci complet") }}</a>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
+    <template v-else>
+      <p class="text-center mt-3"><em>{{ _("No s'ha publicat cap anunci que encaixe amb el filtre") }}</em></p>
+    </template>
   </div>
 </main>
 {% endblock %}

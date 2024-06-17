@@ -27,13 +27,17 @@
         {{ csrf_input }}
         {{ form_feedback(form) }}
 
+        <label for="id_name">{{ _("Nom i cognoms") }}</label>
+        <input type="text" {{ input_classes(form, "name") }} name="name" autocomplete="{{ _("Nom") }}" id="id_name" {{ input_value(form, "name") }} required>
+        {{ input_feedback(form, "name") }}
+
         <label for="id_email">{{ _("El teu correu electrònic. T'enviarem una còpia del missatge, i la organització el farà servir per posar-se en contacte amb tu.") }}</label>
-        <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="{{ _("Nom") }}" id="id_email" {{ input_value(form, "email") }} required>
+        <input type="email" {{ input_classes(form, "email") }} name="email" id="id_email" {{ input_value(form, "email") }} required>
         {{ input_feedback(form, "email") }}
 
-        <label for="id_content" class="mt-2">{{ _("Missatge per a la organització") }}</label>
-        <textarea id="content" name="content" rows="8" {{ input_classes(form, "content") }} required>{{ textarea_value(form, "content") }}</textarea>
-        {{ input_feedback(form, "content") }}
+        <label for="id_message" class="mt-2">{{ _("Missatge per a la organització") }}</label>
+        <textarea id="message" name="message" rows="8" {{ input_classes(form, "message") }} required>{{ textarea_value(form, "message") }}</textarea>
+        {{ input_feedback(form, "message") }}
 
         <div class="mt-2"></div>
       </div>

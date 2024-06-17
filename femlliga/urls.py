@@ -83,6 +83,11 @@ urlpatterns = [
         views.agreement,
         name="agreement",
     ),
+    path(
+        "organization/<uuid:organization_id>/external-contacts/",
+        views.external_contacts,
+        name="external_contacts",
+    ),
     # for debugging style
     #    path(
     #        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/email/view/",

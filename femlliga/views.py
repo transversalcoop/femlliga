@@ -49,6 +49,7 @@ from .constants import (
 
 from .forms import (
     ContactForm,
+    ExternalContactForm,
     MessageForm,
     OrganizationForm,
     PreferencesForm,
@@ -515,19 +516,27 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
                     resource_options.append(ro)
 
             if model is Need:
-                m.new_options.clear()
+                for ro in m.new_options.all():
+                    if ro not in resource_options:
+                        m.new_options.remove(ro)
+
                 for ro in resource_options:
-                    public = False
-                    comments = ""
+                    comments, public = "", False
                     try:
                         if ro.name in form.cleaned_data["published"]:
-                            public = True
                             comments = form.cleaned_data["published"][ro.name]
+                            public = True
                     except:
                         pass
-                    NeedOptionThrough.objects.create(
-                        need=m, option=ro, public=public, comments=comments
-                    )
+                    try:
+                        no = NeedOptionThrough.objects.get(need=m, option=ro)
+                        no.public = public
+                        no.comments = comments
+                        no.save()
+                    except:
+                        NeedOptionThrough.objects.create(
+                            need=m, option=ro, public=public, comments=comments
+                        )
             else:
                 m.new_options.set(resource_options)
 
@@ -887,6 +896,9 @@ def save_preferences(request):
         request.user.notify_immediate_communications_received = form.cleaned_data[
             "notify_immediate_communications_received"
         ]
+        request.user.notify_immediate_external_communications_received = (
+            form.cleaned_data["notify_immediate_external_communications_received"]
+        )
         request.user.notify_agreement_communication_pending = form.cleaned_data[
             "notify_agreement_communication_pending"
         ]
@@ -1094,6 +1106,24 @@ def mark_message_read(request, organization_id, agreement_id, message_id):
         m.save()
 
     return JsonResponse({"ok": True})
+
+
+@login_required
+@require_own_organization
+def external_contacts(request, organization_id):
+    organization = get_object_or_404(Organization, pk=organization_id)
+    return render(
+        request,
+        "femlliga/external_contacts.html",
+        {
+            "org": organization,
+            "json_data": {
+                "contacts": [
+                    c.json() for c in organization.received_external_contacts.all()
+                ],
+            },
+        },
+    )
 
 
 def requested_resources(agreements):
@@ -1657,17 +1687,16 @@ def public_announcement(request, pk):
     if not announcement.public:
         raise PermissionDenied()
 
-    form = ContactForm()
+    form = ExternalContactForm()
     if request.method == "POST":
-        form = ContactForm(request.POST)
+        form = ExternalContactForm(request.POST)
         if form.is_valid():
             org = announcement.need.organization
-            email = form.cleaned_data["email"]
-            content = form.cleaned_data["content"]
-            ExternalContact.objects.create(
+            ec = ExternalContact.objects.create(
                 organization=org,
-                email=email,
-                message=content,
+                name=form.cleaned_data["name"],
+                email=form.cleaned_data["email"],
+                message=form.cleaned_data["message"],
                 resource=announcement.need.resource,
                 option=announcement.option,
             )
@@ -1678,14 +1707,28 @@ def public_announcement(request, pk):
             body = render_to_string(
                 "email/external_contact_sent.html",
                 {
-                    "content": content,
                     "org": org,
+                    "option": announcement.option,
+                    "message": ec.message,
                     "current_site": get_current_site(request),
                 },
             )
-            send_email(to=[email], subject=subject, body=body)
+            send_email(to=[ec.email], subject=subject, body=body)
             # TODO FL121 mark messages as read when contacts page visited
-            # TODO FL122 if preference set to receive email, send email to org too
+
+            if org.creator.notify_immediate_external_communications_received:
+                subject = _("T'han contactat per una necessitat publicada")
+                send_notification(
+                    user=org.creator,
+                    subject=subject,
+                    template="email/notify_external_communication_received.html",
+                    context={
+                        "org": org,
+                        "contact": ec,
+                        "option": announcement.option,
+                        "current_site": get_current_site(request),
+                    },
+                )
 
             msg = _(
                 "S'ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible"

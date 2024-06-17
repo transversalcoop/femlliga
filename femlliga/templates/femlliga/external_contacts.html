@@ -1,0 +1,97 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import organization_link, vue_js, sidebar_filter_show_link, initial_loading_vue %}
+
+{% block title %}{{ _("Contactes rebuts") }}{% endblock %}
+
+{% block content %}
+{% if len(json_data.contacts) > 0 %}
+<div class="container-fluid">
+  <div id="vue-app" class="row">
+    <div class="col-md-4 d-md-block bg-light sidebar">
+      <h1>{{ _("Contactes rebuts") }}</h1>
+      {{ sidebar_filter_show_link() }}
+      <div class="collapse show" id="sidebar-filter">
+        <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca contactes rebuts") }}">
+      </div>
+    </div>
+
+    <div class="col-md-8 ms-sm-auto px-md-4">
+      {{ initial_loading_vue() }}
+      <template v-else>
+        <div class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">{{ _("Tots els contactes") }}</h2>
+            <div class="matches-count agreements-count">
+              <span>${ contacts.length } {{ _("contactes rebuts") }}</span>
+            </div>
+          </div>
+        </div>
+        <div v-for="contact in contacts" class="row match-box">
+          <h3 class="mt-2">{{ _("Contacte rebut de") }} ${ contact.name } (${ contact.email }) {{ _("sobre l'anunci de") }} ${ contact.option }</h3>
+          <p class="fs-7 fst-italic me-3 text-body-secondary">
+            <span v-if="!contact.read" title="{{ _("Missatge pendent de llegir") }}">
+              <i class="bi-circle-fill text-danger"></i>
+            </span>
+            {{ _("Rebut el") }} ${ formatDateTime(contact.received_on) }
+          </p>
+          <p class="pre-wrap">${ contact.message }</p>
+          TODO FL121 highlight search
+          TODO FL121 mark messages as read on page load
+          TODO FL121 somewhere put a message with instructions on how to reply
+        </div>
+      </template>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="container text-center pt-4">
+  <h1>{{ _("Encara no heu rebut contactes en referència a anuncis publicats") }}</h1>
+  <p>{{ _("En podreu rebre sempre que publiqueu alguna necessitat des de la pàgina de «Entitat»") }}</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block js %}
+{{ vue_js() }}
+<script>
+function contactContains(search) {
+  return function(c) {
+    const parts = sanitize(search).split(" ").filter(x => x !== "");
+    const targets = [
+      sanitize(c.email),
+      sanitize(c.message),
+      sanitize(c.resource),
+      sanitize(c.option),
+    ];
+    for (var part of parts) {
+      if (!targets.some((target) => contains(target, part))) {
+        return false;
+      }
+    }
+    return true;
+  };
+}
+
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      search: "",
+      allContacts: jsonData.contacts,
+    };
+  },
+  methods: {
+    highlightSearch: highlightSearch,
+    formatDateTime: formatDateTime,
+  },
+  computed: {
+    contacts() {
+      return this.allContacts.filter(contactContains(this.search));
+    },
+  },
+}).mount("#vue-app");
+</script>
+{% endblock %}
+

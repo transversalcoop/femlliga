@@ -305,6 +305,9 @@ class Organization(models.Model):
         ).count()
         return sent > 0, received > 0
 
+    def pending_external_contacts(self):
+        return self.received_external_contacts.count() > 0
+
     def creator__email(self):
         return self.creator.email
 
@@ -596,6 +599,7 @@ class ExternalContact(models.Model):
         null=True,
     )
     email = models.EmailField()
+    name = models.TextField(verbose_name=_("Nom"))
     message = models.TextField(verbose_name=_("Missatge"))
     resource = models.CharField(
         max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
@@ -604,6 +608,20 @@ class ExternalContact(models.Model):
         ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
     )
     read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-received_on"]
+
+    def json(self):
+        return {
+            "received_on": self.received_on,
+            "name": self.name,
+            "email": self.email,
+            "message": self.message,
+            "resource": str(self.resource),
+            "option": str(self.option),
+            "read": self.read,
+        }
 
 
 class Offer(BaseResource):
