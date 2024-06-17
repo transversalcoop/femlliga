@@ -81,6 +81,7 @@ from .models import (
 )
 
 from .utils import (
+    strip_accents,
     clean_form_email,
     get_json_body,
     get_next_resource,
@@ -98,6 +99,8 @@ from .maps import (
     get_femlliga_organizations,
     get_tornallom_organizations,
 )
+
+from femlliga.gis.es import spain_provinces
 
 
 def require_own_organization(func):
@@ -446,10 +449,22 @@ def render_wizard(
         imageforms = inlineformset_factory(
             model, imagemodel, fields=("image",), extra=6
         )()
+
+    selected_options = []
     try:
         selected_options = form.cleaned_data["options"]
     except:
-        selected_options = [o.name for o in db_resource.new_options.all()]
+        if db_resource:
+            selected_options = [o.name for o in db_resource.new_options.all()]
+
+    published_comments = {}
+    try:
+        published_comments = form.cleaned_data["published"]
+    except:
+        if db_resource:
+            nos = db_resource.options_details()
+            published_comments = {o.option.name: o.comments for o in nos if o.public}
+
     return render(
         request,
         "femlliga/resources-wizard.html",
@@ -465,6 +480,7 @@ def render_wizard(
             "editing": editing,
             "json_data": {
                 "selected": selected_options,
+                "published_comments": published_comments,
             },
         },
     )
@@ -477,11 +493,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
         model, imagemodel = get_resources_models(resource_type)
-        try:
-            m = model.objects.get(resource=resource, organization=org)
-        except Exception:
-            m = model(resource=resource, organization=org)
-            m.save()
+        m, _created = model.objects.get_or_create(resource=resource, organization=org)
 
         ImageFormSet = inlineformset_factory(model, imagemodel, fields=("image",))
         imageformset = ImageFormSet(
@@ -506,9 +518,12 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
                 for ro in resource_options:
                     public = False
                     comments = ""
-                    if ro.name in form.cleaned_data["published"]:
-                        public = True
-                        comments = form.cleaned_data["published"][ro.name]
+                    try:
+                        if ro.name in form.cleaned_data["published"]:
+                            public = True
+                            comments = form.cleaned_data["published"][ro.name]
+                    except:
+                        pass
                     NeedOptionThrough.objects.create(
                         need=m, option=ro, public=public, comments=comments
                     )
@@ -650,6 +665,7 @@ def render_matches_page(
     }
     if organization_matches:
         json_data["organization_matches"] = organization_matches
+
     return render(
         request,
         template,
@@ -1612,18 +1628,50 @@ def maps(request):
     )
 
 
-def public_needs(request):
-    needs = NeedOptionThrough.objects.filter(
+def public_announcements(request):
+    announcements = NeedOptionThrough.objects.filter(
         need__has_resource=True,
         public=True,
     ).prefetch_related("need__organization")
     return render(
         request,
-        "femlliga/public_needs.html",
+        "femlliga/public_announcements.html",
         {
-            "needs": needs,
+            "provinces": sorted(
+                [
+                    (p["properties"]["id"], p["properties"]["name"])
+                    for p in spain_provinces["features"]
+                ],
+                key=lambda p: strip_accents(p[1]),
+            ),
+            "json_data": {
+                "announcements": [a.json() for a in announcements],
+            },
         },
     )
+
+
+def public_announcement(request, pk):
+    announcement = get_object_or_404(NeedOptionThrough, pk=pk)
+    if not announcement.public:
+        raise PermissionDenied()
+
+    return render(
+        request,
+        "femlliga/public_announcement.html",
+        {
+            "announcement": announcement,
+        },
+    )
+
+
+# TODO FL120 implement
+def contact_public_announcement(request, pk):
+    announcement = get_object_or_404(NeedOptionThrough, pk=pk)
+    if not announcement.public:
+        raise PermissionDenied()
+
+    return redirect(reverse("public_announcement", args=[pk]))
 
 
 @login_required

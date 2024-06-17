@@ -15,6 +15,8 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 
+from shapely.geometry import shape, Point
+
 from femlliga.constants import (
     FROM_EMAIL,
     RESOURCE_OPTIONS_MAP,
@@ -372,3 +374,25 @@ async def create_agreement_message(agreement, organization, message):
         agreement=agreement,
     )
     return m
+
+
+def truncate(s):
+    parts = s.split(" ")
+    n = 50
+    if len(parts) > n:
+        return " ".join(parts[:n]) + "..."
+    return s
+
+
+def get_province(lat, lng, features):
+    p = Point(lng, lat)
+    for feature in features:
+        polygon = shape(feature["geometry"])
+        if polygon.contains(p):
+            return feature["properties"]
+
+
+def strip_accents(s):
+    return "".join(
+        c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
+    )

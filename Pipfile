@@ -30,6 +30,7 @@ channels = {extras = ["daphne"], version = "*"}
 channels-redis = "*"
 requests = "*"
 django-allauth = {extras = ["socialaccount"], version = "*"}
+shapely = "*"
 
 [dev-packages]
 

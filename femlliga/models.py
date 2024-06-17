@@ -536,10 +536,44 @@ class Need(BaseResource):
 
 
 class NeedOptionThrough(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
     need = models.ForeignKey(Need, on_delete=models.CASCADE)
     option = models.ForeignKey(ResourceOption, on_delete=models.CASCADE)
     comments = models.TextField(null=True, blank=True)
     public = models.BooleanField(default=False)
+
+    def json(self):
+        from femlliga.utils import truncate
+
+        lat = self.need.organization.lat
+        lng = self.need.organization.lng
+        return {
+            "id": self.id,
+            "comments": truncate(self.comments),
+            "option": str(self.option),
+            "href": reverse("public_announcement", args=[self.id]),
+            "need": {
+                "resource": self.need.resource,
+                "organization": {
+                    "name": self.need.organization.name,
+                    "lat": lat,
+                    "lng": lng,
+                    "province": self.get_province(),
+                },
+            },
+        }
+
+    def get_province(self):
+        from femlliga.utils import get_province
+        from femlliga.gis.es import spain_provinces
+
+        lat = self.need.organization.lat
+        lng = self.need.organization.lng
+        return get_province(lat, lng, spain_provinces["features"])
 
 
 class Offer(BaseResource):

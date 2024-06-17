@@ -8,7 +8,19 @@ urlpatterns = [
     # no login required
     path("", views.index, name="index"),
     path("talk/", views.contact, name="contact"),
-    path("public-needs/", views.public_needs, name="public_needs"),
+    path(
+        "public-announcements/", views.public_announcements, name="public_announcements"
+    ),
+    path(
+        "public-announcements/<uuid:pk>/",
+        views.public_announcement,
+        name="public_announcement",
+    ),
+    path(
+        "public-announcements/<uuid:pk>/contact/",
+        views.contact_public_announcement,
+        name="contact_public_announcement",
+    ),
     path("maps/", views.maps, name="maps"),
     path("check-matches/", views.check_matches, name="check_matches"),
     path("search-address/", views.search_address, name="search_address"),

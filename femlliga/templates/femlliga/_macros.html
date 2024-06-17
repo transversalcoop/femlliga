@@ -55,7 +55,10 @@
   </div>
   {% for option in resource.options_details() %}
     {% if option.public %}
-    <p>{{ option.comments }}</p>
+    <p>
+      <strong>{{ _("Descripció pública de %(option)s:", option=option.option) }}</strong>
+      {{ option.comments }}
+    </p>
     {% endif %}
   {% endfor %}
   {% if resource.comments %}

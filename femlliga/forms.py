@@ -53,6 +53,20 @@ class ResourceForm(forms.Form):
     place_accessible = forms.BooleanField(required=False)
     published = forms.JSONField(required=False)
 
+    def clean(self):
+        super().clean()
+        published = self.cleaned_data.get("published")
+        errors = []
+        if published:
+            for key in published:
+                if not published[key]:
+                    errors.append(key)
+        if len(errors) > 0:
+            self.add_error(
+                None, _("Totes les necessitats publicades necessiten una descripció")
+            )
+        return self.cleaned_data
+
 
 class ImageForm(forms.Form):
     image = forms.ImageField()

@@ -807,3 +807,7 @@ nav .nav-link.active {
     padding-left: 8px;
     border-left: none;
 }
+
+.alert .errorlist {
+    margin-bottom: 0;
+}
