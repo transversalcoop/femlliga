@@ -1118,12 +1118,26 @@ def external_contacts(request, organization_id):
         {
             "org": organization,
             "json_data": {
+                "org_id": str(organization.id),
                 "contacts": [
                     c.json() for c in organization.received_external_contacts.all()
                 ],
             },
         },
     )
+
+
+@login_required
+@require_own_organization
+def mark_external_contact_read(request, organization_id, contact_id):
+    if request.method == "POST":
+        c = get_object_or_404(ExternalContact, pk=contact_id)
+        if c.organization.id != organization_id:
+            return JsonResponse({"ok": False})
+        c.read = True
+        c.save()
+
+    return JsonResponse({"ok": True})
 
 
 def requested_resources(agreements):
@@ -1714,7 +1728,6 @@ def public_announcement(request, pk):
                 },
             )
             send_email(to=[ec.email], subject=subject, body=body)
-            # TODO FL121 mark messages as read when contacts page visited
 
             if org.creator.notify_immediate_external_communications_received:
                 subject = _("T'han contactat per una necessitat publicada")

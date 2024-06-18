@@ -306,7 +306,7 @@ class Organization(models.Model):
         return sent > 0, received > 0
 
     def pending_external_contacts(self):
-        return self.received_external_contacts.count() > 0
+        return self.received_external_contacts.filter(read=False).count() > 0
 
     def creator__email(self):
         return self.creator.email
@@ -614,6 +614,7 @@ class ExternalContact(models.Model):
 
     def json(self):
         return {
+            "id": str(self.id),
             "received_on": self.received_on,
             "name": self.name,
             "email": self.email,

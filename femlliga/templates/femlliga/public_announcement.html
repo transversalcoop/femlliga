@@ -23,7 +23,7 @@
 
   <form method="POST" action="{{ url("public_announcement", args=[announcement.id]) }}" class="mb-4">
     <div id="vue-app">
-      <div v-if="sending">
+      <template v-if="sending">
         {{ csrf_input }}
         {{ form_feedback(form) }}
 
@@ -40,14 +40,14 @@
         {{ input_feedback(form, "message") }}
 
         <div class="mt-2"></div>
-      </div>
-      <div v-else>
+      </template>
+      <template v-else>
         <div class="text-center">
           <a @click="open" class="btn btn-custom">
             {{ _("Contacta amb la organització") }}
           </a>
         </div>
-      </div>
+      </template>
     </div>
     <div id="submitFooter" class="d-none">
       {{ form.captcha }}

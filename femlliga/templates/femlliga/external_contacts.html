@@ -14,6 +14,10 @@
       <div class="collapse show" id="sidebar-filter">
         <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca contactes rebuts") }}">
       </div>
+
+      <p class="mt-3">
+        {{ _("En aquesta pàgina podeu veure les persones que us han enviat missatges en referència a les necessitats que heu publicat. Podeu posar-vos en contacte amb elles per correu electrònic.") }}
+      </p>
     </div>
 
     <div class="col-md-8 ms-sm-auto px-md-4">
@@ -28,17 +32,20 @@
           </div>
         </div>
         <div v-for="contact in contacts" class="row match-box">
-          <h3 class="mt-2">{{ _("Contacte rebut de") }} ${ contact.name } (${ contact.email }) {{ _("sobre l'anunci de") }} ${ contact.option }</h3>
+          <h3 class="mt-2">
+            {{ _("Contacte rebut de") }}
+            <span v-html="highlightSearch(contact.name, search)"></span>
+            (<span v-html="highlightSearch(contact.email, search)"></span>)
+            {{ _("sobre l'anunci de") }}
+            <span v-html="highlightSearch(contact.option, search)"></span>
+          </h3>
           <p class="fs-7 fst-italic me-3 text-body-secondary">
             <span v-if="!contact.read" title="{{ _("Missatge pendent de llegir") }}">
               <i class="bi-circle-fill text-danger"></i>
             </span>
             {{ _("Rebut el") }} ${ formatDateTime(contact.received_on) }
           </p>
-          <p class="pre-wrap">${ contact.message }</p>
-          TODO FL121 highlight search
-          TODO FL121 mark messages as read on page load
-          TODO FL121 somewhere put a message with instructions on how to reply
+          <p class="pre-wrap" v-html="highlightSearch(contact.message, search)"></p>
         </div>
       </template>
     </div>
@@ -59,9 +66,9 @@ function contactContains(search) {
   return function(c) {
     const parts = sanitize(search).split(" ").filter(x => x !== "");
     const targets = [
+      sanitize(c.name),
       sanitize(c.email),
       sanitize(c.message),
-      sanitize(c.resource),
       sanitize(c.option),
     ];
     for (var part of parts) {
@@ -79,12 +86,24 @@ Vue.createApp({
   data() {
     return {
       search: "",
+      org_id: jsonData.org_id,
       allContacts: jsonData.contacts,
     };
+  },
+  mounted() {
+    for (let contact of this.allContacts) {
+      if (!contact.read) {
+        this.markRead(contact);
+      }
+    }
   },
   methods: {
     highlightSearch: highlightSearch,
     formatDateTime: formatDateTime,
+    markRead(contact) {
+      let url = `/organization/${this.org_id}/external-contacts/${contact.id}/mark-read/`;
+      post(url, "{{ csrf_token }}", {});
+    },
   },
   computed: {
     contacts() {
