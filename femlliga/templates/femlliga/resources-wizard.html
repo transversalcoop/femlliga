@@ -75,7 +75,7 @@
               @click="toggleOption('{{ choice[0] }}')"
             >
               {% if option_is_publishable(resource_type, resource.code, choice[0]) %}
-              {{ info_tooltip(_("Aquesta opció és pot mostrar en una pàgina pública de Fem lliga!"), pos="mid") }}
+              {{ info_tooltip(_("Aquesta opció és pot mostrar en una pàgina d'anuncis de Fem lliga!"), pos="mid") }}
               {% endif %}
               {{ choice[1] }}
             </button>
@@ -139,7 +139,7 @@
               {% set description = publishable_option_description(resource.code, choice[0]) %}
               <label for="published-{{ choice[0] }}">
                 {% if description %}{{ info_tooltip(description) }}{% endif %}
-                {{ _("Descripció de la necessitat que apareixerà a la pàgina pública") }}
+                {{ _("Descripció de la necessitat que apareixerà a la pàgina d'anuncis") }}
               </label>
               <textarea id="published-{{ choice[0] }}" v-model="publishedComments['{{ choice[0] }}']" class="form-control" required></textarea>
             </div>

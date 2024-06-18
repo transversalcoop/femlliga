@@ -22,6 +22,13 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - Es registra la pàgina d'origen de les peticions («Has lliga?» i «Descobreix») per poder
   saber quina es fa servir més a la pràctica
 - Es registren tots els correus electrònics enviats per poder validar-ne el contingut
+- Algunes necessitats es consideren «publicables»
+- Es poden publicar anuncis de les necessitats publicables
+- Una persona externa pot revisar tots els anuncis publicats en una pàgina pública
+- Una persona externa pot enviar un missatge a una organització que ha publicat un anunci
+- Una organització pot configurar si rebre un correu electrònic sempre que es rep un
+  missatge per un anunci
+- Una organització pot revisar els missatges rebuts pels seus anuncis
 
 ### Changed
 
@@ -31,6 +38,8 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - Les converses que s'havien rebutjat es marquen com a que no es va realitzar un
   intercanvi
 - S'han afegit noves categories i etiquetes de recursos, mentre que altres s'han reagrupat
+- Quan s'inicia una petició d'intercanvi, es premarquen les opcions indicades en
+  necessitats
 
 ### Removed
 

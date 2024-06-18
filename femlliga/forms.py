@@ -57,15 +57,22 @@ class ResourceForm(forms.Form):
     def clean(self):
         super().clean()
         published = self.cleaned_data.get("published")
-        errors = []
+        not_publishable_errors, empty_errors = [], []
+        resource = self.cleaned_data.get("resource")
         if published:
             for key in published:
+                if key not in const.NEEDS_PUBLISHABLE_OPTIONS_MAP[resource]:
+                    not_publishable_errors.append(key)
                 if not published[key]:
-                    errors.append(key)
-        if len(errors) > 0:
+                    empty_errors.append(key)
+
+        if len(empty_errors) > 0:
             self.add_error(
                 None, _("Totes les necessitats publicades necessiten una descripció")
             )
+        if len(not_publishable_errors) > 0:
+            self.add_error(None, _("Aquesta opció no és publicable"))
+
         return self.cleaned_data
 
 
