@@ -32,6 +32,11 @@ urlpatterns = [
         name="announcement",
     ),
     path(
+        "organization/<uuid:organization_id>/announcements/<uuid:announcement_id>/edit/",
+        views.edit_announcement,
+        name="edit_announcement",
+    ),
+    path(
         "organization/<uuid:organization_id>/announcements/<uuid:announcement_id>/contacts/<uuid:contact_id>/mark-read/",
         views.mark_announcement_contact_read,
         name="mark_announcement_contact_read",

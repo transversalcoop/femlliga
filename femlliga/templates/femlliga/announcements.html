@@ -7,9 +7,9 @@
 {% block content %}
 {% if len(json_data.announcements) > 0 %}
 <div class="container-fluid">
-  <button class="btn btn-warning float-end">{{ _("Afegeix anunci") }}</button>
   <div id="vue-app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
+      <a class="btn btn-warning float-end mt-3" href="{{ url("add_announcement", args=[org.id]) }}">{{ _("Afegeix anunci") }}</a>
       <h1>{{ _("Anuncis") }}</h1>
       {{ sidebar_filter_show_link() }}
       <div class="collapse show" id="sidebar-filter">
@@ -33,9 +33,16 @@
           </div>
         </div>
         <div v-for="announcement in announcements" class="row match-box">
-          <h3 class="mt-2">
-            <span v-html="highlightSearch(announcement.title, search)"></span>
-          </h3>
+          <div class="mt-2">
+            <a :href="announcement.edit_href" class="btn btn-warning float-end">{{ _("Edita") }}</a>
+            <h3 class="mt-0" >
+              <a v-html="highlightSearch(announcement.title, search)" :href="announcement.href"></a>
+            </h3>
+          </div>
+          <p>
+            <a v-if="announcement.public" :href="announcement.public_href">{{ _("Anunci públic") }}</a>
+            <span v-else>{{ _("Anunci no publicat") }}</span>
+          </p>
           {# TODO rest of fields and also a link to the announcement #}
         </div>
       </template>

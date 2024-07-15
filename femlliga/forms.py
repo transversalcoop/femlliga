@@ -54,6 +54,8 @@ class OrganizationForm(forms.ModelForm):
 
 
 class AnnouncementForm(forms.ModelForm):
+    option = forms.ChoiceField(choices=const.RESOURCE_OPTIONS, required=True)
+
     class Meta:
         model = Announcement
         fields = [
@@ -61,7 +63,6 @@ class AnnouncementForm(forms.ModelForm):
             "title",
             "description",
             "resource",
-            "option",
         ]
 
     def clean(self):
@@ -72,10 +73,8 @@ class AnnouncementForm(forms.ModelForm):
         possible_options = const.NEEDS_PUBLISHABLE_OPTIONS_MAP.get(
             self.cleaned_data.get("resource")
         )
-        if (
-            not possible_options
-            or self.cleaned_data.get("option") not in possible_options
-        ):
+        option = self.cleaned_data.get("option")
+        if not possible_options or (option and option not in possible_options):
             self.add_error("option", _("Aquesta opció no és publicable"))
 
         return self.cleaned_data

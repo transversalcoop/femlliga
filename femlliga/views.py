@@ -55,10 +55,12 @@ from .forms import (
     PreferencesForm,
     ResourceForm,
     AnnouncementForm,
+    AnnouncementContactForm,
 )
 
 from .models import (
     Agreement,
+    Announcement,
     Contact,
     ContactDenyList,
     Graph,
@@ -1101,26 +1103,35 @@ def announcements(request, organization_id):
 
 @login_required
 @require_own_organization
+def edit_announcement(request, organization_id, announcement_id):
+    raise Exception("TODO")  # TODO FL125
+
+
+@login_required
+@require_own_organization
 def add_announcement(request, organization_id):
     organization = get_object_or_404(Organization, pk=organization_id)
     form = AnnouncementForm()
     if request.method == "POST":
         form = AnnouncementForm(request.POST)
         if form.is_valid():
-            form.save()
+            ro, _created = ResourceOption.objects.get_or_create(
+                name=form.cleaned_data["option"]
+            )
             Announcement.objects.create(
                 organization=organization,
                 public=form.cleaned_data["public"],
                 title=form.cleaned_data["title"],
                 description=form.cleaned_data["description"],
                 resource=form.cleaned_data["resource"],
-                option=form.cleaned_data["option"],
+                option=ro,
             )
             return redirect("announcements", organization_id=organization_id)
 
     descriptions = {}
     for k, value in NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP.items():
         descriptions.setdefault(k[0], {})[k[1]] = value
+
     return render(
         request,
         "femlliga/add_announcement.html",

@@ -562,6 +562,11 @@ class Announcement(models.Model):
             "resource": str(self.resource),
             "option": str(self.option),
             "pending_contacts": self.pending_contacts(),
+            "href": reverse("announcement", args=[self.organization.id, self.id]),
+            "public_href": reverse("public_announcement", args=[self.id]),
+            "edit_href": reverse(
+                "edit_announcement", args=[self.organization.id, self.id]
+            ),
         }
 
     def pending_contacts(self):

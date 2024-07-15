@@ -173,6 +173,10 @@ NEEDS_PUBLISHABLE_OPTIONS_MAP = {
     "ALLIANCES": ("VOLUNTEERING",),
 }
 
+NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP = {
+    ("ALLIANCES", "VOLUNTEERING"): _("Aliances - Crida a voluntariat"),
+}
+
 NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP = {
     ("ALLIANCES", "VOLUNTEERING"): _(
         "Una bona descripció inclourà informació com on s'ha de desenvolupar el voluntariat, en quines dates, si hi ha algun tipus de requisit o inscripció necessària, i una breu descripció de la feina que es desenvoluparà"
