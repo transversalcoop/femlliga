@@ -1,0 +1,99 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from "femlliga/_macros.html" import vue_js %}
+
+{% block title %}{{ _("Anuncis") }}{% endblock %}
+
+{% block content %}
+<main id="content" class="container">
+  <h1>{{ _("Anuncis publicats per les organitzacions de Fem lliga") }}</h1>
+  <div id="vue-app" class="row">
+    <div class="col-6">
+      <input v-model="search" class="form-control" type="text" placeholder="{{ _("Cerca anuncis") }}">
+    </div>
+    <div class="col-6">
+      <select v-model="province" class="form-select" type="text">
+        <option value="">{{ _("Filtra per província") }}</option>
+        {% for code, name in provinces %}
+        <option value="{{ code }}">{{ name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <template v-if="announcements.length > 0">
+      <div v-for="a in announcements" class="col-12 col-sm-6 col-md-4 mt-2">
+        <div class="match-box p-2">
+          <h2 class="mt-0">
+            <span v-html="highlightSearch(a.need.organization.name, search)"></span>
+            {{ _("necessita") }}
+            <span v-html="highlightSearch(a.option, search)"></span>
+          </h2>
+          <p>
+            <strong>
+              {{ _("Província de") }}
+            </strong>
+            <span v-html="highlightSearch(a.need.organization.province.name, search)" class="pre-wrap"></span>
+          </p>
+          <p v-html="highlightSearch(a.comments, search)" class="pre-wrap"></p>
+          <div class="text-center">
+            <a :href="a.href" class="btn btn-custom">{{ _("Visualitza l'anunci complet") }}</a>
+          </div>
+        </div>
+      </div>
+    </template>
+    <template v-else>
+      <p class="text-center mt-3"><em>{{ _("No s'ha publicat cap anunci que encaixe amb el filtre") }}</em></p>
+    </template>
+  </div>
+</main>
+{% endblock %}
+
+{% block js %}
+{{ vue_js() }}
+<script>
+
+function announcementContains(search) {
+  return function(a) {
+    const parts = sanitize(search).split(" ").filter(x => x !== "");
+    const targets = [
+      sanitize(a.comments),
+      sanitize(a.option),
+      sanitize(a.need.organization.name),
+      sanitize(a.need.organization.province.name),
+    ];
+    for (var part of parts) {
+      if (!targets.some((target) => contains(target, part))) {
+        return false;
+      }
+    }
+    return true;
+  };
+}
+
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      search: "",
+      province: "",
+      allAnnouncements: jsonData.announcements,
+    };
+  },
+  methods: {
+    highlightSearch: highlightSearch,
+  },
+  computed: {
+    announcements() {
+      return this.allAnnouncements.filter(announcementContains(this.search)).filter(a => {
+        if (!this.province) {
+          return true;
+        }
+        return a.need.organization.province.id === this.province;
+      });
+    },
+  },
+}).mount("#vue-app");
+</script>
+{% endblock %}
+

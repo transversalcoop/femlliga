@@ -39,7 +39,9 @@
 {% macro resource_details(resource, match_type) %}
   <div class="mb-2">
     {% for option in resource.options.all() %}
-      <span class="badge bg-light">{{ option }}</span>
+      <span class="badge bg-light">
+        {{ option }}
+      </span>
     {% endfor %}
   </div>
   <div class="mb-2">
@@ -181,65 +183,6 @@
     </div>
     {{ input_feedback(form, name) }}
   {% endif %}
-{% endmacro %}
-
-{% macro render_multiple_tags(form, name, label, options = [], show_empty=True) %}
-    {% if form.fields[name] and (show_empty or (not show_empty and len(options) > 0))%}
-        {% set choices = form.fields[name].choices %}
-        {% if len(options) > 0 %}
-            {% set choices = options %}
-        {% endif %}
-        {% if label %}
-        <label for="id_{{ name }}">{{ label }}</label>
-        {% endif %}
-        <div class="multi-select">
-            {% for choice in choices %}
-            {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}
-              {% set selected=True %}
-            {% endif %}
-            <button class="btn multi-select-choice {% if selected %}selected{% endif %}"
-                  type="button"
-                  role="switch"
-                  value="{{ choice[0] }}"
-                  onclick="clickOption(this);"
-                  {% if selected %}selected="true"{% endif %}>
-                {{ choice[1] }}
-            </button>
-            {% endfor %}
-        </div>
-        <select
-          id="id_{{ name }}"
-          name="{{ name }}"
-          style="display: none;"
-          class="multi-select {% if form.errors[name] %} is-invalid{% endif %}"
-          multiple>
-            {% for choice in choices %}
-            <option value="{{ choice[0] }}"
-                {% if form and form.cleaned_data and choice[0] in form.cleaned_data[name] %}selected{% endif %}>
-                {{ choice[1] }}
-            </option>
-            {% endfor %}
-        </select>
-        {{ input_feedback(form, name) }}
-
-        <script>
-function clickOption(element) {
-    if (element.getAttribute("selected") === "true") {
-        element.setAttribute("selected", "false");
-        element.classList.remove("selected");
-    } else {
-        element.setAttribute("selected", "true");
-        element.classList.add("selected");
-    }
-    var s = document.getElementById("id_{{ name }}");
-    for (var i = 0; i < s.children.length; i++) {
-        if (s.children[i].value === element.getAttribute("value")) {
-            s.children[i].selected = !s.children[i].selected;
-        }
-    }
-}
-        </script>
-    {% endif %}
 {% endmacro %}
 
 {% macro render_select_raw(name, options, value="") %}
@@ -480,7 +423,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       </div>
     </div>
 
-    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}')" class="btn btn-custom mt-2">
+    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}', {{ needs or '""' }})" class="btn btn-custom mt-2">
       <i class="bi-send fs-6 me-2"></i>
       {{ _("Contacta") }}
     </button>
@@ -491,7 +434,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       <button type="button" class="btn-close float-end" aria-label="Close" @click="closeMessage(result.message_href)"></button>
       <div>
         <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-4 mb-0">
-          {{ _("S'ha enviat el missatge correctament.") }}
+          {{ _("S'ha enviat el missatge correctament.") }} <a :href="messagesOpen[result.message_href].agreement_url">{{ _("Ves a la conversa") }}</a>.
         </div>
         <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-4 mb-0">
           {{ _("Hi ha hagut un error enviant el missatge. Per favor, torneu a intentar-ho més endavant, i si el problema persisteix poseu-vos en contacte amb") }} {{ settings.CONTACT_EMAIL }}.
@@ -580,18 +523,23 @@ function matchContains(search) {
       return l;
     },
     extractSelectedOptions(optionsMap) {
-      return Object.keys(optionsMap).map(k => {
-        if (optionsMap[k]) {
-          return k;
-        }
-        return "";
-      }).filter(v => v);
+      return Object.keys(optionsMap).filter(k => optionsMap[k]);
     },
-    sendMessage(result, origin) {
+    sendMessage(result, origin, needs) {
       var href = result.message_href;
       var m = this.messagesOpen[href];
       if (!this.messagesOpen[href]) {
-        this.messagesOpen[href] = {message: "", options: {}};
+        let options = {};
+        for (let option of result.options) {
+          if (needs) {
+            if (this.optionMatches(result.resource, option, needs)) {
+              options[option] = true;
+            }
+          } else {
+            options[option] = true;
+          }
+        }
+        this.messagesOpen[href] = {message: "", options: options};
         return;
       }
       if (!this.messageFormOk(result)) {
@@ -615,11 +563,11 @@ function matchContains(search) {
           options: this.extractSelectedOptions(m.options)
         },
       ).then(response => {
-      console.log("RESPONSE:", response)
         if (!response.ok) {
           throw "Bad response";
         }
         m.result = true;
+        m.agreement_url = response.agreement_url;
         m.loading = false;
       }).catch(err => {
         m.error = true;

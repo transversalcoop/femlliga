@@ -103,6 +103,22 @@ def provider_login_url_wrapper(request, provider, **params):
     return provider_login_url({"request": request}, provider, **params)
 
 
+def option_is_publishable(resource_type, resource_code, option):
+    try:
+        return (
+            resource_type == "needs"
+            and option in consts.NEEDS_PUBLISHABLE_OPTIONS_MAP[resource_code]
+        )
+    except:
+        return False
+
+
+def publishable_option_description(resource_code, option):
+    return consts.NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP.get(
+        (resource_code, option), ""
+    )
+
+
 def environment(**options):
     env = Environment(extensions=["jinja2.ext.i18n"], **options)
     env.install_gettext_callables(gettext=gettext, ngettext=ngettext, newstyle=True)
@@ -136,6 +152,8 @@ def environment(**options):
             "wizard_url": wizard_url,
             "get_current_site": get_current_site,
             "display_list": display_list,
+            "option_is_publishable": option_is_publishable,
+            "publishable_option_description": publishable_option_description,
         }
     )
     return env

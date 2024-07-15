@@ -7,32 +7,31 @@
 {% block title %}{{ _("Mapes compartits") }}{% endblock %}
 
 {% block content %}
-<div>
-  <label for="show-femlliga">Fem lliga!</label>
-  <input id="show-femlliga" type="checkbox" checked>
-  <label for="show-tornallom">Tornallom</label>
-  <input id="show-tornallom" type="checkbox" checked>
-  <label for="show-sobiraniaalimentariapv">Sobirania alimentària PV</label>
-  <input id="show-sobiraniaalimentariapv" type="checkbox" checked>
-  <label for="show-pamapam">Pam a Pam</label>
-  <input id="show-pamapam" type="checkbox" checked>
-  <input id="search" type="text" placeholder="Cerca">
-</div>
-<div id="citymap" class="map-height-big"></div>
-</div>
+<main id="content" class="container-fluid">
+  <div id="app" class="row">
+    <div class="col-md-4 d-md-block bg-light sidebar">
+      <h1>{{ _("Mapa de mapes de l'ESS") }}</h1>
+      <p>{{ _("Mostrant") }} <span id="results-count"></span> {{ _("resultats") }}</p>
+      <input id="search" class="form-control" type="text" placeholder="{{ _("Cerca punts pel seu nom") }}">
+
+      <h2 class="fs-5">{{ _("Selecciona els mapes que vols mostrar") }}</h2>
+      {% for map in maps %}
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="show-{{ map.code }}" checked>
+        <label class="form-check-label" for="show-{{ map.code }}">{{ map.name }} ({{ _("%(num)s punts", num=map.count) }})</label>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="col-md-8 p-0">
+      <div id="citymap" class="map-height-big"></div>
+    </div>
+  </div>
+</main>
 {% endblock %}
 
 {% block js %}
 {{ leaflet_js(markercluster=True) }}
 <script>
-var organizations = getJsonData().organizations;
-var searchInput = document.getElementById("search");
-var showFemlliga = document.getElementById("show-femlliga");
-var showTornallom = document.getElementById("show-tornallom");
-var showSobiraniaAlimentariaPV = document.getElementById("show-sobiraniaalimentariapv");
-var showPamapam = document.getElementById("show-pamapam");
-var map = L.map("citymap").setView([39.46755210639808, -0.3794678565158268], 8);
-var markerCluster;
 function icon(url) {
   return L.icon({
     iconUrl: "/static/icons/" + url,
@@ -43,26 +42,32 @@ function icon(url) {
     shadowSize: [41, 41]
   });
 }
-var icons = {
-  femlliga: icon("marker-icon-gold.png"),
-  tornallom: icon("marker-icon-orange.png"),
-  sobiraniaalimentariapv: icon("marker-icon-green.png"),
-  pamapam: icon("marker-icon-red.png"),
-};
 
+var jsonData = getJsonData();
+var searchInput = document.getElementById("search");
+var resultsCount = document.getElementById("results-count");
+var icons = {};
+var inputs = {};
+var mapNames = {};
+for (let map of jsonData.maps) {
+  icons[map.code] = icon(`marker-icon-${map.color}.png`);
+  inputs[map.code] = document.getElementById("show-" + map.code);
+  mapNames[map.code] = map.name;
+}
+
+var map = L.map("citymap").setView([39.46755210639808, -0.3794678565158268], 8);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+var markerCluster;
+var organizations = jsonData.organizations;
 function showOrganizations() {
   if (markerCluster) {
     markerCluster.remove();
   }
   let orgs = organizations.filter(o => {
-    return (o.origin === "femlliga" && showFemlliga.checked) ||
-           (o.origin === "tornallom" && showTornallom.checked) ||
-           (o.origin === "sobiraniaalimentariapv" && showSobiraniaAlimentariaPV.checked) ||
-           (o.origin === "pamapam" && showPamapam.checked);
+    return inputs[o.origin].checked;
   }).filter(o => {
     const parts = sanitize(searchInput.value).split(" ").filter(x => x !== "");
     for (var part of parts) {
@@ -72,20 +77,28 @@ function showOrganizations() {
     }
     return true;
   });
+  resultsCount.innerHTML = orgs.length;
   markerCluster = L.markerClusterGroup();
   orgs.forEach(o => {
     let marker = L.marker([o.lat, o.lng], { icon: icons[o.origin] });
-    marker.bindPopup(o.name);
+    let contents = `
+      <strong>${o.name}</strong>
+      <br>${mapNames[o.origin]}
+    `;
+    if (o.url) {
+      contents += `<br><a href="${o.url}" target="_blank">{{ _("Enllaç al mapa original") }}</a>`;
+    }
+    marker.bindPopup(contents);
     markerCluster.addLayer(marker);
   });
   map.addLayer(markerCluster);
 }
-showOrganizations()
+
+showOrganizations();
 searchInput.addEventListener("input", showOrganizations);
-showFemlliga.addEventListener("change", showOrganizations);
-showTornallom.addEventListener("change", showOrganizations);
-showSobiraniaAlimentariaPV.addEventListener("change", showOrganizations);
-showPamapam.addEventListener("change", showOrganizations);
+for (let code in inputs) {
+  inputs[code].addEventListener("change", showOrganizations);
+}
 </script>
 {% endblock %}
 

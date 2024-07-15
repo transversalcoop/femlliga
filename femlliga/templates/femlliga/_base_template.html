@@ -5,7 +5,7 @@
 {% endmacro %}
 
 {% macro menu_url(name, href, args=[], pending=False) %}
-<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}" {% if pending %} title="{{ _("Teniu peticions pendents d'atendre") }}"{% endif %}>{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
+<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}" {% if pending %} title="{{ _("Teniu missatges pendents d'atendre") }}"{% endif %}>{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
 {% endmacro %}
 
 {% macro logout_form(classes) %}
@@ -49,6 +49,9 @@
     >
       {{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}
     </li>
+    {#    <li>
+      {{ menu_url(_("Contactes"), "external_contacts", [organization.id], pending=organization.pending_external_contacts()) }}
+    </li>#}
     {% endif %}
   {% endif %}
   {% if user.is_staff %}

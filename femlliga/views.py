@@ -4,7 +4,7 @@ import time
 import unicodedata
 import urllib
 import uuid
-from functools import cmp_to_key, reduce
+from functools import reduce
 from io import BytesIO
 from pathlib import Path
 from asgiref.sync import async_to_sync
@@ -32,7 +32,7 @@ from django.utils.translation import get_language_from_request
 from django.utils.translation import gettext_lazy as _
 from django.views.static import serve
 
-from config.settings import MEDIA_ROOT
+from config.settings import MEDIA_ROOT, STAGING_ENVIRONMENT_NAME
 
 from .constants import (
     ORG_SCOPES,
@@ -80,6 +80,7 @@ from .models import (
 )
 
 from .utils import (
+    strip_accents,
     clean_form_email,
     get_json_body,
     get_next_resource,
@@ -94,10 +95,11 @@ from .utils import (
 )
 
 from .maps import (
+    get_femlliga_organizations,
     get_tornallom_organizations,
-    get_pamapam_organizations,
-    get_sobiraniaalimentariapv_organizations,
 )
+
+from femlliga.gis.es import spain_provinces
 
 
 def require_own_organization(func):
@@ -446,6 +448,14 @@ def render_wizard(
         imageforms = inlineformset_factory(
             model, imagemodel, fields=("image",), extra=6
         )()
+
+    selected_options = []
+    try:
+        selected_options = form.cleaned_data["options"]
+    except:
+        if db_resource:
+            selected_options = [o.name for o in db_resource.options.all()]
+
     return render(
         request,
         "femlliga/resources-wizard.html",
@@ -459,6 +469,9 @@ def render_wizard(
             "total": len(RESOURCES) * 2,
             "count": get_resource_index(resource_type, resource),
             "editing": editing,
+            "json_data": {
+                "selected": selected_options,
+            },
         },
     )
 
@@ -470,11 +483,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
     org = get_object_or_404(Organization, pk=organization_id)
     if request.method == "POST":
         model, imagemodel = get_resources_models(resource_type)
-        try:
-            m = model.objects.get(resource=resource, organization=org)
-        except Exception:
-            m = model(resource=resource, organization=org)
-            m.save()
+        m, _created = model.objects.get_or_create(resource=resource, organization=org)
 
         ImageFormSet = inlineformset_factory(model, imagemodel, fields=("image",))
         imageformset = ImageFormSet(
@@ -488,14 +497,13 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
             forms_valid = form.is_valid() and imageformset.is_valid()
         if forms_valid:
             options = form.cleaned_data["options"]
+            resource_options = []
             for option, _ignore in Resource.resource(resource).options():
-                # avoid clash with _ translation function
-                ro, _created = ResourceOption.objects.get_or_create(name=option)
+                ro, _ignore = ResourceOption.objects.get_or_create(name=option)
                 if option in options:
-                    m.options.add(ro)
-                else:
-                    m.options.remove(ro)
+                    resource_options.append(ro)
 
+            m.options.set(resource_options)
             m.comments = form.cleaned_data["comments"]
             m.has_resource = len(options) > 0 or len(m.comments) > 0
             m.charge = form.cleaned_data["charge"]
@@ -631,6 +639,7 @@ def render_matches_page(
     }
     if organization_matches:
         json_data["organization_matches"] = organization_matches
+
     return render(
         request,
         template,
@@ -851,6 +860,9 @@ def save_preferences(request):
         request.user.notify_immediate_communications_received = form.cleaned_data[
             "notify_immediate_communications_received"
         ]
+        request.user.notify_immediate_external_communications_received = (
+            form.cleaned_data["notify_immediate_external_communications_received"]
+        )
         request.user.notify_agreement_communication_pending = form.cleaned_data[
             "notify_agreement_communication_pending"
         ]
@@ -933,7 +945,15 @@ def send_message(request, organization_id, organization_to, resource_type, resou
                 },
             )
 
-        return JsonResponse({"ok": True})
+        return JsonResponse(
+            {
+                "ok": True,
+                "agreement_url": reverse(
+                    "agreement",
+                    kwargs={"organization_id": organization_id, "agreement_id": a.id},
+                ),
+            }
+        )
     return JsonResponse({"ok": False})
 
 
@@ -1050,6 +1070,38 @@ def mark_message_read(request, organization_id, agreement_id, message_id):
         m.save()
 
     return JsonResponse({"ok": True})
+
+
+# @login_required
+# @require_own_organization
+# def external_contacts(request, organization_id):
+#    organization = get_object_or_404(Organization, pk=organization_id)
+#    return render(
+#        request,
+#        "femlliga/external_contacts.html",
+#        {
+#            "org": organization,
+#            "json_data": {
+#                "org_id": str(organization.id),
+#                "contacts": [
+#                    c.json() for c in organization.received_external_contacts.all()
+#                ],
+#            },
+#        },
+#    )
+
+
+# @login_required
+# @require_own_organization
+# def mark_external_contact_read(request, organization_id, contact_id):
+#    if request.method == "POST":
+#        c = get_object_or_404(ExternalContact, pk=contact_id)
+#        if c.organization.id != organization_id:
+#            return JsonResponse({"ok": False})
+#        c.read = True
+#        c.save()
+#
+#    return JsonResponse({"ok": True})
 
 
 def requested_resources(agreements):
@@ -1551,19 +1603,125 @@ def contact(request):
 
 
 def maps(request):
-    orgs = [
+    # novel functionality, only available in dev
+    if not STAGING_ENVIRONMENT_NAME:
+        raise PermissionDenied()
+
+    orgs, maps = [], [
         {
-            "name": o.name,
-            "lat": o.lat,
-            "lng": o.lng,
-            "origin": "femlliga",
-        }
-        for o in Organization.objects.all()
+            "name": "Fem lliga!",
+            "code": "femlliga",
+            "color": "gold",
+            "orgs": get_femlliga_organizations(),
+        },
+        {
+            "name": "Tornallom",
+            "code": "tornallom",
+            "color": "orange",
+            "orgs": get_tornallom_organizations(),
+        },
     ]
-    orgs += get_tornallom_organizations()
-    orgs += get_pamapam_organizations()
-    orgs += get_sobiraniaalimentariapv_organizations()
-    return render(request, "femlliga/maps.html", {"json_data": {"organizations": orgs}})
+
+    for m in maps:
+        m["count"] = len(m["orgs"])
+        orgs += m["orgs"]
+        del m["orgs"]
+
+    return render(
+        request,
+        "femlliga/maps.html",
+        {
+            "maps": maps,
+            "json_data": {"organizations": orgs, "maps": maps},
+        },
+    )
+
+    # TODO implement with Announcement model
+
+
+# def public_announcements(request):
+#    return render(
+#        request,
+#        "femlliga/public_announcements.html",
+#            {
+#                "provinces": sorted(
+#                    [
+#                        (p["properties"]["id"], p["properties"]["name"])
+#                        for p in spain_provinces["features"]
+#                    ],
+#                    key=lambda p: strip_accents(p[1]),
+#                ),
+#                "json_data": {
+#                    "announcements": [a.json() for a in announcements],
+#                },
+#            },
+#    )
+
+
+# def public_announcement(request, pk):
+#    # TODO implement with Announcement model
+#    if not announcement.public:
+#        raise PermissionDenied()
+#
+#    form = ExternalContactForm()
+#    if request.method == "POST":
+#        form = ExternalContactForm(request.POST)
+#        if form.is_valid():
+#            org = announcement.need.organization
+#            ec = ExternalContact.objects.create(
+#                organization=org,
+#                name=form.cleaned_data["name"],
+#                email=form.cleaned_data["email"],
+#                message=form.cleaned_data["message"],
+#                resource=announcement.need.resource,
+#                option=announcement.option,
+#            )
+#
+#            subject = _("S'ha enviat el següent missatge a «%(name)s»") % {
+#                "name": org.name
+#            }
+#            body = render_to_string(
+#                "email/external_contact_sent.html",
+#                {
+#                    "org": org,
+#                    "option": announcement.option,
+#                    "message": ec.message,
+#                    "current_site": get_current_site(request),
+#                },
+#            )
+#            send_email(to=[ec.email], subject=subject, body=body)
+#
+#            if org.creator.notify_immediate_external_communications_received:
+#                subject = _("T'han contactat per una necessitat publicada")
+#                send_notification(
+#                    user=org.creator,
+#                    subject=subject,
+#                    template="email/notify_external_communication_received.html",
+#                    context={
+#                        "org": org,
+#                        "contact": ec,
+#                        "option": announcement.option,
+#                        "current_site": get_current_site(request),
+#                    },
+#                )
+#
+#            msg = _(
+#                "S'ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible"
+#            )
+#            messages.info(request, msg, extra_tags="show")
+#            return redirect(reverse("public_announcement", args=[pk]))
+#
+#    return render(
+#        request,
+#        "femlliga/public_announcement.html",
+#        {
+#            "form": form,
+#            "announcement": announcement,
+#            "json_data": {
+#                "sending": request.method == "POST",
+#            },
+#        },
+#    )
 
 
 @login_required
@@ -1590,11 +1748,11 @@ def most_requested(resources):
 
 
 def sort_agreements(agreements):
-    def f(a, b):
-        if a.agreement_successful is None:
-            return -1
-        if b.agreement_successful is None:
-            return 1
-        return a.date < b.date
+    def f(a):
+        a_date = a.date
+        a_messages = list(a.messages.all())
+        if len(a_messages) > 0:
+            a_date = a_messages[-1].sent_on
+        return a_date
 
-    return sorted(agreements, key=cmp_to_key(f))
+    return sorted(agreements, key=f, reverse=True)

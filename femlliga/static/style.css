@@ -390,7 +390,7 @@ nav .nav-link.active {
 
 @media (min-width: 768px) {
     .sidebar {
-        min-height: 100vh;
+        min-height: 90vh;
     }
 }
 
@@ -479,7 +479,7 @@ nav .nav-link.active {
 }
 
 .map-height-big {
-    height: 700px;
+    height: 90vh;
 }
 
 .card-carousel-triple {
@@ -612,7 +612,7 @@ nav .nav-link.active {
 }
 
 .css-tooltip .tooltiptext {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: normal;
   font-style: normal;
   visibility: hidden;
@@ -799,3 +799,15 @@ nav .nav-link.active {
     margin-bottom: -3rem;
 }
 
+.agreement-closed {
+    opacity: 70%;
+}
+
+.multi-select-choice.share-button {
+    padding-left: 8px;
+    border-left: none;
+}
+
+.alert .errorlist {
+    margin-bottom: 0;
+}

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 import re
+import sys
+
 from datetime import timedelta
 from distutils.util import strtobool
 from pathlib import Path
@@ -24,7 +26,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", None)
 
+TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 DEBUG = bool(strtobool(os.getenv("DJANGO_DEBUG", "false")))
+if TESTING:
+    DEBUG = False
+    DEBUG_TOOLBAR_CONFIG = {
+        "IS_RUNNING_TESTS": False,
+    }
 
 allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", ".localhost,127.0.0.1,[::1]")
 ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(",")))

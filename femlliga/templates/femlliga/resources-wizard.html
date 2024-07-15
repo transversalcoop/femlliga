@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_multiple_tags, render_formset_field %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_formset_field, info_tooltip, vue_js %}
 
 {% block title %}
 {% if editing %}
@@ -15,42 +15,6 @@
 {% endif %}
 {{ resource }}
 {% endblock %}
-
-{% macro resource_type_title(resource_type) %}
-  {% if resource_type == "needs" %}
-  {{ _("Què necessiteu?") }}
-  {% else %}
-  {{ _("Què oferiu?") }}
-  {% endif %}
-{% endmacro %}
-
-{% macro steps(resource_type, current_resource_type, count) %}
-<div class="d-flex justify-content-around">
-  {% for i, resource in enumerate(consts.RESOURCES) %}
-  {% if editing %}
-  <a
-    class="rounded-link fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}"
-    href="{% if editing %}{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}{% endif %}"
-  >
-    {{ i+1 }}
-  </a>
-  {% else %}
-  <span class="fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}">{{ i+1 }}</span>
-  {% endif %}
-  {% endfor %}
-</div>
-{% endmacro %}
-
-{% macro all_steps(resource_type, count, border=True) %}
-<div class="col-md-4{% if border %} border-dotted-right{% endif %}">
-  <span class="text-secondary">{{ resource_type_title("needs") }}</span>
-  {{ steps("needs", resource_type, count) }}
-</div>
-<div class="col-md-4">
-  <span class="text-secondary">{{ resource_type_title("offers") }}</span>
-  {{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
-</div>
-{% endmacro %}
 
 {% block content %}
 <div class="container mb-2">
@@ -87,15 +51,51 @@
     {% endif %}
   </p>
 
-  <form method="post" enctype="multipart/form-data" class="mb-1">
+  <div id="vue-app">
+    <form method="post" enctype="multipart/form-data" class="mb-1" @submit="submit">
       {{ csrf_input }}
       {{ form_feedback(form) }}
 
       <input type="hidden" id="resource" name="resource" value="{{ resource.code }}">
 
       {% set options = resource.options() %}
-      {% if len(options) > 0 %}
-          {{ render_multiple_tags(form, "options", "", options) }}
+      {% if len(options) > 0 and form.fields["options"] %}
+        <div class="multi-select">
+          {% for choice in options %}
+          {% if form and form.cleaned_data and choice[0] in form.cleaned_data["options"] %}
+            {% set selected=True %}
+          {% endif %}
+          <div class="btn-group me-2 mb-1" role="group">
+            <button
+              class="btn multi-select-choice m-0"
+              :class="{'selected': selected.indexOf('{{ choice[0] }}') !== -1}"
+              type="button"
+              role="switch"
+              value="{{ choice[0] }}"
+              @click="toggleOption('{{ choice[0] }}')"
+            >
+              {% if option_is_publishable(resource_type, resource.code, choice[0]) %}
+              {{ info_tooltip(_("Aquesta opció és pot mostrar en una pàgina d'anuncis de Fem lliga!"), pos="mid") }}
+              {% endif %}
+              {{ choice[1] }}
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+        <select
+          v-model="selected"
+          id="id_options"
+          name="options"
+          class="d-none multi-select {% if form.errors["options"] %} is-invalid{% endif %}"
+          multiple
+        >
+          {% for choice in options %}
+          <option value="{{ choice[0] }}">
+            {{ choice[1] }}
+          </option>
+          {% endfor %}
+        </select>
+        {{ input_feedback(form, "options") }}
       {% endif %}
 
       {% if resource_type == "offers" %}
@@ -119,7 +119,36 @@
 
       <div class="spacing"></div>
 
-      <label for="comments">{{ _("Observacions o aclariments") }}</label>
+      <template v-for="(value, key) in published">
+      </template>
+
+      {% if len(options) > 0 and form.fields["options"] %}
+        {% for choice in options %}
+          {% if option_is_publishable(resource_type, resource.code, choice[0]) %}
+          <div v-if="selected.indexOf('{{ choice[0] }}') !== -1" class="row mt-3">
+            <div class="col-md-4">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="publish-{{ choice[0] }}" name="publish-{{ choice[0] }}" role="switch" v-model="published['{{ choice[0] }}']">
+                <label class="form-check-label" for="publish-{{ choice[0] }}">
+                  {{ _("Publica la necessitat de %(name)s", name=choice[1]) }}
+                </label>
+              </div>
+            </div>
+
+            <div v-if="published['{{ choice[0] }}']" class="col-md-8">
+              {% set description = publishable_option_description(resource.code, choice[0]) %}
+              <label for="published-{{ choice[0] }}">
+                {% if description %}{{ info_tooltip(description) }}{% endif %}
+                {{ _("Descripció de la necessitat que apareixerà a la pàgina d'anuncis") }}
+              </label>
+              <textarea id="published-{{ choice[0] }}" v-model="publishedComments['{{ choice[0] }}']" class="form-control" required></textarea>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      <label class="mt-2" for="comments">{{ _("Observacions o aclariments per al conjunt de opcions") }}</label>
       <textarea id="comments" name="comments" rows="2" {{ input_classes(form, "comments") }}>{{ textarea_value(form, "comments") }}</textarea>
       {{ input_feedback(form, "comments") }}
 
@@ -171,12 +200,17 @@
           </button>
         </div>
       </div>
-  </form>
+      <input type="hidden" v-model="publishedCommentsString" name="published">
+    </form>
+  </div>
   <div class="d-block d-md-none">
     {{ all_steps(resource_type, count, border=False) }}
   </div>
 </div>
+{% endblock %}
 
+{% block js %}
+{{ vue_js() }}
 <script>
 function addImage(event) {
     for (let i = 0; i < 6; i++) {
@@ -190,6 +224,81 @@ function addImage(event) {
         }
     }
 }
+
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    let published = {};
+    for (let key in jsonData.published_comments) {
+      published[key] = true;
+    }
+    return {
+      selected: jsonData.selected,
+      published: published,
+      publishedComments: jsonData.published_comments,
+      publishedCommentsString: "",
+    };
+  },
+  methods: {
+    toggleOption(option) {
+      let index = this.selected.indexOf(option);
+      if (index === -1) {
+        this.selected.push(option);
+      } else {
+        this.selected.splice(index, 1);
+      }
+    },
+    togglePublish(option) {
+      this.published[option] = !this.published[option];
+    },
+    submit() {
+      let comments = {};
+      for (let key in this.published) {
+        if (this.published[key]) {
+          comments[key] = this.publishedComments[key] || "";
+        }
+      }
+      this.publishedCommentsString = JSON.stringify(comments);
+    },
+  },
+}).mount("#vue-app");
 </script>
 {% endblock %}
 
+
+{% macro resource_type_title(resource_type) %}
+  {% if resource_type == "needs" %}
+  {{ _("Què necessiteu?") }}
+  {% else %}
+  {{ _("Què oferiu?") }}
+  {% endif %}
+{% endmacro %}
+
+{% macro steps(resource_type, current_resource_type, count) %}
+<div class="d-flex justify-content-around">
+  {% for i, resource in enumerate(consts.RESOURCES) %}
+  {% if editing %}
+  <a
+    class="rounded-link fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}"
+    href="{% if editing %}{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}{% endif %}"
+  >
+    {{ i+1 }}
+  </a>
+  {% else %}
+  <span class="fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}">{{ i+1 }}</span>
+  {% endif %}
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro all_steps(resource_type, count, border=True) %}
+<div class="col-md-4{% if border %} border-dotted-right{% endif %}">
+  <span class="text-secondary">{{ resource_type_title("needs") }}</span>
+  {{ steps("needs", resource_type, count) }}
+</div>
+<div class="col-md-4">
+  <span class="text-secondary">{{ resource_type_title("offers") }}</span>
+  {{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
+</div>
+{% endmacro %}

@@ -14,34 +14,21 @@
       <h1>{{ _("Petició de %(resource)s rebuda de <em>%(org)s</em>", resource=resource_name(a.resource), org=a.solicitor_safe().name) }}</h1>
       {% endif %}
 
+      <div id="confirm-question" class="d-none">{{ _("Segur que vols marcar aquesta opció? L'acció no es pot desfer") }}</div>
       <div class="collapse show" id="sidebar-filter">
         <div>
         {% for option in a.options.all() %}
           <span class="badge bg-light me-2">{{ option }}</span>
         {% endfor %}
         </div>
-        <p class="mt-2">
-          <i class="bi-send"></i>
-          {{ _("Petició enviada el %(time)s", time=format_time(a.date)) }}
-        </p>
-        {% if a.agreement_successful == True %}
-        <p>
-          <i class="bi-check2 text-success"></i>
-          {{ _("Es va realitzar l'intercanvi (%(time)s)", time=format_time(a.successful_date)) }}
-        </p>
-        {% elif a.agreement_successful == False %}
-        <p>
-          <i class="bi-x-lg text-danger"></i>
-          {{ _("No es va realitzar l'intercanvi (%(time)s)", time=format_time(a.successful_date)) }}
-        </p>
-        {% else %}
-        <p class="mt-5">{{ _("Heu realitzat l'intercanvi? Indiqueu-ho per donar per acabada la conversa.") }}</p>
-        <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}">
+        {% if a.agreement_successful == None %}
+        <p class="mt-2">{{ _("Heu realitzat l'intercanvi? Indiqueu-ho per donar per acabada la conversa.") }}</p>
+        <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" onsubmit="return confirm(document.getElementById('confirm-question').textContent)">
           {{ csrf_input }}
           <input type="hidden" name="successful" value="yes">
           <button class="btn btn-warning w-100 mb-2">{{ _("Si, hem realitzat l'intercanvi!") }}</button>
         </form>
-        <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}">
+        <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" onsubmit="return confirm(document.getElementById('confirm-question').textContent)">
           {{ csrf_input }}
           <input type="hidden" name="successful" value="no">
           <button class="btn btn-brown w-100">{{ _("No, finalment no hem realitzat l'intercanvi...") }}</button>

@@ -19,6 +19,7 @@ class PreferencesForm(forms.ModelForm):
             "distance_limit_km",
             "notifications_frequency",
             "notify_immediate_communications_received",
+            #            "notify_immediate_external_communications_received",
             "notify_agreement_communication_pending",
             "notify_matches",
             "notify_new_resources",
@@ -51,6 +52,28 @@ class ResourceForm(forms.Form):
     comments = forms.CharField(required=False)
     charge = forms.BooleanField(required=False)
     place_accessible = forms.BooleanField(required=False)
+    published = forms.JSONField(required=False)
+
+    def clean(self):
+        super().clean()
+        published = self.cleaned_data.get("published")
+        not_publishable_errors, empty_errors = [], []
+        resource = self.cleaned_data.get("resource")
+        if published:
+            for key in published:
+                if key not in const.NEEDS_PUBLISHABLE_OPTIONS_MAP[resource]:
+                    not_publishable_errors.append(key)
+                if not published[key]:
+                    empty_errors.append(key)
+
+        if len(empty_errors) > 0:
+            self.add_error(
+                None, _("Totes les necessitats publicades necessiten una descripció")
+            )
+        if len(not_publishable_errors) > 0:
+            self.add_error(None, _("Aquesta opció no és publicable"))
+
+        return self.cleaned_data
 
 
 class ImageForm(forms.Form):
@@ -85,6 +108,14 @@ class ContactForm(forms.ModelForm):
     class Meta:
         model = Contact
         fields = ["email", "content"]
+
+
+# class ExternalContactForm(forms.ModelForm):
+#    captcha = ReCaptchaField()
+#
+#    class Meta:
+#        model = ExternalContact
+#        fields = ["name", "email", "message"]
 
 
 class CaptchaLoginForm(LoginForm):
