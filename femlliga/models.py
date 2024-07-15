@@ -106,9 +106,9 @@ class CustomUser(AbstractUser):
     # DEPRECATED
     accept_communications_automatically = models.BooleanField(default=True)
     notify_immediate_communications_received = models.BooleanField(default=True)
-    notify_immediate_external_communications_received = models.BooleanField(
-        default=True
-    )
+    # notify_immediate_external_communications_received = models.BooleanField(
+    #    default=True
+    # )
     # DEPRECATED
     notify_immediate_communications_rejected = models.BooleanField(default=True)
 
@@ -305,8 +305,8 @@ class Organization(models.Model):
         ).count()
         return sent > 0, received > 0
 
-    def pending_external_contacts(self):
-        return self.received_external_contacts.filter(read=False).count() > 0
+    #    def pending_external_contacts(self):
+    #        return self.received_external_contacts.filter(read=False).count() > 0
 
     def creator__email(self):
         return self.creator.email
@@ -485,16 +485,12 @@ class BaseResource(models.Model):
     def __str__(self):
         return str(Resource.resource(self.resource))
 
-    def get_options(self):
-        options = [(x.name, str(x)) for x in self.new_options.all()]
-        return options
-
     def json(self):
         return {
             "id": self.id,
             "resource": self.resource,
             "comments": self.comments,
-            "options": [o.name for o in self.new_options.all()],
+            "options": [o.name for o in self.options.all()],
         }
 
 
@@ -503,12 +499,6 @@ class Need(BaseResource):
         Organization,
         on_delete=models.CASCADE,
         related_name="needs",
-    )
-    new_options = models.ManyToManyField(
-        ResourceOption,
-        through="NeedOptionThrough",
-        related_name="needs",
-        blank=True,
     )
 
     class Meta:
@@ -537,92 +527,42 @@ class Need(BaseResource):
         j["images"] = [i.json() for i in self.images.all()]
         return j
 
-    def options_details(self):
-        return NeedOptionThrough.objects.filter(need=self)
 
-
-class NeedOptionThrough(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-    )
-    need = models.ForeignKey(Need, on_delete=models.CASCADE)
-    option = models.ForeignKey(ResourceOption, on_delete=models.CASCADE)
-    comments = models.TextField(null=True, blank=True)
-    public = models.BooleanField(default=False)
-
-    def json(self):
-        from femlliga.utils import truncate
-
-        lat = self.need.organization.lat
-        lng = self.need.organization.lng
-        return {
-            "id": self.id,
-            "comments": truncate(self.comments),
-            "option": str(self.option),
-            "href": reverse("public_announcement", args=[self.id]),
-            "need": {
-                "resource": self.need.resource,
-                "organization": {
-                    "name": self.need.organization.name,
-                    "lat": lat,
-                    "lng": lng,
-                    "province": self.get_province(),
-                },
-            },
-        }
-
-    def get_province(self):
-        from femlliga.utils import get_province
-        from femlliga.gis.es import spain_provinces
-
-        lat = self.need.organization.lat
-        lng = self.need.organization.lng
-        return get_province(lat, lng, spain_provinces["features"])
-
-
-class ExternalContact(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-    )
-    received_on = models.DateTimeField(
-        auto_now_add=True, verbose_name=_("Contacte enviat el")
-    )
-    organization = models.ForeignKey(
-        Organization,
-        on_delete=models.SET_NULL,
-        related_name="received_external_contacts",
-        verbose_name=_("Organització contactada"),
-        null=True,
-    )
-    email = models.EmailField()
-    name = models.TextField(verbose_name=_("Nom"))
-    message = models.TextField(verbose_name=_("Missatge"))
-    resource = models.CharField(
-        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
-    )
-    option = models.ForeignKey(
-        ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
-    )
-    read = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ["-received_on"]
-
-    def json(self):
-        return {
-            "id": str(self.id),
-            "received_on": self.received_on,
-            "name": self.name,
-            "email": self.email,
-            "message": self.message,
-            "resource": str(self.resource),
-            "option": str(self.option),
-            "read": self.read,
-        }
+# class ExternalContact(models.Model):
+#    id = models.UUIDField(
+#        primary_key=True,
+#        default=uuid.uuid4,
+#        editable=False,
+#    )
+#    received_on = models.DateTimeField(
+#        auto_now_add=True, verbose_name=_("Contacte enviat el")
+#    )
+#    # TODO link to Announcement
+#    email = models.EmailField()
+#    name = models.TextField(verbose_name=_("Nom"))
+#    message = models.TextField(verbose_name=_("Missatge"))
+#    resource = models.CharField(
+#        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
+#    )
+#    option = models.ForeignKey(
+#        ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
+#    )
+#    read = models.BooleanField(default=False)
+#
+#    class Meta:
+#        ordering = ["-received_on"]
+#
+#    def json(self):
+#        return {
+#            "id": str(self.id),
+#            "received_on": self.received_on,
+#            "name": self.name,
+#            "email": self.email,
+#            "message": self.message,
+#            "resource": str(self.resource),
+#            "option": str(self.option),
+#            "read": self.read,
+#        }
 
 
 class Offer(BaseResource):
@@ -630,12 +570,6 @@ class Offer(BaseResource):
         Organization,
         on_delete=models.CASCADE,
         related_name="offers",
-    )
-    new_options = models.ManyToManyField(
-        ResourceOption,
-        through="OfferOptionThrough",
-        related_name="offers",
-        blank=True,
     )
     charge = models.BooleanField(default=False)
     place_accessible = models.BooleanField(default=False)
@@ -667,14 +601,6 @@ class Offer(BaseResource):
         j["charge"] = self.charge
         j["place_accessible"] = self.place_accessible
         return j
-
-    def options_details(self):
-        return OfferOptionThrough.objects.filter(offer=self)
-
-
-class OfferOptionThrough(models.Model):
-    offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
-    option = models.ForeignKey(ResourceOption, on_delete=models.CASCADE)
 
 
 class Agreement(models.Model):

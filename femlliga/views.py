@@ -49,7 +49,6 @@ from .constants import (
 
 from .forms import (
     ContactForm,
-    ExternalContactForm,
     MessageForm,
     OrganizationForm,
     PreferencesForm,
@@ -61,11 +60,9 @@ from .models import (
     Contact,
     ContactDenyList,
     Graph,
-    ExternalContact,
     Message,
     Need,
     NeedImage,
-    NeedOptionThrough,
     Offer,
     OfferImage,
     Organization,
@@ -175,10 +172,10 @@ def check_matches(request):
     option = post.get("option", "")
 
     needs = Need.objects.filter(
-        resource=resource, has_resource=True, new_options__name__in=[option]
+        resource=resource, has_resource=True, options__name__in=[option]
     ).count()
     offers = Offer.objects.filter(
-        resource=resource, has_resource=True, new_options__name__in=[option]
+        resource=resource, has_resource=True, options__name__in=[option]
     ).count()
     return JsonResponse({"needs": needs, "offers": offers})
 
@@ -414,7 +411,7 @@ def get_resource_form(org, resource_type, resource):
         r = model.objects.get(organization=org, resource=resource)
         data = {
             "resource": resource,
-            "options": list(map(lambda x: x.name, r.new_options.all())),
+            "options": list(map(lambda x: x.name, r.options.all())),
             "has_resource": r.has_resource,
             "comments": r.comments,
         }
@@ -457,15 +454,7 @@ def render_wizard(
         selected_options = form.cleaned_data["options"]
     except:
         if db_resource:
-            selected_options = [o.name for o in db_resource.new_options.all()]
-
-    published_comments = {}
-    try:
-        published_comments = form.cleaned_data["published"]
-    except:
-        if db_resource:
-            nos = db_resource.options_details()
-            published_comments = {o.option.name: o.comments for o in nos if o.public}
+            selected_options = [o.name for o in db_resource.options.all()]
 
     return render(
         request,
@@ -482,7 +471,6 @@ def render_wizard(
             "editing": editing,
             "json_data": {
                 "selected": selected_options,
-                "published_comments": published_comments,
             },
         },
     )
@@ -515,31 +503,7 @@ def resources_wizard(request, organization_id, resource_type, resource, editing=
                 if option in options:
                     resource_options.append(ro)
 
-            if model is Need:
-                for ro in m.new_options.all():
-                    if ro not in resource_options:
-                        m.new_options.remove(ro)
-
-                for ro in resource_options:
-                    comments, public = "", False
-                    try:
-                        if ro.name in form.cleaned_data["published"]:
-                            comments = form.cleaned_data["published"][ro.name]
-                            public = True
-                    except:
-                        pass
-                    try:
-                        no = NeedOptionThrough.objects.get(need=m, option=ro)
-                        no.public = public
-                        no.comments = comments
-                        no.save()
-                    except:
-                        NeedOptionThrough.objects.create(
-                            need=m, option=ro, public=public, comments=comments
-                        )
-            else:
-                m.new_options.set(resource_options)
-
+            m.options.set(resource_options)
             m.comments = form.cleaned_data["comments"]
             m.has_resource = len(options) > 0 or len(m.comments) > 0
             m.charge = form.cleaned_data["charge"]
@@ -636,7 +600,7 @@ def matches(request, organization_id):
     needs_json = [
         {
             "resource": x.resource,
-            "options": [o.name for o in x.new_options.all()],
+            "options": [o.name for o in x.options.all()],
         }
         for x in own_needs
     ]
@@ -707,7 +671,7 @@ def group_matches_by_organization(organization, offer_matches, need_matches):
 def get_organization_matches(user, organization, own_needs):
     offer_matches, need_matches = {}, {}
     for need in own_needs:
-        need_options = [n.name for n in need.new_options.all()]
+        need_options = [n.name for n in need.options.all()]
         offers = get_model_matches(
             user,
             organization,
@@ -745,7 +709,7 @@ def get_model_matches(
         queryset = model.objects.filter(
             resource=resource,
             has_resource=True,
-            new_options__name__in=need_options,
+            options__name__in=need_options,
         )
 
     if not include_other:
@@ -760,7 +724,7 @@ def get_model_matches(
     )
     results = (
         queryset.exclude(organization=organization)
-        .prefetch_related("organization", "images", "new_options")
+        .prefetch_related("organization", "images", "options")
         .distinct()
     )
     # limit distance in python, so exactly the appropriate results are returned
@@ -1108,36 +1072,36 @@ def mark_message_read(request, organization_id, agreement_id, message_id):
     return JsonResponse({"ok": True})
 
 
-@login_required
-@require_own_organization
-def external_contacts(request, organization_id):
-    organization = get_object_or_404(Organization, pk=organization_id)
-    return render(
-        request,
-        "femlliga/external_contacts.html",
-        {
-            "org": organization,
-            "json_data": {
-                "org_id": str(organization.id),
-                "contacts": [
-                    c.json() for c in organization.received_external_contacts.all()
-                ],
-            },
-        },
-    )
+# @login_required
+# @require_own_organization
+# def external_contacts(request, organization_id):
+#    organization = get_object_or_404(Organization, pk=organization_id)
+#    return render(
+#        request,
+#        "femlliga/external_contacts.html",
+#        {
+#            "org": organization,
+#            "json_data": {
+#                "org_id": str(organization.id),
+#                "contacts": [
+#                    c.json() for c in organization.received_external_contacts.all()
+#                ],
+#            },
+#        },
+#    )
 
 
-@login_required
-@require_own_organization
-def mark_external_contact_read(request, organization_id, contact_id):
-    if request.method == "POST":
-        c = get_object_or_404(ExternalContact, pk=contact_id)
-        if c.organization.id != organization_id:
-            return JsonResponse({"ok": False})
-        c.read = True
-        c.save()
-
-    return JsonResponse({"ok": True})
+# @login_required
+# @require_own_organization
+# def mark_external_contact_read(request, organization_id, contact_id):
+#    if request.method == "POST":
+#        c = get_object_or_404(ExternalContact, pk=contact_id)
+#        if c.organization.id != organization_id:
+#            return JsonResponse({"ok": False})
+#        c.read = True
+#        c.save()
+#
+#    return JsonResponse({"ok": True})
 
 
 def requested_resources(agreements):
@@ -1218,8 +1182,8 @@ def organization_prefetches(queryset, include_missing_resources=False):
     return queryset.prefetch_related(
         "scopes",
         "social_media",
-        "needs__new_options",
-        "offers__new_options",
+        "needs__options",
+        "offers__options",
         "needs__images",
         "offers__images",
         "sent_agreements__options",
@@ -1373,12 +1337,12 @@ def report(request):
             for o in organizations:
                 for x in o.needs.all():
                     if x.resource == resource and option[0] in [
-                        op.name for op in x.new_options.all()
+                        op.name for op in x.options.all()
                     ]:
                         needs.append(x)
                 for x in o.offers.all():
                     if x.resource == resource and option[0] in [
-                        op.name for op in x.new_options.all()
+                        op.name for op in x.options.all()
                     ]:
                         offers.append(x)
             resource_options.append(
@@ -1672,94 +1636,92 @@ def maps(request):
         },
     )
 
-
-def public_announcements(request):
-    announcements = NeedOptionThrough.objects.filter(
-        need__has_resource=True,
-        public=True,
-    ).prefetch_related("need__organization")
-    return render(
-        request,
-        "femlliga/public_announcements.html",
-        {
-            "provinces": sorted(
-                [
-                    (p["properties"]["id"], p["properties"]["name"])
-                    for p in spain_provinces["features"]
-                ],
-                key=lambda p: strip_accents(p[1]),
-            ),
-            "json_data": {
-                "announcements": [a.json() for a in announcements],
-            },
-        },
-    )
+    # TODO implement with Announcement model
 
 
-def public_announcement(request, pk):
-    announcement = get_object_or_404(NeedOptionThrough, pk=pk)
-    if not announcement.public:
-        raise PermissionDenied()
+# def public_announcements(request):
+#    return render(
+#        request,
+#        "femlliga/public_announcements.html",
+#            {
+#                "provinces": sorted(
+#                    [
+#                        (p["properties"]["id"], p["properties"]["name"])
+#                        for p in spain_provinces["features"]
+#                    ],
+#                    key=lambda p: strip_accents(p[1]),
+#                ),
+#                "json_data": {
+#                    "announcements": [a.json() for a in announcements],
+#                },
+#            },
+#    )
 
-    form = ExternalContactForm()
-    if request.method == "POST":
-        form = ExternalContactForm(request.POST)
-        if form.is_valid():
-            org = announcement.need.organization
-            ec = ExternalContact.objects.create(
-                organization=org,
-                name=form.cleaned_data["name"],
-                email=form.cleaned_data["email"],
-                message=form.cleaned_data["message"],
-                resource=announcement.need.resource,
-                option=announcement.option,
-            )
 
-            subject = _("S'ha enviat el següent missatge a «%(name)s»") % {
-                "name": org.name
-            }
-            body = render_to_string(
-                "email/external_contact_sent.html",
-                {
-                    "org": org,
-                    "option": announcement.option,
-                    "message": ec.message,
-                    "current_site": get_current_site(request),
-                },
-            )
-            send_email(to=[ec.email], subject=subject, body=body)
-
-            if org.creator.notify_immediate_external_communications_received:
-                subject = _("T'han contactat per una necessitat publicada")
-                send_notification(
-                    user=org.creator,
-                    subject=subject,
-                    template="email/notify_external_communication_received.html",
-                    context={
-                        "org": org,
-                        "contact": ec,
-                        "option": announcement.option,
-                        "current_site": get_current_site(request),
-                    },
-                )
-
-            msg = _(
-                "S'ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible"
-            )
-            messages.info(request, msg, extra_tags="show")
-            return redirect(reverse("public_announcement", args=[pk]))
-
-    return render(
-        request,
-        "femlliga/public_announcement.html",
-        {
-            "form": form,
-            "announcement": announcement,
-            "json_data": {
-                "sending": request.method == "POST",
-            },
-        },
-    )
+# def public_announcement(request, pk):
+#    # TODO implement with Announcement model
+#    if not announcement.public:
+#        raise PermissionDenied()
+#
+#    form = ExternalContactForm()
+#    if request.method == "POST":
+#        form = ExternalContactForm(request.POST)
+#        if form.is_valid():
+#            org = announcement.need.organization
+#            ec = ExternalContact.objects.create(
+#                organization=org,
+#                name=form.cleaned_data["name"],
+#                email=form.cleaned_data["email"],
+#                message=form.cleaned_data["message"],
+#                resource=announcement.need.resource,
+#                option=announcement.option,
+#            )
+#
+#            subject = _("S'ha enviat el següent missatge a «%(name)s»") % {
+#                "name": org.name
+#            }
+#            body = render_to_string(
+#                "email/external_contact_sent.html",
+#                {
+#                    "org": org,
+#                    "option": announcement.option,
+#                    "message": ec.message,
+#                    "current_site": get_current_site(request),
+#                },
+#            )
+#            send_email(to=[ec.email], subject=subject, body=body)
+#
+#            if org.creator.notify_immediate_external_communications_received:
+#                subject = _("T'han contactat per una necessitat publicada")
+#                send_notification(
+#                    user=org.creator,
+#                    subject=subject,
+#                    template="email/notify_external_communication_received.html",
+#                    context={
+#                        "org": org,
+#                        "contact": ec,
+#                        "option": announcement.option,
+#                        "current_site": get_current_site(request),
+#                    },
+#                )
+#
+#            msg = _(
+#                "S'ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible"
+#            )
+#            messages.info(request, msg, extra_tags="show")
+#            return redirect(reverse("public_announcement", args=[pk]))
+#
+#    return render(
+#        request,
+#        "femlliga/public_announcement.html",
+#        {
+#            "form": form,
+#            "announcement": announcement,
+#            "json_data": {
+#                "sending": request.method == "POST",
+#            },
+#        },
+#    )
 
 
 @login_required

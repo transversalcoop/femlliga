@@ -141,14 +141,14 @@ def get_ordered_needs_and_offers(org, distance_limit_km):
                     if (
                         x.has_resource == True
                         and x.resource == resource
-                        and option[0] in [op.name for op in x.new_options.all()]
+                        and option[0] in [op.name for op in x.options.all()]
                     ):
                         needs.append(x)
                 for x in o.offers.all():
                     if (
                         x.has_resource == True
                         and x.resource == resource
-                        and option[0] in [op.name for op in x.new_options.all()]
+                        and option[0] in [op.name for op in x.options.all()]
                     ):
                         offers.append(x)
             all_needs.append((resource, option[0], len(needs)))
@@ -178,7 +178,7 @@ def org_offers_not_matching(org, user):
     offers = []
     own_needs = get_own_needs(org)
     for need in own_needs:
-        need_options = [n.name for n in need.new_options.all()]
+        need_options = [n.name for n in need.options.all()]
         queryset = Offer.objects.exclude(organization=org).filter(
             resource=need.resource,
             has_resource=True,
@@ -191,7 +191,7 @@ def org_offers_not_matching(org, user):
             field_prefix="organization__",
         )
         l = list(queryset)
-        l = [o for o in l if has_different_options(o.new_options.all(), need_options)]
+        l = [o for o in l if has_different_options(o.options.all(), need_options)]
         if len(l) > 0:
             offers.append(join_offers_not_matching(l, need_options))
 
@@ -205,7 +205,7 @@ def has_different_options(has_options, exclude_options):
 def join_offers_not_matching(offers, ignore_options):
     options = set()
     for offer in offers:
-        for o in offer.new_options.all():
+        for o in offer.options.all():
             if o.name not in ignore_options:
                 options.add(o)
     return {
@@ -218,7 +218,7 @@ def get_own_needs(org):
     return sort_resources(
         [
             n
-            for n in org.needs.all().prefetch_related("new_options")
+            for n in org.needs.all().prefetch_related("options")
             if n.has_resource and n.resource != "OTHER"
         ]
     )
@@ -228,7 +228,7 @@ def org_has_resource(model, org, n):
     return (
         len(
             model.objects.filter(
-                organization=org, resource=n[0], new_options=n[1], has_resource=True
+                organization=org, resource=n[0], options=n[1], has_resource=True
             )
         )
         > 0

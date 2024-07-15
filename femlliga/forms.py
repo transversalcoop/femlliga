@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django_recaptcha.fields import ReCaptchaField
 
 from . import constants as const
-from .models import Agreement, Contact, ExternalContact, CustomUser, Organization
+from .models import Agreement, Contact, CustomUser, Organization
 
 
 class PreferencesForm(forms.ModelForm):
@@ -19,7 +19,7 @@ class PreferencesForm(forms.ModelForm):
             "distance_limit_km",
             "notifications_frequency",
             "notify_immediate_communications_received",
-            "notify_immediate_external_communications_received",
+            #            "notify_immediate_external_communications_received",
             "notify_agreement_communication_pending",
             "notify_matches",
             "notify_new_resources",
@@ -110,12 +110,12 @@ class ContactForm(forms.ModelForm):
         fields = ["email", "content"]
 
 
-class ExternalContactForm(forms.ModelForm):
-    captcha = ReCaptchaField()
-
-    class Meta:
-        model = ExternalContact
-        fields = ["name", "email", "message"]
+# class ExternalContactForm(forms.ModelForm):
+#    captcha = ReCaptchaField()
+#
+#    class Meta:
+#        model = ExternalContact
+#        fields = ["name", "email", "message"]
 
 
 class CaptchaLoginForm(LoginForm):
