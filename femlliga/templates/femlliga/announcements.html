@@ -1,0 +1,95 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import organization_link, vue_js, sidebar_filter_show_link, initial_loading_vue %}
+
+{% block title %}{{ _("Anuncis") }}{% endblock %}
+
+{% block content %}
+{% if len(json_data.announcements) > 0 %}
+<div class="container-fluid">
+  <button class="btn btn-warning float-end">{{ _("Afegeix anunci") }}</button>
+  <div id="vue-app" class="row">
+    <div class="col-md-4 d-md-block bg-light sidebar">
+      <h1>{{ _("Anuncis") }}</h1>
+      {{ sidebar_filter_show_link() }}
+      <div class="collapse show" id="sidebar-filter">
+        <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca anuncis creats") }}">
+      </div>
+
+      <p class="mt-3">
+        {{ _("En aquesta pàgina podeu veure els anuncis que heu creat i que es poden publicar.") }}
+      </p>
+    </div>
+
+    <div class="col-md-8 ms-sm-auto px-md-4">
+      {{ initial_loading_vue() }}
+      <template v-else>
+        <div class="row mt-3">
+          <div class="col-12">
+            <h2 class="match-resource-title">{{ _("Tots els anuncis") }}</h2>
+            <div class="matches-count agreements-count">
+              <span>${ announcements.length } {{ _("anuncis") }}</span>
+            </div>
+          </div>
+        </div>
+        <div v-for="announcement in announcements" class="row match-box">
+          <h3 class="mt-2">
+            <span v-html="highlightSearch(announcement.title, search)"></span>
+          </h3>
+          {# TODO rest of fields and also a link to the announcement #}
+        </div>
+      </template>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="container text-center pt-4">
+  <h1>{{ _("Encara no heu creat cap anunci") }}</h1>
+  <a class="btn btn-warning" href="{{ url("add_announcement", args=[org.id]) }}">{{ _("Afegeix anunci") }}</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block js %}
+{{ vue_js() }}
+<script>
+function announcementContains(search) {
+  return function(c) {
+    const parts = sanitize(search).split(" ").filter(x => x !== "");
+    const targets = [
+      sanitize(c.title),
+      sanitize(c.description),
+      sanitize(c.resource),
+      sanitize(c.option),
+    ];
+    for (var part of parts) {
+      if (!targets.some((target) => contains(target, part))) {
+        return false;
+      }
+    }
+    return true;
+  };
+}
+
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      search: "",
+      org_id: jsonData.org_id,
+      allAnnouncements: jsonData.announcements,
+    };
+  },
+  methods: {
+    highlightSearch: highlightSearch,
+  },
+  computed: {
+    announcements() {
+      return this.allAnnouncements.filter(announcementContains(this.search));
+    },
+  },
+}).mount("#vue-app");
+</script>
+{% endblock %}
+

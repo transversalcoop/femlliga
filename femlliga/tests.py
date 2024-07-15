@@ -714,87 +714,87 @@ class IntegrationTests(TestCase):
             self.assertIn(s, mail.outbox[0].body)
 
     # TODO test with Announcement model
-    #    @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
-    #    def test_external_contacts(self):
-    #        announcement_text = "Text de l'anunci publicat"
-    #        announcement_text_escaped = "Text de l&#39;anunci publicat"
-    #        contact_text = "Text del contacte extern"
-    #        org_name = "Nom entitat amb anuncis"
-    #        org_email = "test13@example.com"
-    #        self.aux_check_no_announcements(announcement_text)
-    #
-    #        o = self.aux_create_org(org_name, org_email)
-    #        self.aux_check_no_external_contacts(o, contact_text)
-    #
-    #        needs_url = reverse("resources-wizard", args=[o.id, "needs", "ALLIANCES"])
-    #        self.aux_wizard(
-    #            needs_url,
-    #            "ALLIANCES",
-    #            ["PROJECT_COLLABORATION", "VOLUNTEERING"],
-    #            "",
-    #            "Altres",
-    #        )
-    #
-    #        self.aux_check_no_announcements(announcement_text)
-    #
-    #        self.aux_wizard(
-    #            needs_url,
-    #            "ALLIANCES",
-    #            ["PROJECT_COLLABORATION", "VOLUNTEERING"],
-    #            "",
-    #            "Aquesta opció no és publicable",
-    #            published={"UNKNOWN_KEY": "asd"},
-    #        )
-    #        self.aux_check_no_announcements(announcement_text)
-    #        self.aux_wizard(
-    #            needs_url,
-    #            "ALLIANCES",
-    #            ["PROJECT_COLLABORATION", "VOLUNTEERING"],
-    #            "",
-    #            "Totes les necessitats publicades necessiten una descripció",
-    #            published={"VOLUNTEERING": ""},
-    #        )
-    #        self.aux_check_no_announcements(announcement_text)
-    #
-    #        self.aux_wizard(
-    #            needs_url,
-    #            "ALLIANCES",
-    #            ["PROJECT_COLLABORATION", "VOLUNTEERING"],
-    #            "",
-    #            "Altres",
-    #            published={"VOLUNTEERING": announcement_text},
-    #        )
-    #        response = self.client.get(reverse("public_announcements"))
-    #        self.assertContains(response, announcement_text)
-    #        self.aux_check_no_external_contacts(o, contact_text)
-    #
-    #        self.client.logout()
-    #        a = NeedOptionThrough.objects.filter(option="VOLUNTEERING").first()
-    #        announcement_url = reverse("public_announcement", args=[a.id])
-    #        response = self.client.get(announcement_url)
-    #        self.assertContains(response, announcement_text_escaped)
-    #        self.assertContains(response, org_name)
-    #        self.assertEqual(len(mail.outbox), 0)
-    #
-    #        response = self.client.post(
-    #            announcement_url,
-    #            {
-    #                "name": "Contact name",
-    #                "email": "contactemail@example.com",
-    #                "message": contact_text,
-    #                "g-recaptcha-response": "test",
-    #            },
-    #            follow=True,
-    #        )
-    #        self.assertEqual(len(mail.outbox), 2)
-    #        self.assertContains(
-    #            response,
-    #            "S&#39;ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible",
-    #        )
-    #
-    #        self.client.login(email=org_email, password=PASS_FOR_TESTS)
-    #        response = self.client.get(reverse("external_contacts", args=[o.id]))
-    #        self.assertContains(response, contact_text)
+    @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
+    def test_announcements(self):
+        announcement_text = "Text de l'anunci publicat"
+        announcement_text_escaped = "Text de l&#39;anunci publicat"
+        contact_text = "Text del contacte extern"
+        org_name = "Nom entitat amb anuncis"
+        org_email = "test13@example.com"
+        self.aux_check_no_announcements(announcement_text)
+
+        o = self.aux_create_org(org_name, org_email)
+        self.aux_check_no_announcements(o, contact_text)
+
+        needs_url = reverse("resources-wizard", args=[o.id, "needs", "ALLIANCES"])
+        self.aux_wizard(
+            needs_url,
+            "ALLIANCES",
+            ["PROJECT_COLLABORATION", "VOLUNTEERING"],
+            "",
+            "Altres",
+        )
+
+        self.aux_check_no_announcements(announcement_text)
+
+        self.aux_wizard(
+            needs_url,
+            "ALLIANCES",
+            ["PROJECT_COLLABORATION", "VOLUNTEERING"],
+            "",
+            "Aquesta opció no és publicable",
+            published={"UNKNOWN_KEY": "asd"},
+        )
+        self.aux_check_no_announcements(announcement_text)
+        self.aux_wizard(
+            needs_url,
+            "ALLIANCES",
+            ["PROJECT_COLLABORATION", "VOLUNTEERING"],
+            "",
+            "Totes les necessitats publicades necessiten una descripció",
+            published={"VOLUNTEERING": ""},
+        )
+        self.aux_check_no_announcements(announcement_text)
+
+        self.aux_wizard(
+            needs_url,
+            "ALLIANCES",
+            ["PROJECT_COLLABORATION", "VOLUNTEERING"],
+            "",
+            "Altres",
+            published={"VOLUNTEERING": announcement_text},
+        )
+        response = self.client.get(reverse("public_announcements"))
+        self.assertContains(response, announcement_text)
+        self.aux_check_no_announcements(o, contact_text)
+
+        self.client.logout()
+        a = NeedOptionThrough.objects.filter(option="VOLUNTEERING").first()
+        announcement_url = reverse("public_announcement", args=[a.id])
+        response = self.client.get(announcement_url)
+        self.assertContains(response, announcement_text_escaped)
+        self.assertContains(response, org_name)
+        self.assertEqual(len(mail.outbox), 0)
+
+        response = self.client.post(
+            announcement_url,
+            {
+                "name": "Contact name",
+                "email": "contactemail@example.com",
+                "message": contact_text,
+                "g-recaptcha-response": "test",
+            },
+            follow=True,
+        )
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertContains(
+            response,
+            "S&#39;ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible",
+        )
+
+        self.client.login(email=org_email, password=PASS_FOR_TESTS)
+        response = self.client.get(reverse("announcements", args=[o.id]))
+        self.assertContains(response, contact_text)
 
     def aux_check_no_announcements(self, announcement_text):
         response = self.client.get(reverse("public_announcements"))
@@ -804,7 +804,7 @@ class IntegrationTests(TestCase):
         self.assertNotContains(response, announcement_text)
 
     def aux_check_no_external_contacts(self, o, contact_text):
-        response = self.client.get(reverse("external_contacts", args=[o.id]))
+        response = self.client.get(reverse("announcements", args=[o.id]))
         self.assertContains(
             response, "Encara no heu rebut contactes en referència a anuncis publicats"
         )

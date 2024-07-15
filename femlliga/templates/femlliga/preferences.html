@@ -60,7 +60,7 @@
     <div class="preferences-section">
       <h2 class="preferences-section-title">{{ _("Notificacions immediates") }}</h2>
       {{ preferences_switch(form, "notify_immediate_communications_received", _("Informa immediatament de les peticions d'intercanvi rebudes"), _("Si us envien una petició d'intercanvi, us enviarem un correu perquè la pugueu revisar de seguida")) }}
-      {#      {{ preferences_switch(form, "notify_immediate_external_communications_received", _("Informa immediatament dels contactes rebuts pels anuncis publicats"), _("Si una persona externa us envia un missatge, us enviarem un correu perquè el pugueu revisar de seguida")) }} #}
+      {{ preferences_switch(form, "notify_immediate_announcement_communications_received", _("Informa immediatament de persones interessades pels anuncis publicats"), _("Si una persona externa us envia un missatge en referència a un anunci, us enviarem un correu perquè el pugueu revisar de seguida")) }}
     </div>
 
     <div class="preferences-section">

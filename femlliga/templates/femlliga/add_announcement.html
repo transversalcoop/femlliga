@@ -1,0 +1,62 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, render_multi_checkboxes, render_formset_field, render_formset_select, render_formset_delete_vue, leaflet_css, leaflet_js, vue_js %}
+
+{% block css %}{{ leaflet_css() }}{% endblock %}
+
+{% if edit %}
+{% set title = _("Edita l'anunci") %}
+{% else %}
+{% set title = _("Afegeix un anunci") %}
+{% endif %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<h1>{{ title }}</h1>
+
+<form method="post" id="vue-app" class="mb-2">
+  {{ csrf_input }}
+  {{ form_feedback(form) }}
+
+  <div class="py-3">
+    <label for="id_title"><strong>{{ _("Títol de l'anunci") }}</strong></label>
+    <input type="text" {{ input_classes(form, "title") }} name="title" autocomplete="Nom" id="id_title" {{ input_value(form, "title") }} required>
+    {{ input_feedback(form, "title") }}
+  </div>
+
+  <div class="py-3">
+    <label for="id_description">
+      <strong>{{ _("Descripció de l'anunci") }}</strong>
+      <span v-if="option">. ${ descriptions["ALLIANCES"][option] }</span>
+    </label>
+    <textarea type="text" {{ input_classes(form, "description") }} name="description" autocomplete="Nom" id="id_description" required>{{ textarea_value(form, "description") }}</textarea>
+    {{ input_feedback(form, "description") }}
+  </div>
+
+  <button type="submit" class="btn btn-custom mt-2">
+    {% if edit %}
+    {{ _("Desa") }}
+    {% else %}
+    {{ _("Afegeix") }}
+    {% endif %}
+  </button>
+</form>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ vue_js() }}
+<script>
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {option: "", descriptions: jsonData.descriptions};
+  },
+}).mount("#vue-app");
+</script>
+{% endblock %}

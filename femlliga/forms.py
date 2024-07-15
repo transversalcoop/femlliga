@@ -6,7 +6,14 @@ from django.utils.translation import gettext_lazy as _
 from django_recaptcha.fields import ReCaptchaField
 
 from . import constants as const
-from .models import Agreement, Contact, CustomUser, Organization
+from .models import (
+    Agreement,
+    Contact,
+    Announcement,
+    AnnouncementContact,
+    CustomUser,
+    Organization,
+)
 
 
 class PreferencesForm(forms.ModelForm):
@@ -19,7 +26,7 @@ class PreferencesForm(forms.ModelForm):
             "distance_limit_km",
             "notifications_frequency",
             "notify_immediate_communications_received",
-            #            "notify_immediate_external_communications_received",
+            "notify_immediate_announcement_communications_received",
             "notify_agreement_communication_pending",
             "notify_matches",
             "notify_new_resources",
@@ -44,6 +51,34 @@ class OrganizationForm(forms.ModelForm):
             "lng",
             "address",
         ]
+
+
+class AnnouncementForm(forms.ModelForm):
+    class Meta:
+        model = Announcement
+        fields = [
+            "public",
+            "title",
+            "description",
+            "resource",
+            "option",
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.cleaned_data.get("resource") not in const.NEEDS_PUBLISHABLE_OPTIONS_MAP:
+            self.add_error(None, _("Aquest tipus de recurs no és publicable"))
+
+        possible_options = const.NEEDS_PUBLISHABLE_OPTIONS_MAP.get(
+            self.cleaned_data.get("resource")
+        )
+        if (
+            not possible_options
+            or self.cleaned_data.get("option") not in possible_options
+        ):
+            self.add_error("option", _("Aquesta opció no és publicable"))
+
+        return self.cleaned_data
 
 
 class ResourceForm(forms.Form):
@@ -110,12 +145,12 @@ class ContactForm(forms.ModelForm):
         fields = ["email", "content"]
 
 
-# class ExternalContactForm(forms.ModelForm):
-#    captcha = ReCaptchaField()
-#
-#    class Meta:
-#        model = ExternalContact
-#        fields = ["name", "email", "message"]
+class AnnouncementContactForm(forms.ModelForm):
+    captcha = ReCaptchaField()
+
+    class Meta:
+        model = AnnouncementContact
+        fields = ["name", "email", "message"]
 
 
 class CaptchaLoginForm(LoginForm):

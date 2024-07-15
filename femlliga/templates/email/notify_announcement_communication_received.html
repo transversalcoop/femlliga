@@ -17,7 +17,7 @@
 
 <tr>
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
-    {{ _("Podeu entrar a <a href='%(url)s'>%(site)s</a> per seguir la conversa.", url="https://"+current_site.domain + url("external_contacts", kwargs={'organization_id': org.id}), site=current_site.name) }}
+    {{ _("Podeu entrar a <a href='%(url)s'>%(site)s</a> per seguir la conversa.", url="https://"+current_site.domain + url("announcements", kwargs={'organization_id': org.id}), site=current_site.name) }}
   </td>
 </tr>
 {% endblock %}

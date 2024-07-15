@@ -45,6 +45,7 @@ from .constants import (
     RESOURCES_LIST,
     RESOURCES_ORDER,
     SOCIAL_MEDIA_TYPES,
+    NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP,
 )
 
 from .forms import (
@@ -53,6 +54,7 @@ from .forms import (
     OrganizationForm,
     PreferencesForm,
     ResourceForm,
+    AnnouncementForm,
 )
 
 from .models import (
@@ -860,6 +862,9 @@ def save_preferences(request):
         request.user.notify_immediate_communications_received = form.cleaned_data[
             "notify_immediate_communications_received"
         ]
+        request.user.notify_immediate_announcement_communications_received = (
+            form.cleaned_data["notify_immediate_announcement_communications_received"]
+        )
         request.user.notify_immediate_external_communications_received = (
             form.cleaned_data["notify_immediate_external_communications_received"]
         )
@@ -1072,36 +1077,96 @@ def mark_message_read(request, organization_id, agreement_id, message_id):
     return JsonResponse({"ok": True})
 
 
-# @login_required
-# @require_own_organization
-# def external_contacts(request, organization_id):
-#    organization = get_object_or_404(Organization, pk=organization_id)
-#    return render(
-#        request,
-#        "femlliga/external_contacts.html",
-#        {
-#            "org": organization,
-#            "json_data": {
-#                "org_id": str(organization.id),
-#                "contacts": [
-#                    c.json() for c in organization.received_external_contacts.all()
-#                ],
-#            },
-#        },
-#    )
+@login_required
+@require_own_organization
+def announcements(request, organization_id):
+    organization = get_object_or_404(Organization, pk=organization_id)
+    return render(
+        request,
+        "femlliga/announcements.html",
+        {
+            "org": organization,
+            "json_data": {
+                "org_id": str(organization.id),
+                "announcements": [
+                    a.json()
+                    for a in organization.announcements.all().prefetch_related(
+                        "contacts"
+                    )
+                ],
+            },
+        },
+    )
 
 
-# @login_required
-# @require_own_organization
-# def mark_external_contact_read(request, organization_id, contact_id):
-#    if request.method == "POST":
-#        c = get_object_or_404(ExternalContact, pk=contact_id)
-#        if c.organization.id != organization_id:
-#            return JsonResponse({"ok": False})
-#        c.read = True
-#        c.save()
-#
-#    return JsonResponse({"ok": True})
+@login_required
+@require_own_organization
+def add_announcement(request, organization_id):
+    organization = get_object_or_404(Organization, pk=organization_id)
+    form = AnnouncementForm()
+    if request.method == "POST":
+        form = AnnouncementForm(request.POST)
+        if form.is_valid():
+            form.save()
+            Announcement.objects.create(
+                organization=organization,
+                public=form.cleaned_data["public"],
+                title=form.cleaned_data["title"],
+                description=form.cleaned_data["description"],
+                resource=form.cleaned_data["resource"],
+                option=form.cleaned_data["option"],
+            )
+            return redirect("announcements", organization_id=organization_id)
+
+    descriptions = {}
+    for k, value in NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP.items():
+        descriptions.setdefault(k[0], {})[k[1]] = value
+    return render(
+        request,
+        "femlliga/add_announcement.html",
+        {
+            "form": form,
+            "json_data": {"descriptions": descriptions},
+        },
+    )
+
+
+@login_required
+@require_own_organization
+def announcement(request, organization_id, announcement_id):
+    announcement = get_object_or_404(Announcement, pk=announcement_id)
+    if announcement.organization.id != organization_id:
+        raise PermissionDenied()
+
+    return render(
+        request,
+        "femlliga/announcement.html",
+        {
+            "org": announcement.organization,
+            "json_data": {
+                "org_id": str(organization_id),
+                "contacts": [c.json() for c in announcement.contacts.all()],
+            },
+        },
+    )
+
+
+@login_required
+@require_own_organization
+def mark_announcement_contact_read(
+    request, organization_id, announcement_id, contact_id
+):
+    if request.method == "POST":
+        c = get_object_or_404(AnnouncementContact, pk=contact_id)
+        if (
+            c.announcement.id != announcement_id
+            or c.announcement.organization.id != organization_id
+        ):
+            return JsonResponse({"ok": False})
+        c.read = True
+        c.save()
+
+    return JsonResponse({"ok": True})
 
 
 def requested_resources(agreements):
@@ -1639,89 +1704,90 @@ def maps(request):
     # TODO implement with Announcement model
 
 
-# def public_announcements(request):
-#    return render(
-#        request,
-#        "femlliga/public_announcements.html",
-#            {
-#                "provinces": sorted(
-#                    [
-#                        (p["properties"]["id"], p["properties"]["name"])
-#                        for p in spain_provinces["features"]
-#                    ],
-#                    key=lambda p: strip_accents(p[1]),
-#                ),
-#                "json_data": {
-#                    "announcements": [a.json() for a in announcements],
-#                },
-#            },
-#    )
+def public_announcements(request):
+    announcements = Announcement.objects.filter(public=True)
+    return render(
+        request,
+        "femlliga/public_announcements.html",
+        {
+            "provinces": sorted(
+                [
+                    (p["properties"]["id"], p["properties"]["name"])
+                    for p in spain_provinces["features"]
+                ],
+                key=lambda p: strip_accents(p[1]),
+            ),
+            "json_data": {
+                "announcements": [a.json() for a in announcements],
+            },
+        },
+    )
 
 
-# def public_announcement(request, pk):
-#    # TODO implement with Announcement model
-#    if not announcement.public:
-#        raise PermissionDenied()
-#
-#    form = ExternalContactForm()
-#    if request.method == "POST":
-#        form = ExternalContactForm(request.POST)
-#        if form.is_valid():
-#            org = announcement.need.organization
-#            ec = ExternalContact.objects.create(
-#                organization=org,
-#                name=form.cleaned_data["name"],
-#                email=form.cleaned_data["email"],
-#                message=form.cleaned_data["message"],
-#                resource=announcement.need.resource,
-#                option=announcement.option,
-#            )
-#
-#            subject = _("S'ha enviat el següent missatge a «%(name)s»") % {
-#                "name": org.name
-#            }
-#            body = render_to_string(
-#                "email/external_contact_sent.html",
-#                {
-#                    "org": org,
-#                    "option": announcement.option,
-#                    "message": ec.message,
-#                    "current_site": get_current_site(request),
-#                },
-#            )
-#            send_email(to=[ec.email], subject=subject, body=body)
-#
-#            if org.creator.notify_immediate_external_communications_received:
-#                subject = _("T'han contactat per una necessitat publicada")
-#                send_notification(
-#                    user=org.creator,
-#                    subject=subject,
-#                    template="email/notify_external_communication_received.html",
-#                    context={
-#                        "org": org,
-#                        "contact": ec,
-#                        "option": announcement.option,
-#                        "current_site": get_current_site(request),
-#                    },
-#                )
-#
-#            msg = _(
-#                "S'ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible"
-#            )
-#            messages.info(request, msg, extra_tags="show")
-#            return redirect(reverse("public_announcement", args=[pk]))
-#
-#    return render(
-#        request,
-#        "femlliga/public_announcement.html",
-#        {
-#            "form": form,
-#            "announcement": announcement,
-#            "json_data": {
-#                "sending": request.method == "POST",
-#            },
-#        },
-#    )
+def public_announcement(request, pk):
+    announcement = get_object_or_404(Announcement, pk=pk)
+    if not announcement.public:
+        raise PermissionDenied()
+
+    form = AnnouncementContactForm()
+    if request.method == "POST":
+        form = AnnouncementContactForm(request.POST)
+        if form.is_valid():
+            org = announcement.organization
+            ec = AnnouncementContact.objects.create(
+                organization=org,
+                name=form.cleaned_data["name"],
+                email=form.cleaned_data["email"],
+                message=form.cleaned_data["message"],
+                resource=announcement.resource,
+                option=announcement.option,
+            )
+
+            subject = _("S'ha enviat el següent missatge a «%(name)s»") % {
+                "name": org.name
+            }
+            body = render_to_string(
+                "email/announcement_contact_sent.html",
+                {
+                    "org": org,
+                    "option": announcement.option,
+                    "message": ec.message,
+                    "current_site": get_current_site(request),
+                },
+            )
+            send_email(to=[ec.email], subject=subject, body=body)
+
+            if org.creator.notify_immediate_external_communications_received:
+                subject = _("T'han contactat per una necessitat publicada")
+                send_notification(
+                    user=org.creator,
+                    subject=subject,
+                    template="email/notify_external_communication_received.html",
+                    context={
+                        "org": org,
+                        "contact": ec,
+                        "option": announcement.option,
+                        "current_site": get_current_site(request),
+                    },
+                )
+
+            msg = _(
+                "S'ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible"
+            )
+            messages.info(request, msg, extra_tags="show")
+            return redirect(reverse("public_announcement", args=[pk]))
+
+    return render(
+        request,
+        "femlliga/public_announcement.html",
+        {
+            "form": form,
+            "announcement": announcement,
+            "json_data": {
+                "sending": request.method == "POST",
+            },
+        },
+    )
 
 
 @login_required

@@ -106,9 +106,9 @@ class CustomUser(AbstractUser):
     # DEPRECATED
     accept_communications_automatically = models.BooleanField(default=True)
     notify_immediate_communications_received = models.BooleanField(default=True)
-    # notify_immediate_external_communications_received = models.BooleanField(
-    #    default=True
-    # )
+    notify_immediate_announcement_communications_received = models.BooleanField(
+        default=True
+    )
     # DEPRECATED
     notify_immediate_communications_rejected = models.BooleanField(default=True)
 
@@ -305,8 +305,9 @@ class Organization(models.Model):
         ).count()
         return sent > 0, received > 0
 
-    #    def pending_external_contacts(self):
-    #        return self.received_external_contacts.filter(read=False).count() > 0
+    def pending_announcement_contacts(self):
+        announcements = [a.pending_contacts() for a in self.announcements.all()]
+        return len(announcements) > 0 and any(announcements)
 
     def creator__email(self):
         return self.creator.email
@@ -528,41 +529,77 @@ class Need(BaseResource):
         return j
 
 
-# class ExternalContact(models.Model):
-#    id = models.UUIDField(
-#        primary_key=True,
-#        default=uuid.uuid4,
-#        editable=False,
-#    )
-#    received_on = models.DateTimeField(
-#        auto_now_add=True, verbose_name=_("Contacte enviat el")
-#    )
-#    # TODO link to Announcement
-#    email = models.EmailField()
-#    name = models.TextField(verbose_name=_("Nom"))
-#    message = models.TextField(verbose_name=_("Missatge"))
-#    resource = models.CharField(
-#        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
-#    )
-#    option = models.ForeignKey(
-#        ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
-#    )
-#    read = models.BooleanField(default=False)
-#
-#    class Meta:
-#        ordering = ["-received_on"]
-#
-#    def json(self):
-#        return {
-#            "id": str(self.id),
-#            "received_on": self.received_on,
-#            "name": self.name,
-#            "email": self.email,
-#            "message": self.message,
-#            "resource": str(self.resource),
-#            "option": str(self.option),
-#            "read": self.read,
-#        }
+class Announcement(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="announcements",
+    )
+    public = models.BooleanField(default=False)
+    title = models.TextField(verbose_name=_("Títol"))
+    description = models.TextField(verbose_name=_("Descripció"))
+    resource = models.CharField(
+        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
+    )
+    option = models.ForeignKey(
+        ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.title
+
+    def json(self):
+        return {
+            "id": str(self.id),
+            "title": self.title,
+            "description": self.description,
+            "public": self.public,
+            "resource": str(self.resource),
+            "option": str(self.option),
+            "pending_contacts": self.pending_contacts(),
+        }
+
+    def pending_contacts(self):
+        pc = [c for c in self.contacts.all() if not c.read]
+        return len(pc) > 0
+
+
+class AnnouncementContact(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    received_on = models.DateTimeField(
+        auto_now_add=True, verbose_name=_("Contacte enviat el")
+    )
+    announcement = models.ForeignKey(
+        Announcement,
+        on_delete=models.CASCADE,
+        related_name="contacts",
+    )
+    email = models.EmailField()
+    name = models.TextField(verbose_name=_("Nom"))
+    message = models.TextField(verbose_name=_("Missatge"))
+    read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-received_on"]
+
+    def json(self):
+        return {
+            "id": str(self.id),
+            "received_on": self.received_on,
+            "name": self.name,
+            "email": self.email,
+            "message": self.message,
+            "read": self.read,
+        }
 
 
 class Offer(BaseResource):
