@@ -16,7 +16,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.deconstruct import deconstructible
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from . import constants as const
 
@@ -572,9 +572,11 @@ class Announcement(models.Model):
 
         contacts_count = len(self.contacts.all())
         if contacts_count > 0:
-            j["contacts_message"] = _("Hi ha %(num)s persones interessades") % {
-                "num": contacts_count
-            }
+            j["contacts_message"] = ngettext(
+                "Hi ha una persona interessada",
+                "Hi ha %(num)s persones interessades",
+                contacts_count,
+            ) % {"num": contacts_count}
 
         if include_org:
             j["organization"] = {

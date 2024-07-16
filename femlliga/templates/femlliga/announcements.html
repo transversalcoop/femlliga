@@ -32,20 +32,30 @@
             </div>
           </div>
         </div>
-        <div v-for="announcement in announcements" class="row match-box">
+        <div v-for="announcement in announcements" class="row match-box pb-2">
           <div class="mt-2">
             <h3 class="mt-0">
               <a v-html="highlightSearch(announcement.title, search)" :href="announcement.href"></a>
             </h3>
           </div>
-          <p>
-            <span class="fst-italic me-4">${ labels[announcement.resource][announcement.option_name] }</span>
-            <a v-if="announcement.public" :href="announcement.public_href">{{ _("Anunci públic") }}</a>
-            <span v-else>{{ _("Anunci no publicat") }}</span>
-            <span v-if="announcement.contacts_message" class="ms-4">
-              <i class="bi-circle-fill text-danger" v-if="announcement.pending_contacts"></i>
-              ${ announcement.contacts_message }
+          <p class="mb-0">
+            <i class="{{ consts.RESOURCE_ICONS_MAP["ALLIANCES"] }} me-1"></i>
+            <span class="fst-italic">${ labels[announcement.resource][announcement.option_name] }</span>
+          </p>
+          <p class="mb-0">
+            <span v-if="announcement.public">
+              <i class="bi-share me-1"></i>
+              <a :href="announcement.public_href">{{ _("Anunci públic") }}</a>
             </span>
+            <span v-else>
+              <i class="bi-lock"></i>
+              {{ _("Anunci no publicat") }}
+            </span>
+          </p>
+          <p v-if="announcement.contacts_message" class="mb-0">
+            <i class="bi-circle-fill text-danger" v-if="announcement.pending_contacts"></i>
+            <i class="bi-send" v-else></i>
+            ${ announcement.contacts_message }
           </p>
         </div>
       </template>
