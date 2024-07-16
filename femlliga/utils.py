@@ -1,19 +1,22 @@
-import decimal
 import json
-import unicodedata
 import urllib
+import decimal
+import unicodedata
 
 from datetime import timedelta
+from operator import attrgetter
 from functools import wraps
 from distutils.util import strtobool
-from operator import attrgetter
 
-from django.contrib.auth import get_user_model
-from django.core.mail import EmailMessage
-from django.db.models import F, Func, Q
-from django.template.loader import render_to_string
 from django.urls import reverse
+from django.conf import settings
 from django.utils import timezone
+from django.db.models import F, Func, Q
+from django.core.mail import EmailMessage
+from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
+from django.contrib.sites.models import Site
 
 from shapely.geometry import shape, Point
 
@@ -257,8 +260,28 @@ def send_periodic_notification(subject, template, user, context):
     return True
 
 
-def send_email(to, subject, body):
+def send_welcome_email(org):
+    send_email(
+        to=[org.creator.email],
+        subject=_("Benvingudes a Fem lliga!"),
+        body=render_to_string(
+            "email/welcome.html",
+            {
+                "org": org,
+                "current_site": Site.objects.get(id=settings.SITE_ID),
+            },
+        ),
+        attachments=["static/segell-fem-lliga.png"],
+    )
+    org.welcome_email_sent = True
+    org.save()
+
+
+def send_email(to, subject, body, attachments=None):
     msg = EmailMessage(subject=subject, body=body, from_email=FROM_EMAIL, to=to)
+    if attachments:
+        for att in attachments:
+            msg.attach_file(att)
     msg.content_subtype = "html"
     msg.send()
 

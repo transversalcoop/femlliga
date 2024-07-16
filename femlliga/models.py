@@ -192,6 +192,8 @@ class Organization(models.Model):
         null=True,
     )
 
+    welcome_email_sent = models.BooleanField(default=True)
+
     class Meta:
         verbose_name = _("Organització")
         verbose_name_plural = _("Organitzacions")

@@ -713,7 +713,6 @@ class IntegrationTests(TestCase):
         ]:
             self.assertIn(s, mail.outbox[0].body)
 
-    # TODO test with Announcement model
     @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
     def test_announcements(self):
         announcement_text = "Text de l'anunci publicat"

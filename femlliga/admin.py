@@ -1,5 +1,8 @@
+import re
+
 from django import forms
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from .models import *
 
@@ -104,7 +107,15 @@ class PageAdmin(admin.ModelAdmin):
 
 
 class EmailSentAdmin(admin.ModelAdmin):
-    list_display = ("sent_on", "sent_to", "subject", "body")
+    list_display = ("sent_on", "sent_to", "subject", "email_body")
+    CLEAN_IMG = re.compile("<img.*?>")
+    STRIP_PADDING = re.compile("padding:.*?;")
+
+    @admin.display(description="Email body")
+    def email_body(self, instance):
+        body = re.sub(self.CLEAN_IMG, "", instance.body)
+        body = re.sub(self.STRIP_PADDING, "", body)
+        return mark_safe(body)
 
 
 admin.site.register(Organization, OrganizationAdmin)

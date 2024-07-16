@@ -353,7 +353,7 @@ def process_organization_post(request, existing_org=None):
     socialmedia_formset = social_media_forms()(request.POST, instance=org)
     if form.is_valid() and socialmedia_formset.is_valid():
         if org is None:
-            org = Organization()
+            org = Organization(welcome_email_sent=False)
             socialmedia_formset.instance = org
         lat = form.cleaned_data["lat"]
         lng = form.cleaned_data["lng"]

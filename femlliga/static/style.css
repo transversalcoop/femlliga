@@ -188,6 +188,10 @@ nav a:hover {
     max-height: 200px;
 }
 
+.max-h-200-px {
+    max-height: 200px;
+}
+
 .max-w-100 {
     max-width: 100%;
 }
