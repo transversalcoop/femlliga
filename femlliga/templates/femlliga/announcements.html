@@ -9,7 +9,7 @@
 <div class="container-fluid">
   <div id="vue-app" class="row">
     <div class="col-md-4 d-md-block bg-light sidebar">
-      <a class="btn btn-warning float-end mt-3" href="{{ url("add_announcement", args=[org.id]) }}">{{ _("Afegeix anunci") }}</a>
+      <a class="btn btn-warning float-end mt-3" href="{{ url("add_announcement", args=[org.id]) }}">{{ _("Afegeix") }}</a>
       <h1>{{ _("Anuncis") }}</h1>
       {{ sidebar_filter_show_link() }}
       <div class="collapse show" id="sidebar-filter">
@@ -34,16 +34,19 @@
         </div>
         <div v-for="announcement in announcements" class="row match-box">
           <div class="mt-2">
-            <a :href="announcement.edit_href" class="btn btn-warning float-end">{{ _("Edita") }}</a>
-            <h3 class="mt-0" >
+            <h3 class="mt-0">
               <a v-html="highlightSearch(announcement.title, search)" :href="announcement.href"></a>
             </h3>
           </div>
           <p>
+            <span class="fst-italic me-4">${ labels[announcement.resource][announcement.option_name] }</span>
             <a v-if="announcement.public" :href="announcement.public_href">{{ _("Anunci públic") }}</a>
             <span v-else>{{ _("Anunci no publicat") }}</span>
+            <span v-if="announcement.contacts_message" class="ms-4">
+              <i class="bi-circle-fill text-danger" v-if="announcement.pending_contacts"></i>
+              ${ announcement.contacts_message }
+            </span>
           </p>
-          {# TODO rest of fields and also a link to the announcement #}
         </div>
       </template>
     </div>
@@ -65,9 +68,6 @@ function announcementContains(search) {
     const parts = sanitize(search).split(" ").filter(x => x !== "");
     const targets = [
       sanitize(c.title),
-      sanitize(c.description),
-      sanitize(c.resource),
-      sanitize(c.option),
     ];
     for (var part of parts) {
       if (!targets.some((target) => contains(target, part))) {
@@ -86,6 +86,7 @@ Vue.createApp({
       search: "",
       org_id: jsonData.org_id,
       allAnnouncements: jsonData.announcements,
+      labels: jsonData.resource_labels,
     };
   },
   methods: {

@@ -306,7 +306,10 @@ class Organization(models.Model):
         return sent > 0, received > 0
 
     def pending_announcement_contacts(self):
-        announcements = [a.pending_contacts() for a in self.announcements.all()]
+        announcements = [
+            a.pending_contacts()
+            for a in self.announcements.all().prefetch_related("contacts")
+        ]
         return len(announcements) > 0 and any(announcements)
 
     def creator__email(self):
@@ -553,21 +556,43 @@ class Announcement(models.Model):
     def __str__(self):
         return self.title
 
-    def json(self):
-        return {
+    def json(self, include_org=False):
+        j = {
             "id": str(self.id),
             "title": self.title,
             "description": self.description,
             "public": self.public,
             "resource": str(self.resource),
             "option": str(self.option),
+            "option_name": self.option.name,
             "pending_contacts": self.pending_contacts(),
             "href": reverse("announcement", args=[self.organization.id, self.id]),
             "public_href": reverse("public_announcement", args=[self.id]),
-            "edit_href": reverse(
-                "edit_announcement", args=[self.organization.id, self.id]
-            ),
         }
+
+        contacts_count = len(self.contacts.all())
+        if contacts_count > 0:
+            j["contacts_message"] = _("Hi ha %(num)s persones interessades") % {
+                "num": contacts_count
+            }
+
+        if include_org:
+            j["organization"] = {
+                "name": self.organization.name,
+                "lat": self.organization.lat,
+                "lng": self.organization.lng,
+                "province": self.get_province(),
+            }
+
+        return j
+
+    def get_province(self):
+        from femlliga.utils import get_province
+        from femlliga.gis.es import spain_provinces
+
+        lat = self.organization.lat
+        lng = self.organization.lng
+        return get_province(lat, lng, spain_provinces["features"])
 
     def pending_contacts(self):
         pc = [c for c in self.contacts.all() if not c.read]

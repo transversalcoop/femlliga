@@ -4,7 +4,7 @@
 
 {% block css %}{{ leaflet_css() }}{% endblock %}
 
-{% if edit %}
+{% if object %}
 {% set title = _("Edita l'anunci") %}
 {% else %}
 {% set title = _("Afegeix un anunci") %}
@@ -31,7 +31,7 @@
   <p class="mb-0"><strong>{{ _("Escolleix el tipus d'anunci") }}</strong></p>
   <div class="form-check mb-3">
     <input type="hidden" name="resource" value="ALLIANCES">
-    <input class="form-check-input {% if form.errors["option"] %}is-invalid{% endif %}" type="radio" name="option" id="option-1" value="VOLUNTEERING" v-model="option">
+    <input class="form-check-input {% if form.errors["option"] %}is-invalid{% endif %}" type="radio" name="option" id="option-1" value="VOLUNTEERING" v-model="option" required>
     <label class="form-check-label" for="option-1">
       {{ consts.NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP[("ALLIANCES", "VOLUNTEERING")] }}
     </label>
@@ -57,7 +57,7 @@
   </div>
 
   <button type="submit" class="btn btn-custom mt-2">
-    {% if edit %}{{ _("Desa") }}{% else %}{{ _("Afegeix") }}{% endif %}
+    {% if object %}{{ _("Desa") }}{% else %}{{ _("Afegeix") }}{% endif %}
   </button>
 </form>
 </div>
@@ -72,7 +72,7 @@ Vue.createApp({
   data() {
     return {
       option: "{% if form and form.cleaned_data %}{{ form.cleaned_data["option"] }}{% endif %}",
-      descriptions: jsonData.descriptions,
+      descriptions: jsonData.resource_descriptions,
     };
   },
 }).mount("#vue-app");

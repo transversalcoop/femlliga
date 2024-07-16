@@ -177,11 +177,19 @@ NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP = {
     ("ALLIANCES", "VOLUNTEERING"): _("Aliances - Crida a voluntariat"),
 }
 
+NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP_2 = {}
+for k, value in NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP.items():
+    NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP_2.setdefault(k[0], {})[k[1]] = value
+
 NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP = {
     ("ALLIANCES", "VOLUNTEERING"): _(
         "Una bona descripció inclourà informació com on s'ha de desenvolupar el voluntariat, en quines dates, si hi ha algun tipus de requisit o inscripció necessària, i una breu descripció de la feina que es desenvoluparà"
     ),
 }
+
+NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP_2 = {}
+for k, value in NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP.items():
+    NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP_2.setdefault(k[0], {})[k[1]] = value
 
 RESOURCE_OPTIONS_READABLE_MAP = {
     ("PLACE", "DAILY_USAGE"): _("local per a ús diari"),

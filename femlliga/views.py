@@ -45,7 +45,8 @@ from .constants import (
     RESOURCES_LIST,
     RESOURCES_ORDER,
     SOCIAL_MEDIA_TYPES,
-    NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP,
+    NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP_2,
+    NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP_2,
 )
 
 from .forms import (
@@ -61,6 +62,7 @@ from .forms import (
 from .models import (
     Agreement,
     Announcement,
+    AnnouncementContact,
     Contact,
     ContactDenyList,
     Graph,
@@ -867,8 +869,8 @@ def save_preferences(request):
         request.user.notify_immediate_announcement_communications_received = (
             form.cleaned_data["notify_immediate_announcement_communications_received"]
         )
-        request.user.notify_immediate_external_communications_received = (
-            form.cleaned_data["notify_immediate_external_communications_received"]
+        request.user.notify_immediate_announcement_communications_received = (
+            form.cleaned_data["notify_immediate_announcement_communications_received "]
         )
         request.user.notify_agreement_communication_pending = form.cleaned_data[
             "notify_agreement_communication_pending"
@@ -1090,10 +1092,11 @@ def announcements(request, organization_id):
             "org": organization,
             "json_data": {
                 "org_id": str(organization.id),
+                "resource_labels": NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP_2,
                 "announcements": [
                     a.json()
                     for a in organization.announcements.all().prefetch_related(
-                        "contacts"
+                        "contacts", "option"
                     )
                 ],
             },
@@ -1103,41 +1106,54 @@ def announcements(request, organization_id):
 
 @login_required
 @require_own_organization
-def edit_announcement(request, organization_id, announcement_id):
-    raise Exception("TODO")  # TODO FL125
+def add_announcement(request, organization_id):
+    organization = get_object_or_404(Organization, pk=organization_id)
+    form = AnnouncementForm()
+    return edit_announcement_aux(request, organization, form)
 
 
 @login_required
 @require_own_organization
-def add_announcement(request, organization_id):
+def edit_announcement(request, organization_id, announcement_id):
     organization = get_object_or_404(Organization, pk=organization_id)
-    form = AnnouncementForm()
+    announcement = get_object_or_404(Announcement, pk=announcement_id)
+    form = AnnouncementForm(model_to_dict(announcement))
+    return edit_announcement_aux(request, organization, form, announcement=announcement)
+
+
+def edit_announcement_aux(request, organization, form, announcement=None):
+    editing = announcement is not None
     if request.method == "POST":
         form = AnnouncementForm(request.POST)
         if form.is_valid():
             ro, _created = ResourceOption.objects.get_or_create(
                 name=form.cleaned_data["option"]
             )
-            Announcement.objects.create(
-                organization=organization,
-                public=form.cleaned_data["public"],
-                title=form.cleaned_data["title"],
-                description=form.cleaned_data["description"],
-                resource=form.cleaned_data["resource"],
-                option=ro,
-            )
-            return redirect("announcements", organization_id=organization_id)
-
-    descriptions = {}
-    for k, value in NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP.items():
-        descriptions.setdefault(k[0], {})[k[1]] = value
+            if not announcement:
+                announcement = Announcement(organization=organization)
+            announcement.public = form.cleaned_data["public"]
+            announcement.title = form.cleaned_data["title"]
+            announcement.description = form.cleaned_data["description"]
+            announcement.resource = form.cleaned_data["resource"]
+            announcement.option = ro
+            announcement.save()
+            if editing:
+                return redirect(
+                    "announcement",
+                    organization_id=organization.id,
+                    announcement_id=announcement.id,
+                )
+            return redirect("announcements", organization_id=organization.id)
 
     return render(
         request,
         "femlliga/add_announcement.html",
         {
             "form": form,
-            "json_data": {"descriptions": descriptions},
+            "object": announcement,
+            "json_data": {
+                "resource_descriptions": NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP_2
+            },
         },
     )
 
@@ -1153,9 +1169,10 @@ def announcement(request, organization_id, announcement_id):
         request,
         "femlliga/announcement.html",
         {
-            "org": announcement.organization,
+            "announcement": announcement,
             "json_data": {
                 "org_id": str(organization_id),
+                "announcement_id": str(announcement_id),
                 "contacts": [c.json() for c in announcement.contacts.all()],
             },
         },
@@ -1712,8 +1729,6 @@ def maps(request):
         },
     )
 
-    # TODO implement with Announcement model
-
 
 def public_announcements(request):
     announcements = Announcement.objects.filter(public=True)
@@ -1729,7 +1744,7 @@ def public_announcements(request):
                 key=lambda p: strip_accents(p[1]),
             ),
             "json_data": {
-                "announcements": [a.json() for a in announcements],
+                "announcements": [a.json(include_org=True) for a in announcements],
             },
         },
     )
@@ -1746,12 +1761,10 @@ def public_announcement(request, pk):
         if form.is_valid():
             org = announcement.organization
             ec = AnnouncementContact.objects.create(
-                organization=org,
+                announcement=announcement,
                 name=form.cleaned_data["name"],
                 email=form.cleaned_data["email"],
                 message=form.cleaned_data["message"],
-                resource=announcement.resource,
-                option=announcement.option,
             )
 
             subject = _("S'ha enviat el següent missatge a «%(name)s»") % {
@@ -1768,12 +1781,12 @@ def public_announcement(request, pk):
             )
             send_email(to=[ec.email], subject=subject, body=body)
 
-            if org.creator.notify_immediate_external_communications_received:
+            if org.creator.notify_immediate_announcement_communications_received:
                 subject = _("T'han contactat per una necessitat publicada")
                 send_notification(
                     user=org.creator,
                     subject=subject,
-                    template="email/notify_external_communication_received.html",
+                    template="email/notify_announcement_communication_received.html",
                     context={
                         "org": org,
                         "contact": ec,
