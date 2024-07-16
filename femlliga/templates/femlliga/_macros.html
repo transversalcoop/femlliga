@@ -606,3 +606,8 @@ function matchContains(search) {
 </a>
 {% endmacro %}
 
+{% macro back_button() %}
+<a class="btn btn-light" href="#" onclick="history.back()">
+  {{ _("Torna") }}
+</a>
+{% endmacro %}

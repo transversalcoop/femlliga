@@ -47,6 +47,11 @@ urlpatterns = [
     path("page/<slug:name>/", views.page, name="page"),
     # login required
     path("preferences/", views.preferences, name="preferences"),
+    path(
+        "discard-user-email/<int:pk>/",
+        views.discard_user_email,
+        name="discard_user_email",
+    ),
     path("account/delete/", views.delete_account, name="delete_account"),
     path("app/", views.app, name="app"),
     path("organization/add/", views.add_organization, name="add_organization"),

@@ -30,7 +30,17 @@
               <div>
               {{ _("Si la modifiqueu, el canvi no s'aplicarà fins que valideu la nova adreça") }}
               {% if other_emails %}
-              {{ _("(correus pendents de validar: %(emails)s)", emails=other_emails) }}
+              <p class="mb-1">{{ _("Correus pendents de validar:") }}</p>
+              <ul>
+                {% for email in other_emails %}
+                <li class="mb-1">
+                  <a class="btn btn-sm btn-outline-danger" href="{{ url("discard_user_email", args=[email.id]) }}">
+                    {{ _("Descarta") }}
+                  </a>
+                  {{ email.email }}
+                </li>
+                {% endfor %}
+              </ul>
               {% endif %}
               </div>
           </label>

@@ -826,7 +826,7 @@ def preferences(request):
         "femlliga/preferences.html",
         {
             "form": form,
-            "other_emails": ", ".join([e.email for e in other_emails]),
+            "other_emails": [e for e in other_emails],
             "json_data": {
                 "distance": request.user.distance_limit_km,
             },
@@ -869,9 +869,6 @@ def save_preferences(request):
         request.user.notify_immediate_announcement_communications_received = (
             form.cleaned_data["notify_immediate_announcement_communications_received"]
         )
-        request.user.notify_immediate_announcement_communications_received = (
-            form.cleaned_data["notify_immediate_announcement_communications_received "]
-        )
         request.user.notify_agreement_communication_pending = form.cleaned_data[
             "notify_agreement_communication_pending"
         ]
@@ -895,6 +892,22 @@ def update_user_email(sender, request, email_address, **kwargs):
     EmailAddress.objects.filter(
         user=email_address.user,
     ).exclude(primary=True).delete()
+
+
+@login_required
+def discard_user_email(request, pk):
+    address = get_object_or_404(EmailAddress, pk=pk)
+    if address.user != request.user:
+        raise PermissionDenied()
+
+    if request.method == "POST":
+        if address.primary:
+            raise PermissionDenied()
+
+        address.delete()
+        return redirect("preferences")
+
+    return render(request, "femlliga/discard_user_email.html", {"address": address})
 
 
 @login_required
