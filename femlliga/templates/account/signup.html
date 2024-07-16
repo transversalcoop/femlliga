@@ -1,54 +1,52 @@
 {% extends "account/_passwords.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, toggle_password_button  %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, toggle_password_button, passwords_js, arrow_btn, arrow_btn_link %}
 
 {% block title %}{{ _("Registre") }}{% endblock title %}
 
-{% block content %}
-<div class="container">
-  <h2>{{ _("Registre") }}</h2>
-<div class="alert alert-primary mt-3" role="alert">
-  {{ _("Per inscriure una entitat, primer heu de crear un compte. Si ja el teniu creat, podeu iniciar sessió.") }}
-</div>
+{% block inner_content %}
+<h2 class="text-uppercase text-center mt-0">{{ _("Registra't") }}</h2>
+<div class="divider-3 mb-4"></div>
 
-<form method="post" class="mb-4">
+<form method="post">
   {{ csrf_input }}
   {{ form_feedback(form) }}
-  <label for="id_email">{{ _("Correu electrònic") }}</label>
+  <label class="mt-3" for="id_email">{{ _("Correu electrònic") }}</label>
   <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="email" required id="id_email" {{ input_value(form, "email") }}>
   {{ input_feedback(form, "email") }}
 
-  <label for="id_password1">{{ _("Contrasenya") }}</label>
+  <label class="mt-3" for="id_password1">{{ _("Contrasenya") }}</label>
   <div class="input-group">
     <input type="password" {{ input_classes(form, "password1") }} name="password1" required="" id="id_password1">
     {{ toggle_password_button() }}
     {{ input_feedback(form, "password1") }}
   </div>
 
-  <label for="id_password2">{{ _("Contrasenya (de nou)") }}</label>
+  <label class="mt-3" for="id_password2">{{ _("Contrasenya (de nou)") }}</label>
   <div class="input-group">
     <input type="password" {{ input_classes(form, "password2") }} name="password2" required="" id="id_password2">
     {{ toggle_password_button() }}
     {{ input_feedback(form, "password2") }}
   </div>
 
-  <div class="mt-2"></div>
+  <div class="mt-4"></div>
   {{ form.captcha }}
 
   <p class="mt-2">
-    {{ _("En registrar-te, acceptes la <a target='_blank' rel='noopener noreferrer' href='%(url)s'>política de protecció de dades</a>.", url=url("page", args=["privacy"])) }}
+  {{ _("En registrar-te, acceptes la <a target='_blank' rel='noopener noreferrer' href='%(url)s'>política de protecció de dades</a>.", url=url("page", args=["privacy"])) }}
   </p>
 
   <div class="mt-2">
-    <button type="submit" class="btn btn-custom">{{ _("Registra't") }}</button>
-    <a class="btn btn-light" href="{{ url("account_login") }}">{{ _("Inicia sessió") }}</a>
-    <a class="btn btn-light" href="{{ provider_login_url(request, "google") }}">
-      <img alt="Logo de Google" src="{{ static("google_logo.png") }}">
-      {{ _("Registra't amb un compte de Google") }}
-    </a>
+    {{ arrow_btn(_("Registra't"), "bi-person") }}
+    {{ arrow_btn_link(_("Entra"), url("account_login"), "bi-box-arrow-in-right") }}
+  </div>
+
+  <div class="mt-2">
+    {{ arrow_btn_link(_("Continua amb Google"), provider_login_url(request, "google"), "", image=static("google_logo.png"), image_alt=_("Logo de Google")) }}
   </div>
 </form>
-
-</div>
 {% endblock %}
 
+{% block js %}
+{{ passwords_js() }}
+{% endblock %}

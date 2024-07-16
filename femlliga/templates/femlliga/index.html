@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, render_select, vue_js %}
+{% from 'femlliga/_macros.html' import vue_js, arrow_btn_link %}
 
 {% block title %}{{ _("Portada") }}{% endblock %}
 
@@ -9,11 +9,9 @@
 <div class="container d-none d-md-block">
   <div class="row d-flex flex-md-row-reverse welcome-block">
     <div class="offset-md-5 col-md-7">
-      <div class="spacing"></div>
+      <div class="h-120-px"></div>
       <em>{{ _("Fer lliga: unir-se, fer causa comuna, acordar, amistar-se, anar a l’una, fer pinya…") }}</em>
       <h1 class="app-title">Fem lliga!</h1>
-      <div style="background-image: url('{{ static("decorations/cross.svg") }}'); background-repeat: repeat-x; height: 20px; margin-bottom: 20px; margin-right: -500px;">
-      </div>
       {{ initial_block_text() }}
     </div>
   </div>
@@ -33,26 +31,36 @@
   </div>
 </div>
 
-<div class="container landing-container text-center">
-  <h2 class="fw-black text-center">{{ _("Guia metodològica") }}</h2>
-  <div class="divider-1"></div>
-  <div class="row">
-    <div class="col-12 col-sm-6">
-      <p>{{ _("A partir de l’experiència acumulada, hem elaborat esta guia metodològica que té com a objectiu recollir una sèrie de recomanacions útils per a enfortir els vincles d’un veïnat a través de l’enxarxament de les entitats presents en un territori concret. Al llarg del document es fa èmfasi en les possibilitats que ofereix la utilització de la plataforma Fem Lliga!, una ferramenta de suport als processos de dinamització comunitària.") }}</p>
+<div class="container landing-container bottom-left-triangle-decoration">
+  <h2 class="fw-black fs-2-5-rem text-uppercase text-center mb-0 top-right-triangle-decoration pt-70-px">
+    {{ _("Guia metodològica") }}
+  </h2>
+  <div class="divider-3"></div>
+  <div class="row mt-60-px">
+    <div class="col-12 col-sm-7">
+      <p>
+        {{ _("A partir de l’experiència acumulada, hem elaborat esta guia metodològica que té com a objectiu recollir una sèrie de recomanacions útils per a enfortir els vincles d’un veïnat a través de l’enxarxament de les entitats presents en un territori concret. Al llarg del document es fa èmfasi en les possibilitats que ofereix la utilització de la plataforma Fem Lliga!, una ferramenta de suport als processos de dinamització comunitària.") }}
+      </p>
+      <div class="mt-4">
+        {{ arrow_btn_link(_("Descarrega"), static("guia-metodologica-femlliga.pdf"), "bi-download", download=True, large=True) }}
+      </div>
     </div>
 
-    <div class="col-12 col-sm-6">
-      <a type="button" class="btn btn-custom fw-bold p-2 px-4 fs-4" href="{{ static("guia-metodologica-femlliga.pdf") }}" download>
-        {{ _("Descarrega la guia") }}
-      </a>
+    <div class="col-12 offset-sm-1 col-sm-4">
+      <div class="text-end">
+        <img
+          src="{{ static("home-images/portada-guia-metodologica.png") }}"
+          class="max-w-100"
+        >
+      </div>
     </div>
   </div>
 </div>
 
-<div class="container landing-container text-center">
-  <h2 class="fw-black text-center">{{ _("Segell Fem lliga!") }}</h2>
-  <div class="divider-1"></div>
-  <div class="row">
+<div class="container landing-container">
+  <h2 class="fw-black fs-2-5-rem text-uppercase text-center mb-0">{{ _("Segell Fem lliga!") }}</h2>
+  <div class="divider-3"></div>
+  <div class="row mt-60-px">
     <div class="col-12 col-sm-6">
       <p>{{ _("Inscriviu-vos en la plataforma, i aconseguiu el «segell Fem Lliga» per a la vostra web!") }}</p>
     </div>
@@ -63,10 +71,10 @@
   </div>
 </div>
 
-<div class="container landing-container">
-  <h2 class="fw-black text-center">{{ _("Vols saber si podries fer lliga?") }}</h2>
-  <div class="divider-1"></div>
-  <p>
+<div class="container landing-container bottom-left-triangle-crosses-decoration pb-10-rem">
+  <h2 class="fw-black fs-2-5-rem text-uppercase text-center mb-0 top-right-triangle-decoration pt-70-px">{{ _("Vols saber si podries fer lliga?") }}</h2>
+  <div class="divider-3"></div>
+  <p class="text-center mt-60-px">
     {{ _("Selecciona el tipus de recurs que t'interessa i podràs veure amb quantes entitats el podries intercanviar.") }}
   </p>
   <div id="vueapp">
@@ -88,7 +96,7 @@
       </span>
     </div>
     <div v-if="resourceSelected !== ''">
-      <p>${ resourceOptionsQuestionMap[resourceSelected] }</p>
+      <p class="text-center mt-3">${ resourceOptionsQuestionMap[resourceSelected] }</p>
       <div class="multi-select">
         <button
           v-for="[option, optionName] of resourceOptionsMap[resourceSelected]"
@@ -105,6 +113,7 @@
     </div>
     <div v-if="resourceSelected !== '' && optionSelected !== ''" class="text-center mb-3">
       <button class="btn btn-custom" @click="checkMatches" :disabled="loading">
+        <!-- TODO hide button when already clicked, and convert to arrow button -->
         {{ _("Comprova amb quantes entitats fas lliga") }}
         <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
           <span class="visually-hidden">{{ _("Carregant...") }}</span>
@@ -112,18 +121,36 @@
       </button>
     </div>
     <div v-if="matches">
-      <p v-if="matches.offers === 0 && matches.needs === 0">
+      <p v-if="matches.offers === 0 && matches.needs === 0" class="text-center">
         {{ _("Actualment cap entitat ofereix ni necessita el mateix que vosaltres, però si us inscriviu altres entitats us podran trobar en el futur.") }}
       </p>
-      <p v-else-if="matches.offers === 0 && matches.needs !== 0">
-        {{ _("Hi ha <strong>${ matches.needs }</strong> entitats que necessiten el mateix que vosaltres. Si us inscriviu podreu contactar amb elles i buscar una solució en comú.") }}
-      </p>
-      <p v-else-if="matches.offers !== 0 && matches.needs === 0">
-        {{ _("Hi ha <strong>${ matches.offers }</strong> entitats que ofereixen el que necessiteu. Si us inscriviu podreu contactar amb elles i sol·licitar la seua ajuda.") }}
-      </p>
-      <p v-else>
-        {{ _("Hi ha <strong>${ matches.offers }</strong> entitats que ofereixen el que necessiteu i <strong>${ matches.needs }</strong> entitats que necessiten el mateix que vosaltres. Si us inscriviu podreu contactar amb elles i col·laborar.") }}
-      </p>
+      <template v-else-if="matches.offers === 0 && matches.needs !== 0">
+        <p class="mb-0 text-center">
+          {{ _("Hi ha <strong>${ matches.needs } entitats que necessiten el mateix que vosaltres</strong>.") }}
+        </p>
+        <p class="text-center">
+          {{ _("Si us inscriviu podreu contactar amb elles i buscar una solució en comú.") }}
+        </p>
+      </template>
+      <template v-else-if="matches.offers !== 0 && matches.needs === 0">
+        <p class="mb-0 text-center">
+          {{ _("Hi ha <strong>${ matches.offers } entitats que ofereixen el que necessiteu</strong>.") }}
+        </p>
+        <p class="text-center">
+          {{ _("Si us inscriviu podreu contactar amb elles i sol·licitar la seua ajuda.") }}
+        </p>
+      </template>
+      <template v-else>
+        <p class="mb-0 text-center">
+          {{ _("Hi ha <strong>${ matches.offers } entitats que ofereixen el que necessiteu</strong>.") }}
+        </p>
+        <p class="mb-0 text-center">
+          {{ _("Hi ha <strong>${ matches.needs } entitats que necessiten el mateix que vosaltres</strong>.") }}
+        </p>
+        <p class="text-center">
+          {{ _("Si us inscriviu podreu contactar amb elles i col·laborar.") }}
+        </p>
+      </template>
       <div class="text-center">
         <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
           {{ _("Inscriu la teua entitat") }}
@@ -292,16 +319,14 @@
 <p>
   {{ get_current_site(request).name }} {{ _("és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.") }}
 </p>
-<div class="mt-3 text-center">
-  <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
-    {{ _("Inscriu la teua entitat") }}
-  </a>
+<div class="mt-3">
+  {{ arrow_btn_link(_("Accedeix"), url("account_signup"), "bi-person", large=True) }}
 </div>
 {% endmacro %}
 
 {% macro collaboration_example(image, heading, text, alternatives, active=False, mobile=False) %}
 <div class="carousel-item{% if active %} active{% endif %}">
-  <div class="card {% if not mobile %}card-carousel-triple{% endif %}">
+  <div class="card card-carousel {% if not mobile %}card-carousel-triple{% endif %}">
     <img src="{{ static("decorations/quote.svg") }}" class="example-quote" alt="" loading="lazy">
 
     <img src="{{ static("home-images/"+image) }}" class="card-img-top pt-4 ps-4 pe-4" alt="" loading="lazy">

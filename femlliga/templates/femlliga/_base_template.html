@@ -21,7 +21,7 @@
 {% endmacro %}
 
 {% block primary_navigation %}
-  <ul class="navbar-nav me-auto mb-lg-0">
+  <ul class="navbar-nav mx-auto mb-lg-0">
   {% if not user.is_anonymous %}
     {% set organization = request.user.get_organization() %}
     {% if organization %}

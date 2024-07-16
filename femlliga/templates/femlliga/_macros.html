@@ -23,6 +23,35 @@
 </span>
 {% endmacro %}
 
+{% macro arrow_btn(text, icon, large=False) %}
+<button type="submit" class="btn btn-arrow {% if large %}btn-lg{% endif %}">
+  {{ arrow_btn_content(text, icon) }}
+</button>
+{% endmacro %}
+
+{% macro arrow_btn_link(text, url, icon, download=False, large=False, image=None, image_alt="") %}
+<a
+  type="button"
+  class="btn btn-arrow {% if large %}btn-lg{% endif %}"
+  href="{{ url }}"
+  {% if download %}download{% endif %}
+>
+  {{ arrow_btn_content(text, icon, image=image, image_alt=image_alt) }}
+</a>
+{% endmacro %}
+
+{% macro arrow_btn_content(text, icon, image=None, image_alt="") %}
+  {% if image %}
+  <img src="{{ image }}" class="my-1" alt="{{ image_alt }}">
+  {% else %}
+    <span class="btn-arrow-icon">
+      <i class="{{ icon }}"></i>
+    </span>
+  {% endif %}
+  <span class="btn-arrow-text">{{ text }}</span>
+  <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+{% endmacro %}
+
 {% macro show_messages(messages) %}
     {% for message in messages %}
         {% if message.extra_tags == "SHOW_USER" %}
@@ -610,4 +639,28 @@ function matchContains(search) {
 <a class="btn btn-light" href="#" onclick="history.back()">
   {{ _("Torna") }}
 </a>
+{% endmacro %}
+
+{% macro passwords_js() %}
+<script>
+var inputs = document.querySelectorAll("[type='password']");
+for (var i = 0; i < inputs.length; i++) {
+  const input = inputs[i];
+  const button = input.parentElement.getElementsByTagName("button")[0];
+  const icon = input.parentElement.getElementsByTagName("i")[0];
+
+  function togglePassword() {
+    if (input.type === "password") {
+      input.type = "text";
+      button.setAttribute("aria-label", "{{ _("Amaga la contrasenya") }}");
+      icon.setAttribute("class", "bi-eye-slash");
+    } else {
+      input.type = "password";
+      button.setAttribute("aria-label", "{{ show_password_message() }}");
+      icon.setAttribute("class", "bi-eye");
+    }
+  }
+  button.addEventListener("click", togglePassword);
+}
+</script>
 {% endmacro %}

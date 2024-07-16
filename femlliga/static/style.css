@@ -1,5 +1,6 @@
 :root {
     --blue: #3945B8;
+    --lightblue: #7df9ff;
     --lightbrown: #5b5b00;
     --brown: #505000;
     --yellow: #ffce1c;
@@ -109,6 +110,45 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     font-size: 1.5em;
 }
 
+.btn-arrow {
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    border: 1px solid black;
+    text-transform: uppercase;
+}
+
+.btn-arrow:hover {
+    border: 1px solid black;
+    background-color: var(--yellow);
+}
+
+.btn-arrow .btn-arrow-icon {
+    background-color: var(--yellow);
+    padding: 4px 6px;
+    display: inline-block;
+    border-radius: 0.25rem 0 0 0.25rem;
+}
+
+.btn-arrow .btn-arrow-text {
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+    border-right: 1px solid black;
+    font-weight: 900;
+}
+
+.btn-lg.btn-arrow .btn-arrow-text {
+    padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+}
+
+.btn-arrow .btn-arrow-arrow {
+    font-size: 0.75rem;
+    padding: 0 0.25rem 2px 0.25rem;
+}
+
+.btn-lg.btn-arrow .btn-arrow-arrow {
+    padding: 0 0.5rem 4px 0.5rem;
+}
+
 .btn-custom {
     border-radius: 100px;
     border: 1px solid black;
@@ -147,6 +187,10 @@ nav a:hover {
 
 .nav-link, .nav-link:focus, .nav-link:hover {
     color: black;
+}
+
+.nav-link {
+    margin: 0.5rem 0.75rem;
 }
 
 .edit-row:hover .edit {
@@ -196,6 +240,10 @@ nav a:hover {
     max-width: 100%;
 }
 
+.h-120-px {
+    height: 120px;
+}
+
 .spacing {
     margin-top: 20px;
 }
@@ -228,6 +276,30 @@ nav a:hover {
     margin: 20px 0;
     background-image: url('/static/decorations/zigzag.svg');
     background-repeat: repeat-x;
+}
+
+.divider-3 {
+    width: 390px;
+    max-width: calc(100% - 18px);
+    height: 4px;
+    background-color: var(--yellow);
+    margin: 2px auto;
+    position: relative;
+    border-radius: 2px;
+    transform: translate(9px);
+}
+
+.divider-3::before {
+    background-color: var(--yellow);
+    box-shadow: 6px 0px 0px 0px var(--yellow), 12px 0px 0px 0px var(--yellow);
+    content: "";
+    position: absolute;
+    left: -18px;
+    top: 0;
+    display: inline-block;
+    height: 4px;
+    width: 4px;
+    border-radius: 50%;
 }
 
 .vinyeta {
@@ -310,7 +382,6 @@ pre {
 .welcome-block {
     background-color: var(--lightgrey2);
     margin-top: 20px;
-    padding: 100px 60px;
     background-image: url('/static/home-images/gent-portada.png');
     background-size: cover;
     background-repeat: no-repeat;
@@ -328,6 +399,7 @@ pre {
     color: #000;
     -webkit-text-stroke-color: #000;
     stroke: #000;
+    margin: 1rem 0;
 }
 
 .app-title.app-title-mobile {
@@ -355,10 +427,10 @@ pre {
 }
 
 .multi-select .multi-select-choice {
-    border-radius: 100px;
+    border-radius: 0.5rem;
     border: 1px solid black;
-    padding: 5px 12px;
-    margin: 0 20px 10px 0;
+    padding: 0.5rem 1rem;
+    margin: 0 2rem 2rem 0;
     display: inline-block;
 }
 
@@ -367,7 +439,7 @@ pre {
 }
 
 .multi-select .selected {
-    background-color: var(--yellow);
+    background-color: var(--lightblue);
 }
 
 .sidebar {
@@ -449,9 +521,15 @@ nav .nav-link.active {
     border-radius: 20px;
 }
 
-.card {
+.card.card-carousel {
     border: none;
     box-shadow: 9px 11px 14px 0px rgba(0,0,0,0.1);
+}
+
+.card.card-account {
+    border: 1px solid black;
+    border-radius: 1rem;
+    padding: 2rem;
 }
 
 .container-xxl {
@@ -474,10 +552,6 @@ nav .nav-link.active {
     color: white;
 }
 
-.fs-7 {
-    font-size: 0.85rem !important;
-}
-
 .map-height {
     height: 300px;
 }
@@ -492,8 +566,57 @@ nav .nav-link.active {
     position: relative;
 }
 
+.top-right-triangle-decoration {
+    background-image: url("/static/decorations/top-right-triangle.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top center;
+}
+
+.bottom-left-triangle-decoration {
+    background-image: url("/static/decorations/bottom-left-triangle.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom center;
+}
+
+.bottom-left-triangle-crosses-decoration {
+    background-image: url("/static/decorations/bottom-left-triangle-crosses.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom center;
+}
+
+.black {
+    color: black;
+}
+
+.pt-70-px {
+    padding-top: 70px;
+}
+
+.pb-10-rem {
+    padding-bottom: 10rem;
+}
+
+.mt-60-px {
+    margin-top: 60px;
+}
+
+.mb-10-rem {
+    margin-bottom: 10rem;
+}
+
 .lh-15 {
     line-height: 1.5em;
+}
+
+.fs-2-5-rem {
+    font-size: 2.5rem;
+}
+
+.fs-7 {
+    font-size: 0.85rem !important;
 }
 
 .fsm-1 {
@@ -502,6 +625,10 @@ nav .nav-link.active {
 
 .fsm-2 {
     font-size: 0.8125em;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
 }
 
 .fw-black {
