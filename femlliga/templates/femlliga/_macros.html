@@ -24,19 +24,23 @@
 {% endmacro %}
 
 {% macro arrow_btn(text, icon, large=False) %}
-<button type="submit" class="btn btn-arrow {% if large %}btn-lg{% endif %}">
-  {{ arrow_btn_content(text, icon) }}
+<button type="submit" class="btn btn-arrow {% if large %}btn-lg{% endif %} {% if xl %}btn-xl{% endif %}">
+  <div class="d-flex align-items-center">
+    {{ arrow_btn_content(text, icon) }}
+  </div>
 </button>
 {% endmacro %}
 
-{% macro arrow_btn_link(text, url, icon, download=False, large=False, image=None, image_alt="") %}
+{% macro arrow_btn_link(text, url, icon, download=False, large=False, xl=False, image=None, image_alt="") %}
 <a
   type="button"
-  class="btn btn-arrow {% if large %}btn-lg{% endif %}"
+  class="btn btn-arrow {% if large %}btn-lg{% endif %} {% if xl %}btn-xl{% endif %}"
   href="{{ url }}"
   {% if download %}download{% endif %}
 >
-  {{ arrow_btn_content(text, icon, image=image, image_alt=image_alt) }}
+  <div class="d-flex align-items-center">
+    {{ arrow_btn_content(text, icon, image=image, image_alt=image_alt) }}
+  </div>
 </a>
 {% endmacro %}
 
@@ -44,9 +48,9 @@
   {% if image %}
   <img src="{{ image }}" class="my-1" alt="{{ image_alt }}">
   {% else %}
-    <span class="btn-arrow-icon">
-      <i class="{{ icon }}"></i>
-    </span>
+  <span class="btn-arrow-icon">
+    <i class="{{ icon }}"></i>
+  </span>
   {% endif %}
   <span class="btn-arrow-text">{{ text }}</span>
   <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>

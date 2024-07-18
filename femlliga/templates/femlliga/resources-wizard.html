@@ -228,13 +228,13 @@ Vue.createApp({
   {% for i, resource in enumerate(consts.RESOURCES) %}
   {% if editing %}
   <a
-    class="rounded-link fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}"
+    class="rounded-link fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}bg-lightgrey{% endif %}"
     href="{% if editing %}{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}{% endif %}"
   >
     {{ i+1 }}
   </a>
   {% else %}
-  <span class="fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}">{{ i+1 }}</span>
+  <span class="fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}bg-lightgrey{% endif %}">{{ i+1 }}</span>
   {% endif %}
   {% endfor %}
 </div>

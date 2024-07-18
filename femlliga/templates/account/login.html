@@ -28,12 +28,14 @@
   <div class="mt-4"></div>
   {{ form.captcha }}
 
-  <div class="mt-2">
+  <div class="mt-4">
     {{ arrow_btn(_("Entra"), "bi-box-arrow-in-right") }}
-    {{ arrow_btn_link(_("Registra't"), url("account_signup"), "bi-person") }}
+    <a href="{{ url("account_signup") }}" class="btn btn-light">
+      {{ _("Registra't") }}
+    </a>
   </div>
 
-  <div class="mt-2">
+  <div class="mt-4">
     {{ arrow_btn_link(_("Continua amb Google"), provider_login_url(request, "google"), "", image=static("google_logo.png"), image_alt=_("Logo de Google")) }}
   </div>
 </form>

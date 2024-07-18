@@ -36,12 +36,14 @@
   {{ _("En registrar-te, acceptes la <a target='_blank' rel='noopener noreferrer' href='%(url)s'>política de protecció de dades</a>.", url=url("page", args=["privacy"])) }}
   </p>
 
-  <div class="mt-2">
+  <div class="mt-4">
     {{ arrow_btn(_("Registra't"), "bi-person") }}
-    {{ arrow_btn_link(_("Entra"), url("account_login"), "bi-box-arrow-in-right") }}
+    <a href="{{ url("account_login") }}" class="btn btn-light">
+      {{ _("Entra") }}
+    </a>
   </div>
 
-  <div class="mt-2">
+  <div class="mt-4">
     {{ arrow_btn_link(_("Continua amb Google"), provider_login_url(request, "google"), "", image=static("google_logo.png"), image_alt=_("Logo de Google")) }}
   </div>
 </form>

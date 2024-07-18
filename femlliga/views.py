@@ -39,6 +39,7 @@ from .constants import (
     ORG_TYPES,
     RESOURCE_ICONS_MAP,
     RESOURCE_NAMES_MAP,
+    RESOURCE_OPTIONS_QUESTION_MAP,
     RESOURCE_OPTIONS_DEF_MAP,
     RESOURCE_OPTIONS_MAP,
     RESOURCES,
@@ -148,7 +149,19 @@ def record_stats(name):
 
 
 def index(request):
-    return render(request, "femlliga/index.html", {"form": ContactForm()})
+    return render(
+        request,
+        "femlliga/index.html",
+        {
+            "form": ContactForm(),
+            "json_data": {
+                "resource_names_map": RESOURCE_NAMES_MAP,
+                "resource_options_map": RESOURCE_OPTIONS_MAP,
+                "resource_options_question_map": RESOURCE_OPTIONS_QUESTION_MAP,
+                "option_names_map": RESOURCE_OPTIONS_DEF_MAP,
+            },
+        },
+    )
 
 
 def page(request, name):
