@@ -22,7 +22,8 @@
         {% endfor %}
         </div>
         {% if a.agreement_successful == None %}
-        <p class="mt-2">{{ _("Heu realitzat l'intercanvi? Indiqueu-ho per donar per acabada la conversa.") }}</p>
+        <hr class="my-5" />
+        <p class="mt-5">{{ _("Heu realitzat l'intercanvi? Indiqueu-ho per donar per acabada la conversa.") }}</p>
         <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" onsubmit="return confirm(document.getElementById('confirm-question').textContent)">
           {{ csrf_input }}
           <input type="hidden" name="successful" value="yes">

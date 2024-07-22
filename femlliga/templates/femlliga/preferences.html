@@ -14,7 +14,7 @@
         <h1>{{ _("Preferències") }}</h1>
       </div>
       <div class="col-12 col-sm-6 text-end">
-        <button type="submit" class="btn btn-warning mt-2 w-sm-100">{{ _("Actualitza les preferències") }}</button>
+        <button type="submit" class="btn btn-warning mt-2 w-100 w-sm-auto">{{ _("Actualitza les preferències") }}</button>
       </div>
     </div>
 
@@ -30,7 +30,17 @@
               <div>
               {{ _("Si la modifiqueu, el canvi no s'aplicarà fins que valideu la nova adreça") }}
               {% if other_emails %}
-              {{ _("(correus pendents de validar: %(emails)s)", emails=other_emails) }}
+              <p class="mb-1">{{ _("Correus pendents de validar:") }}</p>
+              <ul>
+                {% for email in other_emails %}
+                <li class="mb-1">
+                  <a class="btn btn-sm btn-outline-danger" href="{{ url("discard_user_email", args=[email.id]) }}">
+                    {{ _("Descarta") }}
+                  </a>
+                  {{ email.email }}
+                </li>
+                {% endfor %}
+              </ul>
               {% endif %}
               </div>
           </label>
@@ -60,7 +70,7 @@
     <div class="preferences-section">
       <h2 class="preferences-section-title">{{ _("Notificacions immediates") }}</h2>
       {{ preferences_switch(form, "notify_immediate_communications_received", _("Informa immediatament de les peticions d'intercanvi rebudes"), _("Si us envien una petició d'intercanvi, us enviarem un correu perquè la pugueu revisar de seguida")) }}
-      {#      {{ preferences_switch(form, "notify_immediate_external_communications_received", _("Informa immediatament dels contactes rebuts pels anuncis publicats"), _("Si una persona externa us envia un missatge, us enviarem un correu perquè el pugueu revisar de seguida")) }} #}
+      {{ preferences_switch(form, "notify_immediate_announcement_communications_received", _("Informa immediatament de persones interessades pels anuncis publicats"), _("Si una persona externa us envia un missatge en referència a un anunci, us enviarem un correu perquè el pugueu revisar de seguida")) }}
     </div>
 
     <div class="preferences-section">
@@ -95,7 +105,7 @@
 
 {% macro preferences_switch(form, name, label, sublabel=None) %}
 <div class="row preferences-row">
-  <div class="col-9 col-lg-11 col-md-10">
+  <div class="col-9 col-md-10 col-lg-11">
     <label class="form-check-label" for="{{ name }}">
       <strong>{{ label }}</strong>
       {% if sublabel %}<div>{{ sublabel }}</div>{% endif %}

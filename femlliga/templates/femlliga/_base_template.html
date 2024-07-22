@@ -5,7 +5,8 @@
 {% endmacro %}
 
 {% macro menu_url(name, href, args=[], pending=False) %}
-<a class="nav-link{% if request.path == url(href, args=args) %} active{% endif %}" href="{{ url(href, args=args) }}" {% if pending %} title="{{ _("Teniu missatges pendents d'atendre") }}"{% endif %}>{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
+{% set url_path = url(href, args=args) %}
+<a class="nav-link{% if request.path == url_path or request.path.startswith(url_path) %} active{% endif %}" href="{{ url_path }}" {% if pending %} title="{{ _("Teniu missatges pendents d'atendre") }}"{% endif %}>{{ name }}{% if pending %} {{ pending_dot() }} {% endif %}</a>
 {% endmacro %}
 
 {% macro logout_form(classes) %}
@@ -20,7 +21,7 @@
 {% endmacro %}
 
 {% block primary_navigation %}
-  <ul class="navbar-nav me-auto mb-lg-0">
+  <ul class="navbar-nav mx-auto mb-lg-0">
   {% if not user.is_anonymous %}
     {% set organization = request.user.get_organization() %}
     {% if organization %}
@@ -49,9 +50,12 @@
     >
       {{ menu_url(_("Peticions"), "agreements", [organization.id], pending=pending_sent or pending_received) }}
     </li>
-    {#    <li>
-      {{ menu_url(_("Contactes"), "external_contacts", [organization.id], pending=organization.pending_external_contacts()) }}
-    </li>#}
+    <li
+      data-tg-order="5"
+      data-tg-tour="<p>{{ _("Des d'aquesta pàgina podeu publicar anuncis visibles per persones externes a la plataforma") }}</p>"
+    >
+      {{ menu_url(_("Anuncis"), "announcements", [organization.id], pending=organization.pending_announcement_contacts()) }}
+    </li>
     {% endif %}
   {% endif %}
   {% if user.is_staff %}

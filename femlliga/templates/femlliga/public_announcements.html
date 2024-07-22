@@ -12,7 +12,7 @@
       <input v-model="search" class="form-control" type="text" placeholder="{{ _("Cerca anuncis") }}">
     </div>
     <div class="col-6">
-      <select v-model="province" class="form-select" type="text">
+      <select v-model="province" class="form-select">
         <option value="">{{ _("Filtra per província") }}</option>
         {% for code, name in provinces %}
         <option value="{{ code }}">{{ name }}</option>
@@ -23,20 +23,21 @@
     <template v-if="announcements.length > 0">
       <div v-for="a in announcements" class="col-12 col-sm-6 col-md-4 mt-2">
         <div class="match-box p-2">
-          <h2 class="mt-0">
-            <span v-html="highlightSearch(a.need.organization.name, search)"></span>
+          <h2 v-html="highlightSearch(a.title, search)" class="mt-0"></h2>
+          <p class="mb-0">
+            <span v-html="highlightSearch(a.organization.name, search)"></span>
             {{ _("necessita") }}
             <span v-html="highlightSearch(a.option, search)"></span>
-          </h2>
+          </p>
           <p>
             <strong>
               {{ _("Província de") }}
             </strong>
-            <span v-html="highlightSearch(a.need.organization.province.name, search)" class="pre-wrap"></span>
+            <span v-html="highlightSearch(a.organization.province.name, search)" class="pre-wrap"></span>
           </p>
-          <p v-html="highlightSearch(a.comments, search)" class="pre-wrap"></p>
+          <p v-html="highlightSearch(a.description, search)" class="pre-wrap"></p>
           <div class="text-center">
-            <a :href="a.href" class="btn btn-custom">{{ _("Visualitza l'anunci complet") }}</a>
+            <a :href="a.public_href" class="btn btn-custom">{{ _("Visualitza l'anunci complet") }}</a>
           </div>
         </div>
       </div>
@@ -56,10 +57,11 @@ function announcementContains(search) {
   return function(a) {
     const parts = sanitize(search).split(" ").filter(x => x !== "");
     const targets = [
-      sanitize(a.comments),
+      sanitize(a.title),
+      sanitize(a.description),
       sanitize(a.option),
-      sanitize(a.need.organization.name),
-      sanitize(a.need.organization.province.name),
+      sanitize(a.organization.name),
+      sanitize(a.organization.province.name),
     ];
     for (var part of parts) {
       if (!targets.some((target) => contains(target, part))) {
@@ -89,7 +91,7 @@ Vue.createApp({
         if (!this.province) {
           return true;
         }
-        return a.need.organization.province.id === this.province;
+        return a.organization.province.id === this.province;
       });
     },
   },

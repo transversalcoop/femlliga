@@ -16,7 +16,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.deconstruct import deconstructible
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from . import constants as const
 
@@ -106,9 +106,9 @@ class CustomUser(AbstractUser):
     # DEPRECATED
     accept_communications_automatically = models.BooleanField(default=True)
     notify_immediate_communications_received = models.BooleanField(default=True)
-    # notify_immediate_external_communications_received = models.BooleanField(
-    #    default=True
-    # )
+    notify_immediate_announcement_communications_received = models.BooleanField(
+        default=True
+    )
     # DEPRECATED
     notify_immediate_communications_rejected = models.BooleanField(default=True)
 
@@ -191,6 +191,8 @@ class Organization(models.Model):
         blank=True,
         null=True,
     )
+
+    welcome_email_sent = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = _("Organització")
@@ -305,8 +307,12 @@ class Organization(models.Model):
         ).count()
         return sent > 0, received > 0
 
-    #    def pending_external_contacts(self):
-    #        return self.received_external_contacts.filter(read=False).count() > 0
+    def pending_announcement_contacts(self):
+        announcements = [
+            a.pending_contacts()
+            for a in self.announcements.all().prefetch_related("contacts")
+        ]
+        return len(announcements) > 0 and any(announcements)
 
     def creator__email(self):
         return self.creator.email
@@ -528,41 +534,106 @@ class Need(BaseResource):
         return j
 
 
-# class ExternalContact(models.Model):
-#    id = models.UUIDField(
-#        primary_key=True,
-#        default=uuid.uuid4,
-#        editable=False,
-#    )
-#    received_on = models.DateTimeField(
-#        auto_now_add=True, verbose_name=_("Contacte enviat el")
-#    )
-#    # TODO link to Announcement
-#    email = models.EmailField()
-#    name = models.TextField(verbose_name=_("Nom"))
-#    message = models.TextField(verbose_name=_("Missatge"))
-#    resource = models.CharField(
-#        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
-#    )
-#    option = models.ForeignKey(
-#        ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
-#    )
-#    read = models.BooleanField(default=False)
-#
-#    class Meta:
-#        ordering = ["-received_on"]
-#
-#    def json(self):
-#        return {
-#            "id": str(self.id),
-#            "received_on": self.received_on,
-#            "name": self.name,
-#            "email": self.email,
-#            "message": self.message,
-#            "resource": str(self.resource),
-#            "option": str(self.option),
-#            "read": self.read,
-#        }
+class Announcement(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="announcements",
+    )
+    public = models.BooleanField(default=False)
+    title = models.TextField(verbose_name=_("Títol"))
+    description = models.TextField(verbose_name=_("Descripció"))
+    resource = models.CharField(
+        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
+    )
+    option = models.ForeignKey(
+        ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.title
+
+    def json(self, include_org=False):
+        j = {
+            "id": str(self.id),
+            "title": self.title,
+            "description": self.description,
+            "public": self.public,
+            "resource": str(self.resource),
+            "option": str(self.option),
+            "option_name": self.option.name,
+            "pending_contacts": self.pending_contacts(),
+            "href": reverse("announcement", args=[self.organization.id, self.id]),
+            "public_href": reverse("public_announcement", args=[self.id]),
+        }
+
+        contacts_count = len(self.contacts.all())
+        if contacts_count > 0:
+            j["contacts_message"] = ngettext(
+                "Hi ha una persona interessada",
+                "Hi ha %(num)s persones interessades",
+                contacts_count,
+            ) % {"num": contacts_count}
+
+        if include_org:
+            j["organization"] = {
+                "name": self.organization.name,
+                "lat": self.organization.lat,
+                "lng": self.organization.lng,
+                "province": self.get_province(),
+            }
+
+        return j
+
+    def get_province(self):
+        from femlliga.utils import get_province
+        from femlliga.gis.es import spain_provinces
+
+        lat = self.organization.lat
+        lng = self.organization.lng
+        return get_province(lat, lng, spain_provinces["features"])
+
+    def pending_contacts(self):
+        pc = [c for c in self.contacts.all() if not c.read]
+        return len(pc) > 0
+
+
+class AnnouncementContact(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    received_on = models.DateTimeField(
+        auto_now_add=True, verbose_name=_("Contacte enviat el")
+    )
+    announcement = models.ForeignKey(
+        Announcement,
+        on_delete=models.CASCADE,
+        related_name="contacts",
+    )
+    email = models.EmailField()
+    name = models.TextField(verbose_name=_("Nom"))
+    message = models.TextField(verbose_name=_("Missatge"))
+    read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-received_on"]
+
+    def json(self):
+        return {
+            "id": str(self.id),
+            "received_on": self.received_on,
+            "name": self.name,
+            "email": self.email,
+            "message": self.message,
+            "read": self.read,
+        }
 
 
 class Offer(BaseResource):

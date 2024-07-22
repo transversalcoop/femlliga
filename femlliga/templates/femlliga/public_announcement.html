@@ -9,17 +9,20 @@
 {% block content %}
 <main id="content" class="container">
   <h2>
-    {{ announcement.need.organization.name }}
+    {{ announcement.title }}
+  </h2>
+  <p class="mb-0">
+    {{ announcement.organization.name }}
     {{ _("necessita") }}
     {{ announcement.option }}
-  </h2>
+  </p>
   <p>
     <strong>
       {{ _("Província de") }}
     </strong>
     {{ announcement.get_province().name }}
   </p>
-  <p class="pre-wrap">{{ announcement.comments }}</p>
+  <p class="pre-wrap">{{ announcement.description }}</p>
 
   <form method="POST" action="{{ url("public_announcement", args=[announcement.id]) }}" class="mb-4">
     <div id="vue-app">
@@ -63,7 +66,7 @@
 {{ leaflet_js() }}
 {{ vue_js() }}
 <script>
-{{ organization_map_js(announcement.need.organization) }}
+{{ organization_map_js(announcement.organization) }}
 var jsonData = getJsonData();
 Vue.createApp({
   delimiters: ["${", "}"],

@@ -8,20 +8,50 @@ urlpatterns = [
     # no login required
     path("", views.index, name="index"),
     path("talk/", views.contact, name="contact"),
-    #    path(
-    #        "public-announcements/", views.public_announcements, name="public_announcements"
-    #    ),
-    #    path(
-    #        "public-announcements/<uuid:pk>/",
-    #        views.public_announcement,
-    #        name="public_announcement",
-    #    ),
+    path(
+        "public-announcements/", views.public_announcements, name="public_announcements"
+    ),
+    path(
+        "public-announcements/<uuid:pk>/",
+        views.public_announcement,
+        name="public_announcement",
+    ),
+    path(
+        "organization/<uuid:organization_id>/announcements/",
+        views.announcements,
+        name="announcements",
+    ),
+    path(
+        "organization/<uuid:organization_id>/announcements/add/",
+        views.add_announcement,
+        name="add_announcement",
+    ),
+    path(
+        "organization/<uuid:organization_id>/announcements/<uuid:announcement_id>/",
+        views.announcement,
+        name="announcement",
+    ),
+    path(
+        "organization/<uuid:organization_id>/announcements/<uuid:announcement_id>/edit/",
+        views.edit_announcement,
+        name="edit_announcement",
+    ),
+    path(
+        "organization/<uuid:organization_id>/announcements/<uuid:announcement_id>/contacts/<uuid:contact_id>/mark-read/",
+        views.mark_announcement_contact_read,
+        name="mark_announcement_contact_read",
+    ),
     path("maps/", views.maps, name="maps"),
     path("check-matches/", views.check_matches, name="check_matches"),
     path("search-address/", views.search_address, name="search_address"),
     path("page/<slug:name>/", views.page, name="page"),
     # login required
     path("preferences/", views.preferences, name="preferences"),
+    path(
+        "discard-user-email/<int:pk>/",
+        views.discard_user_email,
+        name="discard_user_email",
+    ),
     path("account/delete/", views.delete_account, name="delete_account"),
     path("app/", views.app, name="app"),
     path("organization/add/", views.add_organization, name="add_organization"),
@@ -83,16 +113,6 @@ urlpatterns = [
         views.agreement,
         name="agreement",
     ),
-    #    path(
-    #        "organization/<uuid:organization_id>/external-contacts/",
-    #        views.external_contacts,
-    #        name="external_contacts",
-    #    ),
-    #    path(
-    #        "organization/<uuid:organization_id>/external-contacts/<uuid:contact_id>/mark-read/",
-    #        views.mark_external_contact_read,
-    #        name="mark_external_contact_read",
-    #    ),
     # for debugging email style
     #    path(
     #        "organization/<uuid:organization_id>/agreements/<uuid:agreement_id>/email/view/",
