@@ -245,10 +245,6 @@ nav a:hover {
     height: 120px;
 }
 
-.h-400-px {
-    height: 400px;
-}
-
 .spacing {
     margin-top: 20px;
 }
@@ -309,12 +305,6 @@ nav a:hover {
 
 .vinyeta {
     background-image: url('/static/home-images/marc-02.png');
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.vinyeta-menut {
-    background-image: url('/static/home-images/marc-03.png');
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -412,7 +402,7 @@ pre {
 }
 
 .example-quote {
-    width: 60px;
+    width: 75px;
 }
 
 .separator-yellow {
@@ -546,32 +536,20 @@ nav .nav-link.active {
     margin-bottom: 10rem;
 }
 
-.lh-15 {
-    line-height: 1.5em;
-}
-
 .lh-1-em {
     line-height: 1em;
-}
-
-.lh-2-25-rem {
-    line-height: 2.25rem;
 }
 
 .fs-5-rem {
     font-size: 5rem;
 }
 
+.fs-1-5-rem {
+    font-size: 1.5rem;
+}
+
 .fs-2-5-rem {
     font-size: 2.5rem;
-}
-
-.fs-1-75-rem {
-    font-size: 1.75rem;
-}
-
-.fs-2-rem {
-    font-size: 2rem;
 }
 
 .fs-4-5 {
@@ -584,14 +562,6 @@ nav .nav-link.active {
 
 .fs-7 {
     font-size: 0.85rem !important;
-}
-
-.fsm-1 {
-    font-size: 0.875em;
-}
-
-.fsm-2 {
-    font-size: 0.8125em;
 }
 
 .br-1-rem {
@@ -748,10 +718,6 @@ nav .nav-link.active {
     width: 80%;
 }
 
-.w-45 {
-    width: 45%;
-}
-
 .m-center {
     margin: 0 auto;
 }
@@ -839,11 +805,6 @@ nav .nav-link.active {
 
 .background-persones {
     background-image: url(/static/pages/dos-personatges.png);
-}
-
-.page-section {
-    background-color: transparent;
-    background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);
 }
 
 .page-title {
@@ -948,32 +909,11 @@ nav .nav-link.active {
 
 /* Carousel code */
 
-.carousel-item .col-md-3 {
-    background-image: url("/static/home-images/carousel-slide-background.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: top center;
-}
-
-.carousel-item .col-md-3 .card {
-    margin-left: 5%;
-}
-
-@media (max-width: 575px) {
-    .carousel-inner .carousel-item > div {
-        display: none;
-    }
-    .carousel-inner .carousel-item > div:first-child {
-        display: block;
-    }
-}
-
 @media (max-width: 767px) {
     .carousel-inner .carousel-item > div {
         display: none;
     }
-    .carousel-inner .carousel-item > div:first-child,
-    .carousel-inner .carousel-item > div:nth-child(2) {
+    .carousel-inner .carousel-item > div:first-child {
         display: block;
     }
 }
@@ -986,14 +926,15 @@ nav .nav-link.active {
 
 /* medium and up screens */
 @media (min-width: 768px) {
+
     .carousel-inner .carousel-item-end.active,
     .carousel-inner .carousel-item-next {
-        transform: translateX(25%);
+        transform: translateX(33%);
     }
 
     .carousel-inner .carousel-item-start.active,
     .carousel-inner .carousel-item-prev {
-        transform: translateX(-25%);
+        transform: translateX(-33%);
     }
 }
 
@@ -1002,112 +943,14 @@ nav .nav-link.active {
     transform: translateX(0);
 }
 
-#carouselExamples {
-    transform: scale(120%) translateX(150px);
+.carousel-item {
+    font-size: 1.5rem;
 }
 
-#carouselExamples .card {
-    height: 280px;
-    width: 90%;
-}
-
-.carousel-body {
-    font-size: 20px;
-}
-
-@media (max-width: 1800px) {
-    #carouselExamples {
-        transform: scale(115%) translateX(65px);
-    }
-
-    .carousel-body {
-        font-size: 18px;
-    }
-
-    #carouselExamples .card {
-        height: 360px;
-    }
-}
-
-@media (max-width: 1550px) {
-    #carouselExamples {
-        transform: scale(115%) translateX(100px);
-    }
-
-    .carousel-body {
-        font-size: 18px;
-    }
-
-    #carouselExamples .card {
-        height: 300px;
-    }
-}
-
-@media (max-width: 1280px) {
-    #carouselExamples {
-        transform: scale(115%) translateX(65px);
-    }
-
-    .carousel-body {
-        font-size: 18px;
-    }
-
-    #carouselExamples .card {
-        height: 360px;
-    }
-}
-
-@media (max-width: 1024px) {
-    #carouselExamples {
-        transform: scale(115%) translateX(50px);
-    }
-
-    .carousel-body {
-        font-size: 16px;
-    }
-
-    #carouselExamples .card {
-        height: 400px;
-    }
-}
-
-@media (max-width: 768px) {
-    #carouselExamples {
-        transform: scale(100%) translateX(0px);
-    }
-
-    #carouselExamples .card {
-        height: 360px;
-    }
-
-    .carousel-inner .carousel-item-end.active,
-    .carousel-inner .carousel-item-next {
-        transform: translateX(50%);
-    }
-
-    .carousel-inner .carousel-item-start.active,
-    .carousel-inner .carousel-item-prev {
-        transform: translateX(-50%);
-    }
-}
-
-@media (max-width: 576px) {
-    #carouselExamples {
-        transform: scale(100%) translateX(0px);
-    }
-
-    #carouselExamples .card {
-        height: 300px;
-    }
-
-    .carousel-inner .carousel-item-end.active,
-    .carousel-inner .carousel-item-next {
-        transform: translateX(100%);
-    }
-
-    .carousel-inner .carousel-item-start.active,
-    .carousel-inner .carousel-item-prev {
-        transform: translateX(-100%);
-    }
+.carousel-item .col-md-4 {
+    background-image: url("/static/home-images/carousel-slide-background.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top center;
 }
 

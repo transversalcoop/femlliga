@@ -279,7 +279,7 @@
   </p>
 </div>
 
-<section class="mb-7-rem">
+<section class="container mb-7-rem">
   <div class="row mx-auto my-auto justify-content-center">
     <div id="carouselExamples" class="carousel slide p-0 mt-5" data-bs-ride="carousel">
       <div class="carousel-inner">
@@ -301,8 +301,8 @@
 
 {% macro collaboration_example(question, answer, active=False) %}
 <div class="carousel-item{% if active %} active{% endif %}">
-  <div class="col-12 col-sm-6 col-md-3">
-    <div class="card br-1-rem ms-auto">
+  <div class="col-12 col-md-4">
+    <div class="card br-1-rem w-80 mx-auto h-100">
       <div class="card-body carousel-body">
         <img src="{{ static("home-images/quote.svg") }}" class="example-quote mb-2" alt="" loading="lazy">
         <p class="fst-italic mb-0">«{{ question }}»</p>
@@ -320,12 +320,6 @@
 
 {{ collaboration_example(_("Tenim assemblea i no disposem d'un espai"), _("Amb aquesta xarxa social podeu contactar amb altres associacions que estan disposades a compartir la seua seu.")) }}
 
-{{ collaboration_example(_("És necessari contractar una assegurança per a les nostres activitats?"), _("En Fem lliga! pots trobar entitats que poden resoldre els vostres dubtes legals.")) }}
-
-{{ collaboration_example(_("Equip de so, megafonia... tenim un acte i ens vindria genial"), _("Vos sorprendrà la quantitat de col·lectius de Fem lliga! que vos poden ajudar!")) }}
-
-{{ collaboration_example(_("Tenim assemblea i no disposem d'un espai"), _("Amb aquesta xarxa social podeu contactar amb altres associacions que estan disposades a compartir la seua seu.")) }}
-
 {# TODO re-redact {{ collaboration_example(_("Voleu aprendre a redactar projectes? Fem lliga!"), _("Quantes vegades us hauria anat bé que us orientaren quan us poseu davant la paperassa per a demanar recursos econòmics a l'administració?"), _("Per exemple per a demanar una subvenció"), active=False, mobile=mobile) }}
 {{ collaboration_example(_("Necessiteu un projector? Fem lliga!"), _("Entre les associacions fàcilment fareu lliga amb alguna que us el pot deixar. Contacteu i concreteu les condicions!"), _("O algun altre recurs audiovisual? Un equip de so potser?"), mobile=mobile) }}
 {{ collaboration_example(_("Voleu formar-vos? Fem lliga!"), _("Us agradria ensenyar com funcionen les xarxes socials? Voleu compartir algun altre coneixement? Segur que trobeu amb qui compartir-lo."), _("Per exemple en pàgines web? o en com millorar el funcionament de la vostra assemblea?"), mobile=mobile) }}#}
@@ -335,27 +329,22 @@
 {{ vue_js() }}
 <script>
 // from https://stackoverflow.com/questions/20007610/bootstrap-carousel-multiple-frames-at-once
-var items = document.querySelectorAll('.carousel .carousel-item');
+let items = document.querySelectorAll('.carousel .carousel-item')
 
-let minPerSlide = 4;
-if (screen.width < 576) {
-  minPerSlice = 1;
-} else if (screen.width < 768) {
-  minPerSlice = 2;
-}
-if (minPerSlice > 1) {
 items.forEach((el) => {
-  let next = el.nextElementSibling;
-  for (var i = 1; i < minPerSlide; i++) {
+  const minPerSlide = 3
+  let next = el.nextElementSibling
+  for (var i=1; i<minPerSlide; i++) {
     if (!next) {
+      // wrap carousel by using first child
       next = items[0]
     }
-    let cloneChild = next.cloneNode(true);
-    el.appendChild(cloneChild.children[0]);
-    next = next.nextElementSibling;
+    let cloneChild = next.cloneNode(true)
+    el.appendChild(cloneChild.children[0])
+    next = next.nextElementSibling
   }
-});
-}
+})
+
 
 Vue.createApp({
   delimiters: ["${", "}"],

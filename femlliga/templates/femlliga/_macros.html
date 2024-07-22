@@ -56,17 +56,6 @@
   <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
 {% endmacro %}
 
-{% macro show_messages(messages) %}
-    {% for message in messages %}
-        {% if message.extra_tags == "SHOW_USER" %}
-            {% if message.message == "CELEBRATION" %}
-            {% else %}
-            <div class="alert alert-info" style="margin-top: 20px;">{{ message }}</div>
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-{% endmacro %}
-
 {% macro universal_access_icon() %}<img src="{{ static("icons/universal-access.svg") }}">{% endmacro %}
 
 {% macro resource_details(resource, match_type) %}
@@ -218,14 +207,6 @@
   {% endif %}
 {% endmacro %}
 
-{% macro render_select_raw(name, options, value="") %}
-    <select id="id_{{ name }}" name="{{ name }}" class="form-select" value="{{ value }}">
-        {% for option in options %}
-            <option value="{{ option[0] }}" {% if value == option[0] %}selected{% endif %}>{{ option[1] }}</option>
-        {% endfor %}
-    </select>
-{% endmacro %}
-
 {% macro social_media_url(base_url, value) %}{% if value.startswith("http") %}{{ value }}{% else %}{{ base_url }}{{ value }}{% endif %}{% endmacro %}
 
 {% macro render_social_media(org) %}
@@ -266,23 +247,6 @@ a <template> tag, gets shown #}
 </div>
 {% endmacro %}
 
-{% macro render_social_media_vue() %}
-<div v-if="socialMedia.length > 0">
-  <p class="mt-1 mb-0"><strong>{{ _("Xarxes socials") }}</strong></p>
-  <ul class="mb-0">
-    <li v-for="m in socialMedia" :key="m.id">
-      <span class="me-2">${ socialMediaNamesMap[m.media_type] }</span>
-      <a v-if="m.media_type === 'WEBSITE'" target="_blank" rel="noopener noreferrer" :href="addHttp(m.value)">${ m.value }</a>
-      <a v-else-if="m.media_type === 'FACEBOOK'" target="_blank" rel="noopener noreferrer" :href="socialMediaUrl('https://www.facebook.com/', m.value)">${ m.value }</a>
-      <a v-else-if="m.media_type === 'INSTAGRAM'" target="_blank" rel="noopener noreferrer" :href="socialMediaUrl('https://www.instagram.com/', m.value)">${ m.value }</a>
-      <a v-else-if="m.media_type === 'TWITTER'" target="_blank" rel="noopener noreferrer" :href="socialMediaUrl('https://twitter.com/', m.value)">${ m.value }</a>
-      <a v-else-if="m.media_type === 'LINKEDIN'" target="_blank" rel="noopener noreferrer" :href="socialMediaUrl('https://es.linkedin.com/in/', m.value)">${ m.value }</a>
-      <span v-else>${ m.value }</span>
-    </li>
-  </ul>
-</div>
-{% endmacro %}
-
 {% macro render_formset_field(form, field, field_name, input_type, label, placeholder="") %}
   {% if label %}
     <label for="id_{{ field.html_name }}" style="margin-top: 10px;">{{ label }}</label>
@@ -312,10 +276,6 @@ a <template> tag, gets shown #}
 {% macro render_formset_delete_vue(field, deleteFunc) %}
 <button class="btn btn-custom" @click.prevent="{{ deleteFunc }}">{{ _("Esborra") }}</button>
 <input type="hidden" id="id_{{ field.html_name }}" name="{{ field.html_name }}" value="">
-{% endmacro %}
-
-{% macro organization_link(organization) %}
-  <a href="{{ url("view_organization", kwargs={"organization_id": organization.id}) }}">{{ organization.name }}</a>
 {% endmacro %}
 
 {% macro images_modal_vue() %}
@@ -407,15 +367,6 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
-{% endmacro %}
-
-{% macro info_tooltip(title, pos="right", class="") %}
-<span class="css-tooltip {{ class }}">
-  <i class="bi-info-circle"></i>
-  <span class="tooltiptext{% if pos=='left' %} tooltiptextleft{% elif pos=='mid' %} tooltiptextmid{% endif %}">
-    {{ title }}.
-  </span>
-</span>
 {% endmacro %}
 
 {% macro show_matches_vue(matches, needs = None, origin = "SEARCH") %}
