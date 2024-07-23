@@ -3,12 +3,9 @@ import math
 import unicodedata
 import uuid
 from datetime import timedelta
-from io import BytesIO
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import networkx as nx
-import pandas as pd
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -317,6 +314,12 @@ class Organization(models.Model):
     def creator__email(self):
         return self.creator.email
 
+    def get_province(self):
+        from femlliga.utils import get_province
+        from femlliga.gis.es import spain_provinces
+
+        return get_province(self.lat, self.lng, spain_provinces["features"])
+
 
 class SocialMedia(models.Model):
     organization = models.ForeignKey(
@@ -356,87 +359,6 @@ class Resource:
 
     def add_image_label(self):
         return const.RESOURCE_ADD_IMAGE_LABEL[self.code]
-
-
-class Table:
-    def __init__(self, columns, labels, rows):
-        self.columns = columns
-        self.labels = labels
-        self.rows = rows
-        self.footer = ["Total"] + [0] * len(rows[0])
-        for row in rows:
-            for i in range(len(row)):
-                self.footer[i + 1] += row[i]
-
-    def plot(self):
-        df = pd.DataFrame(
-            self.rows,
-            columns=self.columns[1:],
-            index=map(
-                lambda x: x if len(x) < 15 else x[:12].strip() + "...", self.labels
-            ),
-        )
-        return plot_dataframe(df)
-
-
-class Timeline:
-    def __init__(self, rows, name=""):
-        self.rows = [0]
-        self.index = [timezone.now()]
-        self.name = name
-        if len(rows) == 0:
-            return
-        self.index = date_intervals(min(rows), max(rows))[:-1]
-        self.rows = self.count(rows, self.index)
-
-    def count(self, dates, date_intervals):
-        dates = sorted(dates)
-        counts = [0] * len(date_intervals)
-        interval_index = 0
-        for date in dates:
-            while (
-                interval_index < len(date_intervals) - 1
-                and date > date_intervals[interval_index + 1]
-            ):
-                interval_index += 1
-            counts[interval_index] += 1
-        return counts
-
-    def plot(self):
-        df = pd.DataFrame(
-            self.rows,
-            columns=[self.name],
-            index=map(lambda x: x.strftime("%Y/%m/%d"), self.index),
-        )
-        return plot_dataframe(df, figsize=(10, 6))
-
-
-class Graph:
-    def __init__(self, graph, labels):
-        self.graph = graph
-        self.labels = labels
-
-    def plot(self):
-        plt.switch_backend("AGG")
-        pos = nx.kamada_kawai_layout(self.graph)
-        nx.draw_networkx_labels(self.graph, pos, self.labels)
-        nx.draw(self.graph, pos=pos)
-        return plot()
-
-
-def plot_dataframe(df, figsize=(10, 8)):
-    plt.switch_backend("AGG")
-    df.plot.bar(
-        rot=30,
-        figsize=figsize,
-    )
-    return plot()
-
-
-def plot():
-    sio = BytesIO()
-    plt.savefig(sio, format="png")
-    return base64.encodebytes(sio.getvalue()).decode()
 
 
 def option_name(code):
@@ -531,6 +453,13 @@ class Need(BaseResource):
                 ],
             )
         j["images"] = [i.json() for i in self.images.all()]
+        if hasattr(self, "announcements"):
+            j["announcements"] = [
+                a.json(
+                    current_organization=current_organization, include_org=include_org
+                )
+                for a in self.announcements
+            ]
         return j
 
 
@@ -558,7 +487,7 @@ class Announcement(models.Model):
     def __str__(self):
         return self.title
 
-    def json(self, include_org=False):
+    def json(self, include_org=False, current_organization=None):
         j = {
             "id": str(self.id),
             "title": self.title,
@@ -567,9 +496,12 @@ class Announcement(models.Model):
             "resource": str(self.resource),
             "option": str(self.option),
             "option_name": self.option.name,
+            "options": [self.option.name],
+            "type": "need",
             "pending_contacts": self.pending_contacts(),
             "href": reverse("announcement", args=[self.organization.id, self.id]),
             "public_href": reverse("public_announcement", args=[self.id]),
+            "images": [],
         }
 
         contacts_count = len(self.contacts.all())
@@ -588,15 +520,29 @@ class Announcement(models.Model):
                 "province": self.get_province(),
             }
 
+        if current_organization:
+            j["distance"] = current_organization.distance_text(self.organization)
+            j["message_href"] = reverse(
+                "send_message",
+                args=[
+                    current_organization.id,
+                    self.organization.id,
+                    "need",
+                    self.resource,
+                ],
+            )
+        if hasattr(self, "announcements"):
+            j["announcements"] = [
+                a.json(
+                    current_organization=current_organization, include_org=include_org
+                )
+                for a in self.announcements
+            ]
+
         return j
 
     def get_province(self):
-        from femlliga.utils import get_province
-        from femlliga.gis.es import spain_provinces
-
-        lat = self.organization.lat
-        lng = self.organization.lng
-        return get_province(lat, lng, spain_provinces["features"])
+        return self.organization.get_province()
 
     def pending_contacts(self):
         pc = [c for c in self.contacts.all() if not c.read]
@@ -873,3 +819,10 @@ class OfferImage(models.Model):
 
     def json(self):
         return {"url": self.image.url}
+
+
+class ExcludeCommentWord(models.Model):
+    value = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.value

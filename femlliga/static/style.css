@@ -440,13 +440,21 @@ pre {
     color: black;
 }
 
-nav .nav-link.active {
+nav .nav-link.active, ul.nav .nav-link.active {
     border-bottom: 2px solid black;
 }
 
 .badge.bg-light, .alert.alert-light {
     border: 1px solid var(--darkgrey);
     color: var(--darkgrey);
+}
+
+a.badge {
+    text-decoration: none;
+}
+
+a.badge:hover {
+    color: var(--yellow);
 }
 
 .card {
@@ -478,8 +486,8 @@ nav .nav-link.active {
     height: 300px;
 }
 
-.map-height-big {
-    height: 90vh;
+.h-70vh {
+    height: 70vh;
 }
 
 .inner-container {
@@ -576,7 +584,11 @@ nav .nav-link.active {
     font-weight: 900;
 }
 
-.columns {
+.columns-2 {
+    columns: 2;
+}
+
+.columns, .columns-3 {
     columns: 3;
 }
 

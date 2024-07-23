@@ -2,43 +2,7 @@
 
 {% from 'femlliga/_macros.html' import leaflet_css, leaflet_js %}
 
-{% block title %}Informe{% endblock %}
-
-{% macro plot(data) %}
-<div class="text-center">
-    <img src="data:image/png;base64,{{ data }}"/>
-</div>
-{% endmacro %}
-
-{% macro render_table(table) %}
-<table class="table">
-    <thead>
-        <tr>
-            {% for i, value in enumerate(table.columns) %}
-            <th {% if i == 0 %}class="w-50"{% endif %}>{{ value }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for i, row in enumerate(table.rows) %}
-            <tr>
-                <td>{{ table.labels[i] }}</td>
-                {% for value in row %}
-                    <td>{{ value }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </tbody>
-    <tfoot>
-        <tr>
-            {% for value in table.footer %}
-                <td><strong>{{ value }}</strong></td>
-            {% endfor %}
-        </tr>
-    </tfoot>
-</table>
-{{ plot(table.plot()) }}
-{% endmacro %}
+{% block title %}{{ _("Informe") }}{% endblock %}
 
 {% block css %}{{ leaflet_css() }}{% endblock %}
 
@@ -46,127 +10,166 @@
 <div class="container">
   <h1>{{ _("Informe d'activitat de la plataforma") }}</h1>
 
-  <h2>{{ _("Entitats") }}</h2>
+  <ul class="nav">
+    {{ tab_nav("report", _("Informe"), active_tab) }}
+    {{ tab_nav("map", _("Mapa"), active_tab, onclick="redrawMap()") }}
+    {{ tab_nav("graf", _("Graf"), active_tab) }}
+    {{ tab_nav("organizations", _("Organitzations"), active_tab) }}
+    {{ tab_nav("resources", _("Recursos"), active_tab) }}
+    {{ tab_nav("agreements", _("Peticions"), active_tab) }}
+    {{ tab_nav("comments", _("Observacions"), active_tab) }}
+  </ul>
 
-  <h3>{{ _("Mapa d'entitats") }}</h3>
-
-<div id="citymap" class="map-height-big"></div>
-
-<h3>{{ _("Graf de relacions entre entitats") }}</h3>
-
-{{ plot(graph.plot()) }}
-
-<h3>{{ _("Evolució temporal de l'alta d'entitats") }}</h3>
-
-{{ plot(organizations.plot()) }}
-
-<h2>Recursos</h2>
-
-{{ render_table(resources_by_org_type) }}
-{{ render_table(charge_by_org_type) }}
-{{ render_table(resources_by_org_scope) }}
-{{ render_table(resources_by_resource_type) }}
-{{ render_table(charge_by_resource_type) }}
-{{ render_table(resources_by_resource_option) }}
-
-<h3>{{ _("Suggerències de necessitats indicades en «altres»") }}</h3>
-
-<p>{{ _("Paraules més repetides en les necessitats:") }}</p>
-
-<ul>
-  {% for x in most_needed[:10] %}
-  <li>{{ x[0] }} ({{ x[1] }} {{ _("vegades") }})</li>
-  {% endfor %}
-</ul>
-
-<p>{{ _("Una mostra d'exemples de necessitats expressades:") }}</p>
-
-<ul>
-  {% for need in other_needs[:10] %}
-  <li>{{ need.comments }}</li>
-  {% endfor %}
-</ul>
-
-<h3>{{ _("Comentaris en necessitats concretes") }}</h3>
-
-<ul>
-  {% for need in needs_comments[:10] %}
-  <li>{{ need.comments }}</li>
-  {% endfor %}
-</ul>
-
-<h3>{{ _("Suggerències de oferiments indicades en «altres»") }}</h3>
-
-<p>{{ _("Paraules més repetides en els oferiments:") }}</p>
-
-<ul>
-  {% for x in most_offered[:10]%}
-  <li>{{ x[0] }} ({{ x[1] }} {{ _("vegades") }})</li>
-  {% endfor %}
-</ul>
-
-<p>{{ _("Una mostra d'exemples de oferiments expressats:") }}</p>
-
-<ul>
-  {% for offer in other_offers[:10] %}
-  <li>{{ offer.comments }}</li>
-  {% endfor %}
-</ul>
-
-<h3>{{ _("Comentaris en oferiments concrets") }}</h3>
-
-<ul>
-  {% for offer in offers_comments[:10] %}
-  <li>{{ offer.comments }}</li>
-  {% endfor %}
-</ul>
-
-
-<h2>{{ _("Interaccions") }}</h2>
-
-{{ render_table(agreements_by_solicitor_type) }}
-{{ render_table(agreements_by_solicitor_scope) }}
-
-{{ render_table(agreements_by_solicitee_type) }}
-{{ render_table(agreements_by_solicitee_scope) }}
-
-{{ render_table(agreements_by_resource_type) }}
-
-<h3>{{ _("Evolució temporal de les peticions de col·laboració") }}</h3>
-
-{{ plot(agreements_started.plot()) }}
-{{ plot(agreements_comm.plot()) }}
-{{ plot(agreements_success.plot()) }}
-
+  <div class="tab-content">
+    {{ tab_content("report", tab_report, active_tab) }}
+    {{ tab_content("map", tab_map, active_tab) }}
+    {{ tab_content("graf", tab_graf, active_tab) }}
+    {{ tab_content("organizations", tab_organizations, active_tab) }}
+    {{ tab_content("resources", tab_resources, active_tab) }}
+    {{ tab_content("agreements", tab_agreements, active_tab) }}
+    {{ tab_content("comments", tab_comments, active_tab) }}
+  </div>
 </div>
 {% endblock %}
+
+{% macro tab_nav(id, text, active_tab, onclick=None) %}
+<li class="nav-item">
+  <button id="{{ id }}-tab" class="nav-link {% if active_tab == id %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#{{ id }}-pane" type="button" role="tab" aria-controls="{{ id }}-pane" aria-selected="{% if active_tab == id %}true{% else %}false{% endif %}" {% if onclick %}onclick="{{ onclick }}"{% endif %}>
+    {{ text }}
+  </button>
+</li>
+{% endmacro %}
+
+{% macro tab_content(id, content_macro, active_tab) %}
+<div id="{{ id }}-pane" class="tab-pane fade {% if active_tab == id %}active show{% endif %}" role="tabpanel" aria-labelledby="{{ id }}-tab">
+  {% if active_tab == id %}
+    {{ content_macro(active_form) }}
+  {% else %}
+    {{ content_macro(inactive_form) }}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro plot(data) %}
+<div class="text-center">
+  <img src="data:image/png;base64,{{ data }}"/>
+</div>
+{% endmacro %}
+
+{% macro render_dataframe(df) %}
+{{ clean(style_dataframe(df).to_html(), style=True)|safe }}
+{# maybe plot too {{ plot(table.plot()) }} #}
+{% endmacro %}
+
+{% macro tab_report(form) %}
+<p>TODO</p>
+{% endmacro %}
+
+{% macro tab_map(form) %}
+<form method="post" action="?tab=map">
+  {{ csrf_input }}
+  <input type="hidden" name="tab" value="map">
+
+  <div class="row">
+    <div class="col-md-6">{{ form.province.as_field_group() }}</div>
+    <div class="col-md-6">{{ form.org_type.as_field_group() }}</div>
+  </div>
+
+  <button type="submit" class="btn btn-warning">{{ _("Filtra") }}</button>
+</form>
+<div id="map" class="h-70vh">
+  {{ _("No s'ha trobat cap organització que complisca el filtre") }}
+</div>
+{% endmacro %}
+
+{% macro tab_graf(form) %}
+<p>TODO</p>
+{% endmacro %}
+
+{% macro tab_organizations(form) %}
+<p>TODO</p>
+{% endmacro %}
+
+{% macro tab_resources(form) %}
+<form method="post" action="?tab=resources">
+  {{ csrf_input }}
+  <input type="hidden" name="tab" value="map">
+
+  {{ form.group_by.as_field_group() }}
+
+  <div class="row">
+    <div class="col-md-6">{{ form.province.as_field_group() }}</div>
+    <div class="col-md-6">{{ form.org_type.as_field_group() }}</div>
+  </div>
+
+  {{ form.hide_zeroes.as_field_group() }}
+
+  <button type="submit" class="btn btn-warning">{{ _("Filtra") }}</button>
+</form>
+{{ render_dataframe(resources) }}
+{% endmacro %}
+
+{% macro tab_agreements(form) %}
+TODO
+{% endmacro %}
+
+{% macro tab_comments(form) %}
+<p>Paraules més repetides en els comentaris de necessitats i oferiments. Es poden excloure paraules de la llista.</p>
+
+<ul class="columns-3">
+  {% for word, count in comment_word_counts.most_common(51) %}
+  <li>
+    <form method="post" class="d-inline">
+      {{ csrf_input }}
+      <input type="hidden" name="delete_word" value="{{ word }}">
+      <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi-trash"></i></button>
+    </form>
+    ({{ count }}) {{ word }}
+  </li>
+  {% endfor %}
+</ul>
+
+<p>Paraules excloses de la cerca: {{ excluded_words }}</p>
+{% endmacro %}
 
 {% block js %}
 {{ leaflet_js() }}
 <script>
-var orgs = {{ orgs_json|safe }};
-var lat = 0, lng = 0;
-for (var i = 0; i < orgs.length; i++) {
-    lat += +orgs[i].lat;
-    lng += +orgs[i].lng;
+var orgs = getJsonData().organizations;
+
+let map;
+function redrawMap() {
+  if (map) {
+    map.invalidateSize(false);
+    map.fitBounds(group.getBounds());
+  }
 }
 
-var map = L.map('citymap').setView([lat / orgs.length, lng / orgs.length], 13);
+if (orgs.length > 0) {
+  var lat = 0, lng = 0;
+  for (var i = 0; i < orgs.length; i++) {
+      lat += +orgs[i].lat;
+      lng += +orgs[i].lng;
+  }
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+  map = L.map('map').setView([lat / orgs.length, lng / orgs.length], 13);
 
-var markers = [];
-for (var i = 0; i < orgs.length; i++) {
-    var o = orgs[i];
-    var marker = L.marker([+o.lat, +o.lng]).addTo(map);
-    marker.bindPopup(`${o.name}`);
-    markers.push(marker);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  var markers = [];
+  for (var i = 0; i < orgs.length; i++) {
+      var o = orgs[i];
+      var marker = L.marker([+o.lat, +o.lng]).addTo(map);
+      marker.bindPopup(`${o.name}`);
+      markers.push(marker);
+  }
+
+  var group = new L.featureGroup(markers);
+
+  redrawMap();
 }
-
-var group = new L.featureGroup(markers);
-map.fitBounds(group.getBounds());
 </script>
 {% endblock %}
 

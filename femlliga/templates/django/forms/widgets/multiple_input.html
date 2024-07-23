@@ -1,0 +1,12 @@
+{% if len(widget.optgroups) == 0 %}
+<p class="fst-italic">{{ _("No hi ha cap opció disponible") }}</p>
+{% else %}
+{% for group, options, index in widget.optgroups %}
+{% for widget in options %}
+<div class="form-check">
+  <input type="checkbox" class="form-check-input" name="{{ widget.name }}" value="{{ widget.value }}" {% for name, value in widget.attrs.items() %}{% if value is not sameas False %} {{ name }}{% if value is not sameas True %}="{{ value }}"{% endif %}{% endif %}{% endfor %}>
+  <label class="form-check-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
+</div>
+{% endfor %}
+{% endfor %}
+{% endif %}

@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.html import json_script
 from django.utils.translation import get_language_from_request, gettext, ngettext
 from jinja2 import Environment
+from pandas.io.formats.style import Styler
 
 import femlliga.constants as consts
 from femlliga.models import *
@@ -49,6 +50,13 @@ def media_type_placeholder(media_type):
         return SOCIAL_MEDIA_TYPES_PLACEHOLDERS[media_type]
     except:
         return ""
+
+
+def style_dataframe(df):
+    s = Styler(df)
+    s.set_properties(**{"text-align": "left"})
+    s.set_table_attributes('class="table table-sm"')
+    return s
 
 
 def clean(s, style=False):
@@ -143,6 +151,7 @@ def environment(**options):
             "parent": path_parent,
             "provider_login_url": provider_login_url_wrapper,
             "clean": clean,
+            "style_dataframe": style_dataframe,
             "add_http": add_http,
             "settings": settings,
             "json_script": json_script,

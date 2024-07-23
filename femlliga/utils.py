@@ -37,6 +37,8 @@ from femlliga.models import (
     sort_resources,
 )
 
+from femlliga.gis.es import spain_provinces
+
 # Emails and notifications
 
 
@@ -419,3 +421,12 @@ def strip_accents(s):
     return "".join(
         c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
     )
+
+
+spain_provinces_choices = sorted(
+    [
+        (f["properties"]["id"], f["properties"]["name"])
+        for f in spain_provinces["features"]
+    ],
+    key=lambda x: strip_accents(x[1]),
+)

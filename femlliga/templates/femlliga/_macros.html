@@ -383,15 +383,48 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     </div>
     <div class="mb-2">
       <span
+        {# base resource is offer or need #}
+        v-if="!result.public_href"
+        v-for="option in result.options"
+        :key="option"
         {% if needs %}
         class="badge bg-light me-2" :class="{ 'text-body-tertiary': !optionMatches(result.resource, option, {{ needs }}) }"
         {% else %}
         class="badge bg-light me-2"
         {% endif %}
-        v-for="option in result.options"
-        :key="option"
         v-html="highlightSearch(optionNamesMap[option], search)">
       </span>
+      <a
+        {# base resource is announcement #}
+        v-else
+        v-for="option in result.options"
+        :key="option"
+        {% if needs %}
+        class="badge bg-light me-2" :class="{ 'text-body-tertiary': !optionMatches(result.resource, option, {{ needs }}) }"
+        {% else %}
+        class="badge bg-light me-2"
+        {% endif %}
+        :href="result.public_href"
+        target="_blank"
+      >
+        <i class="bi-share me-2"></i>
+        <span v-html="highlightSearch(optionNamesMap[option], search)"></span>
+      </a>
+      <a
+        {# the rest of the announcements #}
+        v-for="a in result.announcements"
+        :key="a.id"
+        {% if needs %}
+        class="badge bg-light me-2" :class="{ 'text-body-tertiary': !optionMatches(result.resource, a.option_name, {{ needs }}) }"
+        {% else %}
+        class="badge bg-light me-2"
+        {% endif %}
+        :href="a.public_href"
+        target="_blank"
+      >
+        <i class="bi-share me-2"></i>
+        <span v-html="highlightSearch(optionNamesMap[a.option_name], search)"></span>
+      </a>
     </div>
     <div class="mb-2">
       <span v-if="result.charge" class="me-3"><span class="fs-4 align-middle">€</span> {{ _("Producte o servei remunerat") }}</span>
@@ -475,7 +508,7 @@ function matchContains(search) {
     const parts = sanitize(search).split(" ").filter(x => x !== "");
     const targets = [
       sanitize(m.organization.name),
-      sanitize(m.comments),
+      sanitize(m.comments || ""),
       sanitize(jsonData.resource_names_map[m.resource]),
     ];
     for (var option of m.options) {

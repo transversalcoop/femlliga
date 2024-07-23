@@ -235,13 +235,16 @@ RESOURCE_OPTIONS_READABLE_MAP = {
     ("ALLIANCES", "PUBLICITY"): _("difusió"),
 }
 
-RESOURCES_LIST, RESOURCE_OPTIONS = [], []
+RESOURCES_LIST, RESOURCE_OPTIONS, RESOURCE_OPTIONS_WITH_PREFIX = [], [], []
 for k in RESOURCE_OPTIONS_MAP:
     RESOURCES_LIST.append(k)
     v = RESOURCE_OPTIONS_MAP[k]
     for vv in v:
         if vv not in RESOURCE_OPTIONS:
             RESOURCE_OPTIONS.append(vv)
+            RESOURCE_OPTIONS_WITH_PREFIX.append(
+                (vv[0], RESOURCE_NAMES_MAP[k] + " - " + vv[1])
+            )
 
 RESOURCE_OPTIONS_DEF_MAP = {}
 for option in RESOURCE_OPTIONS:

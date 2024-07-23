@@ -5,8 +5,8 @@ from allauth.account.forms import LoginForm, SignupForm
 from django.utils.translation import gettext_lazy as _
 from django_recaptcha.fields import ReCaptchaField
 
-from . import constants as const
-from .models import (
+import femlliga.constants as const
+from femlliga.models import (
     Agreement,
     Contact,
     Announcement,
@@ -14,6 +14,8 @@ from .models import (
     CustomUser,
     Organization,
 )
+
+from femlliga.utils import spain_provinces_choices
 
 
 class PreferencesForm(forms.ModelForm):
@@ -158,3 +160,34 @@ class CaptchaLoginForm(LoginForm):
 
 class CaptchaSignupForm(SignupForm):
     captcha = ReCaptchaField()
+
+
+def add_empty_choice(choices):
+    choices.insert(0, ("", "-----"))
+    return choices
+
+
+class ReportFilterForm(forms.Form):
+    province = forms.ChoiceField(
+        choices=add_empty_choice(spain_provinces_choices),
+        required=False,
+        label=_("Província"),
+    )
+    org_type = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_TYPES),
+        required=False,
+        label=_("Tipus d'organització"),
+    )
+    group_by = forms.ChoiceField(
+        choices=[
+            ("ORG_TYPE", _("Tipus d'organització")),
+            ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
+            ("RESOURCE", _("Categoria del recurs")),
+            ("RESOURCE_OPTION", _("Etiqueta del recurs")),
+        ],
+        required=False,
+        label=_("Agrupa per"),
+    )
+    hide_zeroes = forms.BooleanField(
+        required=False, label=_("Oculta files amb tot zeros")
+    )
