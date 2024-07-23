@@ -415,6 +415,7 @@ def get_province(lat, lng, features):
         polygon = shape(feature["geometry"])
         if polygon.contains(p):
             return feature["properties"]
+    return {"id": ""}
 
 
 def strip_accents(s):
