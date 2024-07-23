@@ -166,7 +166,6 @@ def index(request):
 
 
 def page(request, name):
-    raise PermissionDenied()
     lang = get_language_from_request(request)
     try:
         page = get_object_or_404(Page, name=name, language=lang)
