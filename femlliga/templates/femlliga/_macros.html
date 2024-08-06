@@ -119,6 +119,21 @@
   {% endif %}
 {% endmacro %}
 
+{% macro modal(id, content) %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
+      </div>
+      <div class="modal-body">
+        {{ content }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
 {% macro input_classes(form, name) %}
     class="form-control{% if form.errors[name] %} is-invalid{% endif %}"
 {% endmacro %}

@@ -163,22 +163,36 @@ class CaptchaSignupForm(SignupForm):
 
 
 def add_empty_choice(choices):
-    choices.insert(0, ("", "-----"))
-    return choices
+    new_choices = [x for x in choices]
+    new_choices.insert(0, ("", "-----"))
+    return new_choices
 
 
 class ReportFilterForm(forms.Form):
     province = forms.ChoiceField(
         choices=add_empty_choice(spain_provinces_choices),
         required=False,
-        label=_("Província"),
+        label=_("Filtra per província de l'organització"),
     )
     org_type = forms.ChoiceField(
         choices=add_empty_choice(const.ORG_TYPES),
         required=False,
-        label=_("Tipus d'organització"),
+        label=_("Filtra per tipus de l'organització"),
     )
-    group_by = forms.ChoiceField(
+    org_scope = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_SCOPES),
+        required=False,
+        label=_("Filtra per àmbit de treball de l'organització"),
+    )
+    group_org_by = forms.ChoiceField(
+        choices=[
+            ("ORG_TYPE", _("Tipus d'organització")),
+            ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
+        ],
+        required=False,
+        label=_("Agrupa per"),
+    )
+    group_resource_by = forms.ChoiceField(
         choices=[
             ("ORG_TYPE", _("Tipus d'organització")),
             ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
@@ -188,6 +202,27 @@ class ReportFilterForm(forms.Form):
         required=False,
         label=_("Agrupa per"),
     )
+    resource = forms.ChoiceField(
+        choices=add_empty_choice(const.RESOURCES),
+        required=False,
+        label=_("Filtra per categoria del recurs"),
+    )
+    resource_option = forms.ChoiceField(
+        choices=add_empty_choice(const.RESOURCE_OPTIONS_WITH_PREFIX),
+        required=False,
+        label=_("Filtra per etiqueta del recurs"),
+    )
     hide_zeroes = forms.BooleanField(
         required=False, label=_("Oculta files amb tot zeros")
+    )
+
+    start_date = forms.DateField(
+        required=False,
+        label=_("Creat després del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    end_date = forms.DateField(
+        required=False,
+        label=_("Creat abans del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
     )

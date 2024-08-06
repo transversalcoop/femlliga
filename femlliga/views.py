@@ -1382,45 +1382,69 @@ def report(request):
     organizations = organization_prefetches(Organization.objects.all())
     needs = Need.objects.filter(has_resource=True).prefetch_related("organization")
     offers = Offer.objects.filter(has_resource=True).prefetch_related("organization")
-    resources = pd.DataFrame()
+    resources_df, organizations_df = pd.DataFrame(), pd.DataFrame()
     form = ReportFilterForm(request.POST)
+    resources_filtered_by_option = False
     if form.is_valid():
         if active_tab in ("map", "organizations"):
             organizations = filter_report_organizations(organizations, form)
+            organizations_df = get_organizations_df(organizations, form)
         if active_tab in ("resources",):
-            resources = get_report_resources(needs, offers, form)
+            filtered_needs, filtered_offers, resources_df = get_report_resources(
+                needs, offers, form
+            )
 
-    return render(
-        request,
-        "femlliga/report.html",
-        {
-            "active_tab": active_tab or "report",
-            "active_form": form,
-            "inactive_form": ReportFilterForm(),
-            "organizations": organizations,
-            "resources": resources,
-            "comment_word_counts": report_comments(needs, offers),
-            "excluded_words": ", ".join(
-                sorted([x.value for x in ExcludeCommentWord.objects.all()])
-            ),
-            "json_data": {
-                "organizations": [
-                    {"name": o.name, "lat": float(o.lat), "lng": float(o.lng)}
-                    for o in organizations
-                ],
-            },
+            if form.cleaned_data["resource_option"]:
+                resources_filtered_by_option = True
+
+    context = {
+        "active_tab": active_tab or "map",
+        "active_form": form,
+        "inactive_form": ReportFilterForm(),
+        "organizations": organizations,
+        "organizations_df": organizations_df,
+        "resources_df": resources_df,
+        "comment_word_counts": report_comments(needs, offers),
+        "excluded_words": ", ".join(
+            sorted([x.value for x in ExcludeCommentWord.objects.all()])
+        ),
+        "json_data": {
+            "organizations": [
+                {"name": o.name, "lat": float(o.lat), "lng": float(o.lng)}
+                for o in organizations
+            ],
         },
-    )
+    }
+    if resources_filtered_by_option:
+        context["filtered_resources_comment_word_counts"] = report_comments(
+            filtered_needs, filtered_offers
+        )
+        context["needs_comments"] = [x.comments for x in filtered_needs if x.comments]
+        context["offers_comments"] = [x.comments for x in filtered_offers if x.comments]
+
+    return render(request, "femlliga/report.html", context)
 
 
 def filter_report_organizations(organizations, form):
-    province = form.cleaned_data.get("province")
-    if province:
-        organizations = [o for o in organizations if province == o.get_province()["id"]]
-
-    org_type = form.cleaned_data.get("org_type")
-    if org_type:
-        organizations = [o for o in organizations if org_type == o.org_type]
+    filters = [
+        ("province", lambda v, o: v == o.get_province()["id"]),
+        ("org_type", lambda v, o: v == o.org_type),
+        ("org_scope", lambda v, o: v in {s.name for s in o.scopes.all()}),
+        (
+            "start_date",
+            lambda v, o: o.date
+            >= timezone.make_aware(timezone.datetime(v.year, v.month, v.day)),
+        ),
+        (
+            "end_date",
+            lambda v, o: o.date
+            <= timezone.make_aware(timezone.datetime(v.year, v.month, v.day)),
+        ),
+    ]
+    for f in filters:
+        value = form.cleaned_data.get(f[0])
+        if value:
+            organizations = [o for o in organizations if f[1](value, o)]
 
     return organizations
 
@@ -1430,16 +1454,16 @@ def get_report_resources(n, o, form):
 
     # n and o are needs and offers
     index, rows = [], []
-    group_by = form.cleaned_data.get("group_by")
+    group_by = form.cleaned_data.get("group_resource_by")
     if group_by == "ORG_TYPE":
         index, rows = group_report_resources(ORG_TYPES, n, o, same_org_type)
     elif group_by == "ORG_SCOPE":
         index, rows = group_report_resources(ORG_SCOPES, n, o, org_has_scope)
     elif group_by == "RESOURCE":
-        index, rows = group_report_resources(RESOURCES, n, o, is_resource)
+        index, rows = group_report_resources(RESOURCES, n, o, same_resource)
     elif group_by == "RESOURCE_OPTION":
         index, rows = group_report_resources(
-            RESOURCE_OPTIONS_WITH_PREFIX, n, o, has_resource_option
+            RESOURCE_OPTIONS_WITH_PREFIX, n, o, resource_has_option
         )
 
     df = pd.DataFrame(
@@ -1449,19 +1473,52 @@ def get_report_resources(n, o, form):
     )
 
     if form.cleaned_data.get("hide_zeroes"):
+        return n, o, df.loc[~(df == 0).all(axis=1)]
+
+    return n, o, df
+
+
+def get_organizations_df(organizations, form):
+    index, rows = [], []
+    group_by = form.cleaned_data.get("group_org_by")
+    if group_by == "ORG_TYPE":
+        index, rows = group_organizations(
+            ORG_TYPES, organizations, lambda org_type: lambda o: o.org_type == org_type
+        )
+    elif group_by == "ORG_SCOPE":
+        index, rows = group_organizations(
+            ORG_SCOPES,
+            organizations,
+            lambda org_scope: lambda o: org_scope in {s.name for s in o.scopes.all()},
+        )
+
+    df = pd.DataFrame(
+        rows,
+        columns=[_("Organitzacions")],
+        index=index,
+    )
+    print("DF", df)
+
+    if form.cleaned_data.get("hide_zeroes"):
         return df.loc[~(df == 0).all(axis=1)]
 
     return df
 
 
 def filter_report_resources(needs, offers, form):
-    province = form.cleaned_data.get("province")
-    if province:
-        needs, offers = filter_report_resource(needs, offers, same_province(province))
-
-    org_type = form.cleaned_data.get("org_type")
-    if org_type:
-        needs, offers = filter_report_resource(needs, offers, same_org_type(org_type))
+    filters = [
+        ("province", same_province),
+        ("org_type", same_org_type),
+        ("org_scope", org_has_scope),
+        ("resource", same_resource),
+        ("resource_option", resource_has_option),
+        ("start_date", last_updated_after),
+        ("end_date", last_updated_before),
+    ]
+    for f in filters:
+        value = form.cleaned_data.get(f[0])
+        if value:
+            needs, offers = filter_report_resource(needs, offers, f[1](value))
 
     return needs, offers
 
@@ -1470,39 +1527,36 @@ def filter_report_resource(needs, offers, condition):
     return [x for x in needs if condition(x)], [x for x in offers if condition(x)]
 
 
-def same_province(province):
-    def f(x):
-        return province == x.organization.get_province()["id"]
+def last_updated_after(d):
+    return lambda x: x.last_updated_on >= timezone.make_aware(
+        timezone.datetime(d.year, d.month, d.day)
+    )
 
-    return f
+
+def last_updated_before(d):
+    return lambda x: x.last_updated_on <= timezone.make_aware(
+        timezone.datetime(d.year, d.month, d.day)
+    )
+
+
+def same_province(province):
+    return lambda x: province == x.organization.get_province()["id"]
 
 
 def same_org_type(org_type):
-    def f(x):
-        return org_type == x.organization.org_type
+    return lambda x: org_type == x.organization.org_type
 
-    return f
+
+def same_resource(resource):
+    return lambda x: resource == x.resource
 
 
 def org_has_scope(scope):
-    def f(x):
-        return scope in {s.name for s in x.organization.scopes.all()}
-
-    return f
+    return lambda x: scope in {s.name for s in x.organization.scopes.all()}
 
 
-def is_resource(resource):
-    def f(x):
-        return x.resource == resource
-
-    return f
-
-
-def has_resource_option(option):
-    def f(x):
-        return option in {o.name for o in x.options.all()}
-
-    return f
+def resource_has_option(option):
+    return lambda x: option in {o.name for o in x.options.all()}
 
 
 def group_report_resources(index, needs, offers, condition):
@@ -1513,6 +1567,11 @@ def group_report_resources(index, needs, offers, condition):
         )
         for i in index
     ]
+    return [x[1] for x in index], rows
+
+
+def group_organizations(index, organizations, condition):
+    rows = [(len([x for x in organizations if condition(i[0])(x)]),) for i in index]
     return [x[1] for x in index], rows
 
 
