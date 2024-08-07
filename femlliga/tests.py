@@ -87,6 +87,12 @@ class UtilsTests(TestCase):
         )
 
 
+class ReportTests(TestCase):
+    def test_report(self):
+        # TODO FL130
+        pass
+
+
 class SmokeTests(TestCase):
     fixtures = ["testdata.json"]
 

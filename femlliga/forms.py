@@ -169,6 +169,44 @@ def add_empty_choice(choices):
 
 
 class ReportFilterForm(forms.Form):
+    group_orgs_by = forms.ChoiceField(
+        choices=[
+            ("ORG_TYPE", _("Tipus d'organització")),
+            ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
+        ],
+        required=False,
+        label=_("Agrupa per"),
+    )
+    group_resources_by = forms.ChoiceField(
+        choices=[
+            ("ORG_TYPE", _("Tipus d'organització")),
+            ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
+            ("RESOURCE", _("Categoria del recurs")),
+            ("RESOURCE_OPTION", _("Etiqueta del recurs")),
+        ],
+        required=False,
+        label=_("Agrupa per"),
+    )
+    group_agreements_by = forms.ChoiceField(
+        choices=[
+            ("SOLICITOR_ORG_TYPE", _("Tipus d'organització sol·licitant")),
+            (
+                "SOLICITOR_ORG_SCOPE",
+                _("Àmbit de treball de l'organització sol·licitant"),
+            ),
+            ("SOLICITEE_ORG_TYPE", _("Tipus d'organització sol·licitada")),
+            (
+                "SOLICITEE_ORG_SCOPE",
+                _("Àmbit de treball de l'organització sol·licitada"),
+            ),
+            ("RESOURCE", _("Categoria del recurs")),
+            ("RESOURCE_OPTION", _("Etiqueta del recurs")),
+            ("RESOURCE_TYPE", _("Tipus de recurs")),
+        ],
+        required=False,
+        label=_("Agrupa per"),
+    )
+
     province = forms.ChoiceField(
         choices=add_empty_choice(spain_provinces_choices),
         required=False,
@@ -184,24 +222,39 @@ class ReportFilterForm(forms.Form):
         required=False,
         label=_("Filtra per àmbit de treball de l'organització"),
     )
-    group_org_by = forms.ChoiceField(
-        choices=[
-            ("ORG_TYPE", _("Tipus d'organització")),
-            ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
-        ],
+
+    solicitor_province = forms.ChoiceField(
+        choices=add_empty_choice(spain_provinces_choices),
         required=False,
-        label=_("Agrupa per"),
+        label=_("Filtra per província de l'organització sol·licitant"),
     )
-    group_resource_by = forms.ChoiceField(
-        choices=[
-            ("ORG_TYPE", _("Tipus d'organització")),
-            ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
-            ("RESOURCE", _("Categoria del recurs")),
-            ("RESOURCE_OPTION", _("Etiqueta del recurs")),
-        ],
+    solicitor_org_type = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_TYPES),
         required=False,
-        label=_("Agrupa per"),
+        label=_("Filtra per tipus de l'organització sol·licitant"),
     )
+    solicitor_org_scope = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_SCOPES),
+        required=False,
+        label=_("Filtra per àmbit de treball de l'organització sol·licitant"),
+    )
+
+    solicitee_province = forms.ChoiceField(
+        choices=add_empty_choice(spain_provinces_choices),
+        required=False,
+        label=_("Filtra per província de l'organització sol·licitada"),
+    )
+    solicitee_org_type = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_TYPES),
+        required=False,
+        label=_("Filtra per tipus de l'organització sol·licitada"),
+    )
+    solicitee_org_scope = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_SCOPES),
+        required=False,
+        label=_("Filtra per àmbit de treball de l'organització sol·licitada"),
+    )
+
     resource = forms.ChoiceField(
         choices=add_empty_choice(const.RESOURCES),
         required=False,
@@ -211,9 +264,6 @@ class ReportFilterForm(forms.Form):
         choices=add_empty_choice(const.RESOURCE_OPTIONS_WITH_PREFIX),
         required=False,
         label=_("Filtra per etiqueta del recurs"),
-    )
-    hide_zeroes = forms.BooleanField(
-        required=False, label=_("Oculta files amb tot zeros")
     )
 
     start_date = forms.DateField(
@@ -225,4 +275,33 @@ class ReportFilterForm(forms.Form):
         required=False,
         label=_("Creat abans del"),
         widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    communication_start_date = forms.DateField(
+        required=False,
+        label=_("Petició creada després del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    communication_end_date = forms.DateField(
+        required=False,
+        label=_("Petició creada abans del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    agreement_start_date = forms.DateField(
+        required=False,
+        label=_("Acord definitiu després del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    agreement_end_date = forms.DateField(
+        required=False,
+        label=_("Acord definitiu abans del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    hide_zeroes = forms.BooleanField(
+        required=False, label=_("Oculta files amb tot zeros")
+    )
+    show_only_zeroes = forms.BooleanField(
+        required=False, label=_("Mostra només files amb tot zeros")
     )

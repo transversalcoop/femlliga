@@ -59,13 +59,13 @@
 
 {% macro tab_map(form) %}
 {{ organizations_form("map", form, "", "") }}
-<div id="map" class="h-70vh">
+<div id="map" class="h-70vh mt-3">
   {{ _("No s'ha trobat cap organització que complisca el filtre") }}
 </div>
 {% endmacro %}
 
 {% macro tab_organizations(form) %}
-{{ organizations_form("organizations", form, form.group_org_by.as_field_group(), form.hide_zeroes.as_field_group()) }}
+{{ organizations_form("organizations", form, form.group_orgs_by.as_field_group(), zero_switches(form)) }}
 {{ render_dataframe(organizations_df) }}
 {% endmacro %}
 
@@ -88,16 +88,15 @@
 
   {{ post_inputs }}
 
-  <button type="submit" class="btn btn-warning">{{ _("Filtra") }}</button>
+  <button type="submit" class="btn btn-warning mt-2">{{ _("Filtra") }}</button>
 </form>
 {% endmacro %}
 
 {% macro tab_resources(form) %}
 <form method="post" action="?tab=resources">
   {{ csrf_input }}
-  <input type="hidden" name="tab" value="map">
 
-  {{ form.group_resource_by.as_field_group() }}
+  {{ form.group_resources_by.as_field_group() }}
 
   <div class="row mt-3">
     <div class="col-md-4">{{ form.province.as_field_group() }}</div>
@@ -115,9 +114,9 @@
     <div class="col-md-6">{{ form.end_date.as_field_group() }}</div>
   </div>
 
-  {{ form.hide_zeroes.as_field_group() }}
+  {{ zero_switches(form) }}
 
-  <button type="submit" class="btn btn-warning">{{ _("Filtra") }}</button>
+  <button type="submit" class="btn btn-warning mt-2">{{ _("Filtra") }}</button>
   {% if needs_comments or offers_comments %}
     <a data-bs-toggle="modal" href="#resource-comments-modal" role="button" class="btn btn-light">
       {{ _("Consulta els comentaris") }}
@@ -157,7 +156,51 @@
 {% endmacro %}
 
 {% macro tab_agreements(form) %}
-TODO
+<form method="post" action="?tab=agreements">
+  {{ csrf_input }}
+
+  {{ form.group_agreements_by.as_field_group() }}
+
+  <div class="row mt-3">
+    <div class="col-md-4">{{ form.solicitor_province.as_field_group() }}</div>
+    <div class="col-md-4">{{ form.solicitor_org_type.as_field_group() }}</div>
+    <div class="col-md-4">{{ form.solicitor_org_scope.as_field_group() }}</div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-4">{{ form.solicitee_province.as_field_group() }}</div>
+    <div class="col-md-4">{{ form.solicitee_org_type.as_field_group() }}</div>
+    <div class="col-md-4">{{ form.solicitee_org_scope.as_field_group() }}</div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-6">{{ form.resource.as_field_group() }}</div>
+    <div class="col-md-6">{{ form.resource_option.as_field_group() }}</div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-6">{{ form.communication_start_date.as_field_group() }}</div>
+    <div class="col-md-6">{{ form.communication_end_date.as_field_group() }}</div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-6">{{ form.agreement_start_date.as_field_group() }}</div>
+    <div class="col-md-6">{{ form.agreement_end_date.as_field_group() }}</div>
+  </div>
+
+  {{ zero_switches(form) }}
+
+  <button type="submit" class="btn btn-warning mt-2">{{ _("Filtra") }}</button>
+</form>
+
+{{ render_dataframe(agreements_df) }}
+{% endmacro %}
+
+{% macro zero_switches(form) %}
+  <div class="row">
+    <div class="col-md-6">{{ form.hide_zeroes.as_field_group() }}</div>
+    <div class="col-md-6">{{ form.show_only_zeroes.as_field_group() }}</div>
+  </div>
 {% endmacro %}
 
 {% macro tab_comments(form) %}
