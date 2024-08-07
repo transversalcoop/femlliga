@@ -293,7 +293,7 @@ class IntegrationTests(TestCase):
         self.aux_wizard(
             needs_url,
             "PLACE",
-            ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+            ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
             "comentaris de necessita local de test",
             "Formació",
         )
@@ -446,7 +446,7 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
                 "origin": "MATCHES",
                 "message": test_msg_1,
             },
@@ -534,7 +534,7 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
                 "origin": "MATCHES",
                 "message": "test message",
             },
@@ -594,7 +594,7 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
                 "origin": "MATCHES",
                 "message": test_msg_1,
             },
@@ -617,7 +617,7 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
                 "origin": "MATCHES",
                 "message": test_msg_2,
             },
@@ -641,15 +641,15 @@ class IntegrationTests(TestCase):
 
         Need.objects.all().delete()
         Offer.objects.all().delete()
-        self.aux_create_resource(Need, org8, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"])
+        self.aux_create_resource(
+            Need, org8, "PLACE", ["DAILY_USAGE", "PUNCTUAL_MEETINGS"]
+        )
         self.aux_create_resource(Need, org8, "TRAINING", ["TRAINING_DIGITAL"])
         self.aux_create_resource(Need, org9, "PLACE", ["DAILY_USAGE"])
         self.aux_create_resource(
-            Offer, org9, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"]
+            Offer, org9, "PLACE", ["DAILY_USAGE", "PUNCTUAL_MEETINGS"]
         )
-        self.aux_create_resource(
-            Offer, org10, "PLACE", ["PUNCTUAL_MEETINGS", "PUNCTUAL_EVENTS"]
-        )
+        self.aux_create_resource(Offer, org10, "PLACE", ["PUNCTUAL_EVENTS"])
         self.aux_create_resource(
             Offer, org9, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_BUREAUCRACY"]
         )
@@ -681,7 +681,7 @@ class IntegrationTests(TestCase):
                     "total_agreements": 1,
                 },
                 "matches": {
-                    "need": {"name": "local per a ús diari", "count": 1},
+                    "need": {"name": "espai de treball d'oficina", "count": 1},
                     "offer": {"name": "formació en digitalització", "count": 2},
                 },
                 "new_resources": {
@@ -690,7 +690,6 @@ class IntegrationTests(TestCase):
                             "code": "PLACE",
                             "options": [
                                 ResourceOption.objects.get(name="PUNCTUAL_EVENTS"),
-                                ResourceOption.objects.get(name="PUNCTUAL_MEETINGS"),
                             ],
                         },
                         {

@@ -200,7 +200,6 @@ for k, value in NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP.items():
 
 RESOURCE_OPTIONS_READABLE_MAP = {
     ("PLACE", "DAILY_USAGE"): _("espai de treball d'oficina"),
-    ("PLACE", "PUNCTUAL_USAGE"): _("local per a ús puntual"),
     ("PLACE", "PUNCTUAL_MEETINGS"): _("espai per a reunions"),
     ("PLACE", "PUNCTUAL_EVENTS"): _("espai per a actes"),
     ("PLACE", "PLACE_TRAINING"): _("aula de formació"),
