@@ -431,3 +431,7 @@ spain_provinces_choices = sorted(
     ],
     key=lambda x: strip_accents(x[1]),
 )
+
+
+def date_to_datetime(d):
+    return timezone.make_aware(timezone.datetime(d.year, d.month, d.day))

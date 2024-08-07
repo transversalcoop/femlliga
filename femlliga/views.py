@@ -100,6 +100,7 @@ from .utils import (
     send_notification,
     str_to_bool,
     create_agreement_message,
+    date_to_datetime,
 )
 
 from .maps import (
@@ -1501,7 +1502,7 @@ def get_organizations_df(organizations, form):
 
     df = pd.DataFrame(
         rows,
-        columns=[_("Organitzacions")],
+        columns=[str(_("Organitzacions"))],
         index=index,
     )
 
@@ -1642,10 +1643,6 @@ def has_option(option):
     return lambda x: option in {o.name for o in x.options.all()}
 
 
-def date_to_datetime(d):
-    return timezone.make_aware(timezone.datetime(d.year, d.month, d.day))
-
-
 def group_report_resources(index, needs, offers, condition):
     rows = [
         (
@@ -1654,12 +1651,12 @@ def group_report_resources(index, needs, offers, condition):
         )
         for i in index
     ]
-    return [x[1] for x in index], rows
+    return [str(x[1]) for x in index], rows
 
 
 def group_organizations(index, organizations, condition):
     rows = [(len([x for x in organizations if condition(i[0])(x)]),) for i in index]
-    return [x[1] for x in index], rows
+    return [str(x[1]) for x in index], rows
 
 
 def group_agreements(index, agreements, condition):
@@ -1689,7 +1686,7 @@ def group_agreements(index, agreements, condition):
         )
         for i in index
     ]
-    return [x[1] for x in index], rows
+    return [str(x[1]) for x in index], rows
 
 
 def report_comments(needs, offers):
