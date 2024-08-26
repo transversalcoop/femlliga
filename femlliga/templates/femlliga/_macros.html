@@ -23,18 +23,18 @@
 </span>
 {% endmacro %}
 
-{% macro arrow_btn(text, icon, large=False) %}
-<button type="submit" class="btn btn-arrow {% if large %}btn-lg{% endif %} {% if xl %}btn-xl{% endif %}">
+{% macro arrow_btn(text, icon) %}
+<button type="submit" class="btn btn-arrow">
   <div class="d-flex align-items-center">
     {{ arrow_btn_content(text, icon) }}
   </div>
 </button>
 {% endmacro %}
 
-{% macro arrow_btn_link(text, url, icon, download=False, large=False, xl=False, image=None, image_alt="") %}
+{% macro arrow_btn_link(text, url, icon, download=False, image=None, image_alt="") %}
 <a
   type="button"
-  class="btn btn-arrow {% if large %}btn-lg{% endif %} {% if xl %}btn-xl{% endif %}"
+  class="btn btn-arrow"
   href="{{ url }}"
   {% if download %}download{% endif %}
 >

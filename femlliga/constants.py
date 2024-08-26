@@ -271,7 +271,7 @@ RESOURCE_ADD_IMAGE_LABEL = {
 }
 
 RESOURCE_OPTIONS_QUESTION_MAP = {
-    "PLACE": _("Quan necessitarieu fer servir el local?"),
+    "PLACE": _("Quin tipus de local necessiteu?"),
     "SERVICE": _("Quins serveis concrets necessiteu?"),
     "TRAINING": _("De quins temes us interessa formar-vos?"),
     "EQUIPMENT": _("Quina d'aquestes coses necessiteu?"),
