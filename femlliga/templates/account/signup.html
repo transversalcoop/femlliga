@@ -12,19 +12,19 @@
   {{ csrf_input }}
   {{ form_feedback(form) }}
   <label class="mt-3" for="id_email">{{ _("Correu electrònic") }}</label>
-  <input type="email" {{ input_classes(form, "email") }} name="email" autocomplete="email" required id="id_email" {{ input_value(form, "email") }}>
+  <input type="email" {{ input_classes(form, "email", extra="bg-lightblue") }} name="email" autocomplete="email" required id="id_email" {{ input_value(form, "email") }}>
   {{ input_feedback(form, "email") }}
 
   <label class="mt-3" for="id_password1">{{ _("Contrasenya") }}</label>
   <div class="input-group">
-    <input type="password" {{ input_classes(form, "password1") }} name="password1" required="" id="id_password1">
+    <input type="password" {{ input_classes(form, "password1", extra="bg-lightblue") }} name="password1" required="" id="id_password1">
     {{ toggle_password_button() }}
     {{ input_feedback(form, "password1") }}
   </div>
 
   <label class="mt-3" for="id_password2">{{ _("Contrasenya (de nou)") }}</label>
   <div class="input-group">
-    <input type="password" {{ input_classes(form, "password2") }} name="password2" required="" id="id_password2">
+    <input type="password" {{ input_classes(form, "password2", extra="bg-lightblue") }} name="password2" required="" id="id_password2">
     {{ toggle_password_button() }}
     {{ input_feedback(form, "password2") }}
   </div>

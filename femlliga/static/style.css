@@ -40,7 +40,7 @@ h1, h2, h3, h4, h5, h6 {
 
 a {
     text-decoration: underline;
-    color: var(--darkgrey);
+    color: black;
     transition: all .2s ease-in;
 }
 
@@ -82,13 +82,14 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 }
 
 .btn-light {
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     padding: 10px 18px;
-    border: 1px solid white;
+    border: 1px solid var(--textgrey);
     text-transform: uppercase;
     background-color: white;
     font-size: 0.875rem;
     font-weight: 900;
+    color: var(--textgrey);
 }
 
 .btn-light:hover {
@@ -130,6 +131,10 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 .btn-arrow .btn-arrow-arrow {
     font-size: 0.75rem;
     padding: 0 0.25rem 0 0.5rem;
+}
+
+.btn-arrow.dropdown-toggle::after {
+    content: none;
 }
 
 nav a {
@@ -385,10 +390,6 @@ pre {
     background-color: var(--midblue);
 }
 
-.sidebar {
-    padding-bottom: 20px;
-}
-
 .nav-pills .nav-link.active {
     background-color: var(--yellow);
     color: black;
@@ -396,6 +397,11 @@ pre {
 
 nav .nav-link.active, ul.nav .nav-link.active {
     border-bottom: 2px solid black;
+}
+
+.badge {
+    font-weight: normal;
+    margin: 0 5px 10px 0;
 }
 
 .badge.bg-light, .alert.alert-light {
@@ -569,8 +575,24 @@ a.badge:hover {
     font-size: 0.85rem !important;
 }
 
+.br-0375rem {
+    border-radius: 0.375rem;
+}
+
+.br-05rem {
+    border-radius: 0.5rem;
+}
+
 .br-1rem {
     border-radius: 1rem;
+}
+
+.br-tl-05rem {
+    border-top-left-radius: 0.5rem;
+}
+
+.br-tr-05rem {
+    border-top-right-radius: 0.5rem;
 }
 
 .text-uppercase {
@@ -587,15 +609,6 @@ a.badge:hover {
 
 .columns, .columns-3 {
     columns: 3;
-}
-
-.resources-title {
-    margin: 10px 0;
-    background-color: var(--yellow);
-    font-size: 2.5em;
-    text-align: left;
-    padding: 0 5px 0 20px;
-    line-height: 1em;
 }
 
 #djDebug #djDebugToolbarHandle {
@@ -670,6 +683,10 @@ a.badge:hover {
     line-height: 2rem;
 }
 
+.border {
+    border: 1px solid black !important;
+}
+
 .border-dotted-right {
     border-right: 2px dotted var(--midgrey);
 }
@@ -678,12 +695,25 @@ a.badge:hover {
     flex: 0 0 7rem;
 }
 
+.flex-third {
+    flex: 1 1 33%;
+}
+
+.flex-two-thirds {
+    flex: 2 1 66%;
+}
+
 .w-80 {
     width: 80%;
 }
 
+.w-300px {
+    width: 300px;
+}
+
 .m-center {
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .preferences-section {
@@ -755,10 +785,6 @@ a.badge:hover {
     cursor: pointer;
 }
 
-.universal-access-icon img {
-    height: 2em;
-}
-
 .background-home {
     background-image: url(/static/pages/home.png);
 }
@@ -805,41 +831,14 @@ a.badge:hover {
     margin-bottom: 0;
 }
 
-.form-control {
+.bg-lightblue {
     background-color: var(--lightblue);
 }
 
 /* sm: 576; md: 768; lg: 992; xl: 1200; xxl: 1400 */
-@media (max-width: 320px) {
-    .resources-title {
-        font-size: 1.9em;
-        padding: 1px;
-    }
-}
-
-@media (min-width: 576px) {
-    .w-sm-auto {
-        width: auto !important;
-    }
-}
-
 @media (max-width: 576px) {
     .columns {
         columns: 1;
-    }
-}
-
-@media (min-width: 768px) {
-    .sidebar {
-        min-height: 90vh;
-    }
-
-    .w-md-45 {
-        width: 45% !important;
-    }
-
-    .flex-md-row {
-        flex-direction: row !important;
     }
 }
 
@@ -922,6 +921,14 @@ a.badge:hover {
         padding-left: 5rem;
         padding-right: 5rem;
     }
+
+    .w-sm-auto {
+        width: auto !important;
+    }
+
+    .container.container-large {
+        max-width: 700px;
+    }
 }
 
 @media (min-width: 768px) {
@@ -930,6 +937,18 @@ a.badge:hover {
         background-size: contain;
         background-repeat: no-repeat;
         background-position: top center;
+    }
+
+    .w-md-45 {
+        width: 45% !important;
+    }
+
+    .flex-md-row {
+        flex-direction: row !important;
+    }
+
+    .container.container-large {
+        max-width: 900px;
     }
 }
 
@@ -943,12 +962,20 @@ a.badge:hover {
         padding-left: 0;
         padding-right: 0;
     }
+
+    .container.container-large {
+        max-width: 1100px;
+    }
 }
 
 @media (min-width: 1200px) {
     .xl\:px-7rem {
         padding-left: 7rem;
         padding-right: 7rem;
+    }
+
+    .container.container-large {
+        max-width: 1300px;
     }
 }
 
@@ -958,6 +985,10 @@ a.badge:hover {
         background-size: cover;
         background-repeat: no-repeat;
         background-position: bottom center;
+    }
+
+    .container.container-large {
+        max-width: 1500px;
     }
 }
 

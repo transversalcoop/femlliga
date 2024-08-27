@@ -23,31 +23,45 @@
 </span>
 {% endmacro %}
 
-{% macro arrow_btn(text, icon) %}
+{% macro arrow_btn(text, icon=None) %}
 <button type="submit" class="btn btn-arrow">
   <div class="d-flex align-items-center">
-    {{ arrow_btn_content(text, icon) }}
+    {{ arrow_btn_content(text, icon=icon) }}
   </div>
 </button>
 {% endmacro %}
 
-{% macro arrow_btn_link(text, url, icon, download=False, image=None, image_alt="") %}
+{% macro arrow_btn_link(text, url, icon=None, download=False, image=None, image_alt="") %}
 <a
-  type="button"
+  role="button"
   class="btn btn-arrow"
   href="{{ url }}"
   {% if download %}download{% endif %}
 >
   <div class="d-flex align-items-center">
-    {{ arrow_btn_content(text, icon, image=image, image_alt=image_alt) }}
+    {{ arrow_btn_content(text, icon=icon, image=image, image_alt=image_alt) }}
   </div>
 </a>
 {% endmacro %}
 
-{% macro arrow_btn_content(text, icon, image=None, image_alt="") %}
+{% macro arrow_btn_dropdown(text, icon=None) %}
+<a
+  role="button"
+  data-bs-toggle="dropdown"
+  aria-expanded="false"
+  class="btn btn-arrow dropdown-toggle"
+  href="#"
+>
+  <div class="d-flex align-items-center">
+    {{ arrow_btn_content(text, icon=icon) }}
+  </div>
+</a>
+{% endmacro %}
+
+{% macro arrow_btn_content(text, icon=None, image=None, image_alt="") %}
   {% if image %}
   <img src="{{ image }}" class="my-1" alt="{{ image_alt }}">
-  {% else %}
+  {% elif icon %}
   <span class="btn-arrow-icon">
     <i class="{{ icon }}"></i>
   </span>
@@ -56,27 +70,40 @@
   <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
 {% endmacro %}
 
-{% macro universal_access_icon() %}<img src="{{ static("icons/universal-access.svg") }}">{% endmacro %}
+{% macro resource_extra_info(name) %}
+<div class="d-inline-block bg-lightblue py-1 ps-1 pe-3 br-0375rem">
+  <i class="bi-asterisk"></i>
+  {{ name }}
+</div>
+{% endmacro %}
 
 {% macro resource_details(resource, match_type) %}
-  <div class="mb-2">
+  <div class="mb-4">
     {% for option in resource.options.all() %}
       <span class="badge bg-light">
         {{ option }}
       </span>
     {% endfor %}
   </div>
-  <div class="mb-2">
+
+  {% if resource.comments %}
+    {% if resource.resource != "OTHER" %}
+    <p class="text-uppercase fw-bold mb-1">{{ _("Observacions:") }}</p>
+    {% endif %}
+    <p class="mb-4">{{ resource.comments }}</p>
+  {% endif %}
+
+  {% if resource.charge or resource.place_accessible %}
+  <div class="mb-4">
     {% if resource.charge %}
-      <span class="me-3"><span class="fs-4 align-middle">€</span> {{ _("Producte o servei remunerat") }}</span>
+      {{ resource_extra_info(_("Producte o servei remunerat")) }}
     {% endif %}
     {% if resource.place_accessible %}
-      <span class="universal-access-icon" title="">{{ universal_access_icon() }} {{ _("Local accessible") }}</span>
+      {{ resource_extra_info(_("Local accessible")) }}
     {% endif %}
   </div>
-  {% if resource.comments %}
-  <p>{% if resource.resource != "OTHER" %}<strong>{{ _("Observacions:") }}</strong>{% endif %} {{ resource.comments }}</p>
   {% endif %}
+
   {% if resource.images.all() %}
   <div class="image-thumbnails">
     {% for image in resource.images.all() %}
@@ -134,8 +161,8 @@
 </div>
 {% endmacro %}
 
-{% macro input_classes(form, name) %}
-    class="form-control{% if form.errors[name] %} is-invalid{% endif %}"
+{% macro input_classes(form, name, extra="") %}
+  class="form-control{% if form.errors[name] %} is-invalid{% endif %} {{ extra }}"
 {% endmacro %}
 
 {% macro input_value(form, name) %}
@@ -385,7 +412,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 {% endmacro %}
 
 {% macro show_matches_vue(matches, needs = None, origin = "SEARCH") %}
-<div v-for="result in {{ matches }}" :key="result" class="row match-box">
+<div v-for="result in {{ matches }}" :key="result" class="match-box">
   <div class="p-2">
     <h3 class="my-0">
       <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
@@ -442,8 +469,12 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       </a>
     </div>
     <div class="mb-2">
-      <span v-if="result.charge" class="me-3"><span class="fs-4 align-middle">€</span> {{ _("Producte o servei remunerat") }}</span>
-      <span v-if="result.place_accessible" class="universal-access-icon">{{ universal_access_icon() }} {{ _("Local accessible") }}</span>
+      <template v-if="result.charge">
+        {{ resource_extra_info(_("Producte o servei remunerat")) }}
+      </template>
+      <template v-if="result.place_accessible">
+        {{ resource_extra_info(_("Local accessible")) }}
+      </template>
     </div>
     <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">{{ _("Observacions:") }}</strong><span v-html="highlightSearch(result.comments, search)"></span></p>
 

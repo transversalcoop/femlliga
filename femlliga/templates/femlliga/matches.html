@@ -14,9 +14,9 @@
 
 {% block content %}
 {% if len(json_data.matches) > 0 %}
-<main id="content" class="container-fluid">
-  <div id="app" class="row">
-    <div class="col-md-4 d-md-block bg-light sidebar">
+<main id="content" class="container container-large">
+  <div id="app" class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
       <h1>{{ _("Has lligat!") }}</h1>
       {{ sidebar_filter_show_link() }}
       <div class="collapse show" id="sidebar-filter">
@@ -51,22 +51,20 @@
       </div>
     </div>
 
-    <div class="col-md-8 ms-sm-auto px-md-4">
+    <div class="flex-gap"></div>
+
+    <div class="flex-two-thirds">
       {{ initial_loading_vue() }}
       <template v-else>
-        <div v-if="resourceSelected" class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
-            <div class="matches-count"><span>${ matches[resourceSelected].length } {{ _("resultats") }}</span></div>
-            {{ show_matches_vue("matches[resourceSelected]", needs="needs", origin="MATCHES") }}
-          </div>
+        <div v-if="resourceSelected" class="mt-3">
+          <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
+          <div class="matches-count"><span>${ matches[resourceSelected].length } {{ _("resultats") }}</span></div>
+          {{ show_matches_vue("matches[resourceSelected]", needs="needs", origin="MATCHES") }}
         </div>
-        <div v-else class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">{{ _("Tot") }}</h2>
-            <div class="matches-count"><span>${ concatenateMatches(matches).length } {{ _("resultats") }}</span></div>
-            {{ show_matches_vue("concatenateMatches(matches)", needs="needs", origin="MATCHES") }}
-          </div>
+        <div v-else class="mt-3">
+          <h2 class="match-resource-title">{{ _("Tot") }}</h2>
+          <div class="matches-count"><span>${ concatenateMatches(matches).length } {{ _("resultats") }}</span></div>
+          {{ show_matches_vue("concatenateMatches(matches)", needs="needs", origin="MATCHES") }}
         </div>
       </div>
     </template>

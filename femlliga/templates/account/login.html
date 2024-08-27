@@ -12,12 +12,12 @@
   {{ csrf_input }}
   {{ form_feedback(form) }}
   <label class="mt-3" for="id_login">{{ _("Correu electrònic") }}</label>
-  <input type="email" {{ input_classes(form, "login") }} name="login" autocomplete="email" required id="id_login" {{ input_value(form, "login") }}>
+  <input type="email" {{ input_classes(form, "login", extra="bg-lightblue") }} name="login" autocomplete="email" required id="id_login" {{ input_value(form, "login") }}>
   {{ input_feedback(form, "login") }}
 
   <label class="mt-3" for="id_password">{{ _("Contrasenya") }}</label>
   <div class="input-group">
-    <input type="password" {{ input_classes(form, "password") }} name="password" autocomplete="current-password" required="" id="id_password">
+    <input type="password" {{ input_classes(form, "password", extra="bg-lightblue") }} name="password" autocomplete="current-password" required="" id="id_password">
     {{ toggle_password_button() }}
     {{ input_feedback(form, "password") }}
   </div>
