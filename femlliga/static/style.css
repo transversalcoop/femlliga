@@ -374,12 +374,22 @@ pre {
     text-align: center;
 }
 
+.multi-select.multi-select-badges {
+    text-align: left;
+    padding: 0;
+}
+
 .multi-select .multi-select-choice {
     border-radius: 0.5rem;
     border: 1px solid black;
     padding: 0.5rem 1rem;
     margin: 1rem;
     display: inline-block;
+}
+
+.multi-select.multi-select-badges .multi-select-choice {
+    color: black;
+    padding: 0.35em 0.65em;
 }
 
 .multi-select-choice:focus-visible {
@@ -677,6 +687,10 @@ a.badge:hover {
     background-color: var(--lightgrey);
 }
 
+.bg-midblue {
+    background-color: var(--midblue);
+}
+
 .square-2 {
     width: 2rem;
     height: 2rem;
@@ -685,10 +699,6 @@ a.badge:hover {
 
 .border {
     border: 1px solid black !important;
-}
-
-.border-dotted-right {
-    border-right: 2px dotted var(--midgrey);
 }
 
 .flex-gap {
@@ -753,20 +763,25 @@ a.badge:hover {
 }
 
 .form-switch .form-check-input:checked {
-    background-color: var(--brown);
-    border-color: var(--brown);
+    background-color: var(--midblue);
+    border-color: var(--midblue);
+}
+
+.form-switch .form-check-input:checked {
+    background-position: right center;
+    --bs-form-switch-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='%23808080'/></svg>");
 }
 
 .preferences-row .form-range::-webkit-slider-thumb {
-    background-color: var(--brown);
+    background-color: var(--midblue);
 }
 
 .preferences-row .form-range::-moz-range-thumb {
-    background-color: var(--brown);
+    background-color: var(--midblue);
 }
 
 .preferences-row .form-range::-ms-thumb {
-    background-color: var(--brown);
+    background-color: var(--midblue);
 }
 
 .bg-yellow {

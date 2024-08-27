@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_formset_field, vue_js %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_formset_field, vue_js, organization_header %}
 
 {% block title %}
 {% if editing %}
@@ -17,39 +17,28 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mb-2">
-  <div class="d-none d-md-block">
-    <div class="row mt-3">
-      <div class="col-md-4 d-flex align-items-end">
-        <h1 class="resources-title w-100 m-0 p-0 ps-2">{{ resource_type_title(resource_type) }}</h1>
-      </div>
+<div class="container mb-5">
+  {{ organization_header(org) }}
+  <div class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
       {{ all_steps(resource_type, count) }}
     </div>
-  </div>
-  <div class="d-block d-md-none">
-    <div class="row mt-3">
-      <div class="col-md-4 d-flex align-items-end bg-yellow">
-        <h1 class="resources-title w-100 m-0 p-0 ps-2">{{ resource_type_title(resource_type) }}</h1>
-      </div>
+    <div class="flex-gap"></div>
+    <div class="flex-two-thirds bg-lightgrey br-1rem p-3">
+      {{ resource_edit() }}
     </div>
   </div>
+</div>
+{% endblock %}
 
-  <h2 class="fs-1">
+{% macro resource_edit() %}
+  <h2 class="mt-0">
     <i class="{{ resource_icon(resource.code) }}"></i>
     {{ resource }}
   </h2>
   {% if resource_description(resource.code) %}
   <p><em>{{ resource_description(resource.code) }}</em></p>
   {% endif %}
-  <p>
-    {% if resource.code != "OTHER" %}
-    {% if resource_type == "needs" %}
-    {{ _("Selecciona les opcions que necessiteu:") }}
-    {% else %}
-    {{ _("Selecciona les opcions que oferiu:") }}
-    {% endif %}
-    {% endif %}
-  </p>
 
   <div id="vue-app">
     <form method="post" enctype="multipart/form-data" class="mb-1">
@@ -58,16 +47,25 @@
 
       <input type="hidden" id="resource" name="resource" value="{{ resource.code }}">
 
+      <label for="resource_options">
+        {% if resource.code != "OTHER" %}
+        {% if resource_type == "needs" %}
+        {{ _("Selecciona les opcions que necessiteu:") }}
+        {% else %}
+        {{ _("Selecciona les opcions que oferiu:") }}
+        {% endif %}
+        {% endif %}
+      </label>
       {% set options = resource.options() %}
       {% if len(options) > 0 and form.fields["options"] %}
-        <div class="multi-select">
+        <div id="resource_options" class="multi-select multi-select-badges mb-3">
           {% for choice in options %}
           {% if form and form.cleaned_data and choice[0] in form.cleaned_data["options"] %}
             {% set selected=True %}
           {% endif %}
           <div class="btn-group me-2 mb-1" role="group">
             <button
-              class="btn multi-select-choice m-0"
+              class="btn badge multi-select-choice m-0"
               :class="{'selected': selected.indexOf('{{ choice[0] }}') !== -1}"
               type="button"
               role="switch"
@@ -116,7 +114,7 @@
 
       <div class="spacing"></div>
 
-      <label class="mt-2" for="comments">{{ _("Observacions o aclariments per al conjunt de opcions") }}</label>
+      <label class="mt-2" for="comments">{{ _("Observacions o aclariments") }}</label>
       <textarea id="comments" name="comments" rows="2" {{ input_classes(form, "comments") }}>{{ textarea_value(form, "comments") }}</textarea>
       {{ input_feedback(form, "comments") }}
 
@@ -170,11 +168,8 @@
       </div>
     </form>
   </div>
-  <div class="d-block d-md-none">
-    {{ all_steps(resource_type, count, border=False) }}
-  </div>
 </div>
-{% endblock %}
+{% endmacro %}
 
 {% block js %}
 {{ vue_js() }}
@@ -224,29 +219,25 @@ Vue.createApp({
 {% endmacro %}
 
 {% macro steps(resource_type, current_resource_type, count) %}
-<div class="d-flex justify-content-around">
   {% for i, resource in enumerate(consts.RESOURCES) %}
-  {% if editing %}
-  <a
-    class="rounded-link fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}bg-lightgrey{% endif %}"
-    href="{% if editing %}{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}{% endif %}"
-  >
-    {{ i+1 }}
-  </a>
-  {% else %}
-  <span class="fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}bg-lightgrey{% endif %}">{{ i+1 }}</span>
-  {% endif %}
+  <div class="{% if resource_type==current_resource_type and count-1==i %}bg-midblue{% endif %}">
+    {% if editing %}
+    <a href="{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}">
+      <i class="{{ resource_icon(resource[0]) }}"></i>
+      {{ resource_name(resource[0]) }}
+    </a>
+    {% else %}
+      <i class="{{ resource_icon(resource[0]) }}"></i>
+      {{ resource_name(resource[0]) }}
+    {% endif %}
+  </div>
   {% endfor %}
-</div>
 {% endmacro %}
 
-{% macro all_steps(resource_type, count, border=True) %}
-<div class="col-md-4{% if border %} border-dotted-right{% endif %}">
-  <span class="text-secondary">{{ resource_type_title("needs") }}</span>
-  {{ steps("needs", resource_type, count) }}
-</div>
-<div class="col-md-4">
-  <span class="text-secondary">{{ resource_type_title("offers") }}</span>
-  {{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
-</div>
+{% macro all_steps(resource_type, count) %}
+<h2>{{ resource_type_title("needs") }}</h2>
+{{ steps("needs", resource_type, count) }}
+
+<h2>{{ resource_type_title("offers") }}</h2>
+{{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
 {% endmacro %}

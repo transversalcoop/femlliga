@@ -35,9 +35,9 @@
         </div>
         <ul class="nav nav-pills flex-column mb-auto mt-2">
           <template v-if="showBy === 'resources'">
-            <h2 class="resource-matches-title background-yellow">{{ _("Enviades") }}</h2>
+            <h2 class="resource-matches-title">{{ _("Enviades") }}</h2>
             {{ request_filter_row_vue("sent", _("Peticions enviades")) }}
-            <h2 class="resource-matches-title background-yellow-dark">{{ _("Rebudes") }}</h2>
+            <h2 class="resource-matches-title">{{ _("Rebudes") }}</h2>
             {{ request_filter_row_vue("received", _("Peticions rebudes")) }}
           </template>
           <template v-else>
@@ -139,13 +139,13 @@
   <h3 v-if="agreementSent(result)" class="mt-2">
     <span class="me-2">{{ _("Petició de") }}</span>
     <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
-    <span class="me-2 background-yellow">{{ _("enviada a") }}</span>
+    <span class="me-2">{{ _("enviada a") }}</span>
     <a :href="result.solicitee.href" v-html="highlightSearch(result.solicitee.name, search)"></a>
   </h3>
   <h3 v-else class="mt-2">
     <span class="me-2">{{ _("Petició de") }}</span>
     <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
-    <span class="me-2 background-yellow-dark">{{ _("rebuda de") }}</span>
+    <span class="me-2">{{ _("rebuda de") }}</span>
     <a :href="result.solicitor.href" v-html="highlightSearch(result.solicitor.name, search)"></a>
   </h3>
   <div class="mb-2">

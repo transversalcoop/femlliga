@@ -1,22 +1,12 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import resource_details, arrow_btn, arrow_btn_dropdown %}
+{% from 'femlliga/_macros.html' import resource_details, arrow_btn, arrow_btn_dropdown, organization_header %}
 
 {% block title %}{{ _("Entitat") }}{% endblock %}
 
 {% block content %}
 <div class="container text-center">
-  <h1 class="fs-2-5rem mt-100px">
-    <a href="{{ url("profile", args=[org.id]) }}">{{ org.name }}</a>
-  </h1>
-
-  <div class="divider-3"></div>
-
-  {% if org.logo %}
-  <div class="mt-60px mb-60px w-300px m-center">
-    <img src="{{ org.logo.url }}" class="organization-logo" loading="lazy" />
-  </div>
-  {% endif %}
+  {{ organization_header(org, link=True) }}
 
   {% if org.needs_not_set() or org.offers_not_set() %}
   <div class="bg-lightblue br-05rem w-80 m-center text-center py-4 px-2 mb-60px" role="alert">

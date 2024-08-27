@@ -377,6 +377,24 @@ a <template> tag, gets shown #}
 </template>
 {% endmacro %}
 
+{% macro organization_header(org, link=False) %}
+  <h1 class="fs-2-5rem mt-100px text-center">
+    {% if link %}
+    <a href="{{ url("profile", args=[org.id]) }}">{{ org.name }}</a>
+    {% else %}
+    {{ org.name }}
+    {% endif %}
+  </h1>
+
+  <div class="divider-3"></div>
+
+  {% if org.logo %}
+  <div class="mt-60px mb-60px w-300px m-center">
+    <img src="{{ org.logo.url }}" class="organization-logo" loading="lazy" />
+  </div>
+  {% endif %}
+{% endmacro %}
+
 {% macro organization_info(org) %}
   {% if org.description %}
   <p>{{ org.description }}</p>
@@ -416,8 +434,8 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
   <div class="p-2">
     <h3 class="my-0">
       <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
-      <span v-if="result.type === 'offer'" class="ms-2 background-yellow">{{ _("ofereix") }}</span>
-      <span v-if="result.type === 'need'" class="ms-2 background-yellow-dark">{{ _("necessita") }}</span>
+      <span v-if="result.type === 'offer'" class="ms-2">{{ _("ofereix") }}</span>
+      <span v-if="result.type === 'need'" class="ms-2">{{ _("necessita") }}</span>
       <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
     </h3>
     <div>
