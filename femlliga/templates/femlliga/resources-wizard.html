@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_formset_field, vue_js, organization_header %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_formset_field, vue_js, organization_header, arrow_btn_link %}
 
 {% block title %}
 {% if editing %}
@@ -24,7 +24,7 @@
       {{ all_steps(resource_type, count) }}
     </div>
     <div class="flex-gap"></div>
-    <div class="flex-two-thirds bg-lightgrey br-1rem p-3">
+    <div class="flex-two-thirds bg-lightgrey br-1rem p-3 h-100">
       {{ resource_edit() }}
     </div>
   </div>
@@ -63,18 +63,16 @@
           {% if form and form.cleaned_data and choice[0] in form.cleaned_data["options"] %}
             {% set selected=True %}
           {% endif %}
-          <div class="btn-group me-2 mb-1" role="group">
-            <button
-              class="btn badge multi-select-choice m-0"
-              :class="{'selected': selected.indexOf('{{ choice[0] }}') !== -1}"
-              type="button"
-              role="switch"
-              value="{{ choice[0] }}"
-              @click="toggleOption('{{ choice[0] }}')"
-            >
-              {{ choice[1] }}
-            </button>
-          </div>
+          <button
+            class="badge multi-select-choice"
+            :class="{'selected': selected.indexOf('{{ choice[0] }}') !== -1}"
+            type="button"
+            role="switch"
+            value="{{ choice[0] }}"
+            @click="toggleOption('{{ choice[0] }}')"
+          >
+            {{ choice[1] }}
+          </button>
           {% endfor %}
         </div>
         <select
@@ -141,21 +139,21 @@
           </div>
         {% endfor %}
 
-        <a class="btn btn-custom mt-3" onclick="addImage(event)">
-          <i class="bi-plus-lg"></i> {{ resource.add_image_label() }}
-        </a>
+        <div class="mt-3">
+          {{ arrow_btn_link(_("Afegeix imatge"), "", icon="bi-image", onclick="addImage(event)") }}
+        </div>
       {% endif %}
 
       <div class="row mt-3">
         <div class="col-6">
           {% if editing %}
-          <a href="{{ url("app") }}" class="btn btn-lg btn-brown">{{ _("Torna sense fer canvis") }}</a>
+          <a href="{{ url("app") }}" class="btn btn-thin">{{ _("Torna sense fer canvis") }}</a>
           {% elif count > 1 %}
-          <a href="{{ wizard_url(org.id, count-1) }}" class="btn btn-lg btn-brown">{{ _("Anterior") }}</a>
+          <a href="{{ wizard_url(org.id, count-1) }}" class="btn btn-thin">{{ _("Anterior") }}</a>
           {% endif %}
         </div>
         <div class="col-6 text-end">
-          <button type="submit" class="btn btn-lg btn-warning">
+          <button type="submit" class="btn btn-thin">
             {% if editing %}
             {{ _("Desa els canvis") }}
             {% elif count == len(consts.RESOURCES) * 2 %}
@@ -220,17 +218,20 @@ Vue.createApp({
 
 {% macro steps(resource_type, current_resource_type, count) %}
   {% for i, resource in enumerate(consts.RESOURCES) %}
-  <div class="{% if resource_type==current_resource_type and count-1==i %}bg-midblue{% endif %}">
+    {% set active = resource_type==current_resource_type and count-1==i %}
     {% if editing %}
-    <a href="{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}">
-      <i class="{{ resource_icon(resource[0]) }}"></i>
+    <a class="sidebar-row {% if active %}active{% endif %}"
+       href="{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}"
+    >
+      <i class="me-3 {{ resource_icon(resource[0]) }}"></i>
       {{ resource_name(resource[0]) }}
     </a>
     {% else %}
-      <i class="{{ resource_icon(resource[0]) }}"></i>
+    <div class="sidebar-row {% if active %}active{% endif %}">
+      <i class="me-3 {{ resource_icon(resource[0]) }}"></i>
       {{ resource_name(resource[0]) }}
+    </div>
     {% endif %}
-  </div>
   {% endfor %}
 {% endmacro %}
 

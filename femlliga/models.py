@@ -357,9 +357,6 @@ class Resource:
     def options(self):
         return const.RESOURCE_OPTIONS_MAP[self.code]
 
-    def add_image_label(self):
-        return const.RESOURCE_ADD_IMAGE_LABEL[self.code]
-
 
 def option_name(code):
     return const.RESOURCE_OPTIONS_DEF_MAP[code]

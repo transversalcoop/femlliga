@@ -31,12 +31,13 @@
 </button>
 {% endmacro %}
 
-{% macro arrow_btn_link(text, url, icon=None, download=False, image=None, image_alt="") %}
+{% macro arrow_btn_link(text, url, icon=None, download=False, image=None, image_alt="", onclick="") %}
 <a
   role="button"
   class="btn btn-arrow"
-  href="{{ url }}"
+  {% if url %}href="{{ url }}"{% endif %}
   {% if download %}download{% endif %}
+  {% if onclick %}onclick="{{ onclick }}"{% endif %}
 >
   <div class="d-flex align-items-center">
     {{ arrow_btn_content(text, icon=icon, image=image, image_alt=image_alt) }}

@@ -261,15 +261,6 @@ RESOURCE_OPTIONS_DEF_MAP = {}
 for option in RESOURCE_OPTIONS:
     RESOURCE_OPTIONS_DEF_MAP[option[0]] = option[1]
 
-RESOURCE_ADD_IMAGE_LABEL = {
-    "PLACE": _("Afegeix imatge del local"),
-    "SERVICE": _("Afegeix imatge del servei"),
-    "TRAINING": _("Afegeix imatge de la formació"),
-    "EQUIPMENT": _("Afegeix imatge d'aquestes coses"),
-    "ALLIANCES": _("Afegeix imatge d'aquestes coses"),
-    "OTHER": _("Afegeix imatge del que oferiu"),
-}
-
 RESOURCE_OPTIONS_QUESTION_MAP = {
     "PLACE": _("Quin tipus de local necessiteu?"),
     "SERVICE": _("Quins serveis concrets necessiteu?"),
