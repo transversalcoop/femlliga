@@ -149,6 +149,22 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     content: none;
 }
 
+.btn-switch {
+    text-align: left;
+    font-size: 1.125rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0;
+    border: 1px solid black;
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-left-color: transparent;
+}
+
+.btn-switch.active {
+    background-color: var(--midblue);
+    border-radius: 0.375rem;
+}
+
 nav a {
     color: black;
 }
@@ -478,6 +494,10 @@ a.badge:hover {
     width: 300px;
 }
 
+.sidebar-row.active .highlight, .sidebar-row:hover .highlight {
+    background-color: white;
+}
+
 .highlight {
     background-color: var(--midblue);
     color: black;
@@ -554,6 +574,10 @@ a.badge:hover {
 .px-7rem {
     padding-right: 7rem;
     padding-left: 7rem;
+}
+
+.mt-46px {
+    margin-top: 46px;
 }
 
 .mt-60px {
@@ -1029,6 +1053,10 @@ a.sidebar-row:hover {
 
     .container.container-large {
         max-width: 1100px;
+    }
+
+    .lg\:w-50 {
+        width: 50%;
     }
 }
 

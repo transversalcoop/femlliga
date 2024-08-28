@@ -1,50 +1,53 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import vue_js, sidebar_filter_show_link, initial_loading_vue %}
+{% from 'femlliga/_macros.html' import vue_js, sidebar_filter_show_link, initial_loading_vue, arrow_btn_link %}
 
 {% block title %}{{ _("Peticions") }}{% endblock %}
 
 {% block content %}
 {% if len(agreements.sent) > 0 or len(agreements.received) > 0 %}
-<div class="container-fluid">
-  <div id="app" class="row">
-    <div class="col-md-4 d-md-block bg-light sidebar">
-      <h1>{{ _("Peticions d'intercanvi enviades i rebudes") }}</h1>
+<div class="container container-large mb-4">
+  <h1 class="fs-2-5rem mt-100px text-center lg:w-50 m-center">
+    {{ _("Peticions d'intercanvi enviades i rebudes") }}
+  </h1>
+  <div class="divider-3 mb-60px"></div>
+  <div id="app" class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
       {{ sidebar_filter_show_link() }}
-      <div class="collapse show" id="sidebar-filter">
+      <div class="collapse show mt-46px" id="sidebar-filter">
         <div class="btn-group w-100 mb-2" role="group" aria-label="{{ _("Selecciona si mostrar els resultats agrupats per recurs o per organització") }}">
           <button
             type="button"
-            class="btn"
+            class="btn btn-switch"
             @click="setShowBy('resources')"
-            :class="{'btn-warning': showBy === 'resources', 'btn-light': showBy !== 'resources'}">
+            :class="{'active': showBy === 'resources'}">
             {{ _("Recursos") }}
           </button>
           <button
             type="button"
-            class="btn"
+            class="btn btn-switch"
             @click="setShowBy('organizations')"
-            :class="{'btn-warning': showBy === 'organizations', 'btn-light': showBy !== 'organizations'}">
+            :class="{'active': showBy === 'organizations'}">
             {{ _("Organitzacions") }}
           </button>
         </div>
-        <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
+        <input v-model="search" type="text" class="form-control border mt-5 mb-3" placeholder="{{ _("Cerca recursos o organitzacions") }}">
         <div class="form-check form-switch mt-2">
           <input class="form-check-input" type="checkbox" role="switch" id="showClosedSwitch" v-model="showClosed">
           <label class="form-check-label" for="showClosedSwitch">{{ _("Mostra peticions tancades") }}</label>
         </div>
         <ul class="nav nav-pills flex-column mb-auto mt-2">
           <template v-if="showBy === 'resources'">
-            <h2 class="resource-matches-title">{{ _("Enviades") }}</h2>
+            <h2 class="fw-600">{{ _("Enviades") }}</h2>
             {{ request_filter_row_vue("sent", _("Peticions enviades")) }}
-            <h2 class="resource-matches-title">{{ _("Rebudes") }}</h2>
+            <h2 class="fw-600">{{ _("Rebudes") }}</h2>
             {{ request_filter_row_vue("received", _("Peticions rebudes")) }}
           </template>
           <template v-else>
-            <li class="nav-item" v-for="x in organizationsWithAgreements" :key="x.organization.id">
-              <button
+            <li v-for="x in organizationsWithAgreements" :key="x.organization.id">
+              <a
                 @click="selectOrganization(x.organization)"
-                class="nav-link w-100 text-start"
+                class="sidebar-row"
                 :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
                 type="button"
                 role="tab"
@@ -61,42 +64,41 @@
                   <i class="bi-circle-fill text-danger"></i>
                 </span>
                 <span v-html="highlightSearch(x.organization.name, search)"></span>
-              </button>
+              </a>
             </li>
           </template>
         </ul>
       </div>
     </div>
 
-    <div class="col-md-8 ms-sm-auto px-md-4">
+    <div class="flex-gap"></div>
+
+    <div class="flex-two-thirds">
       {{ initial_loading_vue() }}
       <template v-else>
-        <div v-if="resourceSelected" class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
-            <div v-if="requestTypeSelected === 'sent'">
-              <div class="matches-count agreements-count"><span>${ agreements.sent[resourceSelected].length } {{ _("peticions enviades") }}</span></div>
-              {{ show_agreements_vue("agreements.sent[resourceSelected]") }}
-            </div>
-            <div v-else>
-              <div class="matches-count agreements-count"><span>${ agreements.received[resourceSelected].length } {{ _("peticions rebudes") }}</span></div>
-              {{ show_agreements_vue("agreements.received[resourceSelected]") }}
-            </div>
+        <div v-if="resourceSelected" class="mt-3">
+          <h2 class="match-resource-title">
+            <i class="me-2" :class="resourceIconsMap[resourceSelected]"></i>
+            ${ resourceNamesMap[resourceSelected] }
+          </h2>
+          <div v-if="requestTypeSelected === 'sent'">
+            <div class="matches-count"><span>${ agreements.sent[resourceSelected].length } {{ _("peticions enviades") }}</span></div>
+            {{ show_agreements_vue("agreements.sent[resourceSelected]") }}
+          </div>
+          <div v-else>
+            <div class="matches-count"><span>${ agreements.received[resourceSelected].length } {{ _("peticions rebudes") }}</span></div>
+            {{ show_agreements_vue("agreements.received[resourceSelected]") }}
           </div>
         </div>
-        <div v-else-if="organizationSelected" class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">${ organizationSelected.name }</h2>
-            <div class="matches-count agreements-count"><span>${ organizationAgreements.length } {{ _("peticions") }}</span></div>
-            {{ show_agreements_vue("organizationAgreements") }}
-          </div>
+        <div v-else-if="organizationSelected" class="mt-3">
+          <h2 class="match-resource-title">${ organizationSelected.name }</h2>
+          <div class="matches-count"><span>${ organizationAgreements.length } {{ _("peticions") }}</span></div>
+          {{ show_agreements_vue("organizationAgreements") }}
         </div>
-        <div v-else class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">{{ _("Totes les peticions") }}</h2>
-            <div class="matches-count agreements-count"><span>${ concatenatedAgreements.length } {{ _("peticions enviades o rebudes") }}</span></div>
-            {{ show_agreements_vue("concatenatedAgreements") }}
-          </div>
+        <div v-else class="mt-3">
+          <h2 class="match-resource-title">{{ _("Totes les peticions") }}</h2>
+          <div class="matches-count"><span>${ concatenatedAgreements.length } {{ _("peticions enviades o rebudes") }}</span></div>
+          {{ show_agreements_vue("concatenatedAgreements") }}
         </div>
       </template>
     </div>
@@ -111,10 +113,10 @@
 {% endblock %}
 
 {% macro request_filter_row_vue(request_type, title) %}
-<li v-for="resource in requestedResources.{{ request_type }}" :key="resource" class="nav-item">
-  <button
+<li v-for="resource in requestedResources.{{ request_type }}" :key="resource">
+  <a
     @click="selectResource(resource, '{{ request_type }}')"
-    class="nav-link w-100 text-start"
+    class="sidebar-row"
     :class="{active: resourceSelected === resource && requestTypeSelected === '{{ request_type }}'}"
     type="button"
     role="tab"
@@ -129,20 +131,21 @@
     <span v-if="agreementsPending(agreements.{{ request_type }}[resource])" class="float-end">
       <i class="bi-circle-fill text-danger"></i>
     </span>
+    <i class="me-2" :class="resourceIconsMap[resource]"></i>
     ${ resourceNamesMap[resource] }
-  </button>
+  </a>
 </li>
 {% endmacro %}
 
 {% macro show_agreements_vue(agreements) %}
-<div v-for="result in {{ agreements }}" :key="result" class="row match-box" :class="{'agreement-closed': result.agreement_successful !== null}">
-  <h3 v-if="agreementSent(result)" class="mt-2">
+<div v-for="result in {{ agreements }}" :key="result" class="match-box" :class="{'agreement-closed': result.agreement_successful !== null}">
+  <h3 v-if="agreementSent(result)" class="fw-600 mt-2">
     <span class="me-2">{{ _("Petició de") }}</span>
     <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
     <span class="me-2">{{ _("enviada a") }}</span>
     <a :href="result.solicitee.href" v-html="highlightSearch(result.solicitee.name, search)"></a>
   </h3>
-  <h3 v-else class="mt-2">
+  <h3 v-else class="fw-600 mt-2">
     <span class="me-2">{{ _("Petició de") }}</span>
     <span class="me-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
     <span class="me-2">{{ _("rebuda de") }}</span>
@@ -154,43 +157,40 @@
     copy of the resource and options selected when the message was sent #}
     <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
 
-    <div class="row">
-      <div class="col-12 col-sm-8">
-        <p class="mt-2 mb-0">
-          <i class="bi-send"></i>
-          {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }
-        </p>
+    <p class="mt-2 mb-0">
+      <i class="bi-send"></i>
+      {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }
+    </p>
 
-        <p v-if="result.last_message_on" class="mb-0">
-          <i class="bi-chat"></i>
-          {{ _("Últim missatge enviat el") }} ${ formatDateTime(result.last_message_on) }
-        </p>
+    <p v-if="result.last_message_on" class="mb-0">
+      <i class="bi-chat"></i>
+      {{ _("Últim missatge enviat el") }} ${ formatDateTime(result.last_message_on) }
+    </p>
 
-        <p v-if="result.messages_not_read === 1" class="mb-0">
-          <i class="bi-circle-fill text-danger"></i>
-          {{ _("Hi ha un missatge pendent de llegir") }}
-        </p>
-        <p v-else-if="result.messages_not_read > 1" class="mb-0">
-          <i class="bi-circle-fill text-danger"></i>
-          {{ _("Hi ha") }} ${ result.messages_not_read } {{ _("missatges pendents de llegir") }}
-        </p>
-        <div v-else-if="result.agreement_successful === null">
-          <i class="bi-circle-fill text-danger"></i>
-          {{ _("Encara no s'ha indicat si s'ha realitzat l'intercanvi") }}
-        </div>
+    <p v-if="result.messages_not_read === 1" class="mb-0">
+      <i class="bi-circle-fill text-danger"></i>
+      {{ _("Hi ha un missatge pendent de llegir") }}
+    </p>
+    <p v-else-if="result.messages_not_read > 1" class="mb-0">
+      <i class="bi-circle-fill text-danger"></i>
+      {{ _("Hi ha") }} ${ result.messages_not_read } {{ _("missatges pendents de llegir") }}
+    </p>
+    <div v-else-if="result.agreement_successful === null">
+      <i class="bi-circle-fill text-danger"></i>
+      {{ _("Encara no s'ha indicat si s'ha realitzat l'intercanvi") }}
+    </div>
 
-        <div v-if="result.agreement_successful === false">
-          <i class="bi-x-lg text-danger"></i>
-          {{ _("No es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
-        </div>
-        <div v-else-if="result.agreement_successful === true">
-          <i class="bi-check2 text-success"></i>
-          {{ _("Es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
-        </div>
-      </div>
-      <div class="col-12 col-sm-4">
-        <a class="btn btn-warning w-100 mt-2" :href="result.href">{{ _("Visualitza la conversa") }}</a>
-      </div>
+    <div v-if="result.agreement_successful === false">
+      <i class="bi-x-lg text-danger"></i>
+      {{ _("No es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
+    </div>
+    <div v-else-if="result.agreement_successful === true">
+      <i class="bi-check2 text-success"></i>
+      {{ _("Es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
+    </div>
+
+    <div class="mt-3">
+      {{ arrow_btn_link(_("Visualitza la conversa"), "result.href", "bi-send", vue=True) }}
     </div>
   </div>
 </div>
@@ -198,19 +198,8 @@
 
 {% block js %}
 {{ vue_js() }}
-{{ json_script(agreements_json, "agreements-data") }}
-{{ json_script(concatenated_agreements_json, "concatenated-agreements-data") }}
-{{ json_script(organizations_json, "organizations-data") }}
-{{ json_script(requested_resources_json, "requested-resources-data") }}
-{{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
-{{ json_script(consts.RESOURCE_OPTIONS_DEF_MAP, "option-names-data") }}
 <script>
-var agreements = JSON.parse(document.getElementById('agreements-data').textContent);
-var concatenatedAgreements = JSON.parse(document.getElementById('concatenated-agreements-data').textContent);
-var organizations = JSON.parse(document.getElementById('organizations-data').textContent);
-var requestedResources = JSON.parse(document.getElementById('requested-resources-data').textContent);
-var resourceNamesMap = JSON.parse(document.getElementById('resource-names-data').textContent);
-var optionNamesMap = JSON.parse(document.getElementById('option-names-data').textContent);
+var jsonData = getJsonData();
 
 function agreementContains(search) {
   return function(m) {
@@ -218,10 +207,10 @@ function agreementContains(search) {
     const targets = [
       sanitize(m.solicitor.name),
       sanitize(m.solicitee.name),
-      sanitize(resourceNamesMap[m.resource]),
+      sanitize(jsonData.resource_names_map[m.resource]),
     ];
     for (var option of m.options) {
-      targets.push(sanitize(optionNamesMap[option]));
+      targets.push(sanitize(jsonData.option_names_map[option]));
     }
     for (var part of parts) {
       if (!targets.some((target) => contains(target, part))) {
@@ -237,12 +226,13 @@ Vue.createApp({
   data() {
     return {
       organizationID: "{{ org.id }}",
-      allAgreements: agreements,
-      allConcatenatedAgreements: concatenatedAgreements,
-      allOrganizations: organizations,
-      resourceNamesMap: resourceNamesMap,
-      optionNamesMap: optionNamesMap,
-      requestedResources: requestedResources,
+      allAgreements: jsonData.agreements,
+      allConcatenatedAgreements: jsonData.concatenated_agreements,
+      allOrganizations: jsonData.organizations,
+      resourceNamesMap: jsonData.resource_names_map,
+      resourceIconsMap: jsonData.resource_icons_map,
+      optionNamesMap: jsonData.option_names_map,
+      requestedResources: jsonData.requested_resources,
       showBy: "resources",
       search: "",
       resourceSelected: "",

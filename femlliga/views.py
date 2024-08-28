@@ -1069,28 +1069,32 @@ def agreements(request, organization_id):
         {
             "org": organization,
             "agreements": {"sent": sent, "received": received},
-            "agreements_json": {
-                "sent": group_agreements_by_resource_json(sent, organization_id),
-                "received": group_agreements_by_resource_json(
-                    received, organization_id
-                ),
-            },
-            "concatenated_agreements_json": [
-                a.json(organization_id) for a in sort_agreements(sent + received)
-            ],
-            "organizations_json": [
-                {
-                    "organization": agreement_other_organization(
-                        l[0], organization_id
-                    ).json(current_organization=organization),
-                    "agreements": [a.json(organization_id) for a in l],
-                }
-                for l in agreements_by_organization
-            ],
-            "organization_names_map_json": organization_names_map_json,
-            "requested_resources_json": {
-                "sent": requested_resources(sent),
-                "received": requested_resources(received),
+            "json_data": {
+                "agreements": {
+                    "sent": group_agreements_by_resource_json(sent, organization_id),
+                    "received": group_agreements_by_resource_json(
+                        received, organization_id
+                    ),
+                },
+                "concatenated_agreements": [
+                    a.json(organization_id) for a in sort_agreements(sent + received)
+                ],
+                "resource_names_map": RESOURCE_NAMES_MAP,
+                "option_names_map": RESOURCE_OPTIONS_DEF_MAP,
+                "resource_icons_map": RESOURCE_ICONS_MAP,
+                "organizations": [
+                    {
+                        "organization": agreement_other_organization(
+                            l[0], organization_id
+                        ).json(current_organization=organization),
+                        "agreements": [a.json(organization_id) for a in l],
+                    }
+                    for l in agreements_by_organization
+                ],
+                "requested_resources": {
+                    "sent": requested_resources(sent),
+                    "received": requested_resources(received),
+                },
             },
         },
     )

@@ -32,11 +32,11 @@
 </button>
 {% endmacro %}
 
-{% macro arrow_btn_link(text, url, icon=None, download=False, image=None, image_alt="", onclick="") %}
+{% macro arrow_btn_link(text, url, icon=None, download=False, image=None, image_alt="", onclick="", vue=False) %}
 <a
   role="button"
   class="btn btn-arrow"
-  {% if url %}href="{{ url }}"{% endif %}
+  {% if url %}{% if vue %}:{% endif %}href="{{ url }}"{% endif %}
   {% if download %}download{% endif %}
   {% if onclick %}onclick="{{ onclick }}"{% endif %}
 >
@@ -357,10 +357,10 @@ a <template> tag, gets shown #}
 
 {% macro match_filter_row_vue(match_type, title) %}
 <template v-for="resource of matched_needs" :key="resource">
-  <li v-if="resource in matches.{{ match_type }}Matches" class="nav-item">
-    <button
+  <li v-if="resource in matches.{{ match_type }}Matches">
+    <a
       @click="selectResource(resource, '{{ match_type }}')"
-      class="nav-link w-100 text-start"
+      class="sidebar-row"
       :class="{active: resourceSelected === resource && matchTypeSelected === '{{ match_type }}'}"
       type="button"
       role="tab"
@@ -374,7 +374,7 @@ a <template> tag, gets shown #}
       </span>
       <i class="me-2" :class="resourceIconsMap[resource]"></i>
       ${ resourceNamesMap[resource] }
-    </button>
+    </a>
   </li>
 </template>
 {% endmacro %}
@@ -691,7 +691,7 @@ function matchContains(search) {
 {% macro render_resource(r, options) %}{{ resource_name(r) }}{% if len(options) > 0 %} ({{ display_list(options) }}){% endif %}{% endmacro %}
 
 {% macro sidebar_filter_show_link() %}
-<a href="#sidebar-filter" class="text-toggle d-md-none" data-bs-toggle="collapse" aria-expanded="true">
+<a href="#sidebar-filter" class="text-toggle d-lg-none" data-bs-toggle="collapse" aria-expanded="true">
   <span class="text-collapsed">{{ _("Mostra el filtre") }}</span>
   <span class="text-expanded">{{ _("Amaga el filtre") }}</span>
 </a>
