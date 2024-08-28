@@ -355,7 +355,8 @@ class Resource:
         raise Exception("Unknown option")
 
     def options(self):
-        return const.RESOURCE_OPTIONS_MAP[self.code]
+        opts = const.RESOURCE_OPTIONS_MAP[self.code]
+        return list(sorted(opts, key=lambda x: str(x[1])))
 
 
 def option_name(code):
@@ -415,8 +416,12 @@ class BaseResource(models.Model):
             "id": self.id,
             "resource": self.resource,
             "comments": self.comments,
-            "options": [o.name for o in self.options.all()],
+            "options": [o.name for o in self.sorted_options()],
         }
+
+    def sorted_options(self):
+        opts = list(self.options.all())
+        return sorted(opts, key=lambda x: str(x))
 
 
 class Need(BaseResource):
@@ -720,7 +725,7 @@ class Agreement(models.Model):
             "solicitor": self.solicitor_safe().json(),
             "solicitee": self.solicitee_safe().json(),
             "date": self.date,
-            "options": [o.name for o in self.options.all()],
+            "options": [o.name for o in self.sorted_options()],
             "resource": self.resource,
             "resource_type": self.resource_type,
             "communication_accepted": self.communication_accepted,
@@ -741,6 +746,10 @@ class Agreement(models.Model):
                 kwargs={"organization_id": organization_id, "agreement_id": self.id},
             ),
         }
+
+    def sorted_options(self):
+        opts = list(self.options.all())
+        return sorted(opts, key=lambda x: str(x))
 
 
 class Message(models.Model):

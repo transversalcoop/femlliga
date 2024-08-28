@@ -17,7 +17,7 @@
       <div id="confirm-question" class="d-none">{{ _("Segur que vols marcar aquesta opció? L'acció no es pot desfer") }}</div>
       <div class="collapse show" id="sidebar-filter">
         <div>
-        {% for option in a.options.all() %}
+        {% for option in a.sorted_options() %}
           <span class="badge bg-light me-2">{{ option }}</span>
         {% endfor %}
         </div>

@@ -24,6 +24,7 @@
 {% endmacro %}
 
 {% macro arrow_btn(text, icon=None) %}
+{# wrapper also replicated in show_matches_vue, using arrow_btn_content directly or duplicating all #}
 <button type="submit" class="btn btn-arrow">
   <div class="d-flex align-items-center">
     {{ arrow_btn_content(text, icon=icon) }}
@@ -80,7 +81,7 @@
 
 {% macro resource_details(resource, match_type) %}
   <div class="mb-4">
-    {% for option in resource.options.all() %}
+    {% for option in resource.sorted_options() %}
       <span class="badge bg-light">
         {{ option }}
       </span>
@@ -387,10 +388,10 @@ a <template> tag, gets shown #}
     {% endif %}
   </h1>
 
-  <div class="divider-3"></div>
+  <div class="divider-3 mb-60px"></div>
 
   {% if org.logo %}
-  <div class="mt-60px mb-60px w-300px m-center">
+  <div class="mb-60px w-300px m-center">
     <img src="{{ org.logo.url }}" class="organization-logo" loading="lazy" />
   </div>
   {% endif %}
@@ -433,16 +434,16 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 {% macro show_matches_vue(matches, needs = None, origin = "SEARCH") %}
 <div v-for="result in {{ matches }}" :key="result" class="match-box">
   <div class="p-2">
-    <h3 class="my-0">
+    <h3 class="my-0 fw-600">
       <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
       <span v-if="result.type === 'offer'" class="ms-2">{{ _("ofereix") }}</span>
       <span v-if="result.type === 'need'" class="ms-2">{{ _("necessita") }}</span>
-      <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+      <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource].toLowerCase(), search)"></span>
     </h3>
-    <div>
-      <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } {{ _("de vosaltres") }}</span>
+    <div class="mt-2">
+      <span class="fst-italic me-3">A ${ result.distance } {{ _("de vosaltres") }}</span>
     </div>
-    <div class="mb-2">
+    <div class="mt-2 mb-2">
       <span
         {# base resource is offer or need #}
         v-if="!result.public_href"
@@ -489,13 +490,16 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     </div>
     <div class="mb-2">
       <template v-if="result.charge">
-        {{ resource_extra_info(_("Producte o servei remunerat")) }}
+        <span class="me-2">{{ resource_extra_info(_("Producte o servei remunerat")) }}</span>
       </template>
       <template v-if="result.place_accessible">
         {{ resource_extra_info(_("Local accessible")) }}
       </template>
     </div>
-    <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">{{ _("Observacions:") }}</strong><span v-html="highlightSearch(result.comments, search)"></span></p>
+    <template v-if="result.comments && result.comments !== ''" class="mb-0">
+      <p v-if="result.resource !== 'OTHER'" class="text-uppercase fw-bold mb-1">{{ _("Observacions:") }}</p>
+      <p v-html="highlightSearch(result.comments, search)"></p>
+    </template>
 
     <div v-if="result.images.length > 0" class="image-thumbnails">
       <div v-for="image in result.images" :key="image.url" class="thumbnail">
@@ -505,17 +509,18 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       </div>
     </div>
 
-    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}', {{ needs or '""' }})" class="btn btn-custom mt-2">
-      <i class="bi-send fs-6 me-2"></i>
-      {{ _("Contacta") }}
+    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}', {{ needs or '""' }})" class="btn btn-arrow mt-5">
+      <div class="d-flex align-items-center">
+        {{ arrow_btn_content(_("Contacta"), "bi-send") }}
+      </div>
     </button>
   </div>
 
   <div v-if="messagesOpen[result.message_href]" class="col-12">
-    <div class="bg-light my-2 p-2 rounded-3">
-      <button type="button" class="btn-close float-end" aria-label="Close" @click="closeMessage(result.message_href)"></button>
+    <div class="my-2 p-2">
+      <button type="button" class="btn-close float-end opacity-100" aria-label="Close" @click="closeMessage(result.message_href)"></button>
       <div>
-        <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-4 mb-0">
+        <div v-if="messagesOpen[result.message_href].result">
           {{ _("S'ha enviat el missatge correctament.") }} <a :href="messagesOpen[result.message_href].agreement_url">{{ _("Ves a la conversa") }}</a>.
         </div>
         <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-4 mb-0">
@@ -524,12 +529,12 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
         <div v-else>
           <div v-if="result.options.length > 0">
             <p class="mt-1 mb-1 fw-bold">{{ _("Quines opcions vos interessen concretament?") }}</p>
-            <div class="multi-select p-0 text-start">
+            <div class="multi-select multi-select-badges p-0 text-start">
               <button
                 v-for="option in result.options"
                 :key="option"
                 @click="toggleMessageOption(result.message_href, option)"
-                class="btn multi-select-choice"
+                class="badge multi-select-choice"
                 :class="{selected: messagesOpen[result.message_href].options[option]}"
               >
                 ${ optionNamesMap[option] }
@@ -543,20 +548,24 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
           ></textarea>
         </div>
       </div>
-      <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error">
-        <button @click="sendMessage(result, '{{ origin }}')" class="btn btn-custom mt-2">
-          <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
-            Enviant
-            <div class="spinner-border spinner-border-sm" role="status">
-              <span class="visually-hidden">{{ _("Enviant...") }}</span>
-            </div>
-          </span>
-          <span v-else>
-            <i class="bi-send fs-6 me-2"></i>
-            <span v-if="messagesOpen[result.message_href]">
-              {{ _("Envia el missatge") }}
-            </span>
-          </span>
+      <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error" class="mt-2">
+        <button @click="sendMessage(result, '{{ origin }}')" class="btn btn-arrow">
+          <div class="d-flex align-items-center">
+            <template v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
+              <span class="btn-arrow-icon">
+                <div class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">{{ _("Enviant...") }}</span>
+                </div>
+              </span>
+              <span class="btn-arrow-text">{{ _("Enviant") }}</span>
+              <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+            </template>
+            <template v-else>
+              <span class="btn-arrow-icon"><i class="bi-send"></i></span>
+              <span class="btn-arrow-text">{{ _("Envia el missatge") }}</span>
+              <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+            </template>
+          </div>
         </button>
         <span v-if="messagesOpen[result.message_href].errorMessage" class="ms-2">
           ${ messagesOpen[result.message_href].errorMessage }

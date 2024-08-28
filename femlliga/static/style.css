@@ -104,7 +104,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     background-color: white;
 }
 
-.btn-thin:hover {
+.btn-thin:hover, .btn-thin:focus-visible {
     border: 1px solid black;
     background-color: var(--yellow);
 }
@@ -117,7 +117,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     background-color: white;
 }
 
-.btn-arrow:hover {
+.btn-arrow:hover, .btn-arrow:focus-visible {
     border: 1px solid black;
     background-color: var(--yellow);
 }
@@ -129,7 +129,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     border-radius: 0.5rem 0 0 0.5rem;
 }
 
-.btn-arrow:hover .btn-arrow-icon {
+.btn-arrow:hover .btn-arrow-icon, .btn-arrow:focus-visible .btn-arrow-icon {
     background-color: white;
 }
 
@@ -163,6 +163,18 @@ nav a:hover {
 
 .nav-link {
     margin: 0.5rem 0.75rem;
+}
+
+.nav-link.sidebar-box {
+    margin: 0 0 2rem 0;
+    border: 1px solid black;
+    border-radius: 1rem;
+}
+
+
+.nav-pills .nav-link.sidebar-box.active, .nav-pills .nav-link.sidebar-box:hover {
+    background-color: var(--midblue);
+    border: 1px solid black;
 }
 
 .edit-row:hover .edit {
@@ -467,8 +479,8 @@ a.badge:hover {
 }
 
 .highlight {
-    background-color: var(--blue);
-    color: white;
+    background-color: var(--midblue);
+    color: black;
 }
 
 .map-height {
@@ -653,29 +665,28 @@ a.badge:hover {
 }
 
 .match-box {
-    border: 1px solid black;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+    background-color: var(--lightgrey);
+    padding: 1rem;
+    border-radius: 1rem;
 }
 
 .match-resource-title {
     text-align: center;
-    text-transform: uppercase;
     margin-top: 0;
 }
 
 .matches-count {
-    border-top: 1px solid var(--midgrey);
-    height: 2em;
-    line-height: 1.8em;
-    margin: 1rem auto;
+    border-top: 1px solid black;
+    height: 3em;
+    line-height: 2.8em;
+    margin: 2rem auto 0 auto;
     position: relative;
-    width: 70%;
 }
 
 .matches-count span {
+    font-size: 0.875rem;
     background-color: #ffffff;
-    color: var(--midgrey);
-    font-style: italic;
     left: 50%;
     margin-left: -6em;
     position: absolute;

@@ -215,7 +215,7 @@ def join_offers_not_matching(offers, ignore_options):
                 options.add(o)
     return {
         "code": offers[0].resource,
-        "options": list(sorted(options, key=attrgetter("name"))),
+        "options": list(sorted(options, key=lambda x: str(x))),
     }
 
 

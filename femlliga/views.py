@@ -621,7 +621,7 @@ def matches(request, organization_id):
     needs_json = [
         {
             "resource": x.resource,
-            "options": [o.name for o in x.options.all()],
+            "options": [o.name for o in x.sorted_options()],
         }
         for x in own_needs
     ]
