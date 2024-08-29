@@ -17,13 +17,13 @@
 {% if edit %}
 {{ page_title(_("Edita la informació de l'entitat")) }}
 {% else %}
-<div class="bg-lightblue br-1rem p-3 mb-2 mt-2" role="alert">
+<div class="bg-lightblue text-center br-1rem p-3 mb-2 mt-2" role="alert">
   {{ _("Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les dades de sota per crear-la. Podràs modificar i afegir més informació després.") }}
 </div>
 {% endif %}
 
 {% if form.errors %}
-<div class="bg-yellow br-1rem p-3 mb-2 mt-2" role="alert">
+<div class="bg-yellow text-center br-1rem p-3 mb-2 mt-2" role="alert">
   {{ _("Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo.") }}
 </div>
 {% endif %}

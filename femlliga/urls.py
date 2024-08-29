@@ -137,7 +137,6 @@ urlpatterns = [
     path("uploads/<path:path>", views.uploads, name="uploads"),
     # admin required
     path("report/", views.report, name="report"),
-    path("dashboard/", views.dashboard, name="dashboard"),
     path("admin/", admin.site.urls),
     # otherwise tested
     path("accounts/", include("allauth.urls")),

@@ -3,7 +3,7 @@
 {% from 'femlliga/_macros.html' import page_title, arrow_btn_link %}
 
 {% block content %}
-<div class="container">
+<div class="container less-lg:text-center">
   {{ page_title(_("El correu electrònic ja s'ha fet servir")) }}
 
   <p>{{ _("Sembla que el correu electrònic de %(name)s amb el que us esteu intentant identificar ja es va fer servir per registrar-se en aquesta web. Si us plau, inicieu la sessió fent servir el correu electrònic i la contrasenya:", name=account.get_provider().name) }}</p>

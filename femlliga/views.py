@@ -1365,19 +1365,6 @@ def organization_prefetches(queryset, include_missing_resources=False):
 
 
 @user_passes_test(lambda u: u.is_staff)
-def dashboard(request):
-    return render(
-        request,
-        "femlliga/dashboard.html",
-        {
-            "organizations": Organization.objects.count(),
-            "agreements": Agreement.objects.count(),
-            "contacts": Contact.objects.count(),
-        },
-    )
-
-
-@user_passes_test(lambda u: u.is_staff)
 def report(request):
     active_tab = request.GET.get("tab")
     if request.method == "POST" and request.POST.get("delete_word"):
