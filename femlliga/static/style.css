@@ -57,11 +57,6 @@ a.rounded-link:hover {
     background-color: var(--yellow);
 }
 
-.organization-main-page a:hover {
-    color: var(--darkgrey);
-    font-weight: bold;
-}
-
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     text-decoration: none;
 }
@@ -191,6 +186,10 @@ nav a:hover {
 .nav-pills .nav-link.sidebar-box.active, .nav-pills .nav-link.sidebar-box:hover {
     background-color: var(--midblue);
     border: 1px solid black;
+}
+
+.edit-row:hover .edit-inline a, .edit-row .edit-inline a:focus {
+    opacity: 1 !important;
 }
 
 .edit-row:hover .edit {

@@ -379,9 +379,18 @@ a <template> tag, gets shown #}
 </template>
 {% endmacro %}
 
-{% macro organization_header(org, link=False) %}
+{% macro organization_header(org, link=False, edit_link=False) %}
   <h1 class="fs-2-5rem mt-100px text-center">
-    {% if link %}
+    {% if edit_link %}
+    <div class="edit-row">
+      {{ org.name }}
+      <span class="edit-inline">
+        <a href="{{ url("edit_organization", args=[org.id]) }}" title="{{ _("Edita") }}" tabindex="0" class="opacity-0">
+          <i class="bi-pencil-square fs-1-5rem"></i>
+        </a>
+      </span>
+    </div>
+    {% elif link %}
     <a href="{{ url("profile", args=[org.id]) }}">{{ org.name }}</a>
     {% else %}
     {{ org.name }}
@@ -399,11 +408,13 @@ a <template> tag, gets shown #}
 
 {% macro organization_info(org) %}
   {% if org.description %}
-  <p>{{ org.description }}</p>
+  <div class="bg-lightblue br-1rem p-4 mb-5">
+    <p class="mb-0 text-center">{{ org.description }}</p>
+  </div>
   {% endif %}
 
-  <div class="row">
-    <div class="col-md-6">
+  <div class="d-flex flex-column flex-lg-row mb-5">
+    <div class="w-100 bg-lightgrey br-1rem p-4">
       <p class="mb-0"><strong>{{ _("Forma jurídica") }}</strong>: {{ org_type_name(org.org_type) }}</p>
       <p class="mb-0"><strong>{{ _("Àmbits de treball") }}</strong></p>
       <ul>
@@ -414,11 +425,12 @@ a <template> tag, gets shown #}
       {{ render_social_media(org) }}
     </div>
 
-    <div class="col-md-6">
-      <div id="citymap" class="map-height"></div>
+    <div class="flex-gap"></div>
+
+    <div class="w-100">
+      <div id="citymap" class="map-height br-1rem"></div>
     </div>
   </div>
-
 {% endmacro %}
 
 {% macro organization_map_js(org) %}
