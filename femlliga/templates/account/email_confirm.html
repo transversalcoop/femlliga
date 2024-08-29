@@ -1,10 +1,12 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import page_title, arrow_btn %}
+
 {% block title %}{{ _("Confirma") }}{% endblock title %}
 
 {% block content %}
 <div class="container">
-  <h2>{{ _("Confirma l'adreça de correu electrònic") }}</h2>
+  {{ page_title(_("Confirma l'adreça de correu electrònic")) }}
 
 {% if confirmation %}
 
@@ -14,7 +16,7 @@
 
 <form method="post" action="{{ url('account_confirm_email', kwargs = {'key': confirmation.key }) }}" class="mb-1">
     {{ csrf_input }}
-    <button type="submit" class="btn btn-custom">{{ _("Confirma") }}</button>
+    {{ arrow_btn(_("Confirma"), "bi-hand-thumbs-up") }}
 </form>
 
 {% else %}

@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from "femlliga/_macros.html" import leaflet_css, leaflet_js, organization_map_js, vue_js, initial_loading_vue, input_classes, input_value, textarea_value, input_feedback, form_feedback %}
+{% from "femlliga/_macros.html" import leaflet_css, leaflet_js, organization_map_js, vue_js, initial_loading_vue, input_classes, input_value, textarea_value, input_feedback, form_feedback, page_title, arrow_btn, arrow_btn_content %}
 
 {% block css %}{{ leaflet_css() }}{% endblock %}
 
@@ -8,9 +8,7 @@
 
 {% block content %}
 <main id="content" class="container">
-  <h2>
-    {{ announcement.title }}
-  </h2>
+  {{ page_title(announcement.title) }}
   <p class="mb-0">
     {{ announcement.organization.name }}
     {{ _("necessita") }}
@@ -46,15 +44,17 @@
       </template>
       <template v-else>
         <div class="text-center">
-          <a @click="open" class="btn btn-custom">
-            {{ _("Contacta amb la organització") }}
-          </a>
+          <button class="btn btn-arrow" @click="open">
+            <div class="d-flex align-items-center">
+              {{ arrow_btn_content(_("Contacta amb la organització"), icon="bi-send") }}
+            </div>
+          </button>
         </div>
       </template>
     </div>
     <div id="submitFooter" class="d-none">
       {{ form.captcha }}
-      <button type="submit" class="btn btn-warning mt-2">{{ _("Envia") }}</button>
+      <div class="mt-3">{{ arrow_btn(_("Envia"), "bi-send") }}</div>
     </div>
   </form>
 

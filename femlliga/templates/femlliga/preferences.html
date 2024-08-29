@@ -1,23 +1,16 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import form_feedback, input_classes, input_value, input_feedback, render_select, vue_js %}
+{% from 'femlliga/_macros.html' import form_feedback, input_classes, input_value, input_feedback, render_select, vue_js, page_title, arrow_btn %}
 
 {% block title %}{{ _("Preferències") }}{% endblock %}
-
-{% block content_classes %}background-grey{% endblock %}
 
 {% block content %}
 <div class="container">
   <form method="post">
-    <div class="row">
-      <div class="col-12 col-sm-6">
-        <h1>{{ _("Preferències") }}</h1>
-      </div>
-      <div class="col-12 col-sm-6 text-end">
-        <button type="submit" class="btn btn-warning mt-2 w-100 w-sm-auto">{{ _("Actualitza les preferències") }}</button>
-      </div>
+    {{ page_title(_("Preferències")) }}
+    <div class="text-center">
+      {{ arrow_btn(_("Actualitza les preferències"), "bi-floppy") }}
     </div>
-
     {{ csrf_input }}
     {{ form_feedback(form) }}
 
@@ -93,7 +86,9 @@
       <div class="row preferences-row">
         <div class="col-md-8">
           <strong>{{ _("Esborra el compte") }}</strong>
-          <div>{{ _("Aquesta acció esborrarà la organització i l'usuari amb què has iniciat sessió. L'acció no es pot desfer") }}</div>
+          <p>
+            {{ _("Aquesta acció esborrarà la organització i l'usuari amb què has iniciat sessió. L'acció no es pot desfer") }}
+          </p>
         </div>
         <div class="col-md-4 text-end">
           <button type="submit" class="btn btn-danger">{{ _("Esborra el compte") }}</button>

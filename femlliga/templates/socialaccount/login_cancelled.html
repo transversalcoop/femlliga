@@ -1,11 +1,13 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import page_title %}
+
 {% block head_title %}{{ _("S'ha cancel·lat l'inici de sessió") }}{% endblock %}
 
 {% block content %}
 
 <div class="container">
-  <h1>{{ _("S'ha cancel·lat l'inici de sessió") }}</h1>
+  {{ page_title(_("S'ha cancel·lat l'inici de sessió")) }}
 
   <p>{{ _("Has decidit cancel·lar l'inici de sessió en aquest lloc web fent servir un dels vostres comptes existents. Si ha sigut per error, per favor ves a la pàgina <a href='%(url)s'>d'inici de sessió</a>.", url=url("account_login")) }}</p>
 </div>

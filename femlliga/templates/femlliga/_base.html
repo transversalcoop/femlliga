@@ -54,7 +54,7 @@
           <div class="container">
             {% for message in messages %}
             {% if "show" in message.tags %}
-            <div class="alert alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}success{% else %}info{% endif %} mt-2">
+            <div class="bg-lightblue br-1rem p-3 mb-2" role="alert">
               {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<i class="bi bi-check-lg fs-1 align-middle pb-2"></i>{% endif %}
               <span>{{ message }}</span>
             </div>

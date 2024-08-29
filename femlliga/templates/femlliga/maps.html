@@ -1,18 +1,18 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from "femlliga/_macros.html" import leaflet_css, leaflet_js %}
+{% from "femlliga/_macros.html" import leaflet_css, leaflet_js, page_title %}
 
 {% block css %}{{ leaflet_css(markercluster=True) }}{% endblock %}
 
 {% block title %}{{ _("Mapes compartits") }}{% endblock %}
 
 {% block content %}
-<main id="content" class="container-fluid">
-  <div id="app" class="row">
-    <div class="col-md-4 d-md-block bg-light sidebar">
-      <h1>{{ _("Mapa de mapes de l'ESS") }}</h1>
+<main id="content" class="container container-large">
+  {{ page_title(_("Mapa de mapes de l'ESS")) }}
+  <div id="app" class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
       <p>{{ _("Mostrant") }} <span id="results-count"></span> {{ _("resultats") }}</p>
-      <input id="search" class="form-control" type="text" placeholder="{{ _("Cerca punts pel seu nom") }}">
+      <input id="search" class="form-control border" type="text" placeholder="{{ _("Cerca punts pel seu nom") }}">
 
       <h2 class="fs-5">{{ _("Selecciona els mapes que vols mostrar") }}</h2>
       {% for map in maps %}
@@ -22,7 +22,8 @@
       </div>
       {% endfor %}
     </div>
-    <div class="col-md-8 p-0">
+    <div class="flex-gap"></div>
+    <div class="flex-two-thirds">
       <div id="citymap" class="map-height-big"></div>
     </div>
   </div>

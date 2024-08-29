@@ -1,10 +1,12 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import page_title %}
+
 {% block title %}{{ _("Verifica el correu electrònic") }}{% endblock title %}
 
 {% block content %}
 <div class="container">
-  <h2>{{ _("Verifica el correu electrònic") }}</h2>
+  {{ page_title(_("Verifica el correu electrònic")) }}
   <p>{{ _("T'hem enviat un correu electrònic per fer la verificació. Clica a l'enllaç que hi ha al correu per completar el procés de registre. Per favor, contacta'ns si no l'has rebut en uns pocs minuts.") }}</p>
 </div>
 {% endblock %}

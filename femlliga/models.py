@@ -708,7 +708,7 @@ class Agreement(models.Model):
                 "id": m.id,
                 "message": m.message,
                 "sent_on": m.sent_on,
-                "sent_by": m.sent_by.id,
+                "sent_by": m.sent_by.id if m.sent_by else None,
                 "read": m.read,
             }
             for m in self.messages.all()
@@ -737,7 +737,7 @@ class Agreement(models.Model):
                 [
                     m
                     for m in self.messages.all()
-                    if not m.read and m.sent_by.id != organization_id
+                    if not m.read and m.sent_by and m.sent_by.id != organization_id
                 ]
             ),
             "last_message_on": last_message_on,

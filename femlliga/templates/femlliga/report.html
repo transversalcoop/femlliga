@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import leaflet_css, leaflet_js, modal %}
+{% from 'femlliga/_macros.html' import leaflet_css, leaflet_js, modal, page_title, arrow_btn %}
 
 {% block title %}{{ _("Informe") }}{% endblock %}
 
@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="container">
-  <h1>{{ _("Informe d'activitat de la plataforma") }}</h1>
+  {{ page_title(_("Informe d'activitat de la plataforma")) }}
 
   <ul class="nav">
     {{ tab_nav("map", _("Mapa"), active_tab, onclick="redrawMap()") }}
@@ -88,7 +88,7 @@
 
   {{ post_inputs }}
 
-  <button type="submit" class="btn btn-warning mt-2">{{ _("Filtra") }}</button>
+  <div class="mt-3">{{ arrow_btn(_("Filtra"), "bi-filter") }}</div>
 </form>
 {% endmacro %}
 
@@ -116,7 +116,7 @@
 
   {{ zero_switches(form) }}
 
-  <button type="submit" class="btn btn-warning mt-2">{{ _("Filtra") }}</button>
+  <div class="mt-3">{{ arrow_btn(_("Filtra"), "bi-filter") }}</div>
   {% if needs_comments or offers_comments %}
     <a data-bs-toggle="modal" href="#resource-comments-modal" role="button" class="btn btn-light">
       {{ _("Consulta els comentaris") }}
@@ -190,7 +190,7 @@
 
   {{ zero_switches(form) }}
 
-  <button type="submit" class="btn btn-warning mt-2">{{ _("Filtra") }}</button>
+  <div class="mt-3">{{ arrow_btn(_("Filtra"), "bi-filter") }}</div>
 </form>
 
 {{ render_dataframe(agreements_df) }}

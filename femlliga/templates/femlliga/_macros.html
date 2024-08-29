@@ -33,6 +33,7 @@
 {% endmacro %}
 
 {% macro arrow_btn_link(text, url, icon=None, download=False, image=None, image_alt="", onclick="", vue=False) %}
+{# wrapper also replicated in add_organization #}
 <a
   role="button"
   class="btn btn-arrow"
@@ -64,9 +65,7 @@
   {% if image %}
   <img src="{{ image }}" class="my-1" alt="{{ image_alt }}">
   {% elif icon %}
-  <span class="btn-arrow-icon">
-    <i class="{{ icon }}"></i>
-  </span>
+  <span class="btn-arrow-icon"><i class="{{ icon }}"></i></span>
   {% endif %}
   <span class="btn-arrow-text">{{ text }}</span>
   <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
@@ -318,7 +317,13 @@ a <template> tag, gets shown #}
 {% endmacro %}
 
 {% macro render_formset_delete_vue(field, deleteFunc) %}
-<button class="btn btn-custom" @click.prevent="{{ deleteFunc }}">{{ _("Esborra") }}</button>
+<button class="btn btn-arrow" @click.prevent="{{ deleteFunc }}">
+  <div class="d-flex align-items-center">
+    <span class="btn-arrow-icon"><i class="bi-trash"></i></span>
+    <span class="btn-arrow-text">{{ _("Esborra") }}</span>
+    <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+  </div>
+</button>
 <input type="hidden" id="id_{{ field.html_name }}" name="{{ field.html_name }}" value="">
 {% endmacro %}
 
@@ -377,6 +382,13 @@ a <template> tag, gets shown #}
     </a>
   </li>
 </template>
+{% endmacro %}
+
+{% macro page_title(title) %}
+  <h1 class="fs-2-5rem mt-100px text-center">
+    {{ title }}
+  </h1>
+  <div class="divider-3 mb-60px"></div>
 {% endmacro %}
 
 {% macro organization_header(org, link=False, edit_link=False) %}

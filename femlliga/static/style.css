@@ -506,6 +506,10 @@ a.badge:hover {
     height: 300px;
 }
 
+.map-height-big {
+    height: 700px;
+}
+
 .h-70vh {
     height: 70vh;
 }
@@ -718,6 +722,16 @@ a.badge:hover {
     width: 12em;
 }
 
+.matches-count span.matches-count-w-8rem {
+    margin-left: -4rem;
+    width: 8rem;
+}
+
+.matches-count span.matches-count-w-14rem {
+    margin-left: -7rem;
+    width: 14rem;
+}
+
 .matches-count.agreements-count {
     width: 90%;
 }
@@ -781,8 +795,9 @@ a.badge:hover {
 
 .preferences-section {
     padding: 1rem 1rem 0 1rem;
-    background-color: white;
+    background-color: var(--lightgrey);
     margin-bottom: 2rem;
+    border-radius: 1rem;
 }
 
 .preferences-section-title {
