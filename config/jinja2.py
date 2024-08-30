@@ -127,6 +127,10 @@ def publishable_option_description(resource_code, option):
     )
 
 
+def exist_public_announcements():
+    return Announcement.objects.filter(public=True).count() > 0
+
+
 def environment(**options):
     env = Environment(extensions=["jinja2.ext.i18n"], **options)
     env.install_gettext_callables(gettext=gettext, ngettext=ngettext, newstyle=True)
@@ -163,6 +167,7 @@ def environment(**options):
             "display_list": display_list,
             "option_is_publishable": option_is_publishable,
             "publishable_option_description": publishable_option_description,
+            "exist_public_announcements": exist_public_announcements,
         }
     )
     return env

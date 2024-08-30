@@ -16,21 +16,21 @@
       {{ sidebar_filter_show_link() }}
       <div class="collapse show" id="sidebar-filter">
         <input v-model="search" type="text" class="form-control border" placeholder="{{ _("Cerca persones interessades") }}">
+        <p class="mt-2 mb-0">
+          <i class="{{ consts.RESOURCE_ICONS_MAP["ALLIANCES"] }} me-1"></i>
+          {{ consts.NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP[(announcement.resource, announcement.option.name)] }}
+        </p>
+        <p>
+          {% if announcement.public %}
+          <i class="bi-share me-2"></i>
+          <a href="{{ url("public_announcement", args=[announcement.id]) }}">{{ _("Anunci públic") }}</a>
+          {% else %}
+          <i class="bi-lock"></i>
+          {{ _("Anunci no publicat") }}
+          {% endif %}
+        </p>
+        <p class="pre-wrap">{{ announcement.description }}</p>
       </div>
-      <p class="mt-2 mb-0">
-        <i class="{{ consts.RESOURCE_ICONS_MAP["ALLIANCES"] }} me-1"></i>
-        {{ consts.NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP[(announcement.resource, announcement.option.name)] }}
-      </p>
-      <p>
-        {% if announcement.public %}
-        <i class="bi-share me-2"></i>
-        <a href="{{ url("public_announcement", args=[announcement.id]) }}">{{ _("Anunci públic") }}</a>
-        {% else %}
-        <i class="bi-lock"></i>
-        {{ _("Anunci no publicat") }}
-        {% endif %}
-      </p>
-      <p class="pre-wrap">{{ announcement.description }}</p>
     </div>
 
     <div class="flex-gap"></div>

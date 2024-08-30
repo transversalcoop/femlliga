@@ -56,16 +56,22 @@
       {% if a.agreement_successful == None %}
       <div class="bg-lightblue mt-2 mb-3 text-center p-3 br-1rem">
         <div class="row">
-          <div class="col-3"><span class="fs-1">1</span></div>
-          <div class="col-3"><span class="fs-1">2</span></div>
-          <div class="col-3"><span class="fs-1">3</span></div>
-          <div class="col-3"><span class="fs-1">4</span></div>
-        </div>
-        <div class="row">
-          <div class="col-3">{{ _("Has fet una petició d'un recurs") }}</div>
-          <div class="col-3">{{ _("Entrem en contacte? Parlem!") }}</div>
-          <div class="col-3">{{ _("Concretem dia i hora per trobar-nos?") }}</div>
-          <div class="col-3">{{ _("Realitzem l'intercanvi!") }}</div>
+          <div class="col-6 col-md-3">
+            <div class="fs-1">1</div>
+            {{ _("Has fet una petició d'un recurs") }}
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="fs-1">2</div>
+            {{ _("Entrem en contacte? Parlem!") }}
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="fs-1">3</div>
+            {{ _("Concretem dia i hora per trobar-nos?") }}
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="fs-1">4</div>
+            {{ _("Realitzem l'intercanvi!") }}
+          </div>
         </div>
       </div>
       {% endif %}

@@ -92,7 +92,7 @@
         </div>
         <div v-else-if="organizationSelected" class="mt-3">
           <h2 class="match-resource-title">${ organizationSelected.name }</h2>
-          <div class="matches-count agreements-count"><span>${ organizationMatches.length } {{ _("resultats") }}</span></div>
+          <div class="matches-count"><span>${ organizationMatches.length } {{ _("resultats") }}</span></div>
           {{ show_matches_vue("organizationMatches") }}
         </div>
         <div v-else class="mt-3">

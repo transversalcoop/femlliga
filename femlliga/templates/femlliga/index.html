@@ -135,10 +135,10 @@
       </div>
       <div v-if="resourceSelected !== '' && optionSelected !== '' && !matches" class="text-center mb-3">
         <button class="btn btn-arrow btn-lg" @click="checkMatches" :disabled="loading">
-          <div class="d-flex align-items-center">
-            <span class="btn-arrow-icon"><i class="bi-recycle"></i></span>
+          <div class="d-flex align-items-stretch">
+            <span class="btn-arrow-icon d-flex align-items-center"><i class="bi-recycle"></i></span>
             <span class="btn-arrow-text">{{ _("Comprova les teues lligues") }}</span>
-            <span class="btn-arrow-arrow">
+            <span class="btn-arrow-arrow d-flex align-items-center">
               <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
                 <span class="visually-hidden">{{ _("Carregant...") }}</span>
               </div>

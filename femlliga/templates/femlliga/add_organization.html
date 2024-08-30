@@ -48,15 +48,15 @@
       </div>
       <div class="col-6">
         <button type="submit" class="btn btn-arrow" @click.prevent="deleteLogo" :disabled="loading">
-          <div class="d-flex align-items-center">
-            <span class="btn-arrow-icon">
+          <div class="d-flex align-items-stretch">
+            <span class="btn-arrow-icon d-flex align-items-center">
               <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
                 <span class="visually-hidden">{{ _("Esborrant...") }}</span>
               </div>
               <i v-else class="bi-trash"></i>
             </span>
             <span class="btn-arrow-text">{{ _("Esborra la imatge") }}</span>
-            <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+            <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
           </div>
         </button>
       </div>
@@ -81,13 +81,13 @@
           class="row mb-2 social-media-wrapper {% if not mform.media_type.value() and not mform.value.value() %}d-none{% endif %}"
           id="social-media-wrapper-{{ i }}"
         >
-          <div class="col-4">
+          <div class="col-md-4 mt-2">
             {{ render_formset_select(mform, mform.media_type, "media_type", "", handler='@change="setMediaType($event)"') }}
           </div>
-          <div class="col-4">
+          <div class="col-md-4 mt-2">
             {{ render_formset_field(mform, mform.value, "value", "text", "", placeholder=media_type_placeholder(mform.media_type.value())) }}
           </div>
-          <div class="col-4">
+          <div class="col-md-4 mt-2">
             {{ render_formset_delete_vue(mform.DELETE, "deleteSocialMedia(" + str(i) + ")") }}
             {{ mform.id }}
             {{ mform.organization }}

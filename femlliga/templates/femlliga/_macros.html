@@ -26,7 +26,7 @@
 {% macro arrow_btn(text, icon=None) %}
 {# wrapper also replicated in show_matches_vue, using arrow_btn_content directly or duplicating all #}
 <button type="submit" class="btn btn-arrow">
-  <div class="d-flex align-items-center">
+  <div class="d-flex align-items-stretch">
     {{ arrow_btn_content(text, icon=icon) }}
   </div>
 </button>
@@ -41,7 +41,7 @@
   {% if download %}download{% endif %}
   {% if onclick %}onclick="{{ onclick }}"{% endif %}
 >
-  <div class="d-flex align-items-center">
+  <div class="d-flex align-items-stretch">
     {{ arrow_btn_content(text, icon=icon, image=image, image_alt=image_alt) }}
   </div>
 </a>
@@ -55,7 +55,7 @@
   class="btn btn-arrow dropdown-toggle"
   href="#"
 >
-  <div class="d-flex align-items-center">
+  <div class="d-flex align-items-stretch">
     {{ arrow_btn_content(text, icon=icon) }}
   </div>
 </a>
@@ -65,14 +65,14 @@
   {% if image %}
   <img src="{{ image }}" class="my-1" alt="{{ image_alt }}">
   {% elif icon %}
-  <span class="btn-arrow-icon"><i class="{{ icon }}"></i></span>
+  <span class="btn-arrow-icon d-flex align-items-center"><i class="{{ icon }}"></i></span>
   {% endif %}
   <span class="btn-arrow-text">{{ text }}</span>
-  <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+  <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
 {% endmacro %}
 
 {% macro resource_extra_info(name) %}
-<div class="d-inline-block bg-lightblue py-1 ps-1 pe-3 br-0375rem">
+<div class="d-inline-block bg-lightblue py-1 ps-1 pe-3 br-0375rem mt-2">
   <i class="bi-asterisk"></i>
   {{ name }}
 </div>
@@ -318,10 +318,10 @@ a <template> tag, gets shown #}
 
 {% macro render_formset_delete_vue(field, deleteFunc) %}
 <button class="btn btn-arrow" @click.prevent="{{ deleteFunc }}">
-  <div class="d-flex align-items-center">
-    <span class="btn-arrow-icon"><i class="bi-trash"></i></span>
+  <div class="d-flex align-items-stretch">
+    <span class="btn-arrow-icon d-flex align-items-center"><i class="bi-trash"></i></span>
     <span class="btn-arrow-text">{{ _("Esborra") }}</span>
-    <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+    <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
   </div>
 </button>
 <input type="hidden" id="id_{{ field.html_name }}" name="{{ field.html_name }}" value="">
@@ -460,9 +460,9 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
   <div class="p-2">
     <h3 class="my-0 fw-600">
       <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
-      <span v-if="result.type === 'offer'" class="ms-2">{{ _("ofereix") }}</span>
-      <span v-if="result.type === 'need'" class="ms-2">{{ _("necessita") }}</span>
-      <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource].toLowerCase(), search)"></span>
+      <template v-if="result.type === 'offer'"> {{ _("ofereix") }} </template>
+      <template v-if="result.type === 'need'"> {{ _("necessita") }} </template>
+      <span v-html="highlightSearch(resourceNamesMap[result.resource].toLowerCase(), search)"></span>
     </h3>
     <div class="mt-2">
       <span class="fst-italic me-3">A ${ result.distance } {{ _("de vosaltres") }}</span>
@@ -534,7 +534,7 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
     </div>
 
     <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}', {{ needs or '""' }})" class="btn btn-arrow mt-5">
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-stretch">
         {{ arrow_btn_content(_("Contacta"), "bi-send") }}
       </div>
     </button>
@@ -574,20 +574,20 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       </div>
       <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error" class="mt-2">
         <button @click="sendMessage(result, '{{ origin }}')" class="btn btn-arrow">
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-stretch">
             <template v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
-              <span class="btn-arrow-icon">
+              <span class="btn-arrow-icon d-flex align-items-center">
                 <div class="spinner-border spinner-border-sm" role="status">
                   <span class="visually-hidden">{{ _("Enviant...") }}</span>
                 </div>
               </span>
               <span class="btn-arrow-text">{{ _("Enviant") }}</span>
-              <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+              <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
             </template>
             <template v-else>
-              <span class="btn-arrow-icon"><i class="bi-send"></i></span>
+              <span class="btn-arrow-icon d-flex align-items-center"><i class="bi-send"></i></span>
               <span class="btn-arrow-text">{{ _("Envia el missatge") }}</span>
-              <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+              <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
             </template>
           </div>
         </button>
