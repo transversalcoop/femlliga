@@ -1,56 +1,52 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import vue_js, sidebar_filter_show_link, initial_loading_vue %}
+{% from 'femlliga/_macros.html' import vue_js, sidebar_filter_show_link, initial_loading_vue, page_title, arrow_btn_link %}
 
 {% block title %}{{ _("Anunci") }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <div id="vue-app" class="row">
-    <div class="col-md-4 d-md-block bg-light sidebar">
-      <a
-        href="{{ url("edit_announcement", kwargs={"organization_id": announcement.organization.id, "announcement_id": announcement.id}) }}"
-        class="btn btn-warning float-end mt-3">
-        {{ _("Edita") }}
-      </a>
-      <h1>
-        {{ _("Anunci") }}
-        <em>{{ announcement.title }}</em>
-      </h1>
+<div class="container">
+  {{ page_title(announcement.title) }}
+  <div class="text-center mb-3">
+    {{ arrow_btn_link(_("Edita"), url("edit_announcement", kwargs={"organization_id": announcement.organization.id, "announcement_id": announcement.id}), "bi-pencil-square") }}
+  </div>
+
+  <div id="vue-app" class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
       {{ sidebar_filter_show_link() }}
       <div class="collapse show" id="sidebar-filter">
-        <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca persones interessades") }}">
+        <input v-model="search" type="text" class="form-control border" placeholder="{{ _("Cerca persones interessades") }}">
+        <p class="mt-2 mb-0">
+          <i class="{{ consts.RESOURCE_ICONS_MAP["ALLIANCES"] }} me-1"></i>
+          {{ consts.NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP[(announcement.resource, announcement.option.name)] }}
+        </p>
+        <p>
+          {% if announcement.public %}
+          <i class="bi-share me-2"></i>
+          <a href="{{ url("public_announcement", args=[announcement.id]) }}">{{ _("Anunci públic") }}</a>
+          {% else %}
+          <i class="bi-lock"></i>
+          {{ _("Anunci no publicat") }}
+          {% endif %}
+        </p>
+        <p class="pre-wrap">{{ announcement.description }}</p>
       </div>
-      <p class="mt-2 mb-0">
-        <i class="{{ consts.RESOURCE_ICONS_MAP["ALLIANCES"] }} me-1"></i>
-        {{ consts.NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP[(announcement.resource, announcement.option.name)] }}
-      </p>
-      <p>
-        {% if announcement.public %}
-        <i class="bi-share me-2"></i>
-        <a href="{{ url("public_announcement", args=[announcement.id]) }}">{{ _("Anunci públic") }}</a>
-        {% else %}
-        <i class="bi-lock"></i>
-        {{ _("Anunci no publicat") }}
-        {% endif %}
-      </p>
-      <p class="pre-wrap">{{ announcement.description }}</p>
     </div>
 
-    <div class="col-md-8 ms-sm-auto px-md-4">
+    <div class="flex-gap"></div>
+
+    <div class="flex-two-thirds">
       {% if len(json_data.contacts) > 0 %}
       {{ initial_loading_vue() }}
       <template v-else>
-        <div class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">{{ _("Totes les persones interessades") }}</h2>
-            <div class="matches-count agreements-count">
-              <span>${ contacts.length } {{ _("persones interessades") }}</span>
-            </div>
+        <div class="mt-3">
+          <h2 class="match-resource-title">{{ _("Totes les persones interessades") }}</h2>
+          <div class="matches-count">
+            <span class="matches-count-w-14rem">${ contacts.length } {{ _("persones interessades") }}</span>
           </div>
         </div>
-        <div v-for="contact in contacts" class="row match-box">
-          <h3 class="mt-2">
+        <div v-for="contact in contacts" class="match-box">
+          <h3 class="mt-2 fw-600">
             {{ _("Missatge rebut de") }}
             <span v-html="highlightSearch(contact.name, search)"></span>
             (<span v-html="highlightSearch(contact.email, search)"></span>)

@@ -37,6 +37,8 @@ from femlliga.models import (
     sort_resources,
 )
 
+from femlliga.gis.es import spain_provinces
+
 # Emails and notifications
 
 
@@ -213,7 +215,7 @@ def join_offers_not_matching(offers, ignore_options):
                 options.add(o)
     return {
         "code": offers[0].resource,
-        "options": list(sorted(options, key=attrgetter("name"))),
+        "options": list(sorted(options, key=lambda x: str(x))),
     }
 
 
@@ -413,9 +415,23 @@ def get_province(lat, lng, features):
         polygon = shape(feature["geometry"])
         if polygon.contains(p):
             return feature["properties"]
+    return {"id": ""}
 
 
 def strip_accents(s):
     return "".join(
         c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
     )
+
+
+spain_provinces_choices = sorted(
+    [
+        (f["properties"]["id"], f["properties"]["name"])
+        for f in spain_provinces["features"]
+    ],
+    key=lambda x: strip_accents(x[1]),
+)
+
+
+def date_to_datetime(d):
+    return timezone.make_aware(timezone.datetime(d.year, d.month, d.day))

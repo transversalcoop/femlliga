@@ -126,10 +126,13 @@ RESOURCE_DESCRIPTIONS_MAP = {
 
 RESOURCE_OPTIONS_MAP = {
     "PLACE": (
-        ("DAILY_USAGE", _("Ús diari")),
-        ("PUNCTUAL_USAGE", _("Ús puntual")),
-        ("PUNCTUAL_MEETINGS", _("Puntualment per a reunions")),
-        ("PUNCTUAL_EVENTS", _("Puntualment per a actes")),
+        ("DAILY_USAGE", _("Espai de treball d'oficina")),
+        # Former "PUNCTUAL_USAGE" was a different tag, now PUNCTUAL_MEETINGS + PUNCTUAL_EVENTS
+        ("PUNCTUAL_MEETINGS", _("Espai per a reunions")),
+        ("PUNCTUAL_EVENTS", _("Espai per a actes")),
+        ("PLACE_TRAINING", _("Aula de formació")),
+        ("PLACE_WORKSHOP", _("Taller")),
+        ("PLACE_WAREHOUSE", _("Magatzem")),
     ),
     "TRAINING": (
         ("TRAINING_DIGITAL", _("Digitalització")),
@@ -165,6 +168,10 @@ RESOURCE_OPTIONS_MAP = {
         ("PROJECT_COLLABORATION", _("Col·laboració en projectes")),
         ("VOLUNTEERING", _("Voluntariat")),
         ("PUBLICITY", _("Difusió")),
+        ("MONEY", _("Suport econòmic")),
+        ("USERS_REFERRAL", _("Derivació d'usuàries")),
+        ("SUPPORT_GROUPS", _("Xarxes i grups de suport")),
+        ("COMMON_STRATEGY", _("Estratègia i protocols conjunts")),
     ),
     "OTHER": (),
 }
@@ -192,12 +199,12 @@ for k, value in NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP.items():
     NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP_2.setdefault(k[0], {})[k[1]] = value
 
 RESOURCE_OPTIONS_READABLE_MAP = {
-    ("PLACE", "DAILY_USAGE"): _("local per a ús diari"),
-    ("PLACE", "PUNCTUAL_USAGE"): _("local per a ús puntual"),
-    ("PLACE", "PUNCTUAL_MEETINGS"): _(
-        "local per fer servir puntualment per a reunions"
-    ),
-    ("PLACE", "PUNCTUAL_EVENTS"): _("local per fer servir puntualment per a actes"),
+    ("PLACE", "DAILY_USAGE"): _("espai de treball d'oficina"),
+    ("PLACE", "PUNCTUAL_MEETINGS"): _("espai per a reunions"),
+    ("PLACE", "PUNCTUAL_EVENTS"): _("espai per a actes"),
+    ("PLACE", "PLACE_TRAINING"): _("aula de formació"),
+    ("PLACE", "PLACE_WORKSHOP"): _("taller"),
+    ("PLACE", "PLACE_WAREHOUSE"): _("magatzem"),
     ("TRAINING", "TRAINING_DIGITAL"): _("formació en digitalització"),
     ("TRAINING", "TRAINING_BUREAUCRACY"): _(
         "formació en relacions amb l'administració"
@@ -233,31 +240,29 @@ RESOURCE_OPTIONS_READABLE_MAP = {
     ("ALLIANCES", "PROJECT_COLLABORATION"): _("col·laboració en projectes"),
     ("ALLIANCES", "VOLUNTEERING"): _("voluntariat"),
     ("ALLIANCES", "PUBLICITY"): _("difusió"),
+    ("ALLIANCES", "MONEY"): _("suport econòmic"),
+    ("ALLIANCES", "USERS_REFERRAL"): _("derivació d'usuàries"),
+    ("ALLIANCES", "SUPPORT_GROUPS"): _("xarxes i grups de suport"),
+    ("ALLIANCES", "COMMON_STRATEGY"): _("estratègia i protocols conjunts"),
 }
 
-RESOURCES_LIST, RESOURCE_OPTIONS = [], []
+RESOURCES_LIST, RESOURCE_OPTIONS, RESOURCE_OPTIONS_WITH_PREFIX = [], [], []
 for k in RESOURCE_OPTIONS_MAP:
     RESOURCES_LIST.append(k)
     v = RESOURCE_OPTIONS_MAP[k]
     for vv in v:
         if vv not in RESOURCE_OPTIONS:
             RESOURCE_OPTIONS.append(vv)
+            RESOURCE_OPTIONS_WITH_PREFIX.append(
+                (vv[0], RESOURCE_NAMES_MAP[k] + " - " + vv[1])
+            )
 
 RESOURCE_OPTIONS_DEF_MAP = {}
 for option in RESOURCE_OPTIONS:
     RESOURCE_OPTIONS_DEF_MAP[option[0]] = option[1]
 
-RESOURCE_ADD_IMAGE_LABEL = {
-    "PLACE": _("Afegeix imatge del local"),
-    "SERVICE": _("Afegeix imatge del servei"),
-    "TRAINING": _("Afegeix imatge de la formació"),
-    "EQUIPMENT": _("Afegeix imatge d'aquestes coses"),
-    "ALLIANCES": _("Afegeix imatge d'aquestes coses"),
-    "OTHER": _("Afegeix imatge del que oferiu"),
-}
-
 RESOURCE_OPTIONS_QUESTION_MAP = {
-    "PLACE": _("Quan necessitarieu fer servir el local?"),
+    "PLACE": _("Quin tipus de local necessiteu?"),
     "SERVICE": _("Quins serveis concrets necessiteu?"),
     "TRAINING": _("De quins temes us interessa formar-vos?"),
     "EQUIPMENT": _("Quina d'aquestes coses necessiteu?"),

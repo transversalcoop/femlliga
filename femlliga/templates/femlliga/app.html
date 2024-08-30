@@ -1,89 +1,74 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import resource_details %}
+{% from 'femlliga/_macros.html' import resource_details, arrow_btn, arrow_btn_dropdown, organization_header %}
 
 {% block title %}{{ _("Entitat") }}{% endblock %}
 
-{% macro resources(name, resource_type, data, missing, description) %}
-    <div class="col-lg-6">
-        <h2 class="resources-title">
-            {{ name }}
-        {% if len(missing) > 0 %}
-          <span class="float-end">
-            <a class="dropdown-toogle btn btn-sm btn-custom btn-custom-sm" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#" title="Afegeix">
-              <i class="bi-plus-lg"></i> <span class="d-none d-md-inline">{{ _("Afegeix") }}</span>
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="afegeix{{ resource_type }}">
-              {% for resource in missing %}
-              <li>
-                <a class="dropdown-item" href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.code]) }}">
-                  {{ resource }}
-                </a>
-              </li>
-              {% endfor %}
-            </ul>
-          </span>
-        {% endif %}
-        </h2>
-        <div class="p-3 bg-lightgrey">
-        {% for i, resource in enumerate(data) %}
-          {% if i != 0 %}
-            <hr class="separator-yellow">
-          {% endif %}
-          <div class="edit-row">
-            <span class="edit d-md-none d-block float-end position-relative">
-              <a href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.resource]) }}" title="{{ _("Edita") }}">
-                <i class="bi-pencil-square edit fs-1-5-rem"></i>
-              </a>
-            </span>
-            <p class="mt-2 fs-1-5-rem">
-                <i class="{{ resource_icon(resource.resource) }}"></i>
-                <span class="fw-bold me-1">{{ resource }}</span>
-            </p>
-            {{ resource_details(resource, resource_type) }}
-          </div>
-        {% endfor %}
-        </div>
-    </div>
-{% endmacro %}
-
 {% block content %}
-<section>
-  <div class="container">
-    <div class="row pt-5">
-      <div class="col-md-6">
-        <h1 class="fs-2-5-rem m-0">
-          <a href="{{ url("profile", args=[org.id]) }}">{{ org.name }}</a>
-        </h1>
-      </div>
-      <div class="col-md-6">
-        {% if org.logo %}
-        <div class="mb-2">
-          <img src="{{ org.logo.url }}" class="organization-logo" loading="lazy" />
-        </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</section>
+<div class="container text-center">
+  {{ organization_header(org, link=True) }}
 
-<div class="container mb-4">
   {% if org.needs_not_set() or org.offers_not_set() %}
-  <div class="alert alert-primary mt-3 row" role="alert">
-    <div class="col-12 col-sm-8">
-      <span class="align-middle">{{ _("Encara no heu completat el procés d'alta, o hem afegit opcions noves des de que ho vau fer. Voleu completar les dades ara?") }}</span>
-    </div>
-    <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}" class="col-12 col-sm-4 mt-2 text-center">
-        {{ csrf_input }}
-        <button class="btn btn-sm btn-custom">{{ _("Completa les dades") }}</button>
+  <div class="bg-lightblue br-05rem w-80 m-center text-center py-4 px-2 mb-60px" role="alert">
+    <p>
+      {{ _("Encara no heu completat el procés d'alta, o hem afegit opcions noves des de que ho vau fer. Voleu completar les dades ara?") }}
+    </p>
+
+    <form method="POST" action="{{ url("reset-wizard", args=[org.id]) }}">
+      {{ csrf_input }}
+      {{ arrow_btn(_("Completa les dades")) }}
     </form>
   </div>
   {% endif %}
+</div>
 
-  <div class="row">
+<div class="container container-large mb-4">
+  <div class="d-flex flex-column flex-lg-row">
     {{ resources(_("Què necessiteu?"), "needs", sort_resources(needs), org.needs_missing()) }}
+    <div class="flex-gap"></div>
     {{ resources(_("Què oferiu?"), "offers", sort_resources(offers), org.offers_missing()) }}
   </div>
 </div>
 {% endblock %}
+
+{% macro resources(name, resource_type, data, missing, description) %}
+<div class="w-100">
+  <h2 class="fs-2-5rem text-center border br-tl-05rem br-tr-05rem py-2">
+    {{ name }}
+  </h2>
+
+  {% if len(missing) > 0 %}
+  <div class="text-center mt-4 mb-4">
+    {{ arrow_btn_dropdown(_("Afegeix-ne més"), "bi-chevron-double-right") }}
+    <ul class="dropdown-menu">
+      {% for resource in missing %}
+      <li>
+        <a class="dropdown-item" href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.code]) }}">
+          {{ resource }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% for resource in data %}
+  <div class="bg-lightgrey br-05rem mb-4 p-3">
+    <div class="edit-row">
+      <span class="edit d-lg-none d-block float-end position-relative">
+        <a href="{{ url("force-resources-wizard", args=[org.id, resource_type, resource.resource]) }}" title="{{ _("Edita") }}">
+          <i class="bi-pencil-square edit fs-1-5rem"></i>
+        </a>
+      </span>
+      <p class="mt-2 fs-1-5rem">
+        <i class="{{ resource_icon(resource.resource) }}"></i>
+        <span class="fw-bold me-1">{{ resource }}</span>
+      </p>
+    </div>
+    {{ resource_details(resource, resource_type) }}
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
 

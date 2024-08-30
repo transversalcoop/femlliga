@@ -4,13 +4,14 @@ import time
 import unicodedata
 import urllib
 import uuid
-from functools import reduce
+import collections
+import pandas as pd
+
 from io import BytesIO
 from pathlib import Path
 from asgiref.sync import async_to_sync
 
 import exif
-import networkx as nx
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
 from django.contrib import messages
@@ -42,6 +43,7 @@ from .constants import (
     RESOURCE_OPTIONS_QUESTION_MAP,
     RESOURCE_OPTIONS_DEF_MAP,
     RESOURCE_OPTIONS_MAP,
+    RESOURCE_OPTIONS_WITH_PREFIX,
     RESOURCES,
     RESOURCES_LIST,
     RESOURCES_ORDER,
@@ -58,6 +60,7 @@ from .forms import (
     ResourceForm,
     AnnouncementForm,
     AnnouncementContactForm,
+    ReportFilterForm,
 )
 
 from .models import (
@@ -66,7 +69,6 @@ from .models import (
     AnnouncementContact,
     Contact,
     ContactDenyList,
-    Graph,
     Message,
     Need,
     NeedImage,
@@ -78,8 +80,7 @@ from .models import (
     Resource,
     ResourceOption,
     SocialMedia,
-    Table,
-    Timeline,
+    ExcludeCommentWord,
     option_name,
     org_scope_name,
     org_type_name,
@@ -99,6 +100,7 @@ from .utils import (
     send_notification,
     str_to_bool,
     create_agreement_message,
+    date_to_datetime,
 )
 
 from .maps import (
@@ -165,7 +167,6 @@ def index(request):
 
 
 def page(request, name):
-    raise PermissionDenied()
     lang = get_language_from_request(request)
     try:
         page = get_object_or_404(Page, name=name, language=lang)
@@ -620,7 +621,7 @@ def matches(request, organization_id):
     needs_json = [
         {
             "resource": x.resource,
-            "options": [o.name for o in x.options.all()],
+            "options": [o.name for o in x.sorted_options()],
         }
         for x in own_needs
     ]
@@ -636,6 +637,7 @@ def matches(request, organization_id):
         matches[need] = [
             m.json(
                 current_organization=organization,
+                include_org=True,
             )
             for l in organization_matches
             for m in l
@@ -753,7 +755,51 @@ def get_model_matches(
         for r in results
         if r.organization.distance(organization) < user.distance_limit_km
     ]
+
+    # add matches with announcements
+    if model is Need:
+        if need_options is None:
+            queryset = Announcement.objects.filter(
+                resource=resource,
+                public=True,
+            )
+        else:
+            queryset = Announcement.objects.filter(
+                resource=resource,
+                public=True,
+                option__name__in=need_options,
+            )
+
+        queryset = limit_organizations_distance(
+            queryset,
+            organization,
+            user.distance_limit_km,
+            field_prefix="organization__",
+        )
+        results_2 = (
+            queryset.exclude(organization=organization)
+            .prefetch_related("organization", "option")
+            .distinct()
+        )
+        for r in results_2:
+            if r.organization.distance(organization) < user.distance_limit_km:
+                results = add_announcement_result(results, r)
+
     return sorted(results, key=lambda r: r.organization.distance(organization))
+
+
+def add_announcement_result(results, r):
+    found = False
+    for er in results:
+        if er.resource == r.resource and er.organization == r.organization:
+            found = True
+            if hasattr(er, "announcements"):
+                er.announcements.append(r)
+            else:
+                er.announcements = [r]
+    if not found:
+        results.append(r)
+    return results
 
 
 def get_all_resources(user, organization):
@@ -786,6 +832,7 @@ def search(request, organization_id):
             k: [
                 m.json(
                     current_organization=organization,
+                    include_org=True,
                 )
                 for m in offer_matches[k]
             ]
@@ -795,6 +842,7 @@ def search(request, organization_id):
             k: [
                 m.json(
                     current_organization=organization,
+                    include_org=True,
                 )
                 for m in need_matches[k]
             ]
@@ -807,6 +855,7 @@ def search(request, organization_id):
             "matches": [
                 m.json(
                     current_organization=organization,
+                    include_org=True,
                 )
                 for m in l
             ],
@@ -1020,28 +1069,32 @@ def agreements(request, organization_id):
         {
             "org": organization,
             "agreements": {"sent": sent, "received": received},
-            "agreements_json": {
-                "sent": group_agreements_by_resource_json(sent, organization_id),
-                "received": group_agreements_by_resource_json(
-                    received, organization_id
-                ),
-            },
-            "concatenated_agreements_json": [
-                a.json(organization_id) for a in sort_agreements(sent + received)
-            ],
-            "organizations_json": [
-                {
-                    "organization": agreement_other_organization(
-                        l[0], organization_id
-                    ).json(current_organization=organization),
-                    "agreements": [a.json(organization_id) for a in l],
-                }
-                for l in agreements_by_organization
-            ],
-            "organization_names_map_json": organization_names_map_json,
-            "requested_resources_json": {
-                "sent": requested_resources(sent),
-                "received": requested_resources(received),
+            "json_data": {
+                "agreements": {
+                    "sent": group_agreements_by_resource_json(sent, organization_id),
+                    "received": group_agreements_by_resource_json(
+                        received, organization_id
+                    ),
+                },
+                "concatenated_agreements": [
+                    a.json(organization_id) for a in sort_agreements(sent + received)
+                ],
+                "resource_names_map": RESOURCE_NAMES_MAP,
+                "option_names_map": RESOURCE_OPTIONS_DEF_MAP,
+                "resource_icons_map": RESOURCE_ICONS_MAP,
+                "organizations": [
+                    {
+                        "organization": agreement_other_organization(
+                            l[0], organization_id
+                        ).json(current_organization=organization),
+                        "agreements": [a.json(organization_id) for a in l],
+                    }
+                    for l in agreements_by_organization
+                ],
+                "requested_resources": {
+                    "sent": requested_resources(sent),
+                    "received": requested_resources(received),
+                },
             },
         },
     )
@@ -1312,362 +1365,338 @@ def organization_prefetches(queryset, include_missing_resources=False):
 
 
 @user_passes_test(lambda u: u.is_staff)
-def dashboard(request):
-    return render(
-        request,
-        "femlliga/dashboard.html",
-        {
-            "organizations": Organization.objects.count(),
-            "agreements": Agreement.objects.count(),
-            "contacts": Contact.objects.count(),
-        },
-    )
-
-
-@user_passes_test(lambda u: u.is_staff)
 def report(request):
+    active_tab = request.GET.get("tab")
+    if request.method == "POST" and request.POST.get("delete_word"):
+        ExcludeCommentWord.objects.create(value=request.POST.get("delete_word"))
+        return redirect(reverse("report") + "?tab=comments")
+
     organizations = organization_prefetches(Organization.objects.all())
-
-    orgs_json = list(
-        map(
-            lambda o: {"name": o.name, "lat": float(o.lat), "lng": float(o.lng)},
-            organizations,
-        )
+    needs = Need.objects.filter(has_resource=True).prefetch_related(
+        "organization", "options"
     )
-
-    def offers_needs_orgs(orgs):
-        return [
-            count(orgs, lambda x: x.offers.all()),
-            count(orgs, lambda x: x.needs.all()),
-            len(orgs),
-        ]
-
-    def offers_charge_orgs(orgs):
-        return [
-            count(orgs, lambda x: [r for r in x.offers.all() if r.charge]),
-            count(orgs, lambda x: [r for r in x.offers.all() if not r.charge]),
-        ]
-
-    def agreements_orgs(orgs, f):
-        return [
-            count(
-                orgs, lambda x: [a for a in f(x) if a.communication_accepted is None]
-            ),
-            count(
-                orgs,
-                lambda x: [
-                    a
-                    for a in f(x)
-                    if a.communication_accepted is True
-                    and a.agreement_successful is None
-                ],
-            ),
-            count(
-                orgs, lambda x: [a for a in f(x) if a.communication_accepted is False]
-            ),
-            count(
-                orgs,
-                lambda x: [
-                    a
-                    for a in f(x)
-                    if a.communication_accepted is True
-                    and a.agreement_successful is True
-                ],
-            ),
-            count(
-                orgs,
-                lambda x: [
-                    a
-                    for a in f(x)
-                    if a.communication_accepted is True
-                    and a.agreement_successful is False
-                ],
-            ),
-            count(orgs, lambda x: [a for a in f(x)]),
-        ]
-
-    (
-        org_types,
-        resources_by_org_type,
-        agreements_by_solicitor_type,
-        agreements_by_solicitee_type,
-    ) = ([], [], [], [])
-    charge_by_org_type = []
-    for org_type in sort_by_name(ORG_TYPES):
-        orgs = [o for o in organizations if o.org_type == org_type[0]]
-        org_types.append(org_type_name(org_type[0]))
-        resources_by_org_type.append(offers_needs_orgs(orgs))
-        charge_by_org_type.append(offers_charge_orgs(orgs))
-        agreements_by_solicitor_type.append(
-            agreements_orgs(orgs, lambda x: x.sent_agreements.all())
-        )
-        agreements_by_solicitee_type.append(
-            agreements_orgs(orgs, lambda x: x.received_agreements.all())
-        )
-
-    (
-        org_scopes,
-        resources_by_org_scope,
-        agreements_by_solicitor_scope,
-        agreements_by_solicitee_scope,
-    ) = ([], [], [], [])
-    for scope in sort_by_name(ORG_SCOPES):
-        orgs = [o for o in organizations if o.has_scope(scope[0])]
-        org_scopes.append(org_scope_name(scope[0]))
-        resources_by_org_scope.append(offers_needs_orgs(orgs))
-        agreements_by_solicitor_scope.append(
-            agreements_orgs(orgs, lambda x: x.sent_agreements.all())
-        )
-        agreements_by_solicitee_scope.append(
-            agreements_orgs(orgs, lambda x: x.received_agreements.all())
-        )
-
-    resource_names, resources_by_resource_type, agreements_by_resource_type = [], [], []
-    charge_by_resource_type = []
-    for resource in RESOURCES_ORDER:
-        needs, offers = [], []
-        for o in organizations:
-            for x in o.needs.all():
-                if x.resource == resource:
-                    needs.append(x)
-            for x in o.offers.all():
-                if x.resource == resource:
-                    offers.append(x)
-        resource_names.append(resource_name(resource))
-        resources_by_resource_type.append([len(offers), len(needs)])
-        charge_by_resource_type.append(
-            [
-                len([x for x in offers if x.charge]),
-                len([x for x in offers if not x.charge]),
-            ]
-        )
-        agreements_by_resource_type.append(
-            agreements_orgs(
-                organizations,
-                lambda x: [
-                    a for a in x.sent_agreements.all() if a.resource == resource
-                ],
+    offers = Offer.objects.filter(has_resource=True).prefetch_related(
+        "organization", "options"
+    )
+    agreements = Agreement.objects.all().prefetch_related(
+        "solicitor", "solicitee", "options"
+    )
+    resources_df = pd.DataFrame()
+    organizations_df = pd.DataFrame()
+    agreements_df = pd.DataFrame()
+    form = ReportFilterForm(request.POST)
+    resources_filtered_by_option = False
+    if form.is_valid():
+        if active_tab in ("map", "organizations"):
+            organizations = filter_report_organizations(organizations, form)
+            organizations_df = get_organizations_df(organizations, form)
+        if active_tab in ("agreements",):
+            agreements_df = get_agreements_df(agreements, form)
+        if active_tab in ("resources",):
+            filtered_needs, filtered_offers, resources_df = get_report_resources(
+                needs, offers, form
             )
-        )
 
-    resource_options, resources_by_resource_option = [], []
-    for resource in RESOURCES_ORDER:
-        for option in RESOURCE_OPTIONS_MAP[resource]:
-            needs, offers = [], []
-            for o in organizations:
-                for x in o.needs.all():
-                    if x.resource == resource and option[0] in [
-                        op.name for op in x.options.all()
-                    ]:
-                        needs.append(x)
-                for x in o.offers.all():
-                    if x.resource == resource and option[0] in [
-                        op.name for op in x.options.all()
-                    ]:
-                        offers.append(x)
-            resource_options.append(
-                "{} - {}".format(resource_name(resource), option_name(option[0]))
-            )
-            resources_by_resource_option.append([len(offers), len(needs)])
+            if form.cleaned_data["resource_option"]:
+                resources_filtered_by_option = True
 
-    agreements_header = [
-        _("Pendents de comunicació"),
-        _("Comunicació iniciada"),
-        _("Comunicació rebutjada"),
-        _("Acord aconseguit"),
-        _("Acord no aconseguit"),
-        _("Total"),
-    ]
-    agreements_started = list(map(lambda o: o.date, Agreement.objects.all()))
-    agreements_comm = list(
-        map(
-            lambda o: o.communication_date,
-            Agreement.objects.filter(communication_accepted=True),
-        )
-    )
-    agreements_success = list(
-        map(
-            lambda o: o.successful_date,
-            Agreement.objects.filter(agreement_successful=True),
-        )
-    )
-
-    graph = get_relationships_graph()
-    other_needs = (
-        Need.objects.filter(resource="OTHER")
-        .exclude(comments="")
-        .exclude(comments=None)
-    )
-    other_offers = (
-        Offer.objects.filter(resource="OTHER")
-        .exclude(comments="")
-        .exclude(comments=None)
-    )
-    most_needed = count_word_freqs(" ".join(map(lambda x: x.comments, other_needs)))
-    most_offered = count_word_freqs(" ".join(map(lambda x: x.comments, other_offers)))
-    return render(
-        request,
-        "femlliga/report.html",
-        {
-            "orgs_json": json.dumps(orgs_json),
-            "organizations": Timeline(
-                list(map(lambda o: o.date, organizations)), name=_("Altes d'entitats")
-            ),
-            "resources_by_org_type": Table(
-                [
-                    _("Recursos per tipus d'entitat"),
-                    _("Oferiments"),
-                    _("Necessitats"),
-                    _("Entitats"),
-                ],
-                org_types,
-                resources_by_org_type,
-            ),
-            "charge_by_org_type": Table(
-                [
-                    _("Oferiments que es cobren per tipus d'entitat"),
-                    _("Oferiments cobrant"),
-                    _("Oferiments gratuïts"),
-                ],
-                org_types,
-                charge_by_org_type,
-            ),
-            "resources_by_org_scope": Table(
-                [
-                    _("Recursos per àmbit de treball de l'entitat"),
-                    _("Oferiments"),
-                    _("Necessitats"),
-                    _("Entitats"),
-                ],
-                org_scopes,
-                resources_by_org_scope,
-            ),
-            "resources_by_resource_type": Table(
-                [_("Recursos per tipus de recurs"), _("Oferiments"), _("Necessitats")],
-                resource_names,
-                resources_by_resource_type,
-            ),
-            "charge_by_resource_type": Table(
-                [
-                    _("Oferiments que es cobren per tipus de recurs"),
-                    _("Oferiments cobrant"),
-                    _("Oferiments gratuïts"),
-                ],
-                resource_names,
-                charge_by_resource_type,
-            ),
-            "resources_by_resource_option": Table(
-                [
-                    _("Recursos per tipus concret de recurs"),
-                    _("Oferiments"),
-                    _("Necessitats"),
-                ],
-                resource_options,
-                resources_by_resource_option,
-            ),
-            "agreements_by_solicitor_type": Table(
-                [_("Interaccions per tipus d'entitat sol·licitant")]
-                + agreements_header,
-                org_types,
-                agreements_by_solicitor_type,
-            ),
-            "agreements_by_solicitor_scope": Table(
-                [_("Interaccions per àmbit de treball de l'entitat sol·licitant")]
-                + agreements_header,
-                org_scopes,
-                agreements_by_solicitor_scope,
-            ),
-            "agreements_by_solicitee_type": Table(
-                [_("Interaccions per tipus d'entitat sol·licitada")]
-                + agreements_header,
-                org_types,
-                agreements_by_solicitee_type,
-            ),
-            "agreements_by_solicitee_scope": Table(
-                [_("Interaccions per àmbit de treball de l'entitat sol·licitada")]
-                + agreements_header,
-                org_scopes,
-                agreements_by_solicitee_scope,
-            ),
-            "agreements_by_resource_type": Table(
-                [_("Interaccions per tipus de recurs")] + agreements_header,
-                resource_names,
-                agreements_by_resource_type,
-            ),
-            "agreements_started": Timeline(
-                agreements_started, name=_("Peticions de col·laboració")
-            ),
-            "agreements_comm": Timeline(
-                agreements_comm, name=_("Comunicació acceptada")
-            ),
-            "agreements_success": Timeline(
-                agreements_success, name=_("Col·laboració exitosa")
-            ),
-            "graph": graph,
-            "other_needs": other_needs,
-            "other_offers": other_offers,
-            "most_needed": most_needed,
-            "most_offered": most_offered,
-            "needs_comments": Need.objects.exclude(resource="OTHER").exclude(
-                comments=""
-            ),
-            "offers_comments": Offer.objects.exclude(resource="OTHER").exclude(
-                comments=""
-            ),
+    context = {
+        "active_tab": active_tab or "map",
+        "active_form": form,
+        "inactive_form": ReportFilterForm(),
+        "organizations": organizations,
+        "organizations_df": organizations_df,
+        "agreements_df": agreements_df,
+        "resources_df": resources_df,
+        "comment_word_counts": report_comments(needs, offers),
+        "excluded_words": ", ".join(
+            sorted([x.value for x in ExcludeCommentWord.objects.all()])
+        ),
+        "json_data": {
+            "organizations": [
+                {"name": o.name, "lat": float(o.lat), "lng": float(o.lng)}
+                for o in organizations
+            ],
         },
+    }
+    if resources_filtered_by_option:
+        context["filtered_resources_comment_word_counts"] = report_comments(
+            filtered_needs, filtered_offers
+        )
+        context["needs_comments"] = [x.comments for x in filtered_needs if x.comments]
+        context["offers_comments"] = [x.comments for x in filtered_offers if x.comments]
+
+    return render(request, "femlliga/report.html", context)
+
+
+def filter_report_organizations(organizations, form):
+    filters = [
+        ("province", lambda v, o: v == o.get_province()["id"]),
+        ("org_type", lambda v, o: v == o.org_type),
+        ("org_scope", lambda v, o: v in {s.name for s in o.scopes.all()}),
+        ("start_date", lambda v, o: o.date >= date_to_datetime(v)),
+        ("end_date", lambda v, o: o.date <= date_to_datetime(v)),
+    ]
+    for f in filters:
+        value = form.cleaned_data.get(f[0])
+        if value:
+            organizations = [o for o in organizations if f[1](value, o)]
+
+    return organizations
+
+
+def get_report_resources(n, o, form):
+    n, o = filter_report_resources(n, o, form)
+
+    # n and o are needs and offers
+    index, rows = [], []
+    group_by = form.cleaned_data.get("group_resources_by")
+    groups = [
+        ("ORG_TYPE", ORG_TYPES, same_org_type),
+        ("ORG_SCOPE", ORG_SCOPES, org_has_scope),
+        ("RESOURCE", RESOURCES, same_resource),
+        ("RESOURCE_OPTION", RESOURCE_OPTIONS_WITH_PREFIX, has_option),
+    ]
+    for g in groups:
+        if group_by == g[0]:
+            index, rows = group_report_resources(g[1], n, o, g[2])
+
+    df = pd.DataFrame(
+        rows,
+        columns=[_("Necessitats"), _("Oferiments")],
+        index=index,
     )
+
+    if form.cleaned_data.get("hide_zeroes"):
+        return n, o, df.loc[~(df == 0).all(axis=1)]
+
+    if form.cleaned_data.get("show_only_zeroes"):
+        return n, o, df.loc[(df == 0).all(axis=1)]
+
+    return n, o, df
+
+
+def get_organizations_df(organizations, form):
+    index, rows = [], []
+    group_by = form.cleaned_data.get("group_orgs_by")
+    groups = [
+        ("ORG_TYPE", ORG_TYPES, lambda org_type: lambda o: o.org_type == org_type),
+        (
+            "ORG_SCOPE",
+            ORG_SCOPES,
+            lambda org_scope: lambda o: org_scope in {s.name for s in o.scopes.all()},
+        ),
+    ]
+    for g in groups:
+        if group_by == g[0]:
+            index, rows = group_organizations(g[1], organizations, g[2])
+
+    df = pd.DataFrame(
+        rows,
+        columns=[str(_("Organitzacions"))],
+        index=index,
+    )
+
+    if form.cleaned_data.get("hide_zeroes"):
+        return df.loc[~(df == 0).all(axis=1)]
+
+    if form.cleaned_data.get("show_only_zeroes"):
+        return df.loc[(df == 0).all(axis=1)]
+
+    return df
+
+
+def filter_report_resources(needs, offers, form):
+    filters = [
+        ("province", lambda pr: lambda x: pr == x.organization.get_province()["id"]),
+        ("org_type", same_org_type),
+        ("org_scope", org_has_scope),
+        ("resource", same_resource),
+        ("resource_option", has_option),
+        ("start_date", lambda d: lambda x: x.last_updated_on >= date_to_datetime(d)),
+        ("end_date", lambda d: lambda x: x.last_updated_on <= date_to_datetime(d)),
+    ]
+    for f in filters:
+        value = form.cleaned_data.get(f[0])
+        if value:
+            needs = [x for x in needs if f[1](value)(x)]
+            offers = [x for x in offers if f[1](value)(x)]
+
+    return needs, offers
+
+
+def get_agreements_df(agreements, form):
+    agreements = filter_report_agreements(agreements, form)
+    index, rows = [], []
+    group_by = form.cleaned_data.get("group_agreements_by")
+    groups = [
+        (
+            "SOLICITOR_ORG_TYPE",
+            ORG_TYPES,
+            lambda org_type: lambda a: a.solicitor.org_type == org_type,
+        ),
+        (
+            "SOLICITOR_ORG_SCOPE",
+            ORG_SCOPES,
+            lambda org_scope: lambda a: org_scope
+            in {s.name for s in a.solicitor.scopes.all()},
+        ),
+        (
+            "SOLICITEE_ORG_TYPE",
+            ORG_TYPES,
+            lambda org_type: lambda a: a.solicitee.org_type == org_type,
+        ),
+        (
+            "SOLICITEE_ORG_SCOPE",
+            ORG_SCOPES,
+            lambda org_scope: lambda a: org_scope
+            in {s.name for s in a.solicitee.scopes.all()},
+        ),
+        ("RESOURCE", RESOURCES, same_resource),
+        ("RESOURCE_OPTION", RESOURCE_OPTIONS_WITH_PREFIX, has_option),
+        (
+            "RESOURCE_TYPE",
+            [("need", _("Necessitat")), ("offer", _("Oferiment"))],
+            lambda rt: lambda a: a.resource_type == rt,
+        ),
+    ]
+    for g in groups:
+        if group_by == g[0]:
+            index, rows = group_agreements(g[1], agreements, g[2])
+
+    df = pd.DataFrame(
+        rows,
+        columns=[
+            _("Peticions pendents"),
+            _("Peticions sense acord"),
+            _("Peticions amb acord"),
+        ],
+        index=index,
+    )
+
+    if form.cleaned_data.get("hide_zeroes"):
+        return df.loc[~(df == 0).all(axis=1)]
+
+    if form.cleaned_data.get("show_only_zeroes"):
+        return df.loc[(df == 0).all(axis=1)]
+
+    return df
+
+
+def filter_report_agreements(agreements, form):
+    filters = [
+        ("solicitor_province", lambda v, a: v == a.solicitor.get_province()["id"]),
+        ("solicitee_province", lambda v, a: v == a.solicitee.get_province()["id"]),
+        ("solicitor_org_type", lambda v, a: v == a.solicitor.org_type),
+        ("solicitee_org_type", lambda v, a: v == a.solicitee.org_type),
+        (
+            "solicitor_org_scope",
+            lambda v, a: v in {s.name for s in a.solicitor.scopes.all()},
+        ),
+        (
+            "solicitee_org_scope",
+            lambda v, a: v in {s.name for s in a.solicitee.scopes.all()},
+        ),
+        ("resource", lambda v, a: v == a.resource),
+        ("resource_option", lambda v, a: v in {x.name for x in a.options.all()}),
+        ("communication_start_date", lambda v, a: a.date >= date_to_datetime(v)),
+        ("communication_end_date", lambda v, a: a.date <= date_to_datetime(v)),
+        (
+            "agreement_start_date",
+            lambda v, a: a.successful_date and a.successful_date >= date_to_datetime(v),
+        ),
+        (
+            "agreement_end_date",
+            lambda v, a: a.successful_date and a.successful_date <= date_to_datetime(v),
+        ),
+    ]
+    for f in filters:
+        value = form.cleaned_data.get(f[0])
+        if value:
+            agreements = [a for a in agreements if f[1](value, a)]
+
+    return agreements
+
+
+def same_org_type(org_type):
+    return lambda x: org_type == x.organization.org_type
+
+
+def same_resource(resource):
+    return lambda x: resource == x.resource
+
+
+def org_has_scope(scope):
+    return lambda x: scope in {s.name for s in x.organization.scopes.all()}
+
+
+def has_option(option):
+    return lambda x: option in {o.name for o in x.options.all()}
+
+
+def group_report_resources(index, needs, offers, condition):
+    rows = [
+        (
+            len([x for x in needs if condition(i[0])(x)]),
+            len([x for x in offers if condition(i[0])(x)]),
+        )
+        for i in index
+    ]
+    return [str(x[1]) for x in index], rows
+
+
+def group_organizations(index, organizations, condition):
+    rows = [(len([x for x in organizations if condition(i[0])(x)]),) for i in index]
+    return [str(x[1]) for x in index], rows
+
+
+def group_agreements(index, agreements, condition):
+    rows = [
+        (
+            len(
+                [
+                    x
+                    for x in agreements
+                    if condition(i[0])(x) and x.agreement_successful is None
+                ]
+            ),
+            len(
+                [
+                    x
+                    for x in agreements
+                    if condition(i[0])(x) and x.agreement_successful is False
+                ]
+            ),
+            len(
+                [
+                    x
+                    for x in agreements
+                    if condition(i[0])(x) and x.agreement_successful is True
+                ]
+            ),
+        )
+        for i in index
+    ]
+    return [str(x[1]) for x in index], rows
+
+
+def report_comments(needs, offers):
+    need_comments = " ".join([x.comments for x in needs if x.comments])
+    offer_comments = " ".join([x.comments for x in offers if x.comments])
+    comments = sanitize_for_searching(need_comments + " " + offer_comments).split()
+    for w in ExcludeCommentWord.objects.all():
+        comments = [c for c in comments if c != w.value]
+    return collections.Counter(comments)
+
+
+def sanitize_for_searching(s):
+    return strip_accents(s.casefold()).replace(".", "").replace(",", "")
 
 
 def strip_accents(s):
     return "".join(
         c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
     )
-
-
-def count_word_freqs(s):
-    l, freqs = strip_accents(s.lower()).split(), {}
-    for x in l:
-        if x not in freqs:
-            freqs[x] = 1
-        else:
-            freqs[x] += 1
-
-    l = []
-    for x in freqs:
-        l.append((x, freqs[x]))
-
-    return sorted(l, key=lambda x: x[1], reverse=True)
-
-
-def get_relationships_graph():
-    agreements = Agreement.objects.all().prefetch_related("solicitor", "solicitee")
-    relations, labels = {}, {}
-    for a in agreements:
-        if not a.solicitor or not a.solicitee:
-            continue
-        labels[a.solicitor.id] = a.solicitor.name
-        labels[a.solicitee.id] = a.solicitee.name
-        key = (a.solicitor.id, a.solicitee.id)
-        if key not in relations.keys():
-            relations[key] = 1
-        else:
-            relations[key] += 1
-
-    edges = []
-    for key in relations:
-        edges.append((key[0], key[1], relations[key]))
-
-    DG = nx.DiGraph()
-    DG.add_weighted_edges_from(edges)
-    return Graph(DG, labels)
-
-
-def sort_by_name(l):
-    return sorted(l, key=lambda x: x[1])
-
-
-def count(orgs, f):
-    return reduce(lambda a, b: a + len(f(b)), orgs, 0)
 
 
 def contact(request):

@@ -8,7 +8,7 @@
   <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
     {{ _("Us enviem aquest missatge des de %(name)s ja que <strong>%(solicitor)s</strong> us ha demanat", name=current_site.name, solicitor=a.solicitor_safe().name) }}
     {{ agreement_action(a) }}
-    {{ render_resource(a.resource, a.options.all()) }}, {{ _("amb aquest missatge:") }}
+    {{ render_resource(a.resource, a.sorted_options()) }}, {{ _("amb aquest missatge:") }}
   </td>
 </tr>
 <tr>

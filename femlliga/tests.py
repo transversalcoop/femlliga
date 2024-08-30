@@ -1,6 +1,8 @@
 import json
+import pandas as pd
 
-from datetime import datetime, timedelta
+from collections import namedtuple
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from allauth.account.models import EmailAddress
@@ -18,7 +20,10 @@ from .utils import (
     get_ordered_needs_and_offers,
     get_periodic_notification_data,
     send_periodic_notification,
+    date_to_datetime,
 )
+from .views import filter_report_organizations, get_organizations_df
+from .forms import ReportFilterForm
 
 AUTH_BACKENDS = settings.AUTHENTICATION_BACKENDS[1:]
 PASS_FOR_TESTS = "passfortests"
@@ -85,6 +90,146 @@ class UtilsTests(TestCase):
         self.assertEqual(
             date_intervals(start1, end4), [start02, mid05, mid06, mid07, mid08, end04]
         )
+
+
+class ReportTests(TestCase):
+    def test_report_organizations(self):
+        S1, _ = OrganizationScope.objects.get_or_create(name="EQUALITY")
+        S2, _ = OrganizationScope.objects.get_or_create(name="EDUCATION")
+        O = namedtuple("O", ["organization", "scopes", "date"])
+        ORGS = [
+            O(
+                Organization(  # CS
+                    org_type="ASSOCIATION", lat=39.984469700, lng=-0.052528300
+                ),
+                [S1],
+                date_to_datetime(date(2022, 1, 2)),
+            ),
+            O(
+                Organization(  # Alcora
+                    org_type="COOPERATIVE", lat=40.0873178, lng=-0.2142333
+                ),
+                [S2],
+                date_to_datetime(date(2023, 1, 2)),
+            ),
+            O(
+                Organization(  # Morella
+                    org_type="FOUNDATION", lat=40.6208324, lng=-0.0995635
+                ),
+                [S1, S2],
+                date_to_datetime(date(2024, 1, 2)),
+            ),
+            O(
+                Organization(  # Almeria
+                    org_type="FOUNDATION", lat=36.8431419, lng=-2.4664306
+                ),
+                [S1, S2],
+                date_to_datetime(date(2024, 1, 2)),
+            ),
+        ]
+        ORGANIZATIONS = []
+        for o in ORGS:
+            o.organization.save()
+            o.organization.date = o.date
+            for s in o.scopes:
+                o.organization.scopes.add(s)
+            o.organization.save()
+            ORGANIZATIONS.append(o.organization)
+
+        TC = namedtuple("TC", ["post", "df"])
+        TEST_CASES = [
+            TC(
+                {"group_orgs_by": "ORG_TYPE"},
+                self.organizations_df(ORG_TYPES, [1, 1, 0, 2] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_TYPE", "province": "ESCS"},
+                self.organizations_df(ORG_TYPES, [1, 1, 0, 1] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_TYPE", "province": "ESAL"},
+                self.organizations_df(ORG_TYPES, [0, 0, 0, 1] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_TYPE", "province": "ESA"},
+                self.organizations_df(ORG_TYPES, [0, 0, 0, 0] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_TYPE", "org_scope": "EDUCATION"},
+                self.organizations_df(ORG_TYPES, [0, 1, 0, 2] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE"},
+                self.organizations_df(ORG_SCOPES, [3, 3] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "org_type": "ASSOCIATION"},
+                self.organizations_df(ORG_SCOPES, [1, 0] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "org_type": "COOPERATIVE"},
+                self.organizations_df(ORG_SCOPES, [0, 1] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "org_type": "FOUNDATION"},
+                self.organizations_df(ORG_SCOPES, [2, 2] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "org_type": "MUTUALITY"},
+                self.organizations_df(ORG_SCOPES, [0, 0] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "start_date": date(2022, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [3, 3] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "start_date": date(2023, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [2, 3] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "start_date": date(2024, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [2, 2] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "end_date": date(2023, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [1, 0] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "end_date": date(2024, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [1, 1] + [0] * 25),
+            ),
+            TC(
+                {
+                    "group_orgs_by": "ORG_SCOPE",
+                    "start_date": date(2024, 1, 1),
+                    "end_date": date(2025, 1, 1),
+                },
+                self.organizations_df(ORG_SCOPES, [2, 2] + [0] * 25),
+            ),
+            TC(
+                {
+                    "group_orgs_by": "ORG_SCOPE",
+                    "start_date": date(2022, 1, 1),
+                    "end_date": date(2024, 1, 1),
+                },
+                self.organizations_df(ORG_SCOPES, [1, 1] + [0] * 25),
+            ),
+        ]
+        for t in TEST_CASES:
+            form = ReportFilterForm(t.post)
+            self.assertTrue(form.is_valid())
+            organizations = filter_report_organizations(ORGANIZATIONS, form)
+            organizations_df = get_organizations_df(organizations, form)
+            pd.testing.assert_frame_equal(organizations_df, t.df, check_dtype=False)
+
+    def organizations_df(self, index, rows):
+        return pd.DataFrame(
+            rows,
+            columns=["Organitzacions"],
+            index=[str(x[1]) for x in index],
+        )
+
+    # TODO test also resources and agreements
 
 
 class SmokeTests(TestCase):
@@ -287,7 +432,7 @@ class IntegrationTests(TestCase):
         self.aux_wizard(
             needs_url,
             "PLACE",
-            ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+            ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
             "comentaris de necessita local de test",
             "Formació",
         )
@@ -440,7 +585,7 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
                 "origin": "MATCHES",
                 "message": test_msg_1,
             },
@@ -528,7 +673,7 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
                 "origin": "MATCHES",
                 "message": "test message",
             },
@@ -588,7 +733,7 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
                 "origin": "MATCHES",
                 "message": test_msg_1,
             },
@@ -611,7 +756,7 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
                 "origin": "MATCHES",
                 "message": test_msg_2,
             },
@@ -635,15 +780,15 @@ class IntegrationTests(TestCase):
 
         Need.objects.all().delete()
         Offer.objects.all().delete()
-        self.aux_create_resource(Need, org8, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"])
+        self.aux_create_resource(
+            Need, org8, "PLACE", ["DAILY_USAGE", "PUNCTUAL_MEETINGS"]
+        )
         self.aux_create_resource(Need, org8, "TRAINING", ["TRAINING_DIGITAL"])
         self.aux_create_resource(Need, org9, "PLACE", ["DAILY_USAGE"])
         self.aux_create_resource(
-            Offer, org9, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"]
+            Offer, org9, "PLACE", ["DAILY_USAGE", "PUNCTUAL_MEETINGS"]
         )
-        self.aux_create_resource(
-            Offer, org10, "PLACE", ["PUNCTUAL_MEETINGS", "PUNCTUAL_EVENTS"]
-        )
+        self.aux_create_resource(Offer, org10, "PLACE", ["PUNCTUAL_EVENTS"])
         self.aux_create_resource(
             Offer, org9, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_BUREAUCRACY"]
         )
@@ -675,7 +820,7 @@ class IntegrationTests(TestCase):
                     "total_agreements": 1,
                 },
                 "matches": {
-                    "need": {"name": "local per a ús diari", "count": 1},
+                    "need": {"name": "espai de treball d'oficina", "count": 1},
                     "offer": {"name": "formació en digitalització", "count": 2},
                 },
                 "new_resources": {
@@ -684,14 +829,13 @@ class IntegrationTests(TestCase):
                             "code": "PLACE",
                             "options": [
                                 ResourceOption.objects.get(name="PUNCTUAL_EVENTS"),
-                                ResourceOption.objects.get(name="PUNCTUAL_MEETINGS"),
                             ],
                         },
                         {
                             "code": "TRAINING",
                             "options": [
-                                ResourceOption.objects.get(name="TRAINING_BUREAUCRACY"),
                                 ResourceOption.objects.get(name="TRAINING_EQUALITY"),
+                                ResourceOption.objects.get(name="TRAINING_BUREAUCRACY"),
                             ],
                         },
                     ],

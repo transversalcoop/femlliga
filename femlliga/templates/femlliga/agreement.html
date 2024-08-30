@@ -1,95 +1,107 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import vue_js, initial_loading_vue %}
+{% from 'femlliga/_macros.html' import vue_js, initial_loading_vue, arrow_btn %}
 
 {% block title %}{{ _("Petició d'intercanvi") }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <div id="app" class="row">
-    <div class="col-md-4 d-md-block bg-light sidebar">
-      {% if a.solicitor == org %}
-      <h1>{{ _("Petició de %(resource)s enviada a <em>%(org)s</em>", resource=resource_name(a.resource), org=a.solicitee_safe().name) }}</h1>
-      {% else %}
-      <h1>{{ _("Petició de %(resource)s rebuda de <em>%(org)s</em>", resource=resource_name(a.resource), org=a.solicitor_safe().name) }}</h1>
-      {% endif %}
+<div class="container container-large">
+  {% if a.solicitor == org %}
+  {% set title = _("Petició de %(resource)s enviada a %(org)s", resource=resource_name(a.resource), org=a.solicitee_safe().name) %}
+  {% else %}
+  {% set title = _("Petició de %(resource)s rebuda de %(org)s", resource=resource_name(a.resource), org=a.solicitor_safe().name) %}
+  {% endif %}
 
+  <h1 class="fs-2-5rem mt-100px text-center">
+    {{ title }}
+  </h1>
+  <div class="divider-3 mb-3"></div>
+  <div class="mb-60px text-center">
+  {% for option in a.sorted_options() %}
+    <span class="badge bg-light me-2">{{ option }}</span>
+  {% endfor %}
+  </div>
+
+  <div id="app" class="d-flex flex-column flex-lg-row mb-5">
+    <div class="flex-third">
       <div id="confirm-question" class="d-none">{{ _("Segur que vols marcar aquesta opció? L'acció no es pot desfer") }}</div>
-      <div class="collapse show" id="sidebar-filter">
-        <div>
-        {% for option in a.options.all() %}
-          <span class="badge bg-light me-2">{{ option }}</span>
-        {% endfor %}
-        </div>
-        {% if a.agreement_successful == None %}
-        <hr class="my-5" />
-        <p class="mt-5">{{ _("Heu realitzat l'intercanvi? Indiqueu-ho per donar per acabada la conversa.") }}</p>
-        <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" onsubmit="return confirm(document.getElementById('confirm-question').textContent)">
-          {{ csrf_input }}
-          <input type="hidden" name="successful" value="yes">
-          <button class="btn btn-warning w-100 mb-2">{{ _("Si, hem realitzat l'intercanvi!") }}</button>
-        </form>
-        <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" onsubmit="return confirm(document.getElementById('confirm-question').textContent)">
-          {{ csrf_input }}
-          <input type="hidden" name="successful" value="no">
-          <button class="btn btn-brown w-100">{{ _("No, finalment no hem realitzat l'intercanvi...") }}</button>
-        </form>
+      {% if a.agreement_successful == None %}
+      <p>{{ _("Heu realitzat l'intercanvi? Indiqueu-ho per donar per acabada la conversa.") }}</p>
+      <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" onsubmit="return confirm(document.getElementById('confirm-question').textContent)" class="mb-2">
+        {{ csrf_input }}
+        <input type="hidden" name="successful" value="yes">
+        {{ arrow_btn(_("Si, hem realitzat l'intercanvi!"), "bi-hand-thumbs-up") }}
+      </form>
+      <form method="post" action="{{ url("agreement_successful", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" onsubmit="return confirm(document.getElementById('confirm-question').textContent)">
+        {{ csrf_input }}
+        <input type="hidden" name="successful" value="no">
+        {{ arrow_btn(_("No hem realitzat l'intercanvi..."), "bi-hand-thumbs-down") }}
+      </form>
+      {% else %}
+      <div class="bg-lightblue br-1rem text-center p-3">
+        {% if a.agreement_successful == True %}
+        {{ _("Es va indicar que s'havia realitzat l'intercanvi el %(time)s", time=format_time(a.successful_date)) }}
+        {% else %}
+        {{ _("Es va indicar que <strong>no</strong> s'havia realitzat l'intercanvi el %(time)s", time=format_time(a.successful_date)) }}
         {% endif %}
+        <br />
+        {{ _("Ja no es poden enviar més missatges en aquesta conversa. Si voleu realitzar un intercanvi de nou, podeu sol·licitar-ho a través de les pàgines de «Has lligat?» o «Descobreix»") }}
       </div>
+      {% endif %}
     </div>
 
-    <div id="vue-app" class="col-md-8">
-      <div class="alert alert-warning mt-2 text-center">
+    <div class="flex-gap"></div>
+
+    <div class="flex-two-thirds">
+      {% if a.agreement_successful == None %}
+      <div class="bg-lightblue mt-2 mb-3 text-center p-3 br-1rem">
         <div class="row">
-          <div class="col-3"><span class="fs-1">1</span></div>
-          <div class="col-3"><span class="fs-1">2</span></div>
-          <div class="col-3"><span class="fs-1">3</span></div>
-          <div class="col-3"><span class="fs-1">4</span></div>
-        </div>
-        <div class="row">
-          <div class="col-3">{{ _("Has fet una petició d'un recurs") }}</div>
-          <div class="col-3">{{ _("Entrem en contacte? Parlem!") }}</div>
-          <div class="col-3">{{ _("Concretem dia i hora per trobar-nos?") }}</div>
-          <div class="col-3">{{ _("Realitzem l'intercanvi!") }}</div>
+          <div class="col-6 col-md-3">
+            <div class="fs-1">1</div>
+            {{ _("Has fet una petició d'un recurs") }}
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="fs-1">2</div>
+            {{ _("Entrem en contacte? Parlem!") }}
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="fs-1">3</div>
+            {{ _("Concretem dia i hora per trobar-nos?") }}
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="fs-1">4</div>
+            {{ _("Realitzem l'intercanvi!") }}
+          </div>
         </div>
       </div>
+      {% endif %}
 
       {{ initial_loading_vue() }}
       <template v-else>
         <div v-for="m of messages" class="row">
           <div v-if="m.sent_by === org_id" class="col-9 offset-3 col-lg-6 offset-lg-6">
             <p class="fs-7 mb-0"><em>{{ _("Missatge enviat el") }} ${ formatDateTime(m.sent_on) }</em></p>
-            <div class="alert alert-success pre-wrap">${ m.message }</div>
+            <div class="bg-lightblue br-1rem p-3 pre-wrap mb-3">${ m.message }</div>
           </div>
           <div v-else class="col-9 col-lg-6">
             <p class="fs-7 mb-0"><em>{{ _("Missatge rebut el") }} ${ formatDateTime(m.sent_on) }</em></p>
-            <div class="alert alert-secondary pre-wrap">${ m.message }</div>
+            <div class="bg-lightgrey br-1rem p-3 pre-wrap mb-3">${ m.message }</div>
           </div>
         </div>
       </template>
 
       {% if not a.solicitor or not a.solicitee %}
-      <p><em>{{ _("No es poden enviar més missatges en aquesta conversa perquè l'altra organització ja no existeix") }}</em></p>
+      <div class="bg-lightblue br-1rem p-3 text-center" role="alert">
+        {{ _("No es poden enviar més missatges en aquesta conversa perquè l'altra organització ja no existeix") }}
+      </div>
       {% elif a.agreement_successful == None %}
       <form method="post" action="{{ url("send_agreement_message", kwargs={'organization_id': org.id, 'agreement_id': a.id}) }}" @submit="send">
         {{ csrf_input }}
         <textarea v-model="message" class="form-control" name="message"></textarea>
-        <button class="btn btn-warning mt-2">{{ _("Envia") }}</button>
-      </form>
-      {% else %}
-      <div class="row">
-        <div class="col-12 col-lg-8 offset-lg-2">
-          <div class="alert alert-warning">
-            {% if a.agreement_successful == True %}
-            {{ _("Es va indicar que s'havia realitzat l'intercanvi el %(time)s", time=format_time(a.successful_date)) }}
-            {% else %}
-            {{ _("Es va indicar que <strong>no</strong> s'havia realitzat l'intercanvi el %(time)s", time=format_time(a.successful_date)) }}
-            {% endif %}
-            <br />
-            {{ _("Ja no es poden enviar més missatges en aquesta conversa. Si voleu realitzar un intercanvi de nou, podeu sol·licitar-ho a través de les pàgines de «Has lligat?» o «Descobreix»") }}
-          </div>
+        <div class="mt-2">
+          {{ arrow_btn(_("Envia"), "bi-send") }}
         </div>
-      </div>
+      </form>
       {% endif %}
     </div>
   </div>

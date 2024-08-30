@@ -1,17 +1,17 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from "femlliga/_macros.html" import vue_js %}
+{% from "femlliga/_macros.html" import vue_js, page_title, arrow_btn_link %}
 
 {% block title %}{{ _("Anuncis") }}{% endblock %}
 
 {% block content %}
 <main id="content" class="container">
-  <h1>{{ _("Anuncis publicats per les organitzacions de Fem lliga") }}</h1>
+  {{ page_title(_("Anuncis publicats per les organitzacions de Fem lliga")) }}
   <div id="vue-app" class="row">
-    <div class="col-6">
-      <input v-model="search" class="form-control" type="text" placeholder="{{ _("Cerca anuncis") }}">
+    <div class="col-md-6 mt-2">
+      <input v-model="search" class="form-control border" type="text" placeholder="{{ _("Cerca anuncis") }}">
     </div>
-    <div class="col-6">
+    <div class="col-md-6 mt-2">
       <select v-model="province" class="form-select">
         <option value="">{{ _("Filtra per província") }}</option>
         {% for code, name in provinces %}
@@ -22,8 +22,8 @@
 
     <template v-if="announcements.length > 0">
       <div v-for="a in announcements" class="col-12 col-sm-6 col-md-4 mt-2">
-        <div class="match-box p-2">
-          <h2 v-html="highlightSearch(a.title, search)" class="mt-0"></h2>
+        <div class="match-box p-3">
+          <h2 v-html="highlightSearch(a.title, search)" class="fw-600 mt-0"></h2>
           <p class="mb-0">
             <span v-html="highlightSearch(a.organization.name, search)"></span>
             {{ _("necessita") }}
@@ -37,7 +37,7 @@
           </p>
           <p v-html="highlightSearch(a.description, search)" class="pre-wrap"></p>
           <div class="text-center">
-            <a :href="a.public_href" class="btn btn-custom">{{ _("Visualitza l'anunci complet") }}</a>
+            {{ arrow_btn_link(_("Veure detalls"), "a.public_href", "bi-caret-right", vue=True) }}
           </div>
         </div>
       </div>

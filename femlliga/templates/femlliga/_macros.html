@@ -10,7 +10,7 @@
 {% endmacro %}
 
 {% macro vue_js() %}
-<script src="https://unpkg.com/vue@3/dist/vue.global{% if not settings.DEBUG %}.prod{% endif %}.js"></script>
+<script src="https://unpkg.com/vue@3.4.38/dist/vue.global{% if not settings.DEBUG %}.prod{% endif %}.js"></script>
 {% endmacro %}
 
 {% macro show_password_message() %}{{ _("Mostra la contrasenya com a text pla. Avís: això deixarà veure la teua contrasenya en la pantalla.") }}{% endmacro %}
@@ -23,60 +23,88 @@
 </span>
 {% endmacro %}
 
-{% macro arrow_btn(text, icon, large=False) %}
-<button type="submit" class="btn btn-arrow {% if large %}btn-lg{% endif %} {% if xl %}btn-xl{% endif %}">
-  <div class="d-flex align-items-center">
-    {{ arrow_btn_content(text, icon) }}
+{% macro arrow_btn(text, icon=None) %}
+{# wrapper also replicated in show_matches_vue, using arrow_btn_content directly or duplicating all #}
+<button type="submit" class="btn btn-arrow">
+  <div class="d-flex align-items-stretch">
+    {{ arrow_btn_content(text, icon=icon) }}
   </div>
 </button>
 {% endmacro %}
 
-{% macro arrow_btn_link(text, url, icon, download=False, large=False, xl=False, image=None, image_alt="") %}
+{% macro arrow_btn_link(text, url, icon=None, download=False, image=None, image_alt="", onclick="", vue=False) %}
+{# wrapper also replicated in add_organization #}
 <a
-  type="button"
-  class="btn btn-arrow {% if large %}btn-lg{% endif %} {% if xl %}btn-xl{% endif %}"
-  href="{{ url }}"
+  role="button"
+  class="btn btn-arrow"
+  {% if url %}{% if vue %}:{% endif %}href="{{ url }}"{% endif %}
   {% if download %}download{% endif %}
+  {% if onclick %}onclick="{{ onclick }}"{% endif %}
 >
-  <div class="d-flex align-items-center">
-    {{ arrow_btn_content(text, icon, image=image, image_alt=image_alt) }}
+  <div class="d-flex align-items-stretch">
+    {{ arrow_btn_content(text, icon=icon, image=image, image_alt=image_alt) }}
   </div>
 </a>
 {% endmacro %}
 
-{% macro arrow_btn_content(text, icon, image=None, image_alt="") %}
-  {% if image %}
-  <img src="{{ image }}" class="my-1" alt="{{ image_alt }}">
-  {% else %}
-  <span class="btn-arrow-icon">
-    <i class="{{ icon }}"></i>
-  </span>
-  {% endif %}
-  <span class="btn-arrow-text">{{ text }}</span>
-  <span class="btn-arrow-arrow"><i class="bi-caret-right-fill"></i></span>
+{% macro arrow_btn_dropdown(text, icon=None) %}
+<a
+  role="button"
+  data-bs-toggle="dropdown"
+  aria-expanded="false"
+  class="btn btn-arrow dropdown-toggle"
+  href="#"
+>
+  <div class="d-flex align-items-stretch">
+    {{ arrow_btn_content(text, icon=icon) }}
+  </div>
+</a>
 {% endmacro %}
 
-{% macro universal_access_icon() %}<img src="{{ static("icons/universal-access.svg") }}">{% endmacro %}
+{% macro arrow_btn_content(text, icon=None, image=None, image_alt="") %}
+  {% if image %}
+  <img src="{{ image }}" class="my-1" alt="{{ image_alt }}">
+  {% elif icon %}
+  <span class="btn-arrow-icon d-flex align-items-center"><i class="{{ icon }}"></i></span>
+  {% endif %}
+  <span class="btn-arrow-text">{{ text }}</span>
+  <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
+{% endmacro %}
+
+{% macro resource_extra_info(name) %}
+<div class="d-inline-block bg-lightblue py-1 ps-1 pe-3 br-0375rem mt-2">
+  <i class="bi-asterisk"></i>
+  {{ name }}
+</div>
+{% endmacro %}
 
 {% macro resource_details(resource, match_type) %}
-  <div class="mb-2">
-    {% for option in resource.options.all() %}
+  <div class="mb-4">
+    {% for option in resource.sorted_options() %}
       <span class="badge bg-light">
         {{ option }}
       </span>
     {% endfor %}
   </div>
-  <div class="mb-2">
+
+  {% if resource.comments %}
+    {% if resource.resource != "OTHER" %}
+    <p class="text-uppercase fw-bold mb-1">{{ _("Observacions:") }}</p>
+    {% endif %}
+    <p class="mb-4">{{ resource.comments }}</p>
+  {% endif %}
+
+  {% if resource.charge or resource.place_accessible %}
+  <div class="mb-4">
     {% if resource.charge %}
-      <span class="me-3"><span class="fs-4 align-middle">€</span> {{ _("Producte o servei remunerat") }}</span>
+      {{ resource_extra_info(_("Producte o servei remunerat")) }}
     {% endif %}
     {% if resource.place_accessible %}
-      <span class="universal-access-icon" title="">{{ universal_access_icon() }} {{ _("Local accessible") }}</span>
+      {{ resource_extra_info(_("Local accessible")) }}
     {% endif %}
   </div>
-  {% if resource.comments %}
-  <p>{% if resource.resource != "OTHER" %}<strong>{{ _("Observacions:") }}</strong>{% endif %} {{ resource.comments }}</p>
   {% endif %}
+
   {% if resource.images.all() %}
   <div class="image-thumbnails">
     {% for image in resource.images.all() %}
@@ -90,16 +118,16 @@
 
   <div class="modal fade" id="carouselModal{{ match_type }}{{ resource.id }}" tabindex="-1" aria-labelledby="carouselModalImages" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
-      <div class="modal-content" style="background: none;">
-        <div class="modal-header" style="background-color: white;">
+      <div class="modal-content bg-none">
+        <div class="modal-header bg-white">
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
         </div>
-        <div class="modal-body" style="background-color: rgba(0, 0, 0, 0.3);">
-          <div id="carouselImages{{ match_type }}{{ resource.id }}" class="carousel slide" style="height: 100%;" data-bs-ride="carousel">
+        <div class="modal-body bg-translucid">
+          <div id="carouselImages{{ match_type }}{{ resource.id }}" class="carousel slide h-100" data-bs-ride="carousel">
             <div class="carousel-inner">
               {% for i, image in enumerate(resource.images.all()) %}
               <div class="carousel-item text-center{% if i == 0 %} active{% endif %}">
-                <img src="{{ image.image.url }}/" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;" loading="lazy">
+                <img src="{{ image.image.url }}/" class="d-block carousel-img" loading="lazy">
               </div>
               {% endfor %}
             </div>
@@ -119,8 +147,23 @@
   {% endif %}
 {% endmacro %}
 
-{% macro input_classes(form, name) %}
-    class="form-control{% if form.errors[name] %} is-invalid{% endif %}"
+{% macro modal(id, content) %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
+      </div>
+      <div class="modal-body">
+        {{ content }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro input_classes(form, name, extra="") %}
+  class="form-control{% if form.errors[name] %} is-invalid{% endif %} {{ extra }}"
 {% endmacro %}
 
 {% macro input_value(form, name) %}
@@ -249,7 +292,7 @@ a <template> tag, gets shown #}
 
 {% macro render_formset_field(form, field, field_name, input_type, label, placeholder="") %}
   {% if label %}
-    <label for="id_{{ field.html_name }}" style="margin-top: 10px;">{{ label }}</label>
+    <label for="id_{{ field.html_name }}" class="mt-2">{{ label }}</label>
   {% endif %}
   <input type="{{ input_type }}" {{ input_classes(form, field_name) }} name="{{ field.html_name }}" id="id_{{ field.html_name }}" {{ formset_input_value(field) }} placeholder="{{ placeholder }}">
   {{ input_feedback(form, field_name) }}
@@ -274,7 +317,13 @@ a <template> tag, gets shown #}
 {% endmacro %}
 
 {% macro render_formset_delete_vue(field, deleteFunc) %}
-<button class="btn btn-custom" @click.prevent="{{ deleteFunc }}">{{ _("Esborra") }}</button>
+<button class="btn btn-arrow" @click.prevent="{{ deleteFunc }}">
+  <div class="d-flex align-items-stretch">
+    <span class="btn-arrow-icon d-flex align-items-center"><i class="bi-trash"></i></span>
+    <span class="btn-arrow-text">{{ _("Esborra") }}</span>
+    <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
+  </div>
+</button>
 <input type="hidden" id="id_{{ field.html_name }}" name="{{ field.html_name }}" value="">
 {% endmacro %}
 
@@ -286,14 +335,14 @@ a <template> tag, gets shown #}
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
       </div>
       <div class="modal-body bg-black bg-opacity-25">
-        <div id="carousel-images" class="carousel slide" style="height: 100%;" data-bs-ride="carousel">
+        <div id="carousel-images" class="carousel slide h-100" data-bs-ride="carousel">
           <div class="carousel-inner">
             <div
               v-for="(image, index) in carouselImages"
               :key="image.url"
               class="carousel-item text-center"
               :class="{active: index === 0}">
-              <img :src="image.url" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;" loading="lazy">
+              <img :src="image.url" class="d-block carousel-img" loading="lazy">
             </div>
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#carousel-images" data-bs-slide="prev">
@@ -313,10 +362,10 @@ a <template> tag, gets shown #}
 
 {% macro match_filter_row_vue(match_type, title) %}
 <template v-for="resource of matched_needs" :key="resource">
-  <li v-if="resource in matches.{{ match_type }}Matches" class="nav-item">
-    <button
+  <li v-if="resource in matches.{{ match_type }}Matches">
+    <a
       @click="selectResource(resource, '{{ match_type }}')"
-      class="nav-link w-100 text-start"
+      class="sidebar-row"
       :class="{active: resourceSelected === resource && matchTypeSelected === '{{ match_type }}'}"
       type="button"
       role="tab"
@@ -330,18 +379,54 @@ a <template> tag, gets shown #}
       </span>
       <i class="me-2" :class="resourceIconsMap[resource]"></i>
       ${ resourceNamesMap[resource] }
-    </button>
+    </a>
   </li>
 </template>
 {% endmacro %}
 
+{% macro page_title(title) %}
+  <h1 class="fs-2-5rem mt-100px text-center">
+    {{ title }}
+  </h1>
+  <div class="divider-3 mb-60px"></div>
+{% endmacro %}
+
+{% macro organization_header(org, link=False, edit_link=False) %}
+  <h1 class="fs-2-5rem mt-100px text-center">
+    {% if edit_link %}
+    <div class="edit-row">
+      {{ org.name }}
+      <span class="edit-inline">
+        <a href="{{ url("edit_organization", args=[org.id]) }}" title="{{ _("Edita") }}" tabindex="0" class="opacity-0">
+          <i class="bi-pencil-square fs-1-5rem"></i>
+        </a>
+      </span>
+    </div>
+    {% elif link %}
+    <a href="{{ url("profile", args=[org.id]) }}">{{ org.name }}</a>
+    {% else %}
+    {{ org.name }}
+    {% endif %}
+  </h1>
+
+  <div class="divider-3 mb-60px"></div>
+
+  {% if org.logo %}
+  <div class="mb-60px w-300px m-center">
+    <img src="{{ org.logo.url }}" class="organization-logo" loading="lazy" />
+  </div>
+  {% endif %}
+{% endmacro %}
+
 {% macro organization_info(org) %}
   {% if org.description %}
-  <p>{{ org.description }}</p>
+  <div class="bg-lightblue br-1rem p-4 mb-5">
+    <p class="mb-0 text-center">{{ org.description }}</p>
+  </div>
   {% endif %}
 
-  <div class="row">
-    <div class="col-md-6">
+  <div class="d-flex flex-column flex-lg-row mb-5">
+    <div class="w-100 bg-lightgrey br-1rem p-4">
       <p class="mb-0"><strong>{{ _("Forma jurídica") }}</strong>: {{ org_type_name(org.org_type) }}</p>
       <p class="mb-0"><strong>{{ _("Àmbits de treball") }}</strong></p>
       <ul>
@@ -352,11 +437,12 @@ a <template> tag, gets shown #}
       {{ render_social_media(org) }}
     </div>
 
-    <div class="col-md-6">
-      <div id="citymap" class="map-height"></div>
+    <div class="flex-gap"></div>
+
+    <div class="w-100">
+      <div id="citymap" class="map-height br-1rem"></div>
     </div>
   </div>
-
 {% endmacro %}
 
 {% macro organization_map_js(org) %}
@@ -370,34 +456,74 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
 {% endmacro %}
 
 {% macro show_matches_vue(matches, needs = None, origin = "SEARCH") %}
-<div v-for="result in {{ matches }}" :key="result" class="row match-box">
+<div v-for="result in {{ matches }}" :key="result" class="match-box">
   <div class="p-2">
-    <h3 class="my-0">
+    <h3 class="my-0 fw-600">
       <a :href="result.organization.href" v-html="highlightSearch(result.organization.name, search)"></a>
-      <span v-if="result.type === 'offer'" class="ms-2 background-yellow">{{ _("ofereix") }}</span>
-      <span v-if="result.type === 'need'" class="ms-2 background-yellow-dark">{{ _("necessita") }}</span>
-      <span class="ms-2" v-html="highlightSearch(resourceNamesMap[result.resource], search)"></span>
+      <template v-if="result.type === 'offer'"> {{ _("ofereix") }} </template>
+      <template v-if="result.type === 'need'"> {{ _("necessita") }} </template>
+      <span v-html="highlightSearch(resourceNamesMap[result.resource].toLowerCase(), search)"></span>
     </h3>
-    <div>
-      <span class="fs-7 fst-italic me-3 text-body-secondary">A ${ result.distance } {{ _("de vosaltres") }}</span>
+    <div class="mt-2">
+      <span class="fst-italic me-3">A ${ result.distance } {{ _("de vosaltres") }}</span>
     </div>
-    <div class="mb-2">
+    <div class="mt-2 mb-2">
       <span
+        {# base resource is offer or need #}
+        v-if="!result.public_href"
+        v-for="option in result.options"
+        :key="option"
         {% if needs %}
         class="badge bg-light me-2" :class="{ 'text-body-tertiary': !optionMatches(result.resource, option, {{ needs }}) }"
         {% else %}
         class="badge bg-light me-2"
         {% endif %}
-        v-for="option in result.options"
-        :key="option"
         v-html="highlightSearch(optionNamesMap[option], search)">
       </span>
+      <a
+        {# base resource is announcement #}
+        v-else
+        v-for="option in result.options"
+        :key="option"
+        {% if needs %}
+        class="badge bg-light me-2" :class="{ 'text-body-tertiary': !optionMatches(result.resource, option, {{ needs }}) }"
+        {% else %}
+        class="badge bg-light me-2"
+        {% endif %}
+        :href="result.public_href"
+        target="_blank"
+      >
+        <i class="bi-share me-2"></i>
+        <span v-html="highlightSearch(optionNamesMap[option], search)"></span>
+      </a>
+      <a
+        {# the rest of the announcements #}
+        v-for="a in result.announcements"
+        :key="a.id"
+        {% if needs %}
+        class="badge bg-light me-2" :class="{ 'text-body-tertiary': !optionMatches(result.resource, a.option_name, {{ needs }}) }"
+        {% else %}
+        class="badge bg-light me-2"
+        {% endif %}
+        :href="a.public_href"
+        target="_blank"
+      >
+        <i class="bi-share me-2"></i>
+        <span v-html="highlightSearch(optionNamesMap[a.option_name], search)"></span>
+      </a>
     </div>
     <div class="mb-2">
-      <span v-if="result.charge" class="me-3"><span class="fs-4 align-middle">€</span> {{ _("Producte o servei remunerat") }}</span>
-      <span v-if="result.place_accessible" class="universal-access-icon">{{ universal_access_icon() }} {{ _("Local accessible") }}</span>
+      <template v-if="result.charge">
+        <span class="me-2">{{ resource_extra_info(_("Producte o servei remunerat")) }}</span>
+      </template>
+      <template v-if="result.place_accessible">
+        {{ resource_extra_info(_("Local accessible")) }}
+      </template>
     </div>
-    <p v-if="result.comments" class="mb-0"><strong v-if="result.resource !== 'OTHER'" class="me-2">{{ _("Observacions:") }}</strong><span v-html="highlightSearch(result.comments, search)"></span></p>
+    <template v-if="result.comments && result.comments !== ''" class="mb-0">
+      <p v-if="result.resource !== 'OTHER'" class="text-uppercase fw-bold mb-1">{{ _("Observacions:") }}</p>
+      <p v-html="highlightSearch(result.comments, search)"></p>
+    </template>
 
     <div v-if="result.images.length > 0" class="image-thumbnails">
       <div v-for="image in result.images" :key="image.url" class="thumbnail">
@@ -407,17 +533,18 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
       </div>
     </div>
 
-    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}', {{ needs or '""' }})" class="btn btn-custom mt-2">
-      <i class="bi-send fs-6 me-2"></i>
-      {{ _("Contacta") }}
+    <button v-if="!messagesOpen[result.message_href]" @click="sendMessage(result, '{{ origin }}', {{ needs or '""' }})" class="btn btn-arrow mt-5">
+      <div class="d-flex align-items-stretch">
+        {{ arrow_btn_content(_("Contacta"), "bi-send") }}
+      </div>
     </button>
   </div>
 
   <div v-if="messagesOpen[result.message_href]" class="col-12">
-    <div class="bg-light my-2 p-2 rounded-3">
-      <button type="button" class="btn-close float-end" aria-label="Close" @click="closeMessage(result.message_href)"></button>
+    <div class="my-2 p-2">
+      <button type="button" class="btn-close float-end opacity-100" aria-label="Close" @click="closeMessage(result.message_href)"></button>
       <div>
-        <div v-if="messagesOpen[result.message_href].result" class="alert alert-success mt-4 mb-0">
+        <div v-if="messagesOpen[result.message_href].result">
           {{ _("S'ha enviat el missatge correctament.") }} <a :href="messagesOpen[result.message_href].agreement_url">{{ _("Ves a la conversa") }}</a>.
         </div>
         <div v-else-if="messagesOpen[result.message_href].error" class="alert alert-danger mt-4 mb-0">
@@ -426,12 +553,12 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
         <div v-else>
           <div v-if="result.options.length > 0">
             <p class="mt-1 mb-1 fw-bold">{{ _("Quines opcions vos interessen concretament?") }}</p>
-            <div class="multi-select p-0 text-start">
+            <div class="multi-select multi-select-badges p-0 text-start">
               <button
                 v-for="option in result.options"
                 :key="option"
                 @click="toggleMessageOption(result.message_href, option)"
-                class="btn multi-select-choice"
+                class="badge multi-select-choice"
                 :class="{selected: messagesOpen[result.message_href].options[option]}"
               >
                 ${ optionNamesMap[option] }
@@ -445,20 +572,24 @@ L.marker([{{ org.lat }}, {{ org.lng }}]).addTo(map);
           ></textarea>
         </div>
       </div>
-      <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error">
-        <button @click="sendMessage(result, '{{ origin }}')" class="btn btn-custom mt-2">
-          <span v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
-            Enviant
-            <div class="spinner-border spinner-border-sm" role="status">
-              <span class="visually-hidden">{{ _("Enviant...") }}</span>
-            </div>
-          </span>
-          <span v-else>
-            <i class="bi-send fs-6 me-2"></i>
-            <span v-if="messagesOpen[result.message_href]">
-              {{ _("Envia el missatge") }}
-            </span>
-          </span>
+      <div v-if="!messagesOpen[result.message_href].result && !messagesOpen[result.message_href].error" class="mt-2">
+        <button @click="sendMessage(result, '{{ origin }}')" class="btn btn-arrow">
+          <div class="d-flex align-items-stretch">
+            <template v-if="messagesOpen[result.message_href] && messagesOpen[result.message_href].loading">
+              <span class="btn-arrow-icon d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">{{ _("Enviant...") }}</span>
+                </div>
+              </span>
+              <span class="btn-arrow-text">{{ _("Enviant") }}</span>
+              <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
+            </template>
+            <template v-else>
+              <span class="btn-arrow-icon d-flex align-items-center"><i class="bi-send"></i></span>
+              <span class="btn-arrow-text">{{ _("Envia el missatge") }}</span>
+              <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
+            </template>
+          </div>
         </button>
         <span v-if="messagesOpen[result.message_href].errorMessage" class="ms-2">
           ${ messagesOpen[result.message_href].errorMessage }
@@ -475,7 +606,7 @@ function matchContains(search) {
     const parts = sanitize(search).split(" ").filter(x => x !== "");
     const targets = [
       sanitize(m.organization.name),
-      sanitize(m.comments),
+      sanitize(m.comments || ""),
       sanitize(jsonData.resource_names_map[m.resource]),
     ];
     for (var option of m.options) {
@@ -584,7 +715,7 @@ function matchContains(search) {
 {% macro render_resource(r, options) %}{{ resource_name(r) }}{% if len(options) > 0 %} ({{ display_list(options) }}){% endif %}{% endmacro %}
 
 {% macro sidebar_filter_show_link() %}
-<a href="#sidebar-filter" class="text-toggle d-md-none" data-bs-toggle="collapse" aria-expanded="true">
+<a href="#sidebar-filter" class="text-toggle d-lg-none" data-bs-toggle="collapse" aria-expanded="true">
   <span class="text-collapsed">{{ _("Mostra el filtre") }}</span>
   <span class="text-expanded">{{ _("Amaga el filtre") }}</span>
 </a>

@@ -1,0 +1,1 @@
+<input type="{{ widget.type }}" name="{{ widget.name }}" value="{{ widget.value or '' }}" class="form-control" {% for name, value in widget.attrs.items() %}{% if value is not sameas False %} {{ name }}{% if value is not sameas True %}="{{ value }}"{% endif %}{% endif %}{% endfor %}>

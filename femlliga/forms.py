@@ -5,8 +5,8 @@ from allauth.account.forms import LoginForm, SignupForm
 from django.utils.translation import gettext_lazy as _
 from django_recaptcha.fields import ReCaptchaField
 
-from . import constants as const
-from .models import (
+import femlliga.constants as const
+from femlliga.models import (
     Agreement,
     Contact,
     Announcement,
@@ -14,6 +14,8 @@ from .models import (
     CustomUser,
     Organization,
 )
+
+from femlliga.utils import spain_provinces_choices
 
 
 class PreferencesForm(forms.ModelForm):
@@ -158,3 +160,148 @@ class CaptchaLoginForm(LoginForm):
 
 class CaptchaSignupForm(SignupForm):
     captcha = ReCaptchaField()
+
+
+def add_empty_choice(choices):
+    new_choices = [x for x in choices]
+    new_choices.insert(0, ("", "-----"))
+    return new_choices
+
+
+class ReportFilterForm(forms.Form):
+    group_orgs_by = forms.ChoiceField(
+        choices=[
+            ("ORG_TYPE", _("Tipus d'organització")),
+            ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
+        ],
+        required=False,
+        label=_("Agrupa per"),
+    )
+    group_resources_by = forms.ChoiceField(
+        choices=[
+            ("ORG_TYPE", _("Tipus d'organització")),
+            ("ORG_SCOPE", _("Àmbit de treball de l'organització")),
+            ("RESOURCE", _("Categoria del recurs")),
+            ("RESOURCE_OPTION", _("Etiqueta del recurs")),
+        ],
+        required=False,
+        label=_("Agrupa per"),
+    )
+    group_agreements_by = forms.ChoiceField(
+        choices=[
+            ("SOLICITOR_ORG_TYPE", _("Tipus d'organització sol·licitant")),
+            (
+                "SOLICITOR_ORG_SCOPE",
+                _("Àmbit de treball de l'organització sol·licitant"),
+            ),
+            ("SOLICITEE_ORG_TYPE", _("Tipus d'organització sol·licitada")),
+            (
+                "SOLICITEE_ORG_SCOPE",
+                _("Àmbit de treball de l'organització sol·licitada"),
+            ),
+            ("RESOURCE", _("Categoria del recurs")),
+            ("RESOURCE_OPTION", _("Etiqueta del recurs")),
+            ("RESOURCE_TYPE", _("Tipus de recurs")),
+        ],
+        required=False,
+        label=_("Agrupa per"),
+    )
+
+    province = forms.ChoiceField(
+        choices=add_empty_choice(spain_provinces_choices),
+        required=False,
+        label=_("Filtra per província de l'organització"),
+    )
+    org_type = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_TYPES),
+        required=False,
+        label=_("Filtra per tipus de l'organització"),
+    )
+    org_scope = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_SCOPES),
+        required=False,
+        label=_("Filtra per àmbit de treball de l'organització"),
+    )
+
+    solicitor_province = forms.ChoiceField(
+        choices=add_empty_choice(spain_provinces_choices),
+        required=False,
+        label=_("Filtra per província de l'organització sol·licitant"),
+    )
+    solicitor_org_type = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_TYPES),
+        required=False,
+        label=_("Filtra per tipus de l'organització sol·licitant"),
+    )
+    solicitor_org_scope = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_SCOPES),
+        required=False,
+        label=_("Filtra per àmbit de treball de l'organització sol·licitant"),
+    )
+
+    solicitee_province = forms.ChoiceField(
+        choices=add_empty_choice(spain_provinces_choices),
+        required=False,
+        label=_("Filtra per província de l'organització sol·licitada"),
+    )
+    solicitee_org_type = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_TYPES),
+        required=False,
+        label=_("Filtra per tipus de l'organització sol·licitada"),
+    )
+    solicitee_org_scope = forms.ChoiceField(
+        choices=add_empty_choice(const.ORG_SCOPES),
+        required=False,
+        label=_("Filtra per àmbit de treball de l'organització sol·licitada"),
+    )
+
+    resource = forms.ChoiceField(
+        choices=add_empty_choice(const.RESOURCES),
+        required=False,
+        label=_("Filtra per categoria del recurs"),
+    )
+    resource_option = forms.ChoiceField(
+        choices=add_empty_choice(const.RESOURCE_OPTIONS_WITH_PREFIX),
+        required=False,
+        label=_("Filtra per etiqueta del recurs"),
+    )
+
+    start_date = forms.DateField(
+        required=False,
+        label=_("Creat després del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    end_date = forms.DateField(
+        required=False,
+        label=_("Creat abans del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    communication_start_date = forms.DateField(
+        required=False,
+        label=_("Petició creada després del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    communication_end_date = forms.DateField(
+        required=False,
+        label=_("Petició creada abans del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    agreement_start_date = forms.DateField(
+        required=False,
+        label=_("Acord definitiu després del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    agreement_end_date = forms.DateField(
+        required=False,
+        label=_("Acord definitiu abans del"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    hide_zeroes = forms.BooleanField(
+        required=False, label=_("Oculta files amb tot zeros")
+    )
+    show_only_zeroes = forms.BooleanField(
+        required=False, label=_("Mostra només files amb tot zeros")
+    )

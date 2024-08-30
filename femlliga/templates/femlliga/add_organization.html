@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, render_multi_checkboxes, render_formset_field, render_formset_select, render_formset_delete_vue, leaflet_css, leaflet_js, vue_js %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_select, render_multi_checkboxes, render_formset_field, render_formset_select, render_formset_delete_vue, leaflet_css, leaflet_js, vue_js, arrow_btn, arrow_btn_content, page_title %}
 
 {% block css %}{{ leaflet_css() }}{% endblock %}
 
@@ -15,15 +15,15 @@
 {% block content %}
 <div class="container">
 {% if edit %}
-<h1>{{ _("Edita la informació de l'entitat") }}</h1>
+{{ page_title(_("Edita la informació de l'entitat")) }}
 {% else %}
-<div class="alert alert-primary mt-2" role="alert">
+<div class="bg-lightblue text-center br-1rem p-3 mb-2 mt-2" role="alert">
   {{ _("Sembla que encara no heu donat d'alta cap entitat. Per favor, empleneu les dades de sota per crear-la. Podràs modificar i afegir més informació després.") }}
 </div>
 {% endif %}
 
 {% if form.errors %}
-<div class="alert alert-warning mt-2" role="alert">
+<div class="bg-yellow text-center br-1rem p-3 mb-2 mt-2" role="alert">
   {{ _("Hi ha errors en el formulari. Per favor, corregeix-los i torna a enviar-lo.") }}
 </div>
 {% endif %}
@@ -47,11 +47,17 @@
         {% endif %}
       </div>
       <div class="col-6">
-        <button class="btn btn-custom" @click.prevent="deleteLogo" :disabled="loading">
-          <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
-            <span class="visually-hidden">{{ _("Esborrant...") }}</span>
+        <button type="submit" class="btn btn-arrow" @click.prevent="deleteLogo" :disabled="loading">
+          <div class="d-flex align-items-stretch">
+            <span class="btn-arrow-icon d-flex align-items-center">
+              <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">{{ _("Esborrant...") }}</span>
+              </div>
+              <i v-else class="bi-trash"></i>
+            </span>
+            <span class="btn-arrow-text">{{ _("Esborra la imatge") }}</span>
+            <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
           </div>
-          <span v-else>{{ _("Esborra la imatge") }}</span>
         </button>
       </div>
     </div>
@@ -75,13 +81,13 @@
           class="row mb-2 social-media-wrapper {% if not mform.media_type.value() and not mform.value.value() %}d-none{% endif %}"
           id="social-media-wrapper-{{ i }}"
         >
-          <div class="col-4">
+          <div class="col-md-4 mt-2">
             {{ render_formset_select(mform, mform.media_type, "media_type", "", handler='@change="setMediaType($event)"') }}
           </div>
-          <div class="col-4">
+          <div class="col-md-4 mt-2">
             {{ render_formset_field(mform, mform.value, "value", "text", "", placeholder=media_type_placeholder(mform.media_type.value())) }}
           </div>
-          <div class="col-4">
+          <div class="col-md-4 mt-2">
             {{ render_formset_delete_vue(mform.DELETE, "deleteSocialMedia(" + str(i) + ")") }}
             {{ mform.id }}
             {{ mform.organization }}
@@ -89,8 +95,16 @@
         </div>
       {% endfor %}
       <div>
-        <a v-if="socialMediasAddIndex < totalSocialMedias" @click.prevent="addSocialMedia" class="btn btn-custom" href="#">
-          <i class="bi-plus-lg"></i> {{ _("Afegeix xarxa social") }}
+        <a
+          v-if="socialMediasAddIndex < totalSocialMedias"
+          @click.prevent="addSocialMedia"
+          href="#"
+          role="button"
+          class="btn btn-arrow"
+        >
+          <div class="d-flex align-items-center">
+            {{ arrow_btn_content(_("Afegeix xarxa social"), icon="bi-plus-lg") }}
+          </div>
         </a>
       </div>
     </div>
@@ -136,13 +150,10 @@
   {% endif %}
   <div id="citymap" class="map-height"></div>
 
-  <button type="submit" class="btn btn-custom mt-2">
-    {% if edit %}
-    {{ _("Desa") }}
-    {% else %}
-    {{ _("Crea l'entitat") }}
-    {% endif %}
-  </button>
+  {% if edit %}{% set btn_title = _("Desa") %}{% else %}{% set btn_title = _("Crea l'entitat") %}{% endif %}
+  <div class="mt-2">
+    {{ arrow_btn(btn_title, "bi-floppy") }}
+  </div>
 </form>
 </div>
 {% endblock %}

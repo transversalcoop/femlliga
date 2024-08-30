@@ -1,5 +1,7 @@
 {% extends "femlliga/_base.html" %}
 
+{% from 'femlliga/_macros.html' import arrow_btn_link %}
+
 {% block content %}
 <section>
   <div class="text-center">
@@ -12,7 +14,7 @@
     </h1>
   </div>
   <div class="container">
-    <div class="divider-1"></div>
+    <div class="divider-3 mb-60px"></div>
     <h2 class="text-center page-subheading">
 {% block error_description %}{% endblock %}
     </h2>
@@ -23,7 +25,7 @@
   <p class="text-center">{{ _("Sentim molt la molèstia. Pots tornar a intentar el que estaves fent, o, si l'error continua, <a href='%(url)s'>contactar amb nosaltres</a>", url=url("contact")) }}</p>
 
   <div class="text-center">
-    <a class="btn btn-custom error-page-btn" href="{{ url("index") }}">{{ _("Ves a la pàgina d'inici") }}</a>
+    {{ arrow_btn_link(_("Ves a la pàgina d'inici"), url("index"), "bi-house") }}
   </div>
 </div>
 {% endblock %}

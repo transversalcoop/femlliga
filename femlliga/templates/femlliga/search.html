@@ -8,45 +8,48 @@
 
 {% block content %}
 {% if len(json_data.matches.offerMatches) > 0 or len(json_data.matches.needMatches) > 0 %}
-<main id="content" class="container-fluid">
-  <div id="app" class="row">
-    <div class="col-md-4 d-md-block bg-light sidebar">
-      <h1>{{ _("Descobreix tot el que hi ha a Fem lliga!") }}</h1>
+<main id="content" class="container container-large mb-4">
+  <h1 class="fs-2-5rem mt-100px text-center lg:w-50 m-center">
+    {{ _("Descobreix tot el que hi ha a Fem lliga!") }}
+  </h1>
+  <div class="divider-3 mb-60px"></div>
+  <div id="app" class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
       {{ sidebar_filter_show_link() }}
-      <div class="collapse show" id="sidebar-filter">
+      <div class="collapse show mt-46px" id="sidebar-filter">
         <div class="btn-group w-100 mb-2" role="group" aria-label="{{ _("Selecciona si mostrar els resultats agrupats per recurs o per organització") }}">
           <button
             type="button"
-            class="btn"
+            class="btn btn-switch"
             @click="setShowBy('resources')"
-            :class="{'btn-warning': showBy === 'resources', 'btn-light': showBy !== 'resources'}">
+            :class="{'active': showBy === 'resources'}">
             {{ _("Recursos") }}
           </button>
           <button
             type="button"
-            class="btn"
+            class="btn btn-switch"
             @click="setShowBy('organizations')"
-            :class="{'btn-warning': showBy === 'organizations', 'btn-light': showBy !== 'organizations'}">
+            :class="{'active': showBy === 'organizations'}">
             {{ _("Organitzacions") }}
           </button>
         </div>
-        <input v-model="search" type="text" class="form-control" placeholder="{{ _("Cerca recursos o organitzacions") }}">
+        <input v-model="search" type="text" class="form-control border mt-5 mb-3" placeholder="{{ _("Cerca recursos o organitzacions") }}">
         <ul class="nav nav-pills flex-column mb-auto mt-2">
           <template v-if="showBy === 'resources'">
-            <h2 class="resource-matches-title background-yellow" v-if="allMatches.offerMatches">
+            <h2 class="fw-600" v-if="allMatches.offerMatches">
               {{ _("Ofereixen") }}
             </h2>
             {{ match_filter_row_vue("offer", _("Entitats que ofereixen recursos")) }}
-            <h2 class="resource-matches-title background-yellow-dark" v-if="allMatches.needMatches">
+            <h2 class="fw-600" v-if="allMatches.needMatches">
               {{ _("Necessiten") }}
             </h2>
             {{ match_filter_row_vue("need", _("Entitats que necessiten recursos")) }}
           </template>
           <template v-else>
-            <li class="nav-item" v-for="x in organizationsWithMatches" :key="x.organization.id">
-              <button
+            <li v-for="x in organizationsWithMatches" :key="x.organization.id">
+              <a
                 @click="selectOrganization(x.organization)"
-                class="nav-link w-100 text-start"
+                class="sidebar-row"
                 :class="{active: organizationSelected && organizationSelected.id === x.organization.id}"
                 type="button"
                 role="tab"
@@ -61,43 +64,42 @@
                 </span>
                 <span v-html="highlightSearch(x.organization.name, search)"></span>
                 <div class="fst-italic fs-7 text-body-secondary">A ${ x.organization.distance } {{ _("de vosaltres") }}</div>
-              </button>
+              </a>
             </li>
           </template>
         </ul>
       </div>
     </div>
 
-    <div class="col-md-8 ms-sm-auto px-md-4">
+    <div class="flex-gap"></div>
+
+    <div class="flex-two-thirds">
       {{ initial_loading_vue() }}
       <template v-else>
-        <div v-if="resourceSelected" class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">${ resourceNamesMap[resourceSelected] }</h2>
-            <div v-if="matchTypeSelected === 'offer'">
-              <div class="matches-count"><span>${ matches.offerMatches[resourceSelected].length } {{ _("resultats") }}</span></div>
-              {{ show_matches_vue("matches.offerMatches[resourceSelected]") }}
-            </div>
-            <div v-else>
-              <div class="matches-count"><span>${ matches.needMatches[resourceSelected].length } {{ _("resultats") }}</span></div>
-              {{ show_matches_vue("matches.needMatches[resourceSelected]") }}
-            </div>
+        <div v-if="resourceSelected" class="mt-3">
+          <h2 class="match-resource-title">
+            <i class="me-2" :class="resourceIconsMap[resourceSelected]"></i>
+            ${ resourceNamesMap[resourceSelected] }
+          </h2>
+          <div v-if="matchTypeSelected === 'offer'">
+            <div class="matches-count"><span>${ matches.offerMatches[resourceSelected].length } {{ _("resultats") }}</span></div>
+            {{ show_matches_vue("matches.offerMatches[resourceSelected]") }}
+          </div>
+          <div v-else>
+            <div class="matches-count"><span>${ matches.needMatches[resourceSelected].length } {{ _("resultats") }}</span></div>
+            {{ show_matches_vue("matches.needMatches[resourceSelected]") }}
           </div>
         </div>
-        <div v-else-if="organizationSelected" class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">${ organizationSelected.name }</h2>
-            <div class="matches-count agreements-count"><span>${ organizationMatches.length } {{ _("resultats") }}</span></div>
-            {{ show_matches_vue("organizationMatches") }}
-          </div>
+        <div v-else-if="organizationSelected" class="mt-3">
+          <h2 class="match-resource-title">${ organizationSelected.name }</h2>
+          <div class="matches-count"><span>${ organizationMatches.length } {{ _("resultats") }}</span></div>
+          {{ show_matches_vue("organizationMatches") }}
         </div>
-        <div v-else class="row mt-3">
-          <div class="col-12">
-            <h2 class="match-resource-title">{{ _("Tot") }}</h2>
-            <div class="matches-count"><span>${ concatenateMatches(matches.offerMatches).length + concatenateMatches(matches.needMatches).length } {{ _("resultats") }}</span></div>
-            {{ show_matches_vue("concatenateMatches(matches.offerMatches)") }}
-            {{ show_matches_vue("concatenateMatches(matches.needMatches)") }}
-          </div>
+        <div v-else class="mt-3">
+          <h2 class="match-resource-title">{{ _("Tot") }}</h2>
+          <div class="matches-count"><span>${ concatenateMatches(matches.offerMatches).length + concatenateMatches(matches.needMatches).length } {{ _("resultats") }}</span></div>
+          {{ show_matches_vue("concatenateMatches(matches.offerMatches)") }}
+          {{ show_matches_vue("concatenateMatches(matches.needMatches)") }}
         </div>
       </div>
     </template>
@@ -107,7 +109,8 @@
 </main>
 {% else %}
 <div class="container text-center pt-4">
-  <h1>{{ _("Sembla que no hi ha sort...") }}</h1>
+  <h1 class="fs-2-5rem mt-100px text-center">{{ _("Sembla que no hi ha sort...") }}</h1>
+  <div class="divider-3 mb-60px"></div>
   <p>{{ _("No hem trobat altres organitzacions dins de la distància que teniu marcada en preferències.") }}</p>
   <p>{{ _("No cal patir! Amb el temps s'incorporaran noves entitats que probablement compartisquen les mateixes necessitats que vosaltres. Podeu tornar a comprovar-ho en uns dies.") }}</p>
 </div>

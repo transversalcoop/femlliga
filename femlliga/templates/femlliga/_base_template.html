@@ -22,7 +22,13 @@
 
 {% block primary_navigation %}
   <ul class="navbar-nav mx-auto mb-lg-0">
-  {% if not user.is_anonymous %}
+  {% if user.is_anonymous %}
+    {% if exist_public_announcements() %}
+    <li>
+      {{ menu_url(_("Tauler d'anuncis"), "public_announcements") }}
+    </li>
+    {% endif %}
+  {% else %}
     {% set organization = request.user.get_organization() %}
     {% if organization %}
     <li
@@ -60,7 +66,6 @@
   {% endif %}
   {% if user.is_staff %}
   <li>{{ menu_url(_("Informe"), "report") }}</li>
-  <li>{{ menu_url(_("Dashboard"), "dashboard") }}</li>
   {% endif %}
 {% block menu %}{% endblock %}
   </ul>
