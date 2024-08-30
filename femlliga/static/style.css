@@ -242,28 +242,6 @@ nav a:hover {
     margin-top: 20px;
 }
 
-.divider-1 {
-    width: 50px;
-    height: 3px;
-    background-color: var(--yellow);
-    margin: 10px auto;
-    position: relative;
-    border-radius: 2px;
-}
-
-.divider-1::before {
-    background-color: var(--yellow);
-    box-shadow: 9px 0px 0px 0px var(--yellow), 18px 0px 0px 0px var(--yellow);
-    content: "";
-    position: absolute;
-    left: -27px;
-    top: 0;
-    display: inline-block;
-    height: 4px;
-    width: 4px;
-    border-radius: 50%;
-}
-
 .divider-2 {
     height: 20px;
     width: 260px;
@@ -404,11 +382,6 @@ pre {
     width: 75px;
 }
 
-.separator-yellow {
-    color: var(--yellow);
-    height: 2px;
-}
-
 .multi-select {
     padding: 15px;
     text-align: center;
@@ -545,13 +518,6 @@ a.badge:hover {
     background-position: bottom center;
 }
 
-.bottom-left-triangle-crosses-decoration {
-    background-image: url("/static/decorations/bottom-left-triangle-crosses.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: bottom center;
-}
-
 .black {
     color: black;
 }
@@ -683,14 +649,6 @@ a.badge:hover {
     top: 60px !important;
 }
 
-.resource-matches-title {
-    margin: 10px 0;
-    font-size: 1.75em;
-    text-align: left;
-    padding: 0 5px 0 20px;
-    line-height: 1em;
-}
-
 .match-box {
     margin-bottom: 2rem;
     background-color: var(--lightgrey);
@@ -741,27 +699,8 @@ a.badge:hover {
     margin-left: -9em;
 }
 
-.background-yellow {
-    background-color: var(--yellow);
-}
-
-.background-yellow-dark {
-    background-color: var(--brown);
-    color: white;
-}
-
 .bg-lightgrey {
     background-color: var(--lightgrey);
-}
-
-.bg-midblue {
-    background-color: var(--midblue);
-}
-
-.square-2 {
-    width: 2rem;
-    height: 2rem;
-    line-height: 2rem;
 }
 
 .border {
@@ -826,10 +765,6 @@ a.badge:hover {
     margin-right: -1em;
 }
 
-.background-grey {
-    background-color: var(--lightgrey2);
-}
-
 .form-switch .form-check-input:checked {
     background-color: var(--midblue);
     border-color: var(--midblue);
@@ -890,11 +825,6 @@ a.badge:hover {
     font-weight: 700;
     color: gray;
     font-size: 1.125em;
-}
-
-.error-page-btn {
-    font-weight: bold;
-    font-size: 1.25rem;
 }
 
 .mb--5 {

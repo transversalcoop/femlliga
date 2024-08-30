@@ -13,7 +13,7 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 ### Changed
 
 
-## [1.2.0] - 2024-06-XX
+## [1.2.0] - 2024-09-XX
 
 ### Added
 
@@ -29,9 +29,15 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - Una organització pot configurar si rebre un correu electrònic sempre que es rep un
   missatge per un anunci
 - Una organització pot revisar els missatges rebuts pels seus anuncis
+- Una usuària que intenta canviar el seu correu electrònic pot rectificar i tornar a
+  l'actual
+- Afegida la guia metodològica i el segell a la portada
+- S'envia un correu de benvinguda a l'aplicació al cap de dos dies del registre, amb el
+  segell adjunt
 
 ### Changed
 
+- Revisats els estils de tota l'aplicació
 - Les converses s'accepten automàticament, donat que es fan dins de l'aplicació i no
   impliquen els correus electrònics dels participants
 - Les converses que estaven pendents d'acceptar s'accepten
@@ -40,6 +46,7 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - S'han afegit noves categories i etiquetes de recursos, mentre que altres s'han reagrupat
 - Quan s'inicia una petició d'intercanvi, es premarquen les opcions indicades en
   necessitats
+- L'informe de l'aplicació ara és configurable amb múltiples opcions
 
 ### Removed
 

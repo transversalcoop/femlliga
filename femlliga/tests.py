@@ -834,8 +834,8 @@ class IntegrationTests(TestCase):
                         {
                             "code": "TRAINING",
                             "options": [
-                                ResourceOption.objects.get(name="TRAINING_BUREAUCRACY"),
                                 ResourceOption.objects.get(name="TRAINING_EQUALITY"),
+                                ResourceOption.objects.get(name="TRAINING_BUREAUCRACY"),
                             ],
                         },
                     ],
