@@ -118,16 +118,16 @@
 
   <div class="modal fade" id="carouselModal{{ match_type }}{{ resource.id }}" tabindex="-1" aria-labelledby="carouselModalImages" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
-      <div class="modal-content" style="background: none;">
-        <div class="modal-header" style="background-color: white;">
+      <div class="modal-content bg-none">
+        <div class="modal-header bg-white">
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
         </div>
-        <div class="modal-body" style="background-color: rgba(0, 0, 0, 0.3);">
-          <div id="carouselImages{{ match_type }}{{ resource.id }}" class="carousel slide" style="height: 100%;" data-bs-ride="carousel">
+        <div class="modal-body bg-translucid">
+          <div id="carouselImages{{ match_type }}{{ resource.id }}" class="carousel slide h-100" data-bs-ride="carousel">
             <div class="carousel-inner">
               {% for i, image in enumerate(resource.images.all()) %}
               <div class="carousel-item text-center{% if i == 0 %} active{% endif %}">
-                <img src="{{ image.image.url }}/" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;" loading="lazy">
+                <img src="{{ image.image.url }}/" class="d-block carousel-img" loading="lazy">
               </div>
               {% endfor %}
             </div>
@@ -292,7 +292,7 @@ a <template> tag, gets shown #}
 
 {% macro render_formset_field(form, field, field_name, input_type, label, placeholder="") %}
   {% if label %}
-    <label for="id_{{ field.html_name }}" style="margin-top: 10px;">{{ label }}</label>
+    <label for="id_{{ field.html_name }}" class="mt-2">{{ label }}</label>
   {% endif %}
   <input type="{{ input_type }}" {{ input_classes(form, field_name) }} name="{{ field.html_name }}" id="id_{{ field.html_name }}" {{ formset_input_value(field) }} placeholder="{{ placeholder }}">
   {{ input_feedback(form, field_name) }}
@@ -335,14 +335,14 @@ a <template> tag, gets shown #}
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Tanca") }}"></button>
       </div>
       <div class="modal-body bg-black bg-opacity-25">
-        <div id="carousel-images" class="carousel slide" style="height: 100%;" data-bs-ride="carousel">
+        <div id="carousel-images" class="carousel slide h-100" data-bs-ride="carousel">
           <div class="carousel-inner">
             <div
               v-for="(image, index) in carouselImages"
               :key="image.url"
               class="carousel-item text-center"
               :class="{active: index === 0}">
-              <img :src="image.url" class="d-block" style="max-height: 100%; max-width: 80%; margin: 0 auto;" loading="lazy">
+              <img :src="image.url" class="d-block carousel-img" loading="lazy">
             </div>
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#carousel-images" data-bs-slide="prev">

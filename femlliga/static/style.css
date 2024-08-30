@@ -76,6 +76,12 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     padding: 0;
 }
 
+.brand {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.75em;
+}
+
 .btn-light {
     border-radius: 0.75rem;
     padding: 10px 18px;
@@ -182,7 +188,6 @@ nav a:hover {
     border-radius: 1rem;
 }
 
-
 .nav-pills .nav-link.sidebar-box.active, .nav-pills .nav-link.sidebar-box:hover {
     background-color: var(--midblue);
     border: 1px solid black;
@@ -227,15 +232,6 @@ nav a:hover {
 
 .max-w-100 {
     max-width: 100%;
-}
-
-.h-special {
-    height: calc(100% - 64px);
-}
-
-
-.h-100vh {
-    min-height: 100vh;
 }
 
 .spacing {
@@ -483,6 +479,18 @@ a.badge:hover {
     height: 700px;
 }
 
+.h-special {
+    height: calc(100% - 64px);
+}
+
+.h-100vh {
+    min-height: 100vh;
+}
+
+.h-58px {
+    height: 58px;
+}
+
 .h-70vh {
     height: 70vh;
 }
@@ -497,6 +505,10 @@ a.badge:hover {
 
 .h-425px {
     height: 425px;
+}
+
+.z-10000 {
+    z-index: 10000;
 }
 
 .inner-container {
@@ -524,6 +536,10 @@ a.badge:hover {
 
 .text-grey {
     color: var(--textgrey);
+}
+
+.pt-100px {
+    padding-top: 100px;
 }
 
 .pb-15rem {
@@ -575,6 +591,10 @@ a.badge:hover {
 
 .mb-10rem {
     margin-bottom: 10rem;
+}
+
+.m-decoration-image {
+    margin: 30px 0 30px 250px;
 }
 
 .lh-1-75rem {
@@ -699,10 +719,6 @@ a.badge:hover {
     margin-left: -9em;
 }
 
-.bg-lightgrey {
-    background-color: var(--lightgrey);
-}
-
 .border {
     border: 1px solid black !important;
 }
@@ -787,10 +803,6 @@ a.badge:hover {
     background-color: var(--midblue);
 }
 
-.bg-yellow {
-    background-color: var(--yellow);
-}
-
 .text-toggle[aria-expanded=false] .text-expanded {
     display: none;
 }
@@ -844,8 +856,39 @@ a.badge:hover {
     margin-bottom: 0;
 }
 
+.list-none {
+    list-style: none;
+    padding: 0;
+}
+
 .bg-lightblue {
     background-color: var(--lightblue);
+}
+
+.bg-yellow {
+    background-color: var(--yellow);
+}
+
+.bg-lightgrey {
+    background-color: var(--lightgrey);
+}
+
+.bg-white {
+    background-color: white;
+}
+
+.bg-translucid {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.bg-none {
+    background: none;
+}
+
+.carousel-img {
+    max-height: 100%;
+    max-width: 80%;
+    margin: 0 auto;
 }
 
 .sidebar-row {
