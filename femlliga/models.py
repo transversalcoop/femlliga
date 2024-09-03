@@ -520,6 +520,7 @@ class Announcement(models.Model):
                 "lat": self.organization.lat,
                 "lng": self.organization.lng,
                 "province": self.get_province(),
+                "href": reverse("view_organization", args=[self.organization.id]),
             }
 
         if current_organization:

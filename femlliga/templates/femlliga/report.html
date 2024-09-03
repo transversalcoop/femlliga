@@ -116,12 +116,14 @@
 
   {{ zero_switches(form) }}
 
-  <div class="mt-3">{{ arrow_btn(_("Filtra"), "bi-filter") }}</div>
-  {% if needs_comments or offers_comments %}
-    <a data-bs-toggle="modal" href="#resource-comments-modal" role="button" class="btn btn-light">
-      {{ _("Consulta els comentaris") }}
-    </a>
-  {% endif %}
+  <div class="mt-3">
+    {{ arrow_btn(_("Filtra"), "bi-filter") }}
+    {% if needs_comments or offers_comments %}
+      <a data-bs-toggle="modal" href="#resource-comments-modal" role="button" class="btn btn-light">
+        {{ _("Consulta els comentaris") }}
+      </a>
+    {% endif %}
+  </div>
 </form>
 {{ render_dataframe(resources_df) }}
 {% if needs_comments or offers_comments %}

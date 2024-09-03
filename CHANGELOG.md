@@ -74,7 +74,7 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - Limitació de distància a la que es fan les lligues
 - Indicació de si un Local és accessible
 - _Tour_ de l'aplicació després de completar l'alta
-- Opció d'esborrar per complet el compte d'usuari i la organització creada
+- Opció d'esborrar per complet el compte d'usuari i l'organització creada
 
 ### Changed
 

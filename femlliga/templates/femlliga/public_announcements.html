@@ -25,14 +25,15 @@
         <div class="match-box p-3">
           <h2 v-html="highlightSearch(a.title, search)" class="fw-600 mt-0"></h2>
           <p class="mb-0">
-            <span v-html="highlightSearch(a.organization.name, search)"></span>
+            <a :href="a.organization.href" target="_blank"><span v-html="highlightSearch(a.organization.name, search)"></span></a>
             {{ _("necessita") }}
             <span v-html="highlightSearch(a.option, search)"></span>
           </p>
           <p>
             <strong>
-              {{ _("Província de") }}
+              {{ _("Ubicació de l'entitat:") }}
             </strong>
+            {{ _("província de") }}
             <span v-html="highlightSearch(a.organization.province.name, search)" class="pre-wrap"></span>
           </p>
           <p v-html="highlightSearch(a.description, search)" class="pre-wrap"></p>

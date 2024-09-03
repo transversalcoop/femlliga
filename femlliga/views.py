@@ -302,9 +302,11 @@ def search_address(request):
     return JsonResponse({"addresses": http_get(url)})
 
 
-@login_required
 def view_organization(request, organization_id):
     org = get_object_or_404(Organization, pk=organization_id)
+    if not request.user.is_authenticated:
+        if org.announcements.filter(public=True).count() == 0:
+            raise PermissionDenied()
     return render(request, "femlliga/view_organization.html", {"org": org})
 
 
@@ -979,7 +981,7 @@ def delete_account(request):
         request.user.organizations.first().delete()
         request.user.delete()
         messages.info(
-            request, _("S'ha esborrat el compte i la organització"), extra_tags="show"
+            request, _("S'ha esborrat el compte i l'organització"), extra_tags="show"
         )
         return redirect("index")
 
@@ -1533,24 +1535,24 @@ def get_agreements_df(agreements, form):
         (
             "SOLICITOR_ORG_TYPE",
             ORG_TYPES,
-            lambda org_type: lambda a: a.solicitor.org_type == org_type,
+            lambda org_type: lambda a: a.solicitor and a.solicitor.org_type == org_type,
         ),
         (
             "SOLICITOR_ORG_SCOPE",
             ORG_SCOPES,
-            lambda org_scope: lambda a: org_scope
-            in {s.name for s in a.solicitor.scopes.all()},
+            lambda org_scope: lambda a: a.solicitor
+            and org_scope in {s.name for s in a.solicitor.scopes.all()},
         ),
         (
             "SOLICITEE_ORG_TYPE",
             ORG_TYPES,
-            lambda org_type: lambda a: a.solicitee.org_type == org_type,
+            lambda org_type: lambda a: a.solicitee and a.solicitee.org_type == org_type,
         ),
         (
             "SOLICITEE_ORG_SCOPE",
             ORG_SCOPES,
-            lambda org_scope: lambda a: org_scope
-            in {s.name for s in a.solicitee.scopes.all()},
+            lambda org_scope: lambda a: a.solicitee
+            and org_scope in {s.name for s in a.solicitee.scopes.all()},
         ),
         ("RESOURCE", RESOURCES, same_resource),
         ("RESOURCE_OPTION", RESOURCE_OPTIONS_WITH_PREFIX, has_option),
@@ -1585,17 +1587,25 @@ def get_agreements_df(agreements, form):
 
 def filter_report_agreements(agreements, form):
     filters = [
-        ("solicitor_province", lambda v, a: v == a.solicitor.get_province()["id"]),
-        ("solicitee_province", lambda v, a: v == a.solicitee.get_province()["id"]),
-        ("solicitor_org_type", lambda v, a: v == a.solicitor.org_type),
-        ("solicitee_org_type", lambda v, a: v == a.solicitee.org_type),
+        (
+            "solicitor_province",
+            lambda v, a: a.solicitor and v == a.solicitor.get_province()["id"],
+        ),
+        (
+            "solicitee_province",
+            lambda v, a: a.solicitee and v == a.solicitee.get_province()["id"],
+        ),
+        ("solicitor_org_type", lambda v, a: a.solicitor and v == a.solicitor.org_type),
+        ("solicitee_org_type", lambda v, a: a.solicitee and v == a.solicitee.org_type),
         (
             "solicitor_org_scope",
-            lambda v, a: v in {s.name for s in a.solicitor.scopes.all()},
+            lambda v, a: a.solicitor
+            and v in {s.name for s in a.solicitor.scopes.all()},
         ),
         (
             "solicitee_org_scope",
-            lambda v, a: v in {s.name for s in a.solicitee.scopes.all()},
+            lambda v, a: a.solicitee
+            and v in {s.name for s in a.solicitee.scopes.all()},
         ),
         ("resource", lambda v, a: v == a.resource),
         ("resource_option", lambda v, a: v in {x.name for x in a.options.all()}),
@@ -1852,7 +1862,7 @@ def public_announcement(request, pk):
                 )
 
             msg = _(
-                "S'ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible"
+                "S'ha enviat el missatge. L'organització es posarà en contacte amb tu el més aviat possible"
             )
             messages.info(request, msg, extra_tags="show")
             return redirect(reverse("public_announcement", args=[pk]))

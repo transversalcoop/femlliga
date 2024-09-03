@@ -925,7 +925,7 @@ class IntegrationTests(TestCase):
         self.assertEqual(len(mail.outbox), 2)
         self.assertContains(
             response,
-            "S&#39;ha enviat el missatge. La organització es posarà en contacte amb tu el més aviat possible",
+            "S&#39;ha enviat el missatge. L&#39;organització es posarà en contacte amb tu el més aviat possible",
         )
 
         self.client.login(email=org_email, password=PASS_FOR_TESTS)
