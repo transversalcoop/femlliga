@@ -1,10 +1,7 @@
 :root {
     --yellow: #ffce1c;
-    --blue: #3945B8;
-    --midblue: #7df9ff;
+    --blue: #7df9ff;
     --lightblue: #c5ddff;
-    --brown: #505000;
-    --lightbrown: #5b5b00;
     --textgrey: #808080;
     --darkgrey: #212529;
     --midgrey: #9a9a9a;
@@ -162,7 +159,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 }
 
 .btn-switch.active {
-    background-color: var(--midblue);
+    background-color: var(--blue);
     border-radius: 0.375rem;
 }
 
@@ -189,7 +186,7 @@ nav a:hover {
 }
 
 .nav-pills .nav-link.sidebar-box.active, .nav-pills .nav-link.sidebar-box:hover {
-    background-color: var(--midblue);
+    background-color: var(--blue);
     border: 1px solid black;
 }
 
@@ -407,7 +404,7 @@ pre {
 }
 
 .multi-select .multi-select-choice.selected {
-    background-color: var(--midblue);
+    background-color: var(--blue);
 }
 
 .nav-pills .nav-link.active {
@@ -467,7 +464,7 @@ a.badge:hover {
 }
 
 .highlight {
-    background-color: var(--midblue);
+    background-color: var(--blue);
     color: black;
 }
 
@@ -782,8 +779,8 @@ a.badge:hover {
 }
 
 .form-switch .form-check-input:checked {
-    background-color: var(--midblue);
-    border-color: var(--midblue);
+    background-color: var(--blue);
+    border-color: var(--blue);
 }
 
 .form-switch .form-check-input:checked {
@@ -792,15 +789,15 @@ a.badge:hover {
 }
 
 .preferences-row .form-range::-webkit-slider-thumb {
-    background-color: var(--midblue);
+    background-color: var(--blue);
 }
 
 .preferences-row .form-range::-moz-range-thumb {
-    background-color: var(--midblue);
+    background-color: var(--blue);
 }
 
 .preferences-row .form-range::-ms-thumb {
-    background-color: var(--midblue);
+    background-color: var(--blue);
 }
 
 .text-toggle[aria-expanded=false] .text-expanded {
@@ -907,7 +904,7 @@ a.sidebar-row:hover {
 }
 
 .sidebar-row.active, a.sidebar-row:hover {
-    background-color: var(--midblue);
+    background-color: var(--blue);
 }
 
 .text-start {
