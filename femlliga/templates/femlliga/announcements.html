@@ -8,16 +8,17 @@
 {% if len(json_data.announcements) > 0 %}
 <div class="container">
   {{ page_title(_("Anuncis")) }}
-  <div class="text-center mb-3">
-    {{ arrow_btn_link(_("Afegeix anunci"), url("add_announcement", args=[org.id]), "bi-plus-lg") }}
-  </div>
+
+  <p class="bg-lightblue br-1rem p-4 mb-5 text-center">
+    {{ _("En aquesta pàgina podeu veure els anuncis que heu creat i que es poden publicar.") }}
+  </p>
 
   <div id="vue-app" class="d-flex flex-column flex-lg-row">
     <div class="flex-third">
-      <p class="mt-3">
-        {{ _("En aquesta pàgina podeu veure els anuncis que heu creat i que es poden publicar.") }}
-      </p>
       <div class="collapse show" id="sidebar-filter">
+        <div class="mb-3">
+          {{ arrow_btn_link(_("Afegeix anunci"), url("add_announcement", args=[org.id]), "bi-plus-lg") }}
+        </div>
         <input v-model="search" type="text" class="form-control border" placeholder="{{ _("Cerca anuncis creats") }}">
       </div>
     </div>
@@ -40,18 +41,15 @@
             </h3>
           </div>
           <p class="mb-0">
-            <i class="{{ consts.RESOURCE_ICONS_MAP["ALLIANCES"] }} me-1"></i>
-            <span class="fst-italic">${ labels[announcement.resource][announcement.option_name] }</span>
-          </p>
-          <p class="mb-0">
-            <span v-if="announcement.public">
-              <i class="bi-share me-1"></i>
+            <span v-if="announcement.public" class="me-3">
+              <i class="bi-send me-1"></i>
               <a :href="announcement.public_href">{{ _("Anunci públic") }}</a>
             </span>
-            <span v-else>
+            <span v-else class="me-3">
               <i class="bi-lock"></i>
               {{ _("Anunci no publicat") }}
             </span>
+            <span class="badge bg-light">${ labels[announcement.resource][announcement.option_name] }</span>
           </p>
           <p v-if="announcement.contacts_message" class="mb-0">
             <i class="bi-circle-fill text-danger" v-if="announcement.pending_contacts"></i>

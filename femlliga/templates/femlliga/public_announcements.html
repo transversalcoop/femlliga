@@ -25,7 +25,7 @@
         <div class="match-box p-3">
           <h2 v-html="highlightSearch(a.title, search)" class="fw-600 mt-0"></h2>
           <p class="mb-0">
-            <a :href="a.organization.href" target="_blank"><span v-html="highlightSearch(a.organization.name, search)"></span></a>
+            <strong><a :href="a.organization.href" target="_blank"><span v-html="highlightSearch(a.organization.name, search)"></span></a></strong>
             {{ _("necessita") }}
             <span v-html="highlightSearch(a.option, search)"></span>
           </p>

@@ -6,7 +6,7 @@
 
 {% block content %}
 {% if len(agreements.sent) > 0 or len(agreements.received) > 0 %}
-<div class="container container-large mb-4">
+<div class="container mb-4">
   <h1 class="fs-2-5rem mt-100px text-center lg:w-50 m-center">
     {{ _("Peticions d'intercanvi enviades i rebudes") }}
   </h1>
@@ -34,7 +34,10 @@
         <input v-model="search" type="text" class="form-control border mt-5 mb-3" placeholder="{{ _("Cerca recursos o organitzacions") }}">
         <div class="form-check form-switch mt-2">
           <input class="form-check-input" type="checkbox" role="switch" id="showClosedSwitch" v-model="showClosed">
-          <label class="form-check-label" for="showClosedSwitch">{{ _("Mostra peticions tancades") }}</label>
+          <label class="form-check-label" for="showClosedSwitch">
+            {{ _("Mostra peticions tancades") }}
+            <template v-if="!showClosed">(<span v-html="closedAgreementsCount"></span> {{ _("no es mostren") }})</template>
+          </label>
         </div>
         <ul class="nav nav-pills flex-column mb-auto mt-2">
           <template v-if="showBy === 'resources'">
@@ -106,7 +109,9 @@
 </div>
 {% else %}
 <div class="container text-center pt-4">
-  <h1>{{ _("Encara no heu enviat ni rebut peticions") }}</h1>
+  <h1 class="fs-2-5rem mt-100px text-center lg:w-50 m-center">
+    {{ _("Encara no heu enviat ni rebut peticions") }}
+  </h1>
   <p>{{ _("En podeu enviar des de la pàgina de «Has lligat?» o des de la pàgina de «Descobreix».") }}</p>
 </div>
 {% endif %}
@@ -128,7 +133,7 @@
       title="{{ title }}">
       ${ agreements.{{ request_type }}[resource].length }
     </span>
-    <span v-if="agreementsPending(agreements.{{ request_type }}[resource])" class="float-end">
+    <span v-if="agreementsPending(agreements.{{ request_type }}[resource])" class="float-end mt-2px">
       <i class="bi-circle-fill text-danger"></i>
     </span>
     <i class="me-2" :class="resourceIconsMap[resource]"></i>
@@ -158,33 +163,33 @@
     <span class="badge bg-light me-2" v-for="option in result.options" :key="option" v-html="highlightSearch(optionNamesMap[option], search)"></span>
 
     <p class="mt-2 mb-0">
-      <i class="bi-send"></i>
-      {{ _("Petició enviada el") }} ${ formatDateTime(result.date) }
+      <i class="bi-send me-2"></i>
+      <strong>{{ _("Petició enviada:") }}</strong> ${ formatDateTime(result.date) }
     </p>
 
     <p v-if="result.last_message_on" class="mb-0">
-      <i class="bi-chat"></i>
-      {{ _("Últim missatge enviat el") }} ${ formatDateTime(result.last_message_on) }
+      <i class="bi-chat me-2"></i>
+      <strong>{{ _("Últim missatge enviat:") }}</strong> ${ formatDateTime(result.last_message_on) }
     </p>
 
-    <p v-if="result.messages_not_read === 1" class="mb-0">
+    <div v-if="result.messages_not_read === 1" class="bg-lightblue br-05rem p-2 mb-3 mt-3">
       <i class="bi-circle-fill text-danger"></i>
       {{ _("Hi ha un missatge pendent de llegir") }}
-    </p>
-    <p v-else-if="result.messages_not_read > 1" class="mb-0">
+    </div>
+    <div v-else-if="result.messages_not_read > 1" class="bg-lightblue br-05rem p-2 mb-3 mt-3">
       <i class="bi-circle-fill text-danger"></i>
       {{ _("Hi ha") }} ${ result.messages_not_read } {{ _("missatges pendents de llegir") }}
-    </p>
-    <div v-else-if="result.agreement_successful === null">
+    </div>
+    <div v-else-if="result.agreement_successful === null" class="bg-lightblue br-05rem p-2 mb-3 mt-3">
       <i class="bi-circle-fill text-danger"></i>
       {{ _("Encara no s'ha indicat si s'ha realitzat l'intercanvi") }}
     </div>
 
-    <div v-if="result.agreement_successful === false">
+    <div v-if="result.agreement_successful === false" class="bg-lightblue br-05rem p-2 mb-3 mt-3">
       <i class="bi-x-lg text-danger"></i>
       {{ _("No es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
     </div>
-    <div v-else-if="result.agreement_successful === true">
+    <div v-else-if="result.agreement_successful === true" class="bg-lightblue br-05rem p-2 mb-3 mt-3">
       <i class="bi-check2 text-success"></i>
       {{ _("Es va realitzar l'intercanvi") }} <span v-if="result.successful_date">(${ formatDateTime(result.successful_date) })</span>
     </div>
@@ -293,6 +298,9 @@ Vue.createApp({
     },
     concatenatedAgreements() {
       return this.allConcatenatedAgreements.filter(this.filterClosed).filter(agreementContains(this.search));
+    },
+    closedAgreementsCount() {
+      return this.allConcatenatedAgreements.filter(a => a.agreement_successful !== null).filter(agreementContains(this.search)).length;
     },
     organizationsWithAgreements() {
       return this.allOrganizations.map(o => {

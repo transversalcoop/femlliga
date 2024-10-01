@@ -18,21 +18,21 @@ h1 {
     font-weight: 300;
 }
 
-h2 {
-    font-size: 28px;
-    font-weight: normal;
-}
-
-h3 {
-    font-size: 24px;
-    font-weight: normal;
-}
-
 h1, h2, h3, h4, h5, h6 {
     color: black;
     margin-top: 20px;
     font-family: "Poppins", sans-serif;
     font-weight: 700;
+}
+
+h2 {
+    font-size: 34px;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 28px;
+    font-weight: 600;
 }
 
 a {
@@ -100,6 +100,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     border-radius: 0.375rem;
     padding: 0.25rem 2rem;
     background-color: white;
+    font-size: 17px;
 }
 
 .btn-thin:hover, .btn-thin:focus-visible {
@@ -111,7 +112,6 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     border-radius: 0.75rem;
     padding: 0.25rem;
     border: 1px solid black;
-    text-transform: uppercase;
     background-color: white;
 }
 
@@ -135,7 +135,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     font-size: 1rem;
     padding: 0.25rem 0.75rem;
     border-right: 1px solid black;
-    font-weight: 900;
+    font-weight: 600;
 }
 
 .btn-arrow .btn-arrow-arrow {
@@ -418,6 +418,7 @@ nav .nav-link.active, ul.nav .nav-link.active {
 
 .badge {
     font-weight: normal;
+    font-size: 15px;
     margin: 0 5px 10px 0;
 }
 
@@ -556,6 +557,10 @@ a.badge:hover {
 .px-7rem {
     padding-right: 7rem;
     padding-left: 7rem;
+}
+
+.mt-2px {
+    margin-top: 2px;
 }
 
 .mt-46px {
@@ -890,7 +895,7 @@ a.badge:hover {
 
 .sidebar-row {
     display: block;
-    padding: 2px 5px;
+    padding: 4px 5px 6px 5px;
     margin: 5px 0;
     border-radius: 0.25rem;
 }
@@ -1069,6 +1074,11 @@ a.sidebar-row:hover {
 
     .container.container-large {
         max-width: 1500px;
+    }
+
+    .xxl\:px-5rem {
+        padding-left: 5rem;
+        padding-right: 5rem;
     }
 }
 

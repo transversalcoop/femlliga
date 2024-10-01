@@ -13,7 +13,7 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 ### Changed
 
 
-## [1.2.0] - 2024-09-XX
+## [1.2.0] - 2024-10-XX
 
 ### Added
 
@@ -34,10 +34,12 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 - Afegida la guia metodològica i el segell a la portada
 - S'envia un correu de benvinguda a l'aplicació al cap de dos dies del registre, amb el
   segell adjunt
+- Quan un formulari té errors la pàgina es desplaça verticalment fins el primer error
 
 ### Changed
 
 - Revisats els estils de tota l'aplicació
+- Revisats els textos de tota l'aplicació
 - Les converses s'accepten automàticament, donat que es fan dins de l'aplicació i no
   impliquen els correus electrònics dels participants
 - Les converses que estaven pendents d'acceptar s'accepten

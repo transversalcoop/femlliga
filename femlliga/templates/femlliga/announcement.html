@@ -7,29 +7,29 @@
 {% block content %}
 <div class="container">
   {{ page_title(announcement.title) }}
-  <div class="text-center mb-3">
-    {{ arrow_btn_link(_("Edita"), url("edit_announcement", kwargs={"organization_id": announcement.organization.id, "announcement_id": announcement.id}), "bi-pencil-square") }}
-  </div>
+
+  <p class="pre-wrap bg-lightblue br-1rem p-4 mb-5 text-center">{{ announcement.description }}</p>
 
   <div id="vue-app" class="d-flex flex-column flex-lg-row">
     <div class="flex-third">
+      <div class="mb-3">
+        {{ arrow_btn_link(_("Edita"), url("edit_announcement", kwargs={"organization_id": announcement.organization.id, "announcement_id": announcement.id}), "bi-pencil-square") }}
+      </div>
       {{ sidebar_filter_show_link() }}
       <div class="collapse show" id="sidebar-filter">
         <input v-model="search" type="text" class="form-control border" placeholder="{{ _("Cerca persones interessades") }}">
-        <p class="mt-2 mb-0">
-          <i class="{{ consts.RESOURCE_ICONS_MAP["ALLIANCES"] }} me-1"></i>
+        <p class="mt-2 mb-2 badge bg-light">
           {{ consts.NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP[(announcement.resource, announcement.option.name)] }}
         </p>
         <p>
           {% if announcement.public %}
-          <i class="bi-share me-2"></i>
+          <i class="bi-send me-2"></i>
           <a href="{{ url("public_announcement", args=[announcement.id]) }}">{{ _("Anunci públic") }}</a>
           {% else %}
           <i class="bi-lock"></i>
           {{ _("Anunci no publicat") }}
           {% endif %}
         </p>
-        <p class="pre-wrap">{{ announcement.description }}</p>
       </div>
     </div>
 
@@ -62,7 +62,9 @@
       </template>
       {% else %}
       <div class="container text-center pt-4">
-        <h1>{{ _("Encara no hi ha persones interessades en aquest anunci") }}</h1>
+        <h1 class="fs-2-5rem mt-3 text-center">
+          {{ _("Encara no hi ha persones interessades en aquest anunci") }}
+        </h1>
         <p>{{ _("Qualsevol persona podrà veure aquest anunci i contactar amb vosaltres en cas que el publiqueu") }}</p>
       </div>
       {% endif %}

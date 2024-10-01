@@ -16,18 +16,18 @@
 <div class="container">
   {{ page_title(title) }}
 
-<form method="post" id="vue-app" class="mb-2">
+<form method="post" id="vue-app" class="mb-2 match-box w-80 m-center">
   {{ csrf_input }}
   {{ form_feedback(form) }}
 
-  <div class="mb-3">
+  <div class="mb-5">
     <label for="id_title"><strong>{{ _("Títol de l'anunci") }}</strong></label>
     <input type="text" {{ input_classes(form, "title") }} name="title" autocomplete="Nom" id="id_title" {{ input_value(form, "title") }} required>
     {{ input_feedback(form, "title") }}
   </div>
 
   <p class="mb-0"><strong>{{ _("Escolleix el tipus d'anunci") }}</strong></p>
-  <div class="form-check mb-3">
+  <div class="form-check mb-5">
     <input type="hidden" name="resource" value="ALLIANCES">
     <input class="form-check-input {% if form.errors["option"] %}is-invalid{% endif %}" type="radio" name="option" id="option-1" value="VOLUNTEERING" v-model="option" required>
     <label class="form-check-label" for="option-1">
@@ -36,7 +36,7 @@
     {{ input_feedback(form, "option") }}
   </div>
 
-  <div class="mb-3">
+  <div class="mb-5">
     <label for="id_description">
       <strong>{{ _("Descripció de l'anunci") }}</strong>
       <template v-if="option">. ${ descriptions["ALLIANCES"][option] }</template>

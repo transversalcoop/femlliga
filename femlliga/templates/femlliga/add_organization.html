@@ -114,7 +114,7 @@
     </div>
 
     <div class="py-3">
-      {{ render_multi_checkboxes(form, "scopes", "Àmbits") }}
+      {{ render_multi_checkboxes(form, "scopes", _("Àmbits")) }}
     </div>
 
     <div class="py-3">
@@ -145,7 +145,7 @@
 
   {% if form.errors.lat or form.errors.lng %}
   <div class="invalid-feedback d-block">
-    <ul><li>{{ _("És necessari indicar la posició de l'entitat") }}</li></ul>
+    <ul class="errorlist"><li>{{ _("És necessari indicar la posició de l'entitat") }}</li></ul>
   </div>
   {% endif %}
   <div id="citymap" class="map-height"></div>

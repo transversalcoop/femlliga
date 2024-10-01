@@ -236,9 +236,13 @@ Vue.createApp({
 {% endmacro %}
 
 {% macro all_steps(resource_type, count) %}
+{% if editing or resource_type == "needs" %}
 <h2>{{ resource_type_title("needs") }}</h2>
 {{ steps("needs", resource_type, count) }}
+{% endif %}
 
+{% if editing or resource_type == "offers" %}
 <h2>{{ resource_type_title("offers") }}</h2>
 {{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
+{% endif %}
 {% endmacro %}

@@ -385,14 +385,14 @@ a <template> tag, gets shown #}
 {% endmacro %}
 
 {% macro page_title(title) %}
-  <h1 class="fs-2-5rem mt-100px text-center">
+  <h1 class="fs-2-5rem mt-100px lg:w-50 text-center m-center">
     {{ title }}
   </h1>
   <div class="divider-3 mb-60px"></div>
 {% endmacro %}
 
 {% macro organization_header(org, link=False, edit_link=False) %}
-  <h1 class="fs-2-5rem mt-100px text-center">
+  <h1 class="fs-2-5rem mt-100px lg:w-50 text-center m-center">
     {% if edit_link %}
     <div class="edit-row">
       {{ org.name }}
