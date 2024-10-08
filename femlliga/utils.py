@@ -1,17 +1,24 @@
-import decimal
 import json
-import unicodedata
 import urllib
-from datetime import timedelta
-from distutils.util import strtobool
-from operator import attrgetter
+import decimal
+import unicodedata
 
-from django.contrib.auth import get_user_model
-from django.core.mail import EmailMessage
-from django.db.models import F, Func, Q
-from django.template.loader import render_to_string
+from datetime import timedelta
+from operator import attrgetter
+from functools import wraps
+from distutils.util import strtobool
+
 from django.urls import reverse
+from django.conf import settings
 from django.utils import timezone
+from django.db.models import F, Func, Q
+from django.core.mail import EmailMessage
+from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
+from django.contrib.sites.models import Site
+
+from shapely.geometry import shape, Point
 
 from femlliga.constants import (
     FROM_EMAIL,
@@ -20,7 +27,17 @@ from femlliga.constants import (
     RESOURCES,
     RESOURCES_ORDER,
 )
-from femlliga.models import Agreement, Need, Offer, Organization, sort_resources
+from femlliga.models import (
+    Agreement,
+    EmailSent,
+    Message,
+    Need,
+    Offer,
+    Organization,
+    sort_resources,
+)
+
+from femlliga.gis.es import spain_provinces
 
 # Emails and notifications
 
@@ -63,15 +80,6 @@ def get_periodic_notification_data(site, user, needs, offers):
                 "total_agreements": len(pa),
             }
 
-    if user.notify_agreement_success_pending:
-        pa = org_pending_success_agreements(org)
-        if len(pa) > 0:
-            context["agreement_success_pending"] = {
-                "organization": org,
-                "agreements": pa[:EMAIL_ITEMS_LIMIT],
-                "total_agreements": len(pa),
-            }
-
     time_from_last_long_notification = timezone.now() - user.last_long_notification_date
     long_notification_ready = time_from_last_long_notification > timedelta(days=30 * 6)
     send_long_notification = False
@@ -81,7 +89,6 @@ def get_periodic_notification_data(site, user, needs, offers):
             context["matches"] = {"need": need, "offer": offer}
             send_long_notification = True
 
-    # TODO FL090 consider only resources within distance_limit_km
     if user.notify_new_resources and long_notification_ready:
         offers = org_offers_not_matching(org, user)
         if len(offers) > 0:
@@ -97,20 +104,14 @@ def get_periodic_notification_data(site, user, needs, offers):
 
 def org_pending_agreements(o):
     try:
-        a = Agreement.objects.filter(solicitee=o, communication_accepted=None)
-        return list(a)
-    except:
-        return []
-
-
-def org_pending_success_agreements(o):
-    try:
-        a = Agreement.objects.filter(
-            Q(solicitee=o) | Q(solicitor=o),
-            communication_accepted=True,
-            agreement_successful=None,
+        agreements = Agreement.objects.filter(
+            solicitee=o, communication_accepted=True, agreement_successful=None
         )
-        return list(a)
+        return [
+            a
+            for a in agreements
+            if a.messages.count() == 0 or a.messages.last().sent_by != o
+        ]
     except:
         return []
 
@@ -214,7 +215,7 @@ def join_offers_not_matching(offers, ignore_options):
                 options.add(o)
     return {
         "code": offers[0].resource,
-        "options": list(sorted(options, key=attrgetter("name"))),
+        "options": list(sorted(options, key=lambda x: str(x))),
     }
 
 
@@ -261,10 +262,36 @@ def send_periodic_notification(subject, template, user, context):
     return True
 
 
-def send_email(to, subject, body):
+def send_welcome_email(org):
+    send_email(
+        to=[org.creator.email],
+        subject=_("Benvingudes a Fem lliga!"),
+        body=render_to_string(
+            "email/welcome.html",
+            {
+                "org": org,
+                "current_site": Site.objects.get(id=settings.SITE_ID),
+            },
+        ),
+        attachments=["static/segell-fem-lliga.png"],
+    )
+    org.welcome_email_sent = True
+    org.save()
+
+
+def send_email(to, subject, body, attachments=None):
     msg = EmailMessage(subject=subject, body=body, from_email=FROM_EMAIL, to=to)
+    if attachments:
+        for att in attachments:
+            msg.attach_file(att)
     msg.content_subtype = "html"
     msg.send()
+
+    try:
+        sent_to = ",".join(to)
+    except:
+        sent_to = str(to)
+    EmailSent.objects.create(sent_to=sent_to, subject=subject, body=body)
 
 
 # Other
@@ -327,3 +354,84 @@ def http_get(url):
     with urllib.request.urlopen(url) as f:
         res = json.loads(f.read().decode("utf-8"))
     return res
+
+
+def cache(timedelta):
+    def decorator(func):
+        value = None
+        last_execution = None
+
+        @wraps(func)
+        def decorated():
+            nonlocal value
+            nonlocal last_execution
+
+            # first execution, must call func
+            if value is None:
+                value = func()
+                last_execution = timezone.now()
+                return value
+
+            # value outdated, update it, but if it fails, use old value
+            if (timezone.now() - last_execution) > timedelta:
+                try:
+                    value = func()
+                    last_execution = timezone.now()
+                    return value
+                except:
+                    return value
+
+            # value cached
+            return value
+
+        return decorated
+
+    return decorator
+
+
+async def create_agreement_message(agreement, organization, message):
+    if not message or agreement.agreement_successful is not None:
+        return
+
+    m = await Message.objects.acreate(
+        sent_by=organization,
+        message=message,
+        agreement=agreement,
+    )
+    return m
+
+
+def truncate(s):
+    parts = s.split(" ")
+    n = 50
+    if len(parts) > n:
+        return " ".join(parts[:n]) + "..."
+    return s
+
+
+def get_province(lat, lng, features):
+    p = Point(lng, lat)
+    for feature in features:
+        polygon = shape(feature["geometry"])
+        if polygon.contains(p):
+            return feature["properties"]
+    return {"id": ""}
+
+
+def strip_accents(s):
+    return "".join(
+        c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
+    )
+
+
+spain_provinces_choices = sorted(
+    [
+        (f["properties"]["id"], f["properties"]["name"])
+        for f in spain_provinces["features"]
+    ],
+    key=lambda x: strip_accents(x[1]),
+)
+
+
+def date_to_datetime(d):
+    return timezone.make_aware(timezone.datetime(d.year, d.month, d.day))

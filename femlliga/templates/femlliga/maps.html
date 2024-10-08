@@ -1,0 +1,105 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from "femlliga/_macros.html" import leaflet_css, leaflet_js, page_title %}
+
+{% block css %}{{ leaflet_css(markercluster=True) }}{% endblock %}
+
+{% block title %}{{ _("Mapes compartits") }}{% endblock %}
+
+{% block content %}
+<main id="content" class="container container-large">
+  {{ page_title(_("Mapa de mapes de l'ESS")) }}
+  <div id="app" class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
+      <p>{{ _("Mostrant") }} <span id="results-count"></span> {{ _("resultats") }}</p>
+      <input id="search" class="form-control border" type="text" placeholder="{{ _("Cerca punts pel seu nom") }}">
+
+      <h2 class="fs-5">{{ _("Selecciona els mapes que vols mostrar") }}</h2>
+      {% for map in maps %}
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="show-{{ map.code }}" checked>
+        <label class="form-check-label" for="show-{{ map.code }}">{{ map.name }} ({{ _("%(num)s punts", num=map.count) }})</label>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="flex-gap"></div>
+    <div class="flex-two-thirds">
+      <div id="citymap" class="map-height-big"></div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block js %}
+{{ leaflet_js(markercluster=True) }}
+<script>
+function icon(url) {
+  return L.icon({
+    iconUrl: "/static/icons/" + url,
+    shadowUrl: "/static/icons/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+}
+
+var jsonData = getJsonData();
+var searchInput = document.getElementById("search");
+var resultsCount = document.getElementById("results-count");
+var icons = {};
+var inputs = {};
+var mapNames = {};
+for (let map of jsonData.maps) {
+  icons[map.code] = icon(`marker-icon-${map.color}.png`);
+  inputs[map.code] = document.getElementById("show-" + map.code);
+  mapNames[map.code] = map.name;
+}
+
+var map = L.map("citymap").setView([39.46755210639808, -0.3794678565158268], 8);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var markerCluster;
+var organizations = jsonData.organizations;
+function showOrganizations() {
+  if (markerCluster) {
+    markerCluster.remove();
+  }
+  let orgs = organizations.filter(o => {
+    return inputs[o.origin].checked;
+  }).filter(o => {
+    const parts = sanitize(searchInput.value).split(" ").filter(x => x !== "");
+    for (var part of parts) {
+      if (!contains(sanitize(o.name), part)) {
+        return false;
+      }
+    }
+    return true;
+  });
+  resultsCount.innerHTML = orgs.length;
+  markerCluster = L.markerClusterGroup();
+  orgs.forEach(o => {
+    let marker = L.marker([o.lat, o.lng], { icon: icons[o.origin] });
+    let contents = `
+      <strong>${o.name}</strong>
+      <br>${mapNames[o.origin]}
+    `;
+    if (o.url) {
+      contents += `<br><a href="${o.url}" target="_blank">{{ _("Enllaç al mapa original") }}</a>`;
+    }
+    marker.bindPopup(contents);
+    markerCluster.addLayer(marker);
+  });
+  map.addLayer(markerCluster);
+}
+
+showOrganizations();
+searchInput.addEventListener("input", showOrganizations);
+for (let code in inputs) {
+  inputs[code].addEventListener("change", showOrganizations);
+}
+</script>
+{% endblock %}
+

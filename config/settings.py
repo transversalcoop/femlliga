@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 import re
+import sys
+
 from datetime import timedelta
 from distutils.util import strtobool
 from pathlib import Path
@@ -24,7 +26,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", None)
 
+TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 DEBUG = bool(strtobool(os.getenv("DJANGO_DEBUG", "false")))
+if TESTING:
+    DEBUG = False
+    DEBUG_TOOLBAR_CONFIG = {
+        "IS_RUNNING_TESTS": False,
+    }
 
 allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", ".localhost,127.0.0.1,[::1]")
 ALLOWED_HOSTS = list(map(str.strip, allowed_hosts.split(",")))
@@ -42,6 +50,7 @@ CONTACT_LINKS = os.getenv("DJANGO_CONTACT_LINKS", "")
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -49,6 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "django.forms",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -80,6 +90,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 TEMPLATES = [
     {
@@ -114,6 +125,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(os.getenv("DJANGO_REDIS_HOST", None), 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -227,7 +247,7 @@ ACCOUNT_FORMS = {
 }
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/app"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/app/"
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -363,7 +383,11 @@ if DEBUG:
     import socket  # only if you haven't already imported this
 
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + [
+        "127.0.0.1",
+        "10.0.2.2",
+        "172.20.0.1",
+    ]
 
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(hours=1)

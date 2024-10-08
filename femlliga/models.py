@@ -3,12 +3,9 @@ import math
 import unicodedata
 import uuid
 from datetime import timedelta
-from io import BytesIO
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import networkx as nx
-import pandas as pd
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -16,7 +13,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.deconstruct import deconstructible
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from . import constants as const
 
@@ -103,8 +100,13 @@ class CustomUser(AbstractUser):
     )  # from 0.0 to 99999.9
 
     # immediate notifications
+    # DEPRECATED
     accept_communications_automatically = models.BooleanField(default=True)
     notify_immediate_communications_received = models.BooleanField(default=True)
+    notify_immediate_announcement_communications_received = models.BooleanField(
+        default=True
+    )
+    # DEPRECATED
     notify_immediate_communications_rejected = models.BooleanField(default=True)
 
     # periodic notifications
@@ -114,6 +116,7 @@ class CustomUser(AbstractUser):
         max_length=50, choices=const.NOTIFICATION_CHOICES, default="WEEKLY"
     )
     notify_agreement_communication_pending = models.BooleanField(default=True)
+    # DEPRECATED
     notify_agreement_success_pending = models.BooleanField(default=True)
     notify_matches = models.BooleanField(default=True)
     notify_new_resources = models.BooleanField(default=True)
@@ -185,6 +188,8 @@ class Organization(models.Model):
         blank=True,
         null=True,
     )
+
+    welcome_email_sent = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = _("Organització")
@@ -293,15 +298,27 @@ class Organization(models.Model):
     def pending_agreements(self):
         sent = self.sent_agreements.filter(
             communication_accepted=True, agreement_successful=None
-        )
-        received0 = self.received_agreements.filter(communication_accepted=None)
-        received1 = self.received_agreements.filter(
+        ).count()
+        received = self.received_agreements.filter(
             communication_accepted=True, agreement_successful=None
-        )
-        return len(sent) > 0, len(received0) > 0 or len(received1) > 0
+        ).count()
+        return sent > 0, received > 0
+
+    def pending_announcement_contacts(self):
+        announcements = [
+            a.pending_contacts()
+            for a in self.announcements.all().prefetch_related("contacts")
+        ]
+        return len(announcements) > 0 and any(announcements)
 
     def creator__email(self):
         return self.creator.email
+
+    def get_province(self):
+        from femlliga.utils import get_province
+        from femlliga.gis.es import spain_provinces
+
+        return get_province(self.lat, self.lng, spain_provinces["features"])
 
 
 class SocialMedia(models.Model):
@@ -338,91 +355,8 @@ class Resource:
         raise Exception("Unknown option")
 
     def options(self):
-        return const.RESOURCE_OPTIONS_MAP[self.code]
-
-    def add_image_label(self):
-        return const.RESOURCE_ADD_IMAGE_LABEL[self.code]
-
-
-class Table:
-    def __init__(self, columns, labels, rows):
-        self.columns = columns
-        self.labels = labels
-        self.rows = rows
-        self.footer = ["Total"] + [0] * len(rows[0])
-        for row in rows:
-            for i in range(len(row)):
-                self.footer[i + 1] += row[i]
-
-    def plot(self):
-        df = pd.DataFrame(
-            self.rows,
-            columns=self.columns[1:],
-            index=map(
-                lambda x: x if len(x) < 15 else x[:12].strip() + "...", self.labels
-            ),
-        )
-        return plot_dataframe(df)
-
-
-class Timeline:
-    def __init__(self, rows, name=""):
-        self.rows = [0]
-        self.index = [timezone.now()]
-        self.name = name
-        if len(rows) == 0:
-            return
-        self.index = date_intervals(min(rows), max(rows))[:-1]
-        self.rows = self.count(rows, self.index)
-
-    def count(self, dates, date_intervals):
-        dates = sorted(dates)
-        counts = [0] * len(date_intervals)
-        interval_index = 0
-        for date in dates:
-            while (
-                interval_index < len(date_intervals) - 1
-                and date > date_intervals[interval_index + 1]
-            ):
-                interval_index += 1
-            counts[interval_index] += 1
-        return counts
-
-    def plot(self):
-        df = pd.DataFrame(
-            self.rows,
-            columns=[self.name],
-            index=map(lambda x: x.strftime("%Y/%m/%d"), self.index),
-        )
-        return plot_dataframe(df, figsize=(10, 6))
-
-
-class Graph:
-    def __init__(self, graph, labels):
-        self.graph = graph
-        self.labels = labels
-
-    def plot(self):
-        plt.switch_backend("AGG")
-        pos = nx.kamada_kawai_layout(self.graph)
-        nx.draw_networkx_labels(self.graph, pos, self.labels)
-        nx.draw(self.graph, pos=pos)
-        return plot()
-
-
-def plot_dataframe(df, figsize=(10, 8)):
-    plt.switch_backend("AGG")
-    df.plot.bar(
-        rot=30,
-        figsize=figsize,
-    )
-    return plot()
-
-
-def plot():
-    sio = BytesIO()
-    plt.savefig(sio, format="png")
-    return base64.encodebytes(sio.getvalue()).decode()
+        opts = const.RESOURCE_OPTIONS_MAP[self.code]
+        return list(sorted(opts, key=lambda x: str(x[1])))
 
 
 def option_name(code):
@@ -467,7 +401,7 @@ class ResourceOption(models.Model):
 class BaseResource(models.Model):
     last_updated_on = models.DateTimeField(auto_now=True)
     resource = models.CharField(max_length=100, choices=const.RESOURCES)
-    options = models.ManyToManyField(ResourceOption)
+    options = models.ManyToManyField(ResourceOption, blank=True)
     comments = models.TextField(null=True, blank=True)
     has_resource = models.BooleanField(default=False)
 
@@ -477,17 +411,17 @@ class BaseResource(models.Model):
     def __str__(self):
         return str(Resource.resource(self.resource))
 
-    def get_options(self):
-        options = [(x.name, str(x)) for x in self.options.all()]
-        return options
-
     def json(self):
         return {
             "id": self.id,
             "resource": self.resource,
             "comments": self.comments,
-            "options": [o.name for o in self.options.all()],
+            "options": [o.name for o in self.sorted_options()],
         }
+
+    def sorted_options(self):
+        opts = list(self.options.all())
+        return sorted(opts, key=lambda x: str(x))
 
 
 class Need(BaseResource):
@@ -504,19 +438,13 @@ class Need(BaseResource):
             ),
         ]
 
-    def json(
-        self, current_organization=None, include_org=True, agreement_declined_map=None
-    ):
+    def json(self, current_organization=None, include_org=True):
         j = super().json()
         j["type"] = "need"
         if include_org:
             j["organization"] = self.organization.json()
         if current_organization:
             j["distance"] = current_organization.distance_text(self.organization)
-            if agreement_declined_map:
-                j["last_message_declined"] = self.last_message_declined(
-                    agreement_declined_map
-                )
             j["message_href"] = reverse(
                 "send_message",
                 args=[
@@ -527,13 +455,134 @@ class Need(BaseResource):
                 ],
             )
         j["images"] = [i.json() for i in self.images.all()]
+        if hasattr(self, "announcements"):
+            j["announcements"] = [
+                a.json(
+                    current_organization=current_organization, include_org=include_org
+                )
+                for a in self.announcements
+            ]
         return j
 
-    def last_message_declined(self, agreement_declined_map):
-        try:
-            return agreement_declined_map["need"][self.resource][self.organization.id]
-        except KeyError:
-            return False
+
+class Announcement(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="announcements",
+    )
+    public = models.BooleanField(default=False)
+    title = models.TextField(verbose_name=_("Títol"))
+    description = models.TextField(verbose_name=_("Descripció"))
+    resource = models.CharField(
+        max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
+    )
+    option = models.ForeignKey(
+        ResourceOption, verbose_name=_("Opció"), on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.title
+
+    def json(self, include_org=False, current_organization=None):
+        j = {
+            "id": str(self.id),
+            "title": self.title,
+            "description": self.description,
+            "public": self.public,
+            "resource": str(self.resource),
+            "option": str(self.option),
+            "option_name": self.option.name,
+            "options": [self.option.name],
+            "type": "need",
+            "pending_contacts": self.pending_contacts(),
+            "href": reverse("announcement", args=[self.organization.id, self.id]),
+            "public_href": reverse("public_announcement", args=[self.id]),
+            "images": [],
+        }
+
+        contacts_count = len(self.contacts.all())
+        if contacts_count > 0:
+            j["contacts_message"] = ngettext(
+                "Hi ha una persona interessada",
+                "Hi ha %(num)s persones interessades",
+                contacts_count,
+            ) % {"num": contacts_count}
+
+        if include_org:
+            j["organization"] = {
+                "name": self.organization.name,
+                "lat": self.organization.lat,
+                "lng": self.organization.lng,
+                "province": self.get_province(),
+                "href": reverse("view_organization", args=[self.organization.id]),
+            }
+
+        if current_organization:
+            j["distance"] = current_organization.distance_text(self.organization)
+            j["message_href"] = reverse(
+                "send_message",
+                args=[
+                    current_organization.id,
+                    self.organization.id,
+                    "need",
+                    self.resource,
+                ],
+            )
+        if hasattr(self, "announcements"):
+            j["announcements"] = [
+                a.json(
+                    current_organization=current_organization, include_org=include_org
+                )
+                for a in self.announcements
+            ]
+
+        return j
+
+    def get_province(self):
+        return self.organization.get_province()
+
+    def pending_contacts(self):
+        pc = [c for c in self.contacts.all() if not c.read]
+        return len(pc) > 0
+
+
+class AnnouncementContact(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    received_on = models.DateTimeField(
+        auto_now_add=True, verbose_name=_("Contacte enviat el")
+    )
+    announcement = models.ForeignKey(
+        Announcement,
+        on_delete=models.CASCADE,
+        related_name="contacts",
+    )
+    email = models.EmailField()
+    name = models.TextField(verbose_name=_("Nom"))
+    message = models.TextField(verbose_name=_("Missatge"))
+    read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-received_on"]
+
+    def json(self):
+        return {
+            "id": str(self.id),
+            "received_on": self.received_on,
+            "name": self.name,
+            "email": self.email,
+            "message": self.message,
+            "read": self.read,
+        }
 
 
 class Offer(BaseResource):
@@ -552,19 +601,13 @@ class Offer(BaseResource):
             ),
         ]
 
-    def json(
-        self, current_organization=None, include_org=True, agreement_declined_map=None
-    ):
+    def json(self, current_organization=None, include_org=True):
         j = super().json()
         j["type"] = "offer"
         if include_org:
             j["organization"] = self.organization.json()
         if current_organization:
             j["distance"] = current_organization.distance_text(self.organization)
-            if agreement_declined_map:
-                j["last_message_declined"] = self.last_message_declined(
-                    agreement_declined_map
-                )
             j["message_href"] = reverse(
                 "send_message",
                 args=[
@@ -579,14 +622,14 @@ class Offer(BaseResource):
         j["place_accessible"] = self.place_accessible
         return j
 
-    def last_message_declined(self, agreement_declined_map):
-        try:
-            return agreement_declined_map["offer"][self.resource][self.organization.id]
-        except KeyError:
-            return False
-
 
 class Agreement(models.Model):
+    ORIGIN_CHOICES = [
+        ("UNKNOWN", _("Origen desconegut")),
+        ("MATCHES", _("Pàgina «Has lligat?»")),
+        ("SEARCH", _("Pàgina «Descobreix»")),
+    ]
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -608,6 +651,12 @@ class Agreement(models.Model):
     )
     message = models.TextField(verbose_name=_("Missatge"))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Petició enviada el"))
+    origin = models.CharField(
+        max_length=10,
+        choices=ORIGIN_CHOICES,
+        verbose_name=_("Origen de la petició"),
+        default="UNKNOWN",
+    )
     resource = models.CharField(
         max_length=100, choices=const.RESOURCES, verbose_name=_("Recurs")
     )
@@ -624,10 +673,10 @@ class Agreement(models.Model):
         null=True, blank=True, verbose_name=_("Correu enviat el")
     )
     agreement_successful = models.BooleanField(
-        null=True, verbose_name=_("S'ha arribat a un acord")
+        null=True, verbose_name=_("S'ha realitzat l'intercanvi")
     )
     successful_date = models.DateTimeField(
-        null=True, blank=True, verbose_name=_("Acord registrat el")
+        null=True, blank=True, verbose_name=_("Intercanvi registrat el")
     )
 
     class Meta:
@@ -647,29 +696,85 @@ class Agreement(models.Model):
             return self.solicitee
         return Organization.deleted_organization()
 
+    def all_messages_json(self):
+        return [
+            {
+                "message": self.message,
+                "sent_on": self.date,
+                "sent_by": self.solicitor.id,
+                "read": True,
+            }
+        ] + [
+            {
+                "id": m.id,
+                "message": m.message,
+                "sent_on": m.sent_on,
+                "sent_by": m.sent_by.id if m.sent_by else None,
+                "read": m.read,
+            }
+            for m in self.messages.all()
+        ]
+
     def json(self, organization_id):
+        queryset = self.messages.all()
+        last_message_on = None
+        if queryset.count() > 0:
+            messages = sorted(list(queryset), key=lambda m: m.sent_on)
+            last_message_on = list(messages)[-1].sent_on
         return {
             "id": self.id,
             "solicitor": self.solicitor_safe().json(),
             "solicitee": self.solicitee_safe().json(),
             "date": self.date,
-            "message": self.message,
-            "options": [o.name for o in self.options.all()],
+            "options": [o.name for o in self.sorted_options()],
             "resource": self.resource,
             "resource_type": self.resource_type,
             "communication_accepted": self.communication_accepted,
             "communication_date": self.communication_date,
             "agreement_successful": self.agreement_successful,
             "successful_date": self.successful_date,
-            "href_connect": reverse(
-                "agreement_connect",
-                kwargs={"organization_id": organization_id, "agreement_id": self.id},
+            # use len, because using .filter() defeats the prefetch_related
+            "messages_not_read": len(
+                [
+                    m
+                    for m in self.messages.all()
+                    if not m.read and m.sent_by and m.sent_by.id != organization_id
+                ]
             ),
-            "href_successful": reverse(
-                "agreement_successful",
+            "last_message_on": last_message_on,
+            "href": reverse(
+                "agreement",
                 kwargs={"organization_id": organization_id, "agreement_id": self.id},
             ),
         }
+
+    def sorted_options(self):
+        opts = list(self.options.all())
+        return sorted(opts, key=lambda x: str(x))
+
+
+class Message(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    sent_on = models.DateTimeField(auto_now_add=True, verbose_name=_("Enviat el"))
+    sent_by = models.ForeignKey(
+        Organization,
+        on_delete=models.SET_NULL,
+        related_name="messages_sent",
+        verbose_name=_("Enviat per"),
+        null=True,
+    )
+    message = models.TextField(verbose_name=_("Missatge"))
+    agreement = models.ForeignKey(
+        Agreement, on_delete=models.CASCADE, related_name="messages"
+    )
+    read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["sent_on"]
 
 
 class Contact(models.Model):
@@ -679,6 +784,13 @@ class Contact(models.Model):
 
     class Meta:
         verbose_name = _("Contacte")
+
+
+class EmailSent(models.Model):
+    sent_on = models.DateTimeField(auto_now_add=True)
+    sent_to = models.TextField()
+    subject = models.TextField()
+    body = models.TextField()
 
 
 class ContactDenyList(models.Model):
@@ -714,3 +826,10 @@ class OfferImage(models.Model):
 
     def json(self):
         return {"url": self.image.url}
+
+
+class ExcludeCommentWord(models.Model):
+    value = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.value

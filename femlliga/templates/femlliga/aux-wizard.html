@@ -1,5 +1,7 @@
 {% extends "femlliga/_base_template.html" %}
 
+{% from 'femlliga/_macros.html' import organization_header %}
+
 {% block title %}
 {% if page == "pre-wizard" %}
 {{ _("Alta") }}
@@ -11,36 +13,31 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-{% if page == "pre-wizard" %}
-<h1>{{ _("Benvinguda!") }}</h1>
+<div class="container less-lg:text-center">
+  {{ organization_header(org) }}
+  {% if page == "pre-wizard" %}
+  <h2>{{ _("Benvinguda!") }}</h2>
 
-<p>{{ _("Ara que has donat d'alta la teua %(org_type)s, ens agradaria que ens indiques de quins recursos disposeu i quines necessitats teniu en el vostre dia a dia. Aquesta informació es farà servir per saber amb quines altres organitzacions podeu col·laborar.", org_type = org.type().lower()) }}</p>
+  <p>{{ _("Ens agradaria que ens indiques de quins recursos disposeu i quines necessitats teniu. Farem servir aquesta informació per saber amb qui podeu col·laborar.", org_type = org.type().lower()) }}</p>
 
-<p>{{ _("Et farem una sèrie de preguntes sobre els recursos que teniu o necessiteu, i podreu respondre «Sí» o «No» a cadascuna, i també indicar alguns detalls si així ho voleu.") }}</p>
+  <p>{{ _("Et farem una sèrie de preguntes sobre els recursos que teniu o necessiteu. No patisques si tens dubtes sobre el que has de respondre! Podràs modificar totes les respostes més endavant.") }}</p>
+  {% elif page == "mid-wizard" %}
+  <h2>{{ _("Ja vas per la meitat!") }}</h2>
 
-<p>{{ _("No patisques si tens dubtes sobre el que has de respondre! Podràs modificar totes les respostes més endavant.") }}</p>
+  <p>{{ _("Has acabat d'introduir les vostres necessitats, només et falta introduir els recursos que podeu oferir a altres.", org_type=org.type().lower()) }}</p>
+  {% endif %}
 
-<p>{{ _("Si et va bé fer el procés ara, clica «Endavant!». Si no, pots clicar «Ho faré més tard».") }}</p>
-{% elif page == "mid-wizard" %}
-<h1>{{ _("Ja vas per la meitat!") }}</h1>
-
-<p>{{ _("Has acabat d'introduir les necessitats de la teua %(org_type)s, només et falta introduir els recursos que podeu oferir a les altres organitzacions.", org_type=org.type().lower()) }}</p>
-
-<p>{{ _("Si et va bé seguir el procés, clica «Endavant!». Si no, pots clicar «Ho faré més tard».") }}</p>
-{% endif %}
-
-<form method="POST" action="{{ url(page, args=[org.id]) }}">
-  {{ csrf_input }}
-  <div class="row mt-3">
-    <div class="col-6 d-grid gap-2">
-      <button type="submit" class="btn btn-lg btn-brown" name="start" value="no">{{ _("Ho faré més tard") }}</button>
+  <form method="POST" action="{{ url(page, args=[org.id]) }}">
+    {{ csrf_input }}
+    <div class="row mt-3">
+      <div class="col-6 d-grid gap-2">
+        <button type="submit" class="btn btn-thin" name="start" value="no">{{ _("Ho faré més tard") }}</button>
+      </div>
+      <div class="col-6 d-grid gap-2">
+        <button type="submit" class="btn btn-thin" name="start" value="yes">{{ _("Endavant!") }}</button>
+      </div>
     </div>
-    <div class="col-6 d-grid gap-2">
-      <button type="submit" class="btn btn-lg btn-warning" name="start" value="yes">{{ _("Endavant!") }}</button>
-    </div>
-  </div>
-</form>
+  </form>
 </div>
 {% endblock %}
 

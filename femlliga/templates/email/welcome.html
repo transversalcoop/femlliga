@@ -1,0 +1,15 @@
+{% extends "email/_base_template.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {{ _("Des de l'equip de Fem lliga! us agraïm a totes les membres de %(name)s que confieu en nosaltres i us hagueu volgut inscriure a la nostra plataforma.", name=org.name) }}
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {{ _("Adjunt a aquest correu podeu trobar el Segell Fem lliga!, que podeu publicar a la vostra web perquè altres organitzacions puguen saber que us poden trobar ací.") }}
+  </td>
+</tr>
+{% endblock %}

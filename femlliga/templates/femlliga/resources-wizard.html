@@ -1,6 +1,6 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_multiple_tags, render_formset_field %}
+{% from 'femlliga/_macros.html' import input_classes, input_value, textarea_value, input_feedback, form_feedback, render_formset_field, vue_js, organization_header, arrow_btn_link %}
 
 {% block title %}
 {% if editing %}
@@ -16,83 +16,79 @@
 {{ resource }}
 {% endblock %}
 
-{% macro resource_type_title(resource_type) %}
-  {% if resource_type == "needs" %}
-  {{ _("Què necessiteu?") }}
-  {% else %}
-  {{ _("Què oferiu?") }}
-  {% endif %}
-{% endmacro %}
-
-{% macro steps(resource_type, current_resource_type, count) %}
-<div class="d-flex justify-content-around">
-  {% for i, resource in enumerate(consts.RESOURCES) %}
-  {% if editing %}
-  <a
-    class="rounded-link fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}"
-    href="{% if editing %}{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}{% endif %}"
-  >
-    {{ i+1 }}
-  </a>
-  {% else %}
-  <span class="fs-5 text-center rounded-circle square-2 {% if resource_type==current_resource_type and count-1==i %}text-bg-warning{% else %}text-bg-lightgrey1{% endif %}">{{ i+1 }}</span>
-  {% endif %}
-  {% endfor %}
-</div>
-{% endmacro %}
-
-{% macro all_steps(resource_type, count, border=True) %}
-<div class="col-md-4{% if border %} border-dotted-right{% endif %}">
-  <span class="text-secondary">{{ resource_type_title("needs") }}</span>
-  {{ steps("needs", resource_type, count) }}
-</div>
-<div class="col-md-4">
-  <span class="text-secondary">{{ resource_type_title("offers") }}</span>
-  {{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
-</div>
-{% endmacro %}
-
 {% block content %}
-<div class="container mb-2">
-  <div class="d-none d-md-block">
-    <div class="row mt-3">
-      <div class="col-md-4 d-flex align-items-end">
-        <h1 class="resources-title w-100 m-0 p-0 ps-2">{{ resource_type_title(resource_type) }}</h1>
-      </div>
+<div class="container mb-5">
+  {{ organization_header(org) }}
+  <div class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
       {{ all_steps(resource_type, count) }}
     </div>
-  </div>
-  <div class="d-block d-md-none">
-    <div class="row mt-3">
-      <div class="col-md-4 d-flex align-items-end bg-yellow">
-        <h1 class="resources-title w-100 m-0 p-0 ps-2">{{ resource_type_title(resource_type) }}</h1>
-      </div>
+    <div class="flex-gap"></div>
+    <div class="flex-two-thirds bg-lightgrey br-1rem p-3 h-100">
+      {{ resource_edit() }}
     </div>
   </div>
+</div>
+{% endblock %}
 
-  <h2 class="fs-1">
+{% macro resource_edit() %}
+  <h2 class="mt-0">
     <i class="{{ resource_icon(resource.code) }}"></i>
     {{ resource }}
   </h2>
-  <p>
-    {% if resource.code != "OTHER" %}
-    {% if resource_type == "needs" %}
-    {{ _("Selecciona les opcions que necessiteu:") }}
-    {% else %}
-    {{ _("Selecciona les opcions que oferiu:") }}
-    {% endif %}
-    {% endif %}
-  </p>
+  {% if resource_description(resource.code) %}
+  <p><em>{{ resource_description(resource.code) }}</em></p>
+  {% endif %}
 
-  <form method="post" enctype="multipart/form-data" class="mb-1">
+  <div id="vue-app">
+    <form method="post" enctype="multipart/form-data" class="mb-1">
       {{ csrf_input }}
       {{ form_feedback(form) }}
 
       <input type="hidden" id="resource" name="resource" value="{{ resource.code }}">
 
+      <label for="resource_options">
+        {% if resource.code != "OTHER" %}
+        {% if resource_type == "needs" %}
+        {{ _("Selecciona les opcions que necessiteu:") }}
+        {% else %}
+        {{ _("Selecciona les opcions que oferiu:") }}
+        {% endif %}
+        {% endif %}
+      </label>
       {% set options = resource.options() %}
-      {% if len(options) > 0 %}
-          {{ render_multiple_tags(form, "options", "", options) }}
+      {% if len(options) > 0 and form.fields["options"] %}
+        <div id="resource_options" class="multi-select multi-select-badges mb-3">
+          {% for choice in options %}
+          {% if form and form.cleaned_data and choice[0] in form.cleaned_data["options"] %}
+            {% set selected=True %}
+          {% endif %}
+          <button
+            class="badge multi-select-choice"
+            :class="{'selected': selected.indexOf('{{ choice[0] }}') !== -1}"
+            type="button"
+            role="switch"
+            value="{{ choice[0] }}"
+            @click="toggleOption('{{ choice[0] }}')"
+          >
+            {{ choice[1] }}
+          </button>
+          {% endfor %}
+        </div>
+        <select
+          v-model="selected"
+          id="id_options"
+          name="options"
+          class="d-none multi-select {% if form.errors["options"] %} is-invalid{% endif %}"
+          multiple
+        >
+          {% for choice in options %}
+          <option value="{{ choice[0] }}">
+            {{ choice[1] }}
+          </option>
+          {% endfor %}
+        </select>
+        {{ input_feedback(form, "options") }}
       {% endif %}
 
       {% if resource_type == "offers" %}
@@ -116,7 +112,7 @@
 
       <div class="spacing"></div>
 
-      <label for="comments">{{ _("Observacions o aclariments") }}</label>
+      <label class="mt-2" for="comments">{{ _("Observacions o aclariments") }}</label>
       <textarea id="comments" name="comments" rows="2" {{ input_classes(form, "comments") }}>{{ textarea_value(form, "comments") }}</textarea>
       {{ input_feedback(form, "comments") }}
 
@@ -143,21 +139,21 @@
           </div>
         {% endfor %}
 
-        <a class="btn btn-custom mt-3" onclick="addImage(event)">
-          <i class="bi-plus-lg"></i> {{ resource.add_image_label() }}
-        </a>
+        <div class="mt-3">
+          {{ arrow_btn_link(_("Afegeix imatge"), "", icon="bi-image", onclick="addImage(event)") }}
+        </div>
       {% endif %}
 
       <div class="row mt-3">
         <div class="col-6">
           {% if editing %}
-          <a href="{{ url("app") }}" class="btn btn-lg btn-brown">{{ _("Torna sense fer canvis") }}</a>
+          <a href="{{ url("app") }}" class="btn btn-thin">{{ _("Torna sense fer canvis") }}</a>
           {% elif count > 1 %}
-          <a href="{{ wizard_url(org.id, count-1) }}" class="btn btn-lg btn-brown">{{ _("Anterior") }}</a>
+          <a href="{{ wizard_url(org.id, count-1) }}" class="btn btn-thin">{{ _("Anterior") }}</a>
           {% endif %}
         </div>
         <div class="col-6 text-end">
-          <button type="submit" class="btn btn-lg btn-warning">
+          <button type="submit" class="btn btn-thin">
             {% if editing %}
             {{ _("Desa els canvis") }}
             {% elif count == len(consts.RESOURCES) * 2 %}
@@ -168,12 +164,13 @@
           </button>
         </div>
       </div>
-  </form>
-  <div class="d-block d-md-none">
-    {{ all_steps(resource_type, count, border=False) }}
+    </form>
   </div>
 </div>
+{% endmacro %}
 
+{% block js %}
+{{ vue_js() }}
 <script>
 function addImage(event) {
     for (let i = 0; i < 6; i++) {
@@ -187,6 +184,65 @@ function addImage(event) {
         }
     }
 }
+
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      selected: jsonData.selected,
+    };
+  },
+  methods: {
+    toggleOption(option) {
+      let index = this.selected.indexOf(option);
+      if (index === -1) {
+        this.selected.push(option);
+      } else {
+        this.selected.splice(index, 1);
+      }
+    },
+  },
+}).mount("#vue-app");
 </script>
 {% endblock %}
 
+
+{% macro resource_type_title(resource_type) %}
+  {% if resource_type == "needs" %}
+  {{ _("Què necessiteu?") }}
+  {% else %}
+  {{ _("Què oferiu?") }}
+  {% endif %}
+{% endmacro %}
+
+{% macro steps(resource_type, current_resource_type, count) %}
+  {% for i, resource in enumerate(consts.RESOURCES) %}
+    {% set active = resource_type==current_resource_type and count-1==i %}
+    {% if editing %}
+    <a class="sidebar-row {% if active %}active{% endif %}"
+       href="{{ url("force-resources-wizard", kwargs={"organization_id": org.id, "resource_type": resource_type, "resource": resource[0]}) }}"
+    >
+      <i class="me-3 {{ resource_icon(resource[0]) }}"></i>
+      {{ resource_name(resource[0]) }}
+    </a>
+    {% else %}
+    <div class="sidebar-row {% if active %}active{% endif %}">
+      <i class="me-3 {{ resource_icon(resource[0]) }}"></i>
+      {{ resource_name(resource[0]) }}
+    </div>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% macro all_steps(resource_type, count) %}
+{% if editing or resource_type == "needs" %}
+<h2>{{ resource_type_title("needs") }}</h2>
+{{ steps("needs", resource_type, count) }}
+{% endif %}
+
+{% if editing or resource_type == "offers" %}
+<h2>{{ resource_type_title("offers") }}</h2>
+{{ steps("offers", resource_type, count-len(consts.RESOURCES)) }}
+{% endif %}
+{% endmacro %}

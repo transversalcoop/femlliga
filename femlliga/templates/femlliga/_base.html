@@ -6,8 +6,8 @@
         <meta name="description" content="Una xarxa on organitzacions intercanvien recursos">
         <meta name="keywords" content="intercanvi de recursos, intercambio de recursos, intercooperación, intercooperació, entitats, entidades, associacionisme, asociacionismo, economia social, economia social i solidaria">
 
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <link rel="icon" type="image/x-icon" href="{{ static("favicon.ico") }}">
         <link rel="manifest" href="{{ static("manifest.json") }}">
 
@@ -33,14 +33,14 @@
           <a class="d-inline-flex p-2 m-1" href="#content">{{ _("Salta al contingut principal") }}</a>
         </div>
       </div>
-      <header class="navbar navbar-expand-md bd-navbar" style="background-color: #FFCE1C;">
-        <nav class="container-xxl flex-wrap flex-md-nowrap" aria-label="Main navigation">
+      <header class="navbar navbar-expand-md bd-navbar">
+        <nav class="container flex-wrap flex-md-nowrap" aria-label="{{ _("Navegació principal") }}">
           <a class="navbar-brand" href="/">
-{% block brand %}<span style="font-weight: 900; text-transform: uppercase; font-size: 1.75em;">{{ consts.APP_NAME }}</span>{% endblock %}
+{% block brand %}<span class="brand">{{ consts.APP_NAME }}</span>{% endblock %}
           </a>
 
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="bi-list" style="font-size: 2rem;"></span>
+            <span class="bi-list fs-2rem"></span>
           </button>
 
           <div class="collapse navbar-collapse" id="navbar">
@@ -49,12 +49,12 @@
         </nav>
       </header>
       <wrapper class="d-flex flex-column">
-        <main id="content" class="{% block content_classes %}{% endblock %}">
+        <main id="content" class="h-100vh {% block content_classes %}{% endblock %}">
           {% if messages %}
           <div class="container">
             {% for message in messages %}
             {% if "show" in message.tags %}
-            <div class="alert alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}success{% else %}info{% endif %} mt-2">
+            <div class="bg-lightblue text-center br-1rem p-3 mb-2" role="alert">
               {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<i class="bi bi-check-lg fs-1 align-middle pb-2"></i>{% endif %}
               <span>{{ message }}</span>
             </div>
@@ -64,37 +64,44 @@
           {% endif %}
 {% block content %}{% endblock %}
         </main>
-        <footer class="border-top">
+        <footer class="bg-lightgrey">
           <div class="py-3 my-4 container">
-            <div class="row" style="color: #4b4b4b; font-size: 0.9em;">
-              <div class="col-lg-4">
-                <p class="fw-bold">{{ _("INFORMACIÓ") }}</p>
-                <ul style="list-style: none; padding: 0;">
-                  <li class="mb-1"><a href="{{ url("page", args=["legal"]) }}">{{ _("Avís legal") }}</a></li>
-                  <li class="mb-1"><a href="{{ url("page", args=["accessibility"]) }}">{{ _("Accessibilitat") }}</a></li>
-                  <li class="mb-1"><a href="{{ url("page", args=["privacy"]) }}">{{ _("Política de protecció de dades") }}</a></li>
-                  <li class="mb-1"><a href="{{ url("page", args=["faq"]) }}">{{ _("Preguntes freqüents") }}</a></li>
-                  <li class="mb-1"><a href="{{ url("contact") }}">{{ _("Contacte") }}</a></li>
-                </ul>
+            <div class="row">
+              <div class="col-12 col-md-6 col-lg-8">
+                <div class="row">
+                  <div class="col-12 col-lg-6">
+                    <p class="fw-bold">{{ _("INFORMACIÓ") }}</p>
+                    <ul class="list-none">
+                      <li class="mb-1"><a href="{{ url("page", args=["legal"]) }}">{{ _("Avís legal") }}</a></li>
+                      <li class="mb-1"><a href="{{ url("page", args=["accessibility"]) }}">{{ _("Accessibilitat") }}</a></li>
+                      <li class="mb-1"><a href="{{ url("page", args=["privacy"]) }}">{{ _("Política de protecció de dades") }}</a></li>
+                      <li class="mb-1"><a href="{{ url("page", args=["faq"]) }}">{{ _("Preguntes freqüents") }}</a></li>
+                      <li class="mb-1"><a href="{{ url("contact") }}">{{ _("Contacte") }}</a></li>
+                    </ul>
+                  </div>
+                  <div class="col-12 col-lg-6 less-lg:mt-5">
+                    <p class="fw-bold">{{ _("CONTACTE") }}</p>
+                    <p class="m-0">Tlf: {{ settings.CONTACT_PHONE }}</p>
+                    <p class="m-0">{{ _("Correu electrònic:") }} {{ settings.CONTACT_EMAIL }}</p>
+                    <p class="m-0"><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/{{ settings.CONTACT_SOCIAL }}/">Instagram</a></p>
+                    <p><a target="_blank" rel="noopener noreferrer" href="{{ settings.CONTACT_LINKS }}">{{ _("Enllaços") }}</a></p>
+                    <p>{{ _("Les imatges emprades pertanyen a") }} <a target="_blank" rel="noopener noreferrer" href="https://www.freepik.com">pikisuperstar - www.freepik.com</a></p>
+                    <p>{{ _("Web creada amb <a target='_blank' rel='noopener noreferrer' href='https://github.com/transversalcoop/femlliga'>programari lliure</a>") }}</p>
+                  </div>
+                </div>
               </div>
-              <div class="col-lg-4">
-                <p class="fw-bold">{{ _("CONTACTE") }}</p>
-                <p class="m-0">Tlf: {{ settings.CONTACT_PHONE }}</p>
-                <p class="m-0">{{ _("Correu electrònic:") }} {{ settings.CONTACT_EMAIL }}</p>
-                <p class="m-0"><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/{{ settings.CONTACT_SOCIAL }}/">Instagram</a></p>
-                <p><a target="_blank" rel="noopener noreferrer" href="{{ settings.CONTACT_LINKS }}">{{ _("Enllaços") }}</a></p>
-                <p>{{ _("Les imatges emprades pertanyen a") }} <a target="_blank" rel="noopener noreferrer" href="https://www.freepik.com">pikisuperstar - www.freepik.com</a></p>
-                <p>{{ _("Web creada amb <a target='_blank' rel='noopener noreferrer' href='https://github.com/transversalcoop/femlliga'>programari lliure</a>") }}</p>
-              </div>
-              <div class="col-lg-4">
+              <div class="col-12 col-md-6 col-lg-4 less-md:mt-5">
                 <p class="m-0">{{ _("Un projecte desenvolupat per") }}</p>
                 <a target="_blank" rel="noopener noreferrer" href="https://transversalcoop.org">
-                  <img src="{{ static("transversal.png") }}" style="height: 58px;" alt="{{ _("Logo de la Cooperativa Transversal") }}" loading="lazy">
+                  <img src="{{ static("transversal.png") }}" class="h-58px" alt="{{ _("Logo de la Cooperativa Transversal") }}" loading="lazy">
                 </a>
 
-                <p style="margin: 20px 0 0 0;">{{ _("Amb el suport econòmic de") }}</p>
+                <p class="mt-3">{{ _("Amb el suport de") }}</p>
+                <a target="_blank" rel="noopener noreferrer" href="https://www.mdsocialesa2030.gob.es/">
+                  <img src="{{ static("mdsocialesa2030.png") }}" class="max-w-100" alt="{{ _("Logo del ministeri de drets socials, consum i agenda 2030") }}" loading="lazy">
+                </a>
                 <a target="_blank" rel="noopener noreferrer" href="https://castello.es/">
-                  <img src="{{ static("ajuntament_cs.png") }}" style="height: 85px;" alt="{{ _("Logo de l'Ajuntament de Castelló") }}" loading="lazy">
+                  <img src="{{ static("ajuntament_cs.png") }}" class="h-85px mt-4" alt="{{ _("Logo de l'Ajuntament de Castelló") }}" loading="lazy">
                 </a>
               </div>
             </div>
@@ -102,9 +109,9 @@
         </footer>
       </wrapper>
 
-      <div id="toastWrapper" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>
+      <div id="toastWrapper" class="position-fixed bottom-0 end-0 p-3 z-10000"></div>
 
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
       <script src="{{ static('js.js') }}"></script>
       {% if json_data %}
       {{ json_script(json_data, "django-json-data") }}

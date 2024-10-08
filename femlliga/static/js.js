@@ -131,3 +131,11 @@ function showToast(message) {
         setTimeout(() => { el.remove(); }, 1000);
     }, 5000);
 }
+
+window.addEventListener("load", function() {
+  var feedback = document.querySelector(".invalid-feedback .errorlist");
+  if (feedback) {
+    feedback.scrollIntoView(false);
+  }
+});
+

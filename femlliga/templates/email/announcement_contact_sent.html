@@ -1,0 +1,15 @@
+{% extends "email/_base_template.html" %}
+
+{% block content %}
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    {{ _("S'ha enviat el teu missatge a l'organització «%(name)s», que havia publicat un anunci demanant %(option)s. Es posaran en contacte amb tu el més aviat possible per respondre't. A sota pots veure una còpia del missatge que has enviat:", name=org.name, option=option) }}
+  </td>
+</tr>
+
+<tr>
+  <td style="font-family: 'Poppins', sans-serif; padding: 0 20px;">
+    <pre style="padding: 20px 0 20px 20px; max-width: 590px; font-weight: bold; white-space: pre-wrap;">{{ message }}</pre>
+  </td>
+</tr>
+{% endblock %}

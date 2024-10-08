@@ -1,29 +1,31 @@
 {% extends "femlliga/_base.html" %}
 
+{% from 'femlliga/_macros.html' import arrow_btn_link %}
+
 {% block content %}
-<section style="background-color: transparent; background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);">
-    <div class="text-center">
-      <img src="{{ static("decorations/heading-bird.png") }}" alt="" style="margin: 0 0 -50px 0;">
-    </div>
-    <div class="container">
-      <h1 style="font-weight: 900; font-size: 3.75em; color: #000;" class="text-center">
-        {{ _("Recoi!") }}
-{% block error_code %}{% endblock %}
-      </h1>
-    </div>
+<section>
+  <div class="text-center">
+    <img src="{{ static("decorations/heading-bird.png") }}" alt="{{ _("Imatge decorativa amb ocells") }}" class="mb--5">
+  </div>
   <div class="container">
-    <div class="divider-1"></div>
-    <h3 style="font-weight: 700; color: gray; font-size: 1.125em;" class="text-center">
+    <h1 class="text-center page-title">
+      {{ _("Recoi!") }}
+{% block error_code %}{% endblock %}
+    </h1>
+  </div>
+  <div class="container">
+    <div class="divider-3 mb-60px"></div>
+    <h2 class="text-center page-subheading">
 {% block error_description %}{% endblock %}
-    </h3>
+    </h2>
   </div>
 </section>
 
 <div class="container mb-2">
   <p class="text-center">{{ _("Sentim molt la molèstia. Pots tornar a intentar el que estaves fent, o, si l'error continua, <a href='%(url)s'>contactar amb nosaltres</a>", url=url("contact")) }}</p>
 
-  <div style="text-align: center;">
-    <a class="btn btn-custom" href="{{ url("index") }}" style="font-weight: bold; font-size: 1.25rem;">{{ _("Ves a la pàgina d'inici") }}</a>
+  <div class="text-center">
+    {{ arrow_btn_link(_("Ves a la pàgina d'inici"), url("index"), "bi-house") }}
   </div>
 </div>
 {% endblock %}

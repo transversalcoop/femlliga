@@ -1,4 +1,8 @@
-from datetime import datetime, timedelta
+import json
+import pandas as pd
+
+from collections import namedtuple
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from allauth.account.models import EmailAddress
@@ -16,7 +20,10 @@ from .utils import (
     get_ordered_needs_and_offers,
     get_periodic_notification_data,
     send_periodic_notification,
+    date_to_datetime,
 )
+from .views import filter_report_organizations, get_organizations_df
+from .forms import ReportFilterForm
 
 AUTH_BACKENDS = settings.AUTHENTICATION_BACKENDS[1:]
 PASS_FOR_TESTS = "passfortests"
@@ -85,6 +92,146 @@ class UtilsTests(TestCase):
         )
 
 
+class ReportTests(TestCase):
+    def test_report_organizations(self):
+        S1, _ = OrganizationScope.objects.get_or_create(name="EQUALITY")
+        S2, _ = OrganizationScope.objects.get_or_create(name="EDUCATION")
+        O = namedtuple("O", ["organization", "scopes", "date"])
+        ORGS = [
+            O(
+                Organization(  # CS
+                    org_type="ASSOCIATION", lat=39.984469700, lng=-0.052528300
+                ),
+                [S1],
+                date_to_datetime(date(2022, 1, 2)),
+            ),
+            O(
+                Organization(  # Alcora
+                    org_type="COOPERATIVE", lat=40.0873178, lng=-0.2142333
+                ),
+                [S2],
+                date_to_datetime(date(2023, 1, 2)),
+            ),
+            O(
+                Organization(  # Morella
+                    org_type="FOUNDATION", lat=40.6208324, lng=-0.0995635
+                ),
+                [S1, S2],
+                date_to_datetime(date(2024, 1, 2)),
+            ),
+            O(
+                Organization(  # Almeria
+                    org_type="FOUNDATION", lat=36.8431419, lng=-2.4664306
+                ),
+                [S1, S2],
+                date_to_datetime(date(2024, 1, 2)),
+            ),
+        ]
+        ORGANIZATIONS = []
+        for o in ORGS:
+            o.organization.save()
+            o.organization.date = o.date
+            for s in o.scopes:
+                o.organization.scopes.add(s)
+            o.organization.save()
+            ORGANIZATIONS.append(o.organization)
+
+        TC = namedtuple("TC", ["post", "df"])
+        TEST_CASES = [
+            TC(
+                {"group_orgs_by": "ORG_TYPE"},
+                self.organizations_df(ORG_TYPES, [1, 1, 0, 2] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_TYPE", "province": "ESCS"},
+                self.organizations_df(ORG_TYPES, [1, 1, 0, 1] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_TYPE", "province": "ESAL"},
+                self.organizations_df(ORG_TYPES, [0, 0, 0, 1] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_TYPE", "province": "ESA"},
+                self.organizations_df(ORG_TYPES, [0, 0, 0, 0] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_TYPE", "org_scope": "EDUCATION"},
+                self.organizations_df(ORG_TYPES, [0, 1, 0, 2] + [0] * 5),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE"},
+                self.organizations_df(ORG_SCOPES, [3, 3] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "org_type": "ASSOCIATION"},
+                self.organizations_df(ORG_SCOPES, [1, 0] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "org_type": "COOPERATIVE"},
+                self.organizations_df(ORG_SCOPES, [0, 1] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "org_type": "FOUNDATION"},
+                self.organizations_df(ORG_SCOPES, [2, 2] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "org_type": "MUTUALITY"},
+                self.organizations_df(ORG_SCOPES, [0, 0] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "start_date": date(2022, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [3, 3] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "start_date": date(2023, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [2, 3] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "start_date": date(2024, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [2, 2] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "end_date": date(2023, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [1, 0] + [0] * 25),
+            ),
+            TC(
+                {"group_orgs_by": "ORG_SCOPE", "end_date": date(2024, 1, 1)},
+                self.organizations_df(ORG_SCOPES, [1, 1] + [0] * 25),
+            ),
+            TC(
+                {
+                    "group_orgs_by": "ORG_SCOPE",
+                    "start_date": date(2024, 1, 1),
+                    "end_date": date(2025, 1, 1),
+                },
+                self.organizations_df(ORG_SCOPES, [2, 2] + [0] * 25),
+            ),
+            TC(
+                {
+                    "group_orgs_by": "ORG_SCOPE",
+                    "start_date": date(2022, 1, 1),
+                    "end_date": date(2024, 1, 1),
+                },
+                self.organizations_df(ORG_SCOPES, [1, 1] + [0] * 25),
+            ),
+        ]
+        for t in TEST_CASES:
+            form = ReportFilterForm(t.post)
+            self.assertTrue(form.is_valid())
+            organizations = filter_report_organizations(ORGANIZATIONS, form)
+            organizations_df = get_organizations_df(organizations, form)
+            pd.testing.assert_frame_equal(organizations_df, t.df, check_dtype=False)
+
+    def organizations_df(self, index, rows):
+        return pd.DataFrame(
+            rows,
+            columns=["Organitzacions"],
+            index=[str(x[1]) for x in index],
+        )
+
+    # TODO test also resources and agreements
+
+
 class SmokeTests(TestCase):
     fixtures = ["testdata.json"]
 
@@ -113,7 +260,6 @@ class SmokeTests(TestCase):
             ("send_message", [org.id, org2.id, "offer", "SERVICE"]),
             ("matches", [org.id]),
             ("agreements", [org.id]),
-            ("agreement_connect", [org.id, org.id]),
             ("agreement_successful", [org.id, org.id]),
             ("uploads", ["path"]),
             ("report", []),
@@ -200,7 +346,9 @@ class IntegrationTests(TestCase):
     maxDiff = None
     fixtures = ["testdata.json"]
 
-    def aux_wizard(self, url, resource, options, comments, contains, charge=False):
+    def aux_wizard(
+        self, url, resource, options, comments, contains, charge=False, published=None
+    ):
         params = {
             "resource": resource,
             "options": options,
@@ -210,6 +358,8 @@ class IntegrationTests(TestCase):
         }
         if charge:
             params["charge"] = "on"
+        if published:
+            params["published"] = json.dumps(published)
         response = self.client.post(url, params, follow=True)
         save_response(response)
         self.assertContains(response, contains)
@@ -282,7 +432,7 @@ class IntegrationTests(TestCase):
         self.aux_wizard(
             needs_url,
             "PLACE",
-            ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+            ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
             "comentaris de necessita local de test",
             "Formació",
         )
@@ -302,7 +452,7 @@ class IntegrationTests(TestCase):
             "SERVICE",
             ["AGENCY"],
             "comentaris de necessita servei de test",
-            "Equipaments",
+            "Materials",
         )
 
         needs_url = reverse("resources-wizard", args=[o.id, "needs", "EQUIPMENT"])
@@ -346,7 +496,7 @@ class IntegrationTests(TestCase):
             "SERVICE",
             [],
             "comentaris de ofereix serveis de test",
-            "Equipaments",
+            "Materials",
             charge=True,
         )
 
@@ -380,7 +530,7 @@ class IntegrationTests(TestCase):
         matches = BeautifulSoup(response.content.decode(), "html.parser").find(
             "script", {"id": "django-json-data"}
         )
-        for s in ["PLACE", "Servei", "Formació", "Equipaments", "Altres"]:
+        for s in ["PLACE", "Servei", "Formació", "Materials", "Altres"]:
             self.assertNotIn(s, matches)
 
         # app main page
@@ -391,7 +541,7 @@ class IntegrationTests(TestCase):
             "Local",
             "Servei",
             "Formació",
-            "Equipaments",
+            "Materials",
             "Altres",
             "comentaris de necessita local de test",
             "comentaris de necessita servei de test",
@@ -429,45 +579,40 @@ class IntegrationTests(TestCase):
 
         # send message
         o2 = Organization.objects.get(name="Second example organization")
-        o2.creator.accept_communications_automatically = False
         o2.creator.save()
         send_message_url = reverse("send_message", args=[o.id, o2.id, "offer", "PLACE"])
         test_msg_1 = "missatge de test per al primer missatge"
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
+                "origin": "MATCHES",
                 "message": test_msg_1,
             },
         )
-        self.assertJSONEqual(response.content, {"ok": True})
+        a = Agreement.objects.order_by("-date").first()
+        self.assertJSONEqual(
+            response.content,
+            {"ok": True, "agreement_url": reverse("agreement", args=[o.id, a.id])},
+        )
         self.assertEqual(len(mail.outbox), 1)
 
         # check received
         self.client.login(email="test2@example.com", password=PASS_FOR_TESTS)
         response = self.client.get(reverse("agreements", args=[o2.id]))
-        for s in ["Peticions enviades i rebudes", test_msg_1]:
-            self.assertContains(response, s)
+        self.assertContains(response, "Peticions d'intercanvi enviades i rebudes")
 
         a = Agreement.objects.get(solicitor=o, solicitee=o2)
-        response = self.client.post(
-            reverse("agreement_connect", args=[o2.id, a.id]),
-            {
-                "return_url": "received",
-                "connect": "yes",
-            },
-            follow=True,
-        )
-        self.assertJSONEqual(response.content, {"ok": True})
-        self.assertEqual(len(mail.outbox), 2)
-        save_email(mail.outbox[1], "agreement_connect.html")
+        response = self.client.get(reverse("agreement", args=[o2.id, a.id]))
+        self.assertContains(response, test_msg_1)
 
         # check sent
         self.client.login(email=email3, password=PASS_FOR_TESTS)
         response = self.client.get(reverse("agreements", args=[o.id]))
-        save_response(response)
-        for s in [test_msg_1, '"communication_accepted": true']:
-            self.assertContains(response, s)
+        self.assertContains(response, '"communication_accepted": true')
+
+        response = self.client.get(reverse("agreement", args=[o.id, a.id]))
+        self.assertContains(response, test_msg_1)
 
         response = self.client.post(
             reverse("agreement_successful", args=[o.id, a.id]),
@@ -477,8 +622,49 @@ class IntegrationTests(TestCase):
             },
             follow=True,
         )
-        self.assertJSONEqual(response.content, {"ok": True})
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertContains(
+            response, "Es va indicar que s'havia realitzat l'intercanvi"
+        )
+        self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
+    def test_agreement_conversation(self):
+        email11 = "test11@example.com"
+        email12 = "test12@example.com"
+        org11 = self.aux_create_org("Nom entitat de test 11", email11)
+        org12 = self.aux_create_org("Nom entitat de test 12", email12)
+        Offer.objects.create(resource="PLACE", organization=org11)
+        Offer.objects.create(resource="PLACE", organization=org12)
+
+        self.client.login(email=email11, password=PASS_FOR_TESTS)
+        self.aux_send_message(org11.id, org12.id)
+
+        response = self.client.get(reverse("agreements", args=[org11.id]))
+        self.assertNotContains(response, "test message")
+
+        a = Agreement.objects.get(solicitor=org11)
+        response = self.client.get(reverse("agreement", args=[org11.id, a.id]))
+        self.assertContains(response, "test message")
+        self.assertNotContains(response, "test message 2")
+
+        response = self.client.post(
+            reverse("send_agreement_message", args=[org11.id, a.id]),
+            {"message": "test message 2"},
+            follow=True,
+        )
+        self.assertContains(response, "test message")
+        self.assertContains(response, "test message 2")
+        self.assertNotContains(response, "test message 3")
+
+        self.client.login(email=email12, password=PASS_FOR_TESTS)
+        response = self.client.post(
+            reverse("send_agreement_message", args=[org12.id, a.id]),
+            {"message": "test message 3"},
+            follow=True,
+        )
+        self.assertContains(response, "test message")
+        self.assertContains(response, "test message 2")
+        self.assertContains(response, "test message 3")
 
     def aux_send_message(self, o1_id, o2_id):
         send_message_url = reverse(
@@ -487,7 +673,8 @@ class IntegrationTests(TestCase):
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
+                "origin": "MATCHES",
                 "message": "test message",
             },
         )
@@ -497,156 +684,132 @@ class IntegrationTests(TestCase):
     def test_deleted_organizations(self):
         email4 = "test4@example.com"
         email5 = "test5@example.com"
-        org1 = self.aux_create_org("Nom entitat de test 4", email4)
-        org2 = self.aux_create_org("Nom entitat de test 5", email5)
-        Offer.objects.create(resource="PLACE", organization=org1)
-        Offer.objects.create(resource="PLACE", organization=org2)
+        org4 = self.aux_create_org("Nom entitat de test 4", email4)
+        org5 = self.aux_create_org("Nom entitat de test 5", email5)
+        Offer.objects.create(resource="PLACE", organization=org4)
+        Offer.objects.create(resource="PLACE", organization=org5)
 
-        o1id, o2id = org1.id, org2.id
+        o4id, o5id = org4.id, org5.id
         self.client.login(email=email5, password=PASS_FOR_TESTS)
-        self.aux_send_message(o2id, o1id)
+        self.aux_send_message(o5id, o4id)
 
         self.client.login(email=email4, password=PASS_FOR_TESTS)
-        self.aux_send_message(o1id, o2id)
-        self.assertEqual(Agreement.objects.filter(solicitor=org1).count(), 1)
-        self.assertEqual(Agreement.objects.filter(solicitee=org1).count(), 1)
+        self.aux_send_message(o4id, o5id)
+        self.assertEqual(Agreement.objects.filter(solicitor=org4).count(), 1)
+        self.assertEqual(Agreement.objects.filter(solicitee=org4).count(), 1)
 
-        org2.delete()  # delete org so Agreement's have None fields
+        org5.delete()  # delete org so Agreement's have None fields
 
-        # org2 deleted, no new message is sent
-        self.aux_send_message(o1id, o2id)
-        self.assertEqual(Agreement.objects.filter(solicitor=org1).count(), 1)
+        # org5 deleted, no new message is sent
+        self.aux_send_message(o4id, o5id)
+        self.assertEqual(Agreement.objects.filter(solicitor=org4).count(), 1)
 
-        self.client.get(reverse("agreements", args=[o1id]))
-        self.client.get(reverse("matches", args=[o1id]))
-        self.client.get(reverse("search", args=[o1id]))
+        self.client.get(reverse("agreements", args=[o4id]))
+        self.client.get(reverse("matches", args=[o4id]))
+        self.client.get(reverse("search", args=[o4id]))
 
     @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
     def test_immediate_notifications(self):
         email6 = "test6@example.com"
         email7 = "test7@example.com"
-        org2 = self.aux_create_org("Nom entitat de test 7", email7)
-        org1 = self.aux_create_org("Nom entitat de test 6", email6)
-        user1 = CustomUser.objects.get(email=email6)
-        user2 = CustomUser.objects.get(email=email7)
-        user1.notify_immediate_communications_rejected = False
-        user1.save()
-        user2.accept_communications_automatically = False
-        user2.notify_immediate_communications_received = False
-        user2.save()
+        org6 = self.aux_create_org("Nom entitat de test 6", email6)
+        org7 = self.aux_create_org("Nom entitat de test 7", email7)
+        user7 = CustomUser.objects.get(email=email7)
+        user7.notify_immediate_communications_received = False
+        user7.save()
         offer = Offer.objects.create(
-            organization=org2,
+            organization=org7,
             resource="PLACE",
             has_resource=True,
         )
         option, _ = ResourceOption.objects.get_or_create(name="DAILY_USAGE")
         offer.options.add(option)
 
+        self.client.login(email=email6, password=PASS_FOR_TESTS)
         send_message_url = reverse(
-            "send_message", args=[org1.id, org2.id, "offer", "PLACE"]
+            "send_message", args=[org6.id, org7.id, "offer", "PLACE"]
         )
         test_msg_1 = "missatge de test per al primer missatge"
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
+                "origin": "MATCHES",
                 "message": test_msg_1,
             },
         )
-        save_response(response)
-        self.assertJSONEqual(response.content, {"ok": True})
-        self.assertEqual(len(mail.outbox), 0)
-
-        self.client.login(email=email7, password=PASS_FOR_TESTS)
-        a = Agreement.objects.filter(solicitee=org2).first()
-        connect_url = reverse("agreement_connect", args=[org2.id, a.id])
-        response = self.client.post(
-            connect_url,
+        a = Agreement.objects.order_by("-date").first()
+        self.assertJSONEqual(
+            response.content,
             {
-                "connect": "no",
+                "ok": True,
+                "agreement_url": reverse("agreement", args=[org6.id, a.id]),
             },
         )
-        self.assertJSONEqual(response.content, {"ok": True})
         self.assertEqual(len(mail.outbox), 0)
 
         # activate immediate notifications and check they are received
-        a.delete()  # delete previous agreement to make simpler next queries
-        user1.notify_immediate_communications_rejected = True
-        user1.save()
-        user2.notify_immediate_communications_received = True
-        user2.save()
+        user7.notify_immediate_communications_received = True
+        user7.save()
 
-        self.client.login(email=email6, password=PASS_FOR_TESTS)
         test_msg_2 = "missatge de test per al segon missatge"
         response = self.client.post(
             send_message_url,
             {
-                "options": ["DAILY_USAGE", "PUNCTUAL_USAGE"],
+                "options": ["DAILY_USAGE", "PUNCTUAL_MEETINGS"],
+                "origin": "MATCHES",
                 "message": test_msg_2,
             },
         )
-        self.assertJSONEqual(response.content, {"ok": True})
+        a = Agreement.objects.order_by("-date").first()
+        self.assertJSONEqual(
+            response.content,
+            {"ok": True, "agreement_url": reverse("agreement", args=[org6.id, a.id])},
+        )
         self.assertEqual(len(mail.outbox), 1)
         save_email(mail.outbox[0], "notify_communication_received.html")
-        self.assertIn("T'han enviat una petició per compartir", mail.outbox[0].subject)
-
-        self.client.login(email=email7, password=PASS_FOR_TESTS)
-        a = Agreement.objects.filter(solicitee=org2).first()
-        connect_url = reverse("agreement_connect", args=[org2.id, a.id])
-        response = self.client.post(
-            connect_url,
-            {
-                "connect": "no",
-            },
+        self.assertIn(
+            "T'han enviat una petició per intercanviar", mail.outbox[0].subject
         )
-        self.assertJSONEqual(response.content, {"ok": True})
-        self.assertEqual(len(mail.outbox), 2)
-        save_email(mail.outbox[1], "notify_communication_rejected.html")
-        self.assertIn("Us han declinat una petició", mail.outbox[1].subject)
 
     @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
     def test_periodic_notifications(self):
-        org3 = self.aux_create_org("Nom entitat de test 10", "test10@example.com")
-        org2 = self.aux_create_org("Nom entitat de test 9", "test9@example.com")
-        org1 = self.aux_create_org("Nom entitat de test 8", "test8@example.com")
+        org10 = self.aux_create_org("Nom entitat de test 10", "test10@example.com")
+        org9 = self.aux_create_org("Nom entitat de test 9", "test9@example.com")
+        org8 = self.aux_create_org("Nom entitat de test 8", "test8@example.com")
 
         Need.objects.all().delete()
         Offer.objects.all().delete()
-        self.aux_create_resource(Need, org1, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"])
-        self.aux_create_resource(Need, org1, "TRAINING", ["TRAINING_DIGITAL"])
-        self.aux_create_resource(Need, org2, "PLACE", ["DAILY_USAGE"])
         self.aux_create_resource(
-            Offer, org2, "PLACE", ["DAILY_USAGE", "PUNCTUAL_USAGE"]
+            Need, org8, "PLACE", ["DAILY_USAGE", "PUNCTUAL_MEETINGS"]
+        )
+        self.aux_create_resource(Need, org8, "TRAINING", ["TRAINING_DIGITAL"])
+        self.aux_create_resource(Need, org9, "PLACE", ["DAILY_USAGE"])
+        self.aux_create_resource(
+            Offer, org9, "PLACE", ["DAILY_USAGE", "PUNCTUAL_MEETINGS"]
+        )
+        self.aux_create_resource(Offer, org10, "PLACE", ["PUNCTUAL_EVENTS"])
+        self.aux_create_resource(
+            Offer, org9, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_BUREAUCRACY"]
         )
         self.aux_create_resource(
-            Offer, org3, "PLACE", ["PUNCTUAL_MEETINGS", "PUNCTUAL_EVENTS"]
-        )
-        self.aux_create_resource(
-            Offer, org2, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_BUREAUCRACY"]
-        )
-        self.aux_create_resource(
-            Offer, org3, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_EQUALITY"]
+            Offer, org10, "TRAINING", ["TRAINING_DIGITAL", "TRAINING_EQUALITY"]
         )
 
-        org1.creator.last_notification_date = timezone.now() - timedelta(days=30 * 12)
-        org1.creator.last_long_notification_date = timezone.now() - timedelta(
+        org8.creator.last_notification_date = timezone.now() - timedelta(days=30 * 12)
+        org8.creator.last_long_notification_date = timezone.now() - timedelta(
             days=30 * 12
         )
         a1 = Agreement.objects.create(
-            solicitor=org2,
-            solicitee=org1,
-            resource="PLACE",
-        )
-        a2 = Agreement.objects.create(
-            solicitor=org1,
-            solicitee=org2,
+            solicitor=org9,
+            solicitee=org8,
             resource="PLACE",
             communication_accepted=True,
         )
 
-        needs, offers = get_ordered_needs_and_offers(org1, 100)
+        needs, offers = get_ordered_needs_and_offers(org8, 100)
         site = Site.objects.first()
-        context = get_periodic_notification_data(site, org1.creator, needs, offers)
+        context = get_periodic_notification_data(site, org8.creator, needs, offers)
         self.assertEqual(
             context,
             {
@@ -656,13 +819,8 @@ class IntegrationTests(TestCase):
                     "agreements": [a1],
                     "total_agreements": 1,
                 },
-                "agreement_success_pending": {
-                    "organization": org1,
-                    "agreements": [a2],
-                    "total_agreements": 1,
-                },
                 "matches": {
-                    "need": {"name": "local per a ús diari", "count": 1},
+                    "need": {"name": "espai de treball d'oficina", "count": 1},
                     "offer": {"name": "formació en digitalització", "count": 2},
                 },
                 "new_resources": {
@@ -671,14 +829,13 @@ class IntegrationTests(TestCase):
                             "code": "PLACE",
                             "options": [
                                 ResourceOption.objects.get(name="PUNCTUAL_EVENTS"),
-                                ResourceOption.objects.get(name="PUNCTUAL_MEETINGS"),
                             ],
                         },
                         {
                             "code": "TRAINING",
                             "options": [
-                                ResourceOption.objects.get(name="TRAINING_BUREAUCRACY"),
                                 ResourceOption.objects.get(name="TRAINING_EQUALITY"),
+                                ResourceOption.objects.get(name="TRAINING_BUREAUCRACY"),
                             ],
                         },
                     ],
@@ -688,18 +845,108 @@ class IntegrationTests(TestCase):
         send_periodic_notification(
             "subject",
             "email/periodic_notification.html",
-            org1.creator,
+            org8.creator,
             context,
         )
         self.assertEqual(len(mail.outbox), 1)
         save_email(mail.outbox[0], "periodic_notification.html")
         for s in [
             "Us han fet una petició de col·laboració...",
-            "Heu arribat a fer l'intercanvi finalment?",
             "Possibles lligues",
             "Novetats a la plataforma",
         ]:
             self.assertIn(s, mail.outbox[0].body)
+
+    @override_settings(AUTHENTICATION_BACKENDS=AUTH_BACKENDS)
+    def test_announcements(self):
+        announcement_text = "Text de l'anunci publicat"
+        announcement_text_escaped = "Text de l&#39;anunci publicat"
+        contact_text = "Text del contacte extern"
+        org_name = "Nom entitat amb anuncis"
+        org_email = "test13@example.com"
+        self.aux_check_no_public_announcements(announcement_text)
+
+        o = self.aux_create_org(org_name, org_email)
+        self.aux_check_announcements(o, announcement_text, exist=False)
+
+        add_announcement_url = reverse("add_announcement", args=[o.id])
+        self.client.post(
+            add_announcement_url,
+            {
+                "title": announcement_text,
+                "description": "announcement description",
+                "public": False,
+                "resource": "ALLIANCES",
+                "option": "VOLUNTEERING",
+            },
+        )
+        self.aux_check_announcements(o, announcement_text, exist=True)
+        self.aux_check_no_public_announcements(announcement_text)
+
+        a = Announcement.objects.first()
+        edit_announcement_url = reverse("edit_announcement", args=[o.id, a.id])
+        self.client.post(
+            edit_announcement_url,
+            {
+                "title": announcement_text,
+                "description": "announcement description",
+                "public": True,
+                "resource": "ALLIANCES",
+                "option": "VOLUNTEERING",
+            },
+        )
+
+        response = self.client.get(reverse("public_announcements"))
+        self.assertContains(response, announcement_text)
+
+        response = self.client.get(reverse("announcement", args=[o.id, a.id]))
+        self.assertContains(
+            response, "Encara no hi ha persones interessades en aquest anunci"
+        )
+        self.assertNotContains(response, contact_text)
+
+        self.client.logout()
+        announcement_url = reverse("public_announcement", args=[a.id])
+        response = self.client.get(announcement_url)
+        self.assertContains(response, announcement_text_escaped)
+        self.assertContains(response, org_name)
+        self.assertEqual(len(mail.outbox), 0)
+
+        response = self.client.post(
+            announcement_url,
+            {
+                "name": "Contact name",
+                "email": "contactemail@example.com",
+                "message": contact_text,
+                "g-recaptcha-response": "test",
+            },
+            follow=True,
+        )
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertContains(
+            response,
+            "S&#39;ha enviat el missatge. L&#39;organització es posarà en contacte amb tu el més aviat possible",
+        )
+
+        self.client.login(email=org_email, password=PASS_FOR_TESTS)
+        response = self.client.get(reverse("announcement", args=[o.id, a.id]))
+        self.assertContains(response, contact_text)
+
+    def aux_check_no_public_announcements(self, announcement_text):
+        response = self.client.get(reverse("public_announcements"))
+        self.assertContains(
+            response, "No s'ha publicat cap anunci que encaixe amb el filtre"
+        )
+        self.assertNotContains(response, announcement_text)
+
+    def aux_check_announcements(self, o, announcement_text, exist=False):
+        response = self.client.get(reverse("announcements", args=[o.id]))
+        if exist:
+            self.assertNotContains(response, "Encara no heu creat cap anunci")
+            self.assertContains(response, announcement_text)
+        else:
+            self.assertContains(response, "Encara no heu creat cap anunci")
+            self.assertNotContains(response, announcement_text)
 
     def aux_create_resource(self, model, org, resource, options):
         offer = model.objects.create(

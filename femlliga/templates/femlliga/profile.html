@@ -1,35 +1,18 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import organization_info, organization_map_js, leaflet_css, leaflet_js %}
+{% from 'femlliga/_macros.html' import organization_info, organization_map_js, leaflet_css, leaflet_js, organization_header %}
 
 {% block title %}{{ _("Perfil") }}{% endblock %}
 
 {% block css %}{{ leaflet_css() }}{% endblock %}
 
 {% block content %}
-<section class="mb-4" style="background-color: transparent; background-image: linear-gradient(180deg, #ffce1c 0%, white 100%);">
-  <div class="container organization-main-page">
-    <div class="row edit-row" style="padding-top: 3.5rem;">
-      <div class="col-md-6">
-        <span class="edit d-md-none d-block" style="float: right;">
-          <a href="{{ url("edit_organization", args=[org.id]) }}" style="color: black;" title="Edita">
-            <i class="bi-pencil-square edit" style="font-size: 1.5rem; margin-top: 10px;"></i>
-          </a>
-        </span>
-        <h1 style="font-size: 2.5em; margin: 0;">{{ org.name }}</h1>
-      </div>
-      <div class="col-md-6">
-        {% if org.logo %}
-        <div class="mb-2">
-          <img src="{{ org.logo.url }}" class="organization-logo" loading="lazy" />
-        </div>
-        {% endif %}
-      </div>
-    </div>
-
+<div class="container">
+  <div class="w-80 m-center">
+    {{ organization_header(org, edit_link=True) }}
     {{ organization_info(org) }}
   </div>
-</section>
+</div>
 {% endblock %}
 
 {% block js %}

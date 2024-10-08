@@ -1,273 +1,277 @@
 {% extends "femlliga/_base_template.html" %}
 
-{% from 'femlliga/_macros.html' import input_classes, input_value, input_feedback, form_feedback, render_select, vue_js %}
+{% from 'femlliga/_macros.html' import vue_js, arrow_btn_link %}
 
 {% block title %}{{ _("Portada") }}{% endblock %}
 
 {% block content %}
 <!-- desktop initial block -->
-<div class="container d-none d-md-block">
+<div class="container d-none d-lg-block mb-200px">
   <div class="row d-flex flex-md-row-reverse welcome-block">
     <div class="offset-md-5 col-md-7">
-      <div class="spacing"></div>
-      <em>{{ _("Fer lliga: unir-se, fer causa comuna, acordar, amistar-se, anar a l’una, fer pinya…") }}</em>
+      <div class="h-120px"></div>
+      <em class="fs-6">{{ _("Fer lliga: unir-se, fer causa comuna, acordar, amistar-se, anar a l’una, fer pinya…") }}</em>
       <h1 class="app-title">Fem lliga!</h1>
-      <div style="background-image: url('{{ static("decorations/cross.svg") }}'); background-repeat: repeat-x; height: 20px; margin-bottom: 20px; margin-right: -500px;">
-      </div>
       {{ initial_block_text() }}
     </div>
   </div>
 </div>
 
 <!-- mobile initial block -->
-<div class="container d-block d-md-none">
-  <div style="background-color: #f4f4f4;">
-    <img src="{{ static("home-images/gent-portada-mobile.png") }}" style="max-width: 100%" alt="Persones diverses" loading="lazy">
-    <div class="p-2">
-      <em>{{ _("Fer lliga: unir-se, fer causa comuna, acordar, amistar-se, anar a l’una, fer pinya…") }}</em>
+<div class="container d-block d-lg-none mb-200px">
+  <div class="bg-lightgrey br-1rem">
+    <div class="p-2 less-lg:text-center">
+      <p class="fs-6 mt-4 fst-italic">{{ _("Fer lliga: unir-se, fer causa comuna, acordar, amistar-se, anar a l’una, fer pinya…") }}</p>
       <h1 class="app-title app-title-mobile">Fem lliga!</h1>
-      <div style="background-image: url('{{ static("decorations/cross.svg") }}'); background-repeat: repeat-x; height: 20px; margin-bottom: 20px; margin-right: -500px;">
-      </div>
       {{ initial_block_text() }}
     </div>
   </div>
 </div>
 
-<div class="container landing-container text-center">
-  <h2 class="fw-black text-center">{{ _("Guia metodològica") }}</h2>
-  <div class="divider-1"></div>
-  <div class="row">
-    <div class="col-12 col-sm-6">
-      <p>{{ _("A partir de l’experiència acumulada, hem elaborat esta guia metodològica que té com a objectiu recollir una sèrie de recomanacions útils per a enfortir els vincles d’un veïnat a través de l’enxarxament de les entitats presents en un territori concret. Al llarg del document es fa èmfasi en les possibilitats que ofereix la utilització de la plataforma Fem Lliga!, una ferramenta de suport als processos de dinamització comunitària.") }}</p>
-    </div>
-
-    <div class="col-12 col-sm-6">
-      <a type="button" class="btn btn-custom fw-bold p-2 px-4 fs-4" href="{{ static("guia-metodologica-femlliga.pdf") }}" download>
-        {{ _("Descarrega la guia") }}
-      </a>
-    </div>
-  </div>
-</div>
-
-<div class="container landing-container">
-  <h2 class="fw-black text-center">{{ _("Vols saber si podries fer lliga?") }}</h2>
-  <div class="divider-1"></div>
-  <p>
-    {{ _("Selecciona el tipus de recurs que t'interessa i podràs veure amb quantes entitats el podries intercanviar.") }}
+<div class="container d-none d-lg-block">
+  <h2 class="fw-black fs-3rem text-center mb-0 text-uppercase">
+    {{ _("Entre totes, associacions amb més impacte!") }}
+  </h2>
+  <div class="divider-3"></div>
+  <p class="text-center fs-5 lh-1-75rem mt-3 px-5rem">
+  {{ _("De forma semblant a les famoses aplicacions digitals de cites, us proposem recollir informació amb la qual filtrar els perfils que més poden interessar a la teua entitat. Els col·lectius amb més probabilitats de ser compatibles podem entrar en contacte entre nosaltres.") }}
   </p>
-  <div id="vueapp">
-    <div class="multi-select">
-      <span
-        v-for="(resourceName, resource) in resourceNamesMap"
-        :key="resource"
-      >
-        <button
-          v-if="resource !== 'OTHER'"
-          class="btn multi-select-choice"
-          :class="{selected: resourceSelected === resource}"
-          type="button"
-          role="switch"
-          @click="selectResource(resource);"
-        >
-          ${ resourceName }
-        </button>
-      </span>
+</div>
+
+<div class="container d-none d-lg-block xxl:px-5rem mb-200px less-xl:broad-container">
+  <div class="row g-0 mb-100px">
+    <div class="col-4 text-center">
+      <img src="{{ static("home-images/vinyeta-nuria.png") }}" alt="{{ _("Dona Núria") }}" loading="lazy">
     </div>
-    <div v-if="resourceSelected !== ''">
-      <p>${ resourceOptionsQuestionMap[resourceSelected] }</p>
+    <div class="col-4 vinyeta">
+      <div class="vinyeta-inner d-flex flex-column justify-content-between h-100">
+        <div class="big-number mt-5">01.</div>
+        <p class="vinyeta-text">{{ _("Núria i Albert busquen un projector perquè l’associació en què participen organitza una xerrada i la conferenciant vol projectar una presentació audiovisual.") }}</p>
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <img src="{{ static("home-images/vinyeta-albert.png") }}" alt="{{ _("Home Albert") }}" loading="lazy">
+    </div>
+  </div>
+
+  <div class="row g-0 h-425px mb-100px">
+    <div class="col-4 vinyeta vinyeta-rectangle py-3">
+      <div class="vinyeta-inner d-flex flex-column justify-content-between h-100">
+        <span class="big-number mt-4">02.</span>
+        <p class="vinyeta-text m-0">{{ _("Decideixen inscriure la seua associació en Fem lliga! Contesten el formulari i posen en comú les seues peticions com per exemple el projector.") }}</p>
+      </div>
+    </div>
+    <div class="col-4 text-center vinyeta-groc py-3">
+      <div class="vinyeta-inner d-flex align-items-center justify-content-center h-100">
+        <span class="fw-black fs-2-5rem lh-3-5rem">{{ _("CONNECTAR<br>EL TEIXIT<br>SOCIAL") }}</span>
+      </div>
+    </div>
+    <div class="col-4 vinyeta vinyeta-rectangle py-3">
+      <div class="vinyeta-inner d-flex flex-column justify-content-between h-100">
+        <span class="big-number mt-4">03.</span>
+        <p class="vinyeta-text m-0">{{ _("Per la seua banda, Llúcia va donar d’alta el seu col·lectiu ja que fa setmanes que buscaven espai. A més, la seua assemblea va decidir oferir un projector per si algú el necessitava.") }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-0">
+    <div class="col-4 text-center">
+      <img src="{{ static("home-images/vinyeta-llucia.png") }}" alt="{{ _("Dona Llúcia") }}" loading="lazy">
+    </div>
+    <div class="col-4 vinyeta">
+      <div class="vinyeta-inner d-flex flex-column justify-content-between h-100">
+        <span class="big-number mt-5">04.</span>
+        <p class="vinyeta-text">{{ _("Una vegada Núria ha emplenat el formulari, l’aplicació li ha proposat que contacte amb l’associació de Llúcia. Ara sols cal que es posen d’acord entre elles!") }}</p>
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <img src="{{ static("home-images/vinyeta-llucia-nuria.png") }}" alt="{{ _("Dones Llúcia i Núria") }}" loading="lazy">
+    </div>
+  </div>
+</div>
+
+<div class="container mb-200px">
+  <div class="inner-container">
+    <h2 class="fw-black fs-3rem less-lg:fs-2rem text-uppercase text-center mb-0">
+      {{ _("Vols saber si podries fer lliga?") }}
+    </h2>
+    <div class="divider-3"></div>
+    <p class="text-center mt-60px fs-5">
+    {{ _("Selecciona el tipus de recurs que t'interessa i podràs veure amb quantes entitats el podries intercanviar.") }}
+    </p>
+    <div id="vueapp">
       <div class="multi-select">
-        <button
-          v-for="[option, optionName] of resourceOptionsMap[resourceSelected]"
-          :key="resource"
-          class="btn multi-select-choice"
-          :class="{selected: optionSelected === option}"
-          type="button"
-          role="switch"
-          @click="selectOption(option);"
-        >
-          ${ optionName }
+        <span
+            v-for="(resourceName, resource) in resourceNamesMap"
+            :key="resource"
+            >
+            <button
+                v-if="resource !== 'OTHER'"
+                class="btn multi-select-choice"
+                :class="{selected: resourceSelected === resource}"
+                type="button"
+                role="switch"
+                @click="selectResource(resource);"
+                >
+                ${ resourceName }
+            </button>
+        </span>
+      </div>
+      <div v-if="resourceSelected !== ''">
+        <p class="text-center mt-3 fs-5">${ resourceOptionsQuestionMap[resourceSelected] }</p>
+        <div class="multi-select">
+          <button
+              v-for="[option, optionName] of resourceOptionsMap[resourceSelected]"
+              :key="option"
+              class="btn multi-select-choice"
+              :class="{selected: optionSelected === option}"
+              type="button"
+              role="switch"
+              @click="selectOption(option);"
+              >
+              ${ optionName }
+          </button>
+        </div>
+      </div>
+      <div v-if="resourceSelected !== '' && optionSelected !== '' && !matches" class="text-center mb-3">
+        <button class="btn btn-arrow btn-lg" @click="checkMatches" :disabled="loading">
+          <div class="d-flex align-items-stretch">
+            <span class="btn-arrow-icon d-flex align-items-center"><i class="bi-recycle"></i></span>
+            <span class="btn-arrow-text">{{ _("Comprova les teues lligues") }}</span>
+            <span class="btn-arrow-arrow d-flex align-items-center">
+              <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">{{ _("Carregant...") }}</span>
+              </div>
+              <i v-else class="bi-caret-right-fill"></i>
+            </span>
+          </div>
         </button>
       </div>
-    </div>
-    <div v-if="resourceSelected !== '' && optionSelected !== ''" class="text-center mb-3">
-      <button class="btn btn-custom" @click="checkMatches" :disabled="loading">
-        {{ _("Comprova amb quantes entitats fas lliga") }}
-        <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
-          <span class="visually-hidden">{{ _("Carregant...") }}</span>
-        </div>
-      </button>
-    </div>
-    <div v-if="matches">
-      <p v-if="matches.offers === 0 && matches.needs === 0">
+      <div v-if="matches" class="fs-5">
+        <p v-if="matches.offers === 0 && matches.needs === 0" class="text-center">
         {{ _("Actualment cap entitat ofereix ni necessita el mateix que vosaltres, però si us inscriviu altres entitats us podran trobar en el futur.") }}
+        </p>
+        <template v-else-if="matches.offers === 0 && matches.needs !== 0">
+          <p class="mb-0 text-center">
+          {{ _("Hi ha <strong>${ matches.needs } entitats que necessiten el mateix que vosaltres</strong>.") }}
+          </p>
+          <p class="text-center">
+          {{ _("Si us inscriviu podreu contactar amb elles i buscar una solució en comú.") }}
+          </p>
+        </template>
+        <template v-else-if="matches.offers !== 0 && matches.needs === 0">
+          <p class="mb-0 text-center">
+          {{ _("Hi ha <strong>${ matches.offers } entitats que ofereixen el que necessiteu</strong>.") }}
+          </p>
+          <p class="text-center">
+          {{ _("Si us inscriviu podreu contactar amb elles i sol·licitar la seua ajuda.") }}
+          </p>
+        </template>
+        <template v-else>
+          <p class="mb-0 text-center">
+          {{ _("Hi ha <strong>${ matches.offers } entitats que ofereixen el que necessiteu</strong>.") }}
+          </p>
+          <p class="mb-0 text-center">
+          {{ _("Hi ha <strong>${ matches.needs } entitats que necessiten el mateix que vosaltres</strong>.") }}
+          </p>
+          <p class="text-center">
+          {{ _("Si us inscriviu podreu contactar amb elles i col·laborar.") }}
+          </p>
+        </template>
+        <div class="text-center mt-4">
+          {{ arrow_btn_link(_("Accedeix"), url("account_signup"), "bi-person") }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mb-200px">
+  <div class="inner-container">
+    <h2 class="fw-black fs-2-5rem text-uppercase text-center mb-0">{{ _("Com començar?") }}</h2>
+    <div class="divider-3"></div>
+
+    <div class="m-center lg:px-5rem">
+      <p class="mt-5 fs-5 text-center">
+      {{ _("Respon el qüestionari i prompte trobaràs alguna associació amb qui intercanviar recursos, materials, coneixements, formacions, serveis, habilitats, etc.") }}
       </p>
-      <p v-else-if="matches.offers === 0 && matches.needs !== 0">
-        {{ _("Hi ha <strong>${ matches.needs }</strong> entitats que necessiten el mateix que vosaltres. Si us inscriviu podreu contactar amb elles i buscar una solució en comú.") }}
-      </p>
-      <p v-else-if="matches.offers !== 0 && matches.needs === 0">
-        {{ _("Hi ha <strong>${ matches.offers }</strong> entitats que ofereixen el que necessiteu. Si us inscriviu podreu contactar amb elles i sol·licitar la seua ajuda.") }}
-      </p>
-      <p v-else>
-        {{ _("Hi ha <strong>${ matches.offers }</strong> entitats que ofereixen el que necessiteu i <strong>${ matches.needs }</strong> entitats que necessiten el mateix que vosaltres. Si us inscriviu podreu contactar amb elles i col·laborar.") }}
-      </p>
-      <div class="text-center">
-        <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
-          {{ _("Inscriu la teua entitat") }}
-        </a>
+
+      <div class="d-flex justify-content-between flex-column flex-lg-row sm:px-5rem lg:px-0">
+        <div class="w-100 flex-grow-1 bg-lightgrey mt-5 br-1rem text-center p-4 position-relative">
+          <h3 class="mt-0 fs-2rem fw-600">{{ _("Què podeu oferir?") }}</h3>
+          <p class="fs-5 mt-3 mb-7rem">
+          {{ _("Respon un curt qüestionari sobre aquelles qüestions que el teu col·lectiu voldria compartir.") }}
+          </p>
+          <div class="mb-3 position-absolute bottom-0 start-50 translate-middle">
+          {{ arrow_btn_link(_("Comença!"), url("account_signup"), "bi-person") }}
+          </div>
+        </div>
+
+        <div class="flex-gap"></div>
+
+        <div class="w-100 flex-grow-1 bg-lightgrey mt-5 br-1rem text-center p-4 position-relative">
+          <h3 class="mt-0 fs-2rem fw-600">{{ _("Quines necessitats teniu?") }}</h3>
+          <p class="fs-5 mt-3 mb-7rem">
+          {{ _("Respon un curt qüestionari sobre aquelles qüestions que el teu col·lectiu necessita.") }}
+          </p>
+          <div class="mb-3 position-absolute bottom-0 start-50 translate-middle">
+          {{ arrow_btn_link(_("Comença!"), url("account_signup"), "bi-person") }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="container landing-container text-center">
-  <iframe class="max-w-100" width="560" height="315" src="https://www.youtube.com/embed/XlhE8N3b1qM?si=qHpuJC7mieJy2ZA6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-</div>
+<div class="container p-0 bottom-left-triangle-decoration mt-100px">
+  <div class="inner-container top-right-triangle-decoration pb-15rem">
+    <h2 class="fw-black fs-2-5rem text-uppercase text-center mb-0 pt-3">
+      {{ _("Recursos") }}
+    </h2>
+    <div class="divider-3"></div>
 
-<div class="container landing-container">
-    <h2 class="fw-black text-center">{{ _("Entre totes, associacions amb més impacte!") }}</h2>
-    <div class="divider-1"></div>
-    <p class="text-center">
-      {{ _("De forma semblant a les famoses aplicacions digitals de cites, us proposem recollir informació amb la qual filtrar els perfils que més poden interessar a la teua associació. Els col·lectius amb més probabilitats de ser compatibles a l'hora de <strong>compartir recursos</strong> podem entrar en contacte entre nosaltres.") }}
-    </p>
-</div>
+    <div class="d-flex justify-content-between flex-column flex-lg-row mt-100px sm:px-5rem lg:px-0">
+      <div class="w-100 flex-grow-1 bg-lightgrey br-1rem px-3rem lg:px-5rem xl:px-7rem less-lg:text-center">
+        <img
+          src="{{ static("home-images/portada-guia-metodologica.png") }}"
+          class="max-w-100 w-100 mt-60px"
+        >
+        <p class="fs-5 mt-60px">
+        {{ _("A partir de l’experiència acumulada, hem elaborat esta guia metodològica que té com a objectiu recollir una sèrie de recomanacions útils per a enfortir els vincles d’un veïnat a través de l’enxarxament de les entitats presents en un territori concret.") }}
+        </p>
+        <div class="mt-60px mb-60px text-center">
+          {{ arrow_btn_link(_("Descarrega"), static("guia-metodologica-femlliga.pdf"), "bi-download", download=True) }}
+        </div>
+      </div>
 
-<div class="container">
-    <div class="row">
-        <div class="col-xl-4 col-md-6 col-xs-12 text-center">
-          <img src="{{ static("home-images/vinyeta-1-circuit.png") }}" alt="{{ _("Dona Núria") }}" loading="lazy">
-        </div>
-        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta">
-            <div class="vinyeta-inner">
-                <span class="big-number">01.</span>
-                <p class="vinyeta-text">{{ _("Núria busca un projector perquè l’Associació de dones en què participa organitza una xerrada i la conferenciant vol projectar una presentació audiovisual.") }}</p>
-            </div>
-        </div>
-        <div class="col-xl-4 col-md-6 col-xs-12 text-center">
-          <img src="{{ static("home-images/vinyeta-2-circuit-projector.png") }}" alt="{{ _("Projector i pantalla") }}" loading="lazy">
-        </div>
-    </div>
+      <div class="flex-gap"></div>
 
-    <div class="row">
-        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta py-3">
-            <div class="vinyeta-inner">
-                <span class="big-number">02.</span>
-                <p class="vinyeta-text">{{ _("Decideixen inscriure la seua Associació en <em>Fem lliga!</em>. Contesten el formulari i posen en comú les seues peticions com per exemple el projector.") }}</p>
-            </div>
-        </div>
-        <div class="col-xl-4 col-md-6 col-xs-12 text-center vinyeta-groc py-3">
-            <div class="vinyeta-inner">
-              <span class="fw-black" style=" font-size: 2.6em;">{{ _("CONNECTANT") }}</span>
-              <span class="fw-black" style=" font-size: 5em; line-height: 1em;">{{ _("EL<br>TEIXIT SOCIAL") }}</p>
-            </div>
-        </div>
-        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta py-3">
-            <div class="vinyeta-inner">
-                <span class="big-number">03.</span>
-                <p class="vinyeta-text">{{ _("Per la seua banda, Llúcia va donar d’alta el seu col·lectiu ja que fa setmanes buscaven espai. A més, la seua assemblea va decidir oferir un projector per si algú el necessitava.") }}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xl-4 col-md-6 col-xs-12 text-center">
-          <img src="{{ static("home-images/vinyeta-6.png") }}" alt="{{ _("Dona Núria") }}" loading="lazy">
-        </div>
-        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta">
-            <div class="vinyeta-inner">
-                <span class="big-number">04.</span>
-                <p class="vinyeta-text">{{ _("Una vegada Núria ha emplenat el formulari, l’aplicació li ha proposat que contacte amb l’associació de Llúcia. Ara sols cal que es posen d’acord entre elles!") }}</p>
-            </div>
-        </div>
-        <div class="col-xl-4 col-md-6 col-xs-12 text-center">
-          <img src="{{ static("home-images/vinyeta-7.png") }}" alt="{{ _("Projector i pantalla") }}" loading="lazy">
-        </div>
-    </div>
-</div>
-
-<div class="container">
-    <div class="row" style="margin-top: 80px; margin-bottom: 50px;">
-        <div class="col-12">
-          <h2 class="fw-black" style=" font-size: 4.4em; color: #000; text-align: center;">{{ _("Com començar?") }}</h2>
-            <div class="divider-1"></div>
-        </div>
-    </div>
-
-    <div class="row" style="margin-top: 30px;">
-        <div class="col-xl-4 col-md-6 col-xs-12">
-          <p style="margin-top: 30px;">{{ _("Respon el qüestionari i prompte trobaràs alguna Associació amb qui <strong>intercanviar</strong> recursos, materials, coneixements, formacions, serveis, habilitats, etc.") }}</p>
-        </div>
-
-        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta-menut">
-            <div class="vinyeta-inner text-center" style="padding: 50px 0;">
-              <h3 class="vinyeta-text mb-3">{{ _("Què podeu oferir?") }}</h3>
-              <p class="vinyeta-text mb-3">{{ _("Respon un curt qüestionari sobre aquelles qüestions que el teu col·lectiu voldria compartir.") }}</p>
-                <a type="button" class="btn btn-custom fw-bold" href="{{ url("account_signup") }}" style=" padding: 12px 20px;">
-                  {{ _("Comenceu a fer lliga") }}
-                </a>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6 col-xs-12 vinyeta-menut">
-            <div class="vinyeta-inner text-center" style="padding: 50px 0;">
-              <h3 class="vinyeta-text mb-3">{{ _("Quines necessitats teniu?") }}</h3>
-              <p class="vinyeta-text mb-3">{{ _("Respon un curt qüestionari sobre aquelles qüestions que el teu col·lectiu necessita.") }}</p>
-                <a type="button" class="btn btn-custom fw-bold" href="{{ url("account_signup") }}" style=" padding: 12px 20px;">
-                  {{ _("Comenceu a fer lliga") }}
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" style="margin-top: 100px; margin-bottom: 20px;">
-  <h2 class="fw-black text-center">{{ _("Cooperar, intercanviar, fer lliga per a què?") }}</h2>
-    <div class="divider-1"></div>
-    <p class="text-center">
-    {{ _("Sovint a les nostres organitzacions ens costa trobar solucions als problemes i cobrir les necessitats que ens sorgeixen. Disposem d'escassos recursos i molt poc temps. Aquesta ferramenta ens facilita el <strong>treball en xarxa</strong> amb altres entitats per resoldre aquests problemes i incrementar el nostre impacte i la nostra projecció.") }}
-    </p>
-</div>
-
-<section class="d-none d-lg-block" style="background-color: transparent; background-image: linear-gradient(180deg, white 20%, #ffce1c 100%); padding-bottom: 100px;">
-  <div class="container">
-    <div class="row mt-3">
-      <div id="carouselExamples" class="carousel carousel-triple slide" data-bs-ride="carousel">
-        <div style="padding: 0 120px;">
-          <div class="carousel-inner overflow-hidden" style=" padding: 0 0 30px 0;">
-            {{ carousel_examples() }}
-          </div>
-
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExamples" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">{{ _("Anterior") }}</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselExamples" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">{{ _("Següent") }}</span>
-          </button>
+      <div class="w-100 flex-grow-1 bg-lightgrey br-1rem px-3rem lg:px-5rem xl:px-7rem less-lg:text-center">
+        <img src="{{ static("segell-fem-lliga.png") }}" class="max-w-100 w-100 mt-60px">
+        <p class="fs-5 mt-60px">
+          {{ _("El segell de Fem lliga! es concedeix a les entitats que formen part del projecte. És un distintiu que pots penjar al teu local per difondre el projecte i mostrar el teu compromís amb el foment d'un teixit social fort.") }}
+        </p>
+        <div class="mt-60px mb-60px text-center">
+          {{ arrow_btn_link(_("Descarrega"), static("segell-fem-lliga.png"), "bi-download", download=True) }}
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<section class="d-block d-lg-none" style="background-color: transparent; background-image: linear-gradient(180deg, white 20%, #ffce1c 100%); padding-bottom: 100px;">
-  <div class="container">
-    <div class="row mt-3">
-      <div id="carouselExamplesMobile" class="carousel carousel-triple slide" data-bs-ride="carousel">
-        <div>
-          <div class="carousel-inner overflow-hidden">
-            {{ carousel_examples(mobile=True) }}
-          </div>
+<div class="container">
+  <h2 class="fw-black fs-2-5rem text-uppercase text-center mb-0">{{ _("Per a què?") }}</h2>
+  <div class="divider-3"></div>
+  <p class="mt-5 mb-5 fs-5 text-center lg:px-5rem m-center">
+  {{ _("Sovint a les nostres organitzacions ens costa trobar solucions als problemes i cobrir les necessitats que ens sorgeixen. Disposem d'escassos recursos i molt poc temps. Aquesta ferramenta ens facilita el treball en xarxa amb altres entitats per resoldre aquests problemes i incrementar el nostre impacte i la nostra projecció.") }}
+  </p>
+</div>
 
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExamplesMobile" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">{{ _("Anterior") }}</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselExamplesMobile" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">{{ _("Següent") }}</span>
-          </button>
-        </div>
+<section class="container-fluid g-0 mb-7rem">
+  <div class="row mx-auto my-auto justify-content-center">
+    <div id="carouselExamples" class="carousel slide p-0 mt-5" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        {{ carousel_examples() }}
       </div>
     </div>
   </div>
@@ -275,84 +279,83 @@
 {% endblock %}
 
 {% macro initial_block_text() %}
-<p>
-  {{ get_current_site(request).name }} {{ _("és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.") }}
+<p class="fs-6">
+{{ get_current_site(request).name }} {{ _("és una xarxa on les organitzacions <strong>intercanviem</strong> recursos, habilitats, serveis o coneixements. Es tracta d’una ferramenta que <strong>posa en contacte</strong> les organitzacions segons les nostres necessitats i el que podem oferir.") }}
 </p>
-<div class="mt-3 text-center">
-  <a type="button" class="btn btn-lg btn-custom btn-inscriu" href="{{ url("account_signup") }}">
-    {{ _("Inscriu la teua entitat") }}
-  </a>
+<div class="mt-4 mb-4">
+  {{ arrow_btn_link(_("Accedeix"), url("account_signup"), "bi-person") }}
 </div>
 {% endmacro %}
 
-{% macro collaboration_example(image, heading, text, alternatives, active=False, mobile=False) %}
+{% macro collaboration_example(question, answer, active=False) %}
 <div class="carousel-item{% if active %} active{% endif %}">
-  <div class="card {% if not mobile %}card-carousel-triple{% endif %}">
-    <img src="{{ static("decorations/quote.svg") }}" class="example-quote" alt="" loading="lazy">
-
-    <img src="{{ static("home-images/"+image) }}" class="card-img-top pt-4 ps-4 pe-4" alt="" loading="lazy">
-    <div class="card-body">
-      <p class="text-center text-muted fsm-1">{{ text }}</p>
-      <div class="divider-1"></div>
-      <h3 class="text-center lh-15">{{ heading }}</h3>
-      <p class="text-center text-muted fsm-2">{{ alternatives }}</p>
+  <div class="col-12 col-md-6 col-lg-4">
+    <div class="card br-1rem w-80 mx-auto h-100">
+      <div class="card-body carousel-body">
+        <img src="{{ static("home-images/quote.svg") }}" class="example-quote mb-2" alt="" loading="lazy">
+        <div class="d-flex flex-column h-special">
+          <p class="text-grey fst-italic fw-bold mb-3">«{{ question }}»</p>
+          <div class="flex-grow-1"></div>
+          <p class="mb-3">{{ answer }}</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 {% endmacro %}
 
-{% macro carousel_examples(mobile=False) %}
-{{ collaboration_example("exemples-legal.png", _("Us desborden les qüestions legals?"), _("Segur que teniu dubtes a l'hora de saber si cal contractar una assegurança per a alguna activitat o si heu de complir amb la Llei de Transparència,"), _("O per exemple fiscals i comptables?"), active=True, mobile=mobile) }}
+{% macro carousel_examples() %}
+{{ collaboration_example(_("És necessari contractar una assegurança per a les nostres activitats?"), _("En Fem lliga! pots trobar entitats que poden resoldre els vostres dubtes legals."), active=True) }}
 
-{{ collaboration_example("exemples-llibreta.png", _("Voleu aprendre a redactar projectes? Fem lliga!"), _("Quantes vegades us hauria anat bé que us orientaren quan us poseu davant la paperassa per a demanar recursos econòmics a l'administració?"), _("Per exemple per a demanar una subvenció"), active=False, mobile=mobile) }}
+{{ collaboration_example(_("Equip de so, megafonia... tenim un acte i ens vindria genial"), _("Vos sorprendrà la quantitat de col·lectius de Fem lliga! que vos poden ajudar!")) }}
 
-{{ collaboration_example("exemples-equip-de-so.png", _("Busqueu un equip de so? Fem lliga!"), _("Resulta que voleu fer un acte en el carrer i us aniria molt bé un equip de so perquè s'escolte a les persones participants."), _("Microfonia, altaveus, una taula de mescles."), mobile=mobile) }}
+{{ collaboration_example(_("Tenim assemblea i no disposem d'un espai"), _("Amb aquesta xarxa social podeu contactar amb altres associacions que estan disposades a compartir la seua seu.")) }}
 
-{{ collaboration_example("exemples-persones.png", _("Busqueu un espai? Fem lliga!"), _("Amb aquesta xarxa social podeu contactar amb altres associacions que estan disposades a compartir la seua seu."), _("Per a un acte puntual? de forma periòdica o permanent?"), mobile=mobile) }}
+{{ collaboration_example(_("Subvencions, projectes, estatuts... Els papers ens ofeguen!"), _("Formació, redacció de projectes... Hi ha molts col·lectius que segur que vos volen donar suport.")) }}
 
-{{ collaboration_example("exemples-projector.png", _("Necessiteu un projector? Fem lliga!"), _("Entre les associacions fàcilment fareu lliga amb alguna que us el pot deixar. Contacteu i concreteu les condicions!"), _("O algun altre recurs audiovisual? Un equip de so potser?"), mobile=mobile) }}
-
-{{ collaboration_example("exemples-formacio.png", _("Voleu formar-vos? Fem lliga!"), _("Us agradria ensenyar com funcionen les xarxes socials? Voleu compartir algun altre coneixement? Segur que trobeu amb qui compartir-lo."), _("Per exemple en pàgines web? o en com millorar el funcionament de la vostra assemblea?"), mobile=mobile) }}
+{{ collaboration_example(_("Volem formar-nos més, però no trobem qui ens acompanye"), _("Ús de les xarxes socials, millora del funcionament intern... Moltes entitats fan formació dels seus temes i volen compartir el seu coneixement.")) }}
 {% endmacro %}
 
 {% block js %}
 {{ vue_js() }}
-{{ json_script(consts.RESOURCE_NAMES_MAP, "resource-names-data") }}
-{{ json_script(consts.RESOURCE_OPTIONS_MAP , "resource-options-data") }}
-{{ json_script(consts.RESOURCE_OPTIONS_QUESTION_MAP , "resource-options-question-data") }}
-{{ json_script(consts.RESOURCE_OPTIONS_DEF_MAP, "option-names-data") }}
 <script>
-var resourceNamesMap = JSON.parse(document.getElementById('resource-names-data').textContent);
-var resourceOptionsMap = JSON.parse(document.getElementById('resource-options-data').textContent);
-var resourceOptionsQuestionMap = JSON.parse(document.getElementById('resource-options-question-data').textContent);
-var optionNamesMap = JSON.parse(document.getElementById('option-names-data').textContent);
-var items = document.querySelectorAll('.carousel-triple .carousel-item');
+// from https://stackoverflow.com/questions/20007610/bootstrap-carousel-multiple-frames-at-once
+let items = document.querySelectorAll('.carousel .carousel-item')
+
+var minPerSlide = 3
+if (screen.width < 768) {
+  minPerSlice = 1;
+} else if (screen.width < 992) {
+  minPerSlice = 2;
+}
 
 items.forEach((el) => {
-  const minPerSlide = 3;
-  let next = el.nextElementSibling;
-  for (var i = 1; i < minPerSlide; i++) {
+  let next = el.nextElementSibling
+  for (var i=1; i<minPerSlide; i++) {
     if (!next) {
+      // wrap carousel by using first child
       next = items[0]
     }
-    let cloneChild = next.cloneNode(true);
-    el.appendChild(cloneChild.children[0]);
-    next = next.nextElementSibling;
+    let cloneChild = next.cloneNode(true)
+    el.appendChild(cloneChild.children[0])
+    next = next.nextElementSibling
   }
-});
+})
+
 
 Vue.createApp({
   delimiters: ["${", "}"],
   data() {
+    const jsonData = getJsonData();
     return {
       resourceSelected: "",
       optionSelected: "",
       loading: false,
       matches: undefined,
-      resourceNamesMap: resourceNamesMap,
-      resourceOptionsMap: resourceOptionsMap,
-      resourceOptionsQuestionMap: resourceOptionsQuestionMap,
-      optionNamesMap: optionNamesMap,
+      resourceNamesMap: jsonData.resource_names_map,
+      resourceOptionsMap: jsonData.resource_options_map,
+      resourceOptionsQuestionMap: jsonData.resource_options_question_map,
+      optionNamesMap: jsonData.option_names_map,
     };
   },
   methods: {

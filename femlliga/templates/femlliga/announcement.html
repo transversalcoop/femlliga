@@ -1,0 +1,130 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import vue_js, sidebar_filter_show_link, initial_loading_vue, page_title, arrow_btn_link %}
+
+{% block title %}{{ _("Anunci") }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  {{ page_title(announcement.title) }}
+
+  <p class="pre-wrap bg-lightblue br-1rem p-4 mb-5 text-center">{{ announcement.description }}</p>
+
+  <div id="vue-app" class="d-flex flex-column flex-lg-row">
+    <div class="flex-third">
+      <div class="mb-3">
+        {{ arrow_btn_link(_("Edita"), url("edit_announcement", kwargs={"organization_id": announcement.organization.id, "announcement_id": announcement.id}), "bi-pencil-square") }}
+      </div>
+      {{ sidebar_filter_show_link() }}
+      <div class="collapse show" id="sidebar-filter">
+        <input v-model="search" type="text" class="form-control border" placeholder="{{ _("Cerca persones interessades") }}">
+        <p class="mt-2 mb-2 badge bg-light">
+          {{ consts.NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP[(announcement.resource, announcement.option.name)] }}
+        </p>
+        <p>
+          {% if announcement.public %}
+          <i class="bi-send me-2"></i>
+          <a href="{{ url("public_announcement", args=[announcement.id]) }}">{{ _("Anunci públic") }}</a>
+          {% else %}
+          <i class="bi-lock"></i>
+          {{ _("Anunci no publicat") }}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex-gap"></div>
+
+    <div class="flex-two-thirds">
+      {% if len(json_data.contacts) > 0 %}
+      {{ initial_loading_vue() }}
+      <template v-else>
+        <div class="mt-3">
+          <h2 class="match-resource-title">{{ _("Totes les persones interessades") }}</h2>
+          <div class="matches-count">
+            <span class="matches-count-w-14rem">${ contacts.length } {{ _("persones interessades") }}</span>
+          </div>
+        </div>
+        <div v-for="contact in contacts" class="match-box">
+          <h3 class="mt-2 fw-600">
+            {{ _("Missatge rebut de") }}
+            <span v-html="highlightSearch(contact.name, search)"></span>
+            (<span v-html="highlightSearch(contact.email, search)"></span>)
+          </h3>
+          <p class="fs-7 fst-italic me-3 text-body-secondary">
+            <span v-if="!contact.read" title="{{ _("Missatge pendent de llegir") }}">
+              <i class="bi-circle-fill text-danger"></i>
+            </span>
+            {{ _("Rebut el") }} ${ formatDateTime(contact.received_on) }
+          </p>
+          <p class="pre-wrap" v-html="highlightSearch(contact.message, search)"></p>
+        </div>
+      </template>
+      {% else %}
+      <div class="container text-center pt-4">
+        <h1 class="fs-2-5rem mt-3 text-center">
+          {{ _("Encara no hi ha persones interessades en aquest anunci") }}
+        </h1>
+        <p>{{ _("Qualsevol persona podrà veure aquest anunci i contactar amb vosaltres en cas que el publiqueu") }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ vue_js() }}
+<script>
+function contactContains(search) {
+  return function(c) {
+    const parts = sanitize(search).split(" ").filter(x => x !== "");
+    const targets = [
+      sanitize(c.name),
+      sanitize(c.email),
+      sanitize(c.message),
+    ];
+    for (var part of parts) {
+      if (!targets.some((target) => contains(target, part))) {
+        return false;
+      }
+    }
+    return true;
+  };
+}
+
+var jsonData = getJsonData();
+Vue.createApp({
+  delimiters: ["${", "}"],
+  data() {
+    return {
+      search: "",
+      org_id: jsonData.org_id,
+      announcement_id: jsonData.announcement_id,
+      allContacts: jsonData.contacts,
+    };
+  },
+  mounted() {
+    for (let contact of this.allContacts) {
+      if (!contact.read) {
+        this.markRead(contact);
+      }
+    }
+  },
+  methods: {
+    highlightSearch: highlightSearch,
+    formatDateTime: formatDateTime,
+    markRead(contact) {
+      let url = `/organization/${this.org_id}/announcements/${this.announcement_id}/contacts/${contact.id}/mark-read/`;
+      post(url, "{{ csrf_token }}", {});
+    },
+  },
+  computed: {
+    contacts() {
+      return this.allContacts.filter(contactContains(this.search));
+    },
+  },
+}).mount("#vue-app");
+</script>
+{% endblock %}
+

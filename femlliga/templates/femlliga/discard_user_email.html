@@ -1,0 +1,19 @@
+{% extends "femlliga/_base_template.html" %}
+
+{% from 'femlliga/_macros.html' import arrow_btn, back_button %}
+
+{% block title %}{{ _("Descarta l'adreça de correu electrònic") }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <form method="post" class="mt-4">
+    {{ csrf_input }}
+    <p>{{ _("Segur que vols descartar l'adreça de correu «%(email)s»?", email=address.email) }}</p>
+
+    <div>
+      {{ arrow_btn(_("Descarta"), "bi-trash") }}
+      {{ back_button() }}
+    </div>
+  </form>
+</div>
+{% endblock %}
