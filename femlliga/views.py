@@ -85,6 +85,7 @@ from .models import (
     org_scope_name,
     org_type_name,
     resource_name,
+    get_report_statistics,
 )
 
 from .utils import (
@@ -1368,6 +1369,14 @@ def organization_prefetches(queryset, include_missing_resources=False):
 
 @user_passes_test(lambda u: u.is_staff)
 def report(request):
+    return report_aux(request)
+
+
+def report_public(request):
+    return report_aux(request, public=True)
+
+
+def report_aux(request, public=False):
     active_tab = request.GET.get("tab")
     if request.method == "POST" and request.POST.get("delete_word"):
         ExcludeCommentWord.objects.create(value=request.POST.get("delete_word"))
@@ -1388,6 +1397,11 @@ def report(request):
     agreements_df = pd.DataFrame()
     form = ReportFilterForm(request.POST)
     resources_filtered_by_option = False
+    report_statistics = get_report_statistics()
+    if request.method == "POST":
+        report_statistics.requests_count += 1
+        report_statistics.save()
+
     if form.is_valid():
         if active_tab in ("map", "organizations"):
             organizations = filter_report_organizations(organizations, form)
@@ -1402,8 +1416,13 @@ def report(request):
             if form.cleaned_data["resource_option"]:
                 resources_filtered_by_option = True
 
+    if public:
+        active_tab = active_tab or "organizations"
+    else:
+        active_tab = active_tab or "map"
     context = {
-        "active_tab": active_tab or "map",
+        "public": public,
+        "active_tab": active_tab,
         "active_form": form,
         "inactive_form": ReportFilterForm(),
         "organizations": organizations,
@@ -1414,6 +1433,7 @@ def report(request):
         "excluded_words": ", ".join(
             sorted([x.value for x in ExcludeCommentWord.objects.all()])
         ),
+        "report_statistics": report_statistics,
         "json_data": {
             "organizations": [
                 {"name": o.name, "lat": float(o.lat), "lng": float(o.lng)}

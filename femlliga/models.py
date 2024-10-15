@@ -67,6 +67,11 @@ def organization_logos_directory_path(instance, filename):
     return str(Path("images/logos") / filename)
 
 
+def get_report_statistics():
+    o, _created = ReportStatistics.objects.get_or_create()
+    return o
+
+
 @deconstructible
 class LimitFileSize:
     def __init__(self, MB):
@@ -833,3 +838,8 @@ class ExcludeCommentWord(models.Model):
 
     def __str__(self):
         return self.value
+
+
+class ReportStatistics(models.Model):
+    _singleton = models.BooleanField(default=True, editable=False, unique=True)
+    requests_count = models.IntegerField(default=0)

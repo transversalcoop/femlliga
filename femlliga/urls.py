@@ -135,6 +135,7 @@ urlpatterns = [
         name="agreement_successful",
     ),
     path("uploads/<path:path>", views.uploads, name="uploads"),
+    path("report/public/", views.report_public, name="report_public"),
     # admin required
     path("report/", views.report, name="report"),
     path("admin/", admin.site.urls),

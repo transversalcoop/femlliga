@@ -575,6 +575,10 @@ a.badge:hover {
     margin-top: 100px;
 }
 
+.mt--50px {
+    margin-top: -50px;
+}
+
 .mb-60px {
     margin-bottom: 60px;
 }
