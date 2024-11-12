@@ -13,6 +13,14 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 ### Changed
 
 
+## [1.2.1] - 2024-11-12
+
+### Changed
+
+- A l'informe s'ha afegit la opció de filtrar, en recursos, els oferiments segons si son
+  remunerats o no
+
+
 ## [1.2.0] - 2024-10-08
 
 ### Added
