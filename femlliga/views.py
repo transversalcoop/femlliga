@@ -1535,6 +1535,7 @@ def filter_report_resources(needs, offers, form):
         ("org_scope", org_has_scope),
         ("resource", same_resource),
         ("resource_option", has_option),
+        ("charge", offer_charges),
         ("start_date", lambda d: lambda x: x.last_updated_on >= date_to_datetime(d)),
         ("end_date", lambda d: lambda x: x.last_updated_on <= date_to_datetime(d)),
     ]
@@ -1662,6 +1663,24 @@ def org_has_scope(scope):
 
 def has_option(option):
     return lambda x: option in {o.name for o in x.options.all()}
+
+
+def offer_charges(charges):
+    if not charges:
+        return lambda x: True
+
+    def f(x):
+        if not hasattr(x, "charge"):
+            return True
+
+        if (charges == "CHARGE" and x.charge) or (
+            charges == "NO_CHARGE" and not x.charge
+        ):
+            return True
+
+        return False
+
+    return f
 
 
 def group_report_resources(index, needs, offers, condition):

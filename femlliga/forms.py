@@ -265,6 +265,13 @@ class ReportFilterForm(forms.Form):
         required=False,
         label=_("Filtra per etiqueta del recurs"),
     )
+    charge = forms.ChoiceField(
+        choices=add_empty_choice(
+            [("CHARGE", _("Remunerat")), ("NO_CHARGE", _("No remunerat"))]
+        ),
+        required=False,
+        label=_("Filtra oferiments segons si son remunerats"),
+    )
 
     start_date = forms.DateField(
         required=False,
