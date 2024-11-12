@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-15 14:24+0000\n"
-"PO-Revision-Date: 2024-10-15 16:25+0200\n"
+"POT-Creation-Date: 2024-11-12 15:36+0000\n"
+"PO-Revision-Date: 2024-11-12 16:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: es <LL@li.org>\n"
 "Language: es\n"
@@ -684,35 +684,47 @@ msgstr "Filtra por categoría del recurso"
 msgid "Filtra per etiqueta del recurs"
 msgstr "Filtra por etiqueta del recurso"
 
-#: femlliga/forms.py:271
+#: femlliga/forms.py:270
+msgid "Remunerat"
+msgstr "Remunerado"
+
+#: femlliga/forms.py:270
+msgid "No remunerat"
+msgstr "No remunerado"
+
+#: femlliga/forms.py:273
+msgid "Filtra oferiments segons si son remunerats"
+msgstr "Filtra ofrecimientos según si son remunerados"
+
+#: femlliga/forms.py:278
 msgid "Creat després del"
 msgstr "Creado después del"
 
-#: femlliga/forms.py:276
+#: femlliga/forms.py:283
 msgid "Creat abans del"
 msgstr "Creado antes del"
 
-#: femlliga/forms.py:282
+#: femlliga/forms.py:289
 msgid "Petició creada després del"
 msgstr "Petición creada después del"
 
-#: femlliga/forms.py:287
+#: femlliga/forms.py:294
 msgid "Petició creada abans del"
 msgstr "Petición creada antes del"
 
-#: femlliga/forms.py:293
+#: femlliga/forms.py:300
 msgid "Acord definitiu després del"
 msgstr "Acuerdo definitivo después del"
 
-#: femlliga/forms.py:298
+#: femlliga/forms.py:305
 msgid "Acord definitiu abans del"
 msgstr "Acuerdo definitivo antes del"
 
-#: femlliga/forms.py:303
+#: femlliga/forms.py:310
 msgid "Oculta files amb tot zeros"
 msgstr "Oculta filas con todo ceros"
 
-#: femlliga/forms.py:306
+#: femlliga/forms.py:313
 msgid "Mostra només files amb tot zeros"
 msgstr "Muestra sólo filas con todo ceros"
 
@@ -822,11 +834,11 @@ msgstr "Petición enviada el"
 msgid "Origen de la petició"
 msgstr "Origen de la petición"
 
-#: femlliga/models.py:670 femlliga/views.py:1581
+#: femlliga/models.py:670 femlliga/views.py:1582
 msgid "Necessitat"
 msgstr "Necesidad"
 
-#: femlliga/models.py:670 femlliga/views.py:1581
+#: femlliga/models.py:670 femlliga/views.py:1582
 msgid "Oferiment"
 msgstr "Ofrecimiento"
 
@@ -927,24 +939,24 @@ msgstr "Necesidades"
 msgid "Oferiments"
 msgstr "Ofrecimientos"
 
-#: femlliga/templates/femlliga/preferences.html:74 femlliga/views.py:1592
+#: femlliga/templates/femlliga/preferences.html:74 femlliga/views.py:1593
 msgid "Peticions pendents"
 msgstr "Peticiones pendientes"
 
-#: femlliga/views.py:1593
+#: femlliga/views.py:1594
 msgid "Peticions sense acord"
 msgstr "Peticiones sin acuerdo"
 
-#: femlliga/views.py:1594
+#: femlliga/views.py:1595
 msgid "Peticions amb acord"
 msgstr "Peticiones con acuerdo"
 
-#: femlliga/views.py:1755
+#: femlliga/views.py:1774
 #, python-format
 msgid "S'ha rebut un contacte a la web de %(name)s"
 msgstr "Se ha recibido un contacto a la web de %(name)s"
 
-#: femlliga/views.py:1757
+#: femlliga/views.py:1776
 #, python-format
 msgid ""
 "Des del correu %(email)s envien el següent missatge:\n"
@@ -955,21 +967,21 @@ msgstr ""
 "\n"
 "%(content)s"
 
-#: femlliga/views.py:1762
+#: femlliga/views.py:1781
 #, python-format
 msgid "El formulari de contacte amb %(name)s s'ha enviat correctament"
 msgstr "El formulario de contacto con %(name)s se ha enviado correctamente"
 
-#: femlliga/views.py:1856
+#: femlliga/views.py:1875
 #, python-format
 msgid "S'ha enviat el següent missatge a «%(name)s»"
 msgstr "Se ha enviado el siguiente mensaje a «%(name)s»"
 
-#: femlliga/views.py:1871
+#: femlliga/views.py:1890
 msgid "T'han contactat per una necessitat publicada"
 msgstr "Te han contactado para una necesidad publicada"
 
-#: femlliga/views.py:1884
+#: femlliga/views.py:1903
 msgid ""
 "S'ha enviat el missatge. L'organització es posarà en contacte amb tu el més "
 "aviat possible"
@@ -3014,24 +3026,24 @@ msgid "No s'ha trobat cap organització que complisca el filtre"
 msgstr "No se ha encontrado ninguna organización que encaje con el filtro"
 
 #: femlliga/templates/femlliga/report.html:100
-#: femlliga/templates/femlliga/report.html:129
-#: femlliga/templates/femlliga/report.html:204
+#: femlliga/templates/femlliga/report.html:130
+#: femlliga/templates/femlliga/report.html:205
 msgid "Filtra"
 msgstr "Filtra"
 
-#: femlliga/templates/femlliga/report.html:132
+#: femlliga/templates/femlliga/report.html:133
 msgid "Consulta els comentaris"
 msgstr "Consulta los comentarios"
 
-#: femlliga/templates/femlliga/report.html:144
+#: femlliga/templates/femlliga/report.html:145
 msgid "Paraules més utilitzades en els comentaris"
 msgstr "Palabras más usadas en los comentarios"
 
-#: femlliga/templates/femlliga/report.html:153
+#: femlliga/templates/femlliga/report.html:154
 msgid "Comentaris a necessitats"
 msgstr "Comentarios a necesidades"
 
-#: femlliga/templates/femlliga/report.html:160
+#: femlliga/templates/femlliga/report.html:161
 msgid "Comentaris a oferiments"
 msgstr "Comentarios a ofrecimientos"
 
