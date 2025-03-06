@@ -813,6 +813,17 @@ class ContactDenyList(models.Model):
         super(ContactDenyList, self).save(*args, **kwargs)
 
 
+class ContactWordDenyList(models.Model):
+    word = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = _("Paraula bloquejada")
+        verbose_name_plural = _("Paraules bloquejades")
+
+    def __str__(self):
+        return self.word
+
+
 class NeedImage(models.Model):
     resource = models.ForeignKey(Need, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(

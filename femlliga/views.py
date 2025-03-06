@@ -1,4 +1,3 @@
-import json
 import logging
 import time
 import unicodedata
@@ -46,7 +45,6 @@ from .constants import (
     RESOURCE_OPTIONS_WITH_PREFIX,
     RESOURCES,
     RESOURCES_LIST,
-    RESOURCES_ORDER,
     SOCIAL_MEDIA_TYPES,
     NEEDS_PUBLISHABLE_OPTIONS_LABELS_MAP_2,
     NEEDS_PUBLISHABLE_OPTIONS_DESCRIPTION_MAP_2,
@@ -69,6 +67,7 @@ from .models import (
     AnnouncementContact,
     Contact,
     ContactDenyList,
+    ContactWordDenyList,
     Message,
     Need,
     NeedImage,
@@ -81,9 +80,6 @@ from .models import (
     ResourceOption,
     SocialMedia,
     ExcludeCommentWord,
-    option_name,
-    org_scope_name,
-    org_type_name,
     resource_name,
     get_report_statistics,
 )
@@ -1765,6 +1761,15 @@ def contact(request):
                 {"form": ContactForm(), "form_sent": True},
             )
 
+        for w in ContactWordDenyList.objects.all():
+            if w.word.casefold() in content.casefold():
+                logging.warning(f"Ignoring SPAM message containing {w.word}")
+                return render(
+                    request,
+                    "femlliga/contact.html",
+                    {"form": ContactForm(), "form_sent": True},
+                )
+
         Contact(
             email=email,
             content=content,
@@ -1805,20 +1810,23 @@ def maps(request):
     if not STAGING_ENVIRONMENT_NAME:
         raise PermissionDenied()
 
-    orgs, maps = [], [
-        {
-            "name": "Fem lliga!",
-            "code": "femlliga",
-            "color": "gold",
-            "orgs": get_femlliga_organizations(),
-        },
-        {
-            "name": "Tornallom",
-            "code": "tornallom",
-            "color": "orange",
-            "orgs": get_tornallom_organizations(),
-        },
-    ]
+    orgs, maps = (
+        [],
+        [
+            {
+                "name": "Fem lliga!",
+                "code": "femlliga",
+                "color": "gold",
+                "orgs": get_femlliga_organizations(),
+            },
+            {
+                "name": "Tornallom",
+                "code": "tornallom",
+                "color": "orange",
+                "orgs": get_tornallom_organizations(),
+            },
+        ],
+    )
 
     for m in maps:
         m["count"] = len(m["orgs"])
