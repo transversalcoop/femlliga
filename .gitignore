@@ -6,3 +6,4 @@ run
 Dockerfile.*
 .checks.*
 .env
+tags

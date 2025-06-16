@@ -1,0 +1,44 @@
+[project]
+name = ""
+version = "0.0.1"
+requires-python = "~=3.12"
+dependencies = [
+    "django",
+    "jinja2",
+    "pipenv",
+    "pytz",
+    "pillow",
+    "pandas",
+    "matplotlib",
+    "whitenoise",
+    "gunicorn",
+    "psycopg2-binary",
+    "networkx",
+    "scipy",
+    "django-debug-toolbar",
+    "bleach",
+    "django-csp",
+    "exif",
+    "django-axes",
+    "django-recaptcha",
+    "typing-extensions",
+    "beautifulsoup4",
+    "babel",
+    "pyarrow",
+    "channels[daphne]",
+    "channels-redis",
+    "requests",
+    "django-allauth[socialaccount]",
+    "shapely",
+    "ipython>=9.3.0",
+]
+
+[dependency-groups]
+dev = []
+
+[tool.uv]
+package = false
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
