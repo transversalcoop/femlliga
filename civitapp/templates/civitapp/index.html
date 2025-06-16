@@ -1,0 +1,17 @@
+{% extends "civitapp/base.html" %}
+
+{% from "civitapp/_macros.html" import arrow_btn_link %}
+
+{% block all_content %}
+<wrapper>
+  <main id="content">
+    <div class="landing-page">
+      <img src="{{ static("civitapp_logo.png") }}" class="w-100 d-block" alt="Logo de Civitapp">
+      <h1 class="mt-3 text-center">ferramenta per al disseny d’intervencions comunitàries</h1>
+      <div class="mt-5">
+        {{ arrow_btn_link("Comença", url("civitapp:topics"), icon="bi-person") }}
+      </div>
+    </div>
+  </main>
+</wrapper>
+{% endblock %}

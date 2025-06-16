@@ -15,6 +15,11 @@ from femlliga.models import *
 from femlliga.utils import wizard_url
 
 
+from config.civitapp import count_answered
+from config.civitapp import sorted_answers
+from config.civitapp import join_answer_contents
+
+
 def get_language(request):
     if not request:
         return "ca"
@@ -168,6 +173,9 @@ def environment(**options):
             "option_is_publishable": option_is_publishable,
             "publishable_option_description": publishable_option_description,
             "exist_public_announcements": exist_public_announcements,
+            "sorted_answers": sorted_answers,
+            "count_answered": count_answered,
+            "join_answer_contents": join_answer_contents,
         }
     )
     return env

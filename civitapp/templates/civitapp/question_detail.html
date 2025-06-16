@@ -1,0 +1,113 @@
+{% extends "civitapp/question_base.html" %}
+
+{% from "civitapp/_macros.html" import brand %}
+
+{% set next, is_question = object.next_question_or_topic() %}
+{% if is_question %}
+  {% set next_href=url("civitapp:question", args=[next.id]) %}
+{% elif next %}
+  {% set next_href=url("civitapp:question", args=[next.questions.first().id]) %}
+{% else %}
+  {% set next_href=url("civitapp:roadmap_pre") %}
+{% endif %}
+
+{% macro arrow_svg() %}
+<svg
+   class="arrow-img"
+   width="29.981035mm"
+   height="21.471905mm"
+   viewBox="0 0 29.981035 21.471905"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <path
+     d="M 29.646268,10.509273 C 29.529055,10.013204 29.200783,9.6629549 28.852627,9.3158465 26.029009,6.5009504 23.20923,3.6822167 20.393635,0.85964529 19.924428,0.38939096 19.396614,0.16403243 18.740769,0.37439078 17.741305,0.69463758 17.378497,1.9051581 18.032946,2.7225209 c 0.08931,0.1112841 0.189428,0.2141962 0.290595,0.3150144 1.971719,1.9668351 3.944483,3.9329711 5.91934,5.8966657 0.08024,0.079887 0.186986,0.1329131 0.281177,0.1984975 l -0.05722,0.1112842 h -0.347807 c -7.353825,0 -14.7076495,0.00209 -22.061475,-0.00384 C 1.5248602,9.239797 1.0521641,9.3461972 0.70470638,9.7773795 0.31713049,10.258449 0.23619657,10.79952 0.48771967,11.359778 c 0.24245296,0.540023 0.68584543,0.826432 1.28098893,0.863061 0.132913,0.0085 0.2668727,0.0049 0.4001346,0.0049 7.3158002,3.5e-4 14.6316008,3.5e-4 21.9470508,3.5e-4 h 0.409554 c -0.11582,0.124889 -0.186287,0.206172 -0.261988,0.281873 -2.002418,2.003814 -4.005881,4.006579 -6.007252,6.011438 -0.581538,0.582585 -0.71236,1.239824 -0.381646,1.86497 0.423509,0.800966 1.482976,1.047605 2.211728,0.51072 0.129774,-0.09558 0.248036,-0.208614 0.36246,-0.322689 2.773033,-2.770941 5.543278,-5.544673 8.319451,-8.312125 0.366295,-0.3649 0.72387,-0.727358 0.878063,-1.23773 z"
+     style="stroke:#000000;stroke-width:0.348853;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+   />
+</svg>
+{% endmacro %}
+
+{% block top %}
+<div class="float-end">
+  <a href="{{ next_href }}" class="top-arrow-link">
+    {{ arrow_svg() }}
+  </a>
+</div>
+
+<div class="ms-4">
+  <a href="{{ url("civitapp:question", args=[object.topic.questions.first().id]) }}">
+    {{ object.topic.index }}. {{ object.topic.name }}
+  </a>
+</div>
+
+<div class="my-3 ms-3">
+  {% for q in object.topic.questions.all() %}
+  <a
+    href="{{ url("civitapp:question", args=[q.id]) }}"
+    title="{{ q }}"
+  >
+    <div class="top-question-icon-circle mx-2 {% if q == object %}current{% endif %}">
+      <div class="top-question-icon"></div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block center %}
+  <div class="text-center m-topbar">
+    <h1 class="fw-800 mt-5">{{ object.topic.index }}. {{ object.topic.name }}</h1>
+    <p class="mt-3 fs-5 mt-4">{{ object.topic.description }}</p>
+
+    <p class="fw-800 fs-2-5rem mt-5">0{{ object.index }}.</p>
+    <p class="fs-1-5rem">{{ object.question }}</p>
+  </div>
+
+  <div class="d-grid">
+    {% for answer in object.answers.all() %}
+    <div
+      class="g-col-6 br-1rem clickable answer"
+      tabindex="0"
+      onclick="selectChild(this)"
+      hx-get="{{ url("civitapp:answer", args=[answer.id]) }}"
+      hx-target="#answer"
+    >
+      <div
+        class="p-3 clickable answer br-1rem"
+        oncontextmenu="addToSelection(event, this)"
+        hx-trigger="contextmenu"
+        hx-get="{{ url("civitapp:answer_add", args=[answer.id]) }}"
+        hx-target="#answer"
+      >
+        <h3 class="fw-800 fs-2-5rem">{{ answer.code }}.</h3>
+        <p class="fs-5">{{ answer.answer }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div id="answer"></div>
+{% endblock %}
+
+{% block right %}
+  <div class="position-fixed top-5p">
+    <a href="{{ next_href }}" class="arrow-link">
+      {{ arrow_svg() }}
+    </a>
+  </div>
+
+  <div class="position-fixed top-50 question-dots translate-middle">
+    {% for q in object.topic.questions.all() %}
+    <a
+      class="question-icon-wrapper"
+      href="{{ url("civitapp:question", args=[q.id]) }}"
+      title="{{ q }}"
+    >
+      <div class="question-icon-circle {% if q == object %}current{% endif %}">
+        <div class="question-icon">{{ q.index }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+{% endblock %}
+

@@ -13,6 +13,25 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 ### Changed
 
 
+## [1.2.3] - 2025-06-16
+
+### Added
+
+- S'ha integrat el codi de [Civitapp](https://github.com/transversalcoop/civitapp) dins de
+  Fem lliga!
+
+### Changed
+
+- S'han actualitzat totes les dependències
+
+
+## [1.2.2] - 2025-03-06
+
+### Changed
+
+- S'han afegit filtres addicionals per a l'SPAM rebut
+
+
 ## [1.2.1] - 2024-11-12
 
 ### Changed

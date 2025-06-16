@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-12 15:36+0000\n"
-"PO-Revision-Date: 2024-11-12 16:36+0100\n"
+"POT-Creation-Date: 2025-06-16 08:41+0000\n"
+"PO-Revision-Date: 2025-06-16 10:41+0200\n"
 "Last-Translator: \n"
 "Language-Team: ca <LL@li.org>\n"
 "Language: ca\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.17.0\n"
 "X-Generator: Poedit 3.2.2\n"
 
 #: femlliga/constants.py:3
@@ -261,7 +261,7 @@ msgstr "Serveis necessaris per desenvolupar l'activitat"
 msgid "Formacions, assessoraments i acompanyaments"
 msgstr "Formacions, assessoraments i acompanyaments"
 
-#: femlliga/constants.py:120
+#: femlliga/constants.py:121
 msgid ""
 "Material pedagògic i de sensibilització, d'exposicions, de fires, bibliogràfic, "
 "pamflets, cartells, material esportiu, de cuina, mobles, ferramentes o d'altres"
@@ -417,7 +417,7 @@ msgstr "Estratègia i protocols conjunts"
 msgid "Aliances - Crida a voluntariat"
 msgstr "Aliances - Crida a voluntariat"
 
-#: femlliga/constants.py:192
+#: femlliga/constants.py:193
 msgid ""
 "Una bona descripció inclourà informació com on s'ha de desenvolupar el "
 "voluntariat, en quines dates, si hi ha algun tipus de requisit o inscripció "
@@ -455,7 +455,7 @@ msgstr "magatzem"
 msgid "formació en digitalització"
 msgstr "formació en digitalització"
 
-#: femlliga/constants.py:209
+#: femlliga/constants.py:210
 msgid "formació en relacions amb l'administració"
 msgstr "formació en relacions amb l'administració"
 
@@ -463,7 +463,7 @@ msgstr "formació en relacions amb l'administració"
 msgid "formació en igualtat i feminismes"
 msgstr "formació en igualtat i feminismes"
 
-#: femlliga/constants.py:213
+#: femlliga/constants.py:214
 msgid "formació en eficiència i estalvi energètic"
 msgstr "formació en eficiència i estalvi energètic"
 
@@ -495,7 +495,7 @@ msgstr "servei de gestoria"
 msgid "ajuda amb la redacció de projectes"
 msgstr "ajuda amb la redacció de projectes"
 
-#: femlliga/constants.py:223
+#: femlliga/constants.py:224
 msgid "ajuda amb les relacions digitals amb l'administració"
 msgstr "ajuda amb les relacions digitals amb l'administració"
 
@@ -503,11 +503,11 @@ msgstr "ajuda amb les relacions digitals amb l'administració"
 msgid "ajuda amb projectes de participació"
 msgstr "ajuda amb projectes de participació"
 
-#: femlliga/constants.py:227
+#: femlliga/constants.py:228
 msgid "servei de reparació, manteniment i reutilització"
 msgstr "servei de reparació, manteniment i reutilització"
 
-#: femlliga/constants.py:230
+#: femlliga/constants.py:231
 msgid "material d'esdeveniments, fires i exposicions"
 msgstr "material d'esdeveniments, fires i exposicions"
 
@@ -727,7 +727,7 @@ msgstr "Oculta files amb tot zeros"
 msgid "Mostra només files amb tot zeros"
 msgstr "Mostra només files amb tot zeros"
 
-#: femlliga/models.py:84
+#: femlliga/models.py:85
 #, python-format
 msgid "L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB."
 msgstr "L'arxiu és massa gran, hauria d'ocupar menys de %(max)s MB."
@@ -750,7 +750,7 @@ msgstr "Organització"
 
 #: femlliga/models.py:201 femlliga/templates/femlliga/agreements.html:31
 #: femlliga/templates/femlliga/report.html:18
-#: femlliga/templates/femlliga/search.html:33 femlliga/views.py:1518
+#: femlliga/templates/femlliga/search.html:33 femlliga/views.py:1514
 msgid "Organitzacions"
 msgstr "Organitzacions"
 
@@ -767,7 +767,7 @@ msgstr "menys d'un km"
 msgid "menys de %(d)skm"
 msgstr "menys de %(d)skm"
 
-#: femlliga/models.py:485 femlliga/views.py:179
+#: femlliga/models.py:485 femlliga/views.py:175
 msgid "Títol"
 msgstr "Títol"
 
@@ -783,7 +783,7 @@ msgstr "Recurs"
 msgid "Opció"
 msgstr "Opció"
 
-#: femlliga/models.py:516
+#: femlliga/models.py:517
 #, python-format
 msgid "Hi ha una persona interessada"
 msgid_plural "Hi ha %(num)s persones interessades"
@@ -833,11 +833,11 @@ msgstr "Petició enviada el"
 msgid "Origen de la petició"
 msgstr "Origen de la petició"
 
-#: femlliga/models.py:670 femlliga/views.py:1582
+#: femlliga/models.py:670 femlliga/views.py:1578
 msgid "Necessitat"
 msgstr "Necessitat"
 
-#: femlliga/models.py:670 femlliga/views.py:1582
+#: femlliga/models.py:670 femlliga/views.py:1578
 msgid "Oferiment"
 msgstr "Oferiment"
 
@@ -897,65 +897,73 @@ msgstr "Contacte bloquejat"
 msgid "Contactes bloquejats"
 msgstr "Contactes bloquejats"
 
+#: femlliga/models.py:820
+msgid "Paraula bloquejada"
+msgstr "Paraula bloquejada"
+
+#: femlliga/models.py:821
+msgid "Paraules bloquejades"
+msgstr "Paraules bloquejades"
+
 #: femlliga/utils.py:268
 msgid "Benvingudes a Fem lliga!"
 msgstr "Benvingudes a Fem lliga!"
 
-#: femlliga/views.py:180
+#: femlliga/views.py:176
 msgid "Subtítol"
 msgstr "Subtítol"
 
-#: femlliga/views.py:181
+#: femlliga/views.py:177
 msgid "<p>Cal definir aquesta pàgina</p>"
 msgstr "<p>Cal definir aquesta pàgina</p>"
 
-#: femlliga/views.py:914
+#: femlliga/views.py:910
 msgid "Aquesta adreça ja està en ús"
 msgstr "Aquesta adreça ja està en ús"
 
-#: femlliga/views.py:944
+#: femlliga/views.py:940
 msgid "La configuració s'ha desat correctament"
 msgstr "La configuració s'ha desat correctament"
 
-#: femlliga/views.py:946
+#: femlliga/views.py:942
 msgid ". S'ha enviat un correu electrònic per confirmar la nova adreça"
 msgstr ". S'ha enviat un correu electrònic per confirmar la nova adreça"
 
-#: femlliga/views.py:985
+#: femlliga/views.py:981
 msgid "S'ha esborrat el compte i l'organització"
 msgstr "S'ha esborrat el compte i l'organització"
 
-#: femlliga/views.py:1023
+#: femlliga/views.py:1019
 #, python-format
 msgid "T'han enviat una petició per intercanviar %(resource)s"
 msgstr "T'han enviat una petició per intercanviar %(resource)s"
 
-#: femlliga/views.py:1488
+#: femlliga/views.py:1484
 msgid "Necessitats"
 msgstr "Necessitats"
 
-#: femlliga/views.py:1488
+#: femlliga/views.py:1484
 msgid "Oferiments"
 msgstr "Oferiments"
 
-#: femlliga/templates/femlliga/preferences.html:74 femlliga/views.py:1593
+#: femlliga/templates/femlliga/preferences.html:74 femlliga/views.py:1589
 msgid "Peticions pendents"
 msgstr "Peticions pendents"
 
-#: femlliga/views.py:1594
+#: femlliga/views.py:1590
 msgid "Peticions sense acord"
 msgstr "Peticions sense acord"
 
-#: femlliga/views.py:1595
+#: femlliga/views.py:1591
 msgid "Peticions amb acord"
 msgstr "Peticions amb acord"
 
-#: femlliga/views.py:1774
+#: femlliga/views.py:1779
 #, python-format
 msgid "S'ha rebut un contacte a la web de %(name)s"
 msgstr "S'ha rebut un contacte a la web de %(name)s"
 
-#: femlliga/views.py:1776
+#: femlliga/views.py:1781
 #, python-format
 msgid ""
 "Des del correu %(email)s envien el següent missatge:\n"
@@ -966,21 +974,21 @@ msgstr ""
 "\n"
 "%(content)s"
 
-#: femlliga/views.py:1781
+#: femlliga/views.py:1787
 #, python-format
 msgid "El formulari de contacte amb %(name)s s'ha enviat correctament"
 msgstr "El formulari de contacte amb %(name)s s'ha enviat correctament"
 
-#: femlliga/views.py:1875
+#: femlliga/views.py:1883
 #, python-format
 msgid "S'ha enviat el següent missatge a «%(name)s»"
 msgstr "S'ha enviat el següent missatge a «%(name)s»"
 
-#: femlliga/views.py:1890
+#: femlliga/views.py:1898
 msgid "T'han contactat per una necessitat publicada"
 msgstr "T'han contactat per una necessitat publicada"
 
-#: femlliga/views.py:1903
+#: femlliga/views.py:1912
 msgid ""
 "S'ha enviat el missatge. L'organització es posarà en contacte amb tu el més "
 "aviat possible"
@@ -2510,6 +2518,7 @@ msgstr ""
 
 #: femlliga/templates/femlliga/index.html:156
 #: femlliga/templates/femlliga/index.html:175
+#, python-brace-format
 msgid ""
 "Hi ha <strong>${ matches.needs } entitats que necessiten el mateix que "
 "vosaltres</strong>."
@@ -2523,6 +2532,7 @@ msgstr "Si us inscriviu podreu contactar amb elles i buscar una solució en com�
 
 #: femlliga/templates/femlliga/index.html:164
 #: femlliga/templates/femlliga/index.html:172
+#, python-brace-format
 msgid ""
 "Hi ha <strong>${ matches.offers } entitats que ofereixen el que necessiteu</"
 "strong>."

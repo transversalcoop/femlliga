@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "axes",
     "django_recaptcha",
     "femlliga",
+    "civitapp",
 ]
 
 MIDDLEWARE = [
@@ -97,6 +98,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.jinja2.Jinja2",
         "DIRS": [
             BASE_DIR / "femlliga/templates",
+            BASE_DIR / "civitapp/templates",
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -231,12 +233,13 @@ EMAIL_BACKEND = os.getenv(
 )
 LOGIN_REDIRECT_URL = "app"
 ACCOUNT_LOGOUT_REDIRECT = "index"
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv(
     "DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL", "https"
 )
