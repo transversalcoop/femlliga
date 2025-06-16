@@ -1,0 +1,16 @@
+{% extends "civitapp/question_base.html" %}
+
+{% from "civitapp/_macros.html" import arrow_btn_link %}
+
+{% block center %}
+<div class="text-center">
+  <h1 class="fw-800 mt-5">Enhorabona!</h1>
+  <p class="mt-3 fs-5 mt-4">
+    Has completat totes les preguntes de l'aplicació. Pots descarregar-te el full de ruta, un document amb un resum de tots els consells adaptats a la teua situació particular.
+  </p>
+  <div>
+    {{ arrow_btn_link("Descarrega", url("civitapp:roadmap"), icon="bi-download", download=True) }}
+  </div>
+</div>
+{% endblock %}
+

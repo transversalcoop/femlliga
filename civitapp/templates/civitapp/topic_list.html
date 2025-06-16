@@ -1,0 +1,16 @@
+{% extends "civitapp/base.html" %}
+
+{% block content %}
+<h1 class="text-center fw-bold mt-5 mb-5">Ferramenta per al disseny d'intervencions comunitàries</h1>
+<div class="d-flex flex-wrap mb-3">
+  {% for topic in object_list %}
+  <a
+    href="{{ url("civitapp:question", args=[topic.questions.first().id]) }}"
+    class="topic-box topic-background-{{ loop.index }}"
+  >
+    <div class="number">{{ topic.index }}.</div>
+    <div class="name">{{ topic.name }}</div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

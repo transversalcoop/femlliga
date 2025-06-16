@@ -31,6 +31,7 @@ dependencies = [
     "django-allauth[socialaccount]",
     "shapely",
     "ipython>=9.3.0",
+    "django-ckeditor-5>=0.2.18",
 ]
 
 [dependency-groups]

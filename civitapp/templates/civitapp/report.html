@@ -1,0 +1,12 @@
+{% extends "civitapp/base.html" %}
+
+{% block content %}
+<h1>Informe</h1>
+
+{% for topic in topics %}
+  <h2>{{ topic }}</h2>
+  {% for question in topic.questions.all() %}
+    <img src="data:image/png;base64,{{ question.plot() }}">
+  {% endfor %}
+{% endfor %}
+{% endblock %}

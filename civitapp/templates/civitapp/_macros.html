@@ -1,0 +1,71 @@
+{% macro arrow_btn(text, icon=None) %}
+{# wrapper also replicated in show_matches_vue, using arrow_btn_content directly or duplicating all #}
+<button type="submit" class="btn btn-arrow">
+  <div class="d-flex align-items-stretch">
+    {{ arrow_btn_content(text, icon=icon) }}
+  </div>
+</button>
+{% endmacro %}
+
+{% macro arrow_btn_link(text, url, icon=None, download=False, image=None, image_alt="", onclick="", vue=False) %}
+{# wrapper also replicated in add_organization #}
+<a
+  role="button"
+  class="btn btn-arrow"
+  {% if url %}{% if vue %}:{% endif %}href="{{ url }}"{% endif %}
+  {% if download %}
+    download
+    hx-boost="false"
+  {% endif %}
+  {% if onclick %}onclick="{{ onclick }}"{% endif %}
+>
+  <div class="d-flex align-items-stretch">
+    {{ arrow_btn_content(text, icon=icon, image=image, image_alt=image_alt) }}
+  </div>
+</a>
+{% endmacro %}
+
+{% macro arrow_btn_dropdown(text, icon=None) %}
+<a
+  role="button"
+  data-bs-toggle="dropdown"
+  aria-expanded="false"
+  class="btn btn-arrow dropdown-toggle"
+  href="#"
+>
+  <div class="d-flex align-items-stretch">
+    {{ arrow_btn_content(text, icon=icon) }}
+  </div>
+</a>
+{% endmacro %}
+
+{% macro arrow_btn_modal(text, id, icon=None) %}
+<a
+  role="button"
+  data-bs-toggle="modal"
+  data-bs-target="#{{ id }}"
+  aria-expanded="false"
+  class="btn btn-arrow dropdown-toggle"
+  href="#"
+>
+  <div class="d-flex align-items-stretch">
+    {{ arrow_btn_content(text, icon=icon) }}
+  </div>
+</a>
+{% endmacro %}
+
+{% macro arrow_btn_content(text, icon=None, image=None, image_alt="") %}
+  {% if image %}
+  <img src="{{ image }}" class="my-1" alt="{{ image_alt }}">
+  {% elif icon %}
+  <span class="btn-arrow-icon d-flex align-items-center"><i class="{{ icon }}"></i></span>
+  {% endif %}
+  <span class="btn-arrow-text">{{ text }}</span>
+  <span class="btn-arrow-arrow d-flex align-items-center"><i class="bi-caret-right-fill"></i></span>
+{% endmacro %}
+
+{% macro brand() %}
+<a class="navbar-brand" href="/civitapp/">
+  <span style="font-weight: 900; text-transform: uppercase; font-size: 3rem;">CivitAPP</span>
+</a>
+{% endmacro %}

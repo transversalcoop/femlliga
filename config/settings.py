@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "axes",
     "django_recaptcha",
     "femlliga",
+    "civitapp",
 ]
 
 MIDDLEWARE = [
@@ -97,6 +98,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.jinja2.Jinja2",
         "DIRS": [
             BASE_DIR / "femlliga/templates",
+            BASE_DIR / "civitapp/templates",
         ],
         "APP_DIRS": True,
         "OPTIONS": {

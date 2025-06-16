@@ -1,0 +1,46 @@
+{% from "civitapp/_macros.html" import arrow_btn_modal %}
+
+{% for b in join_answer_contents(answers) %}
+  <h2 class="mt-5 text-center fw-800">
+    {% if b.code %}{{ b.code }}.{% endif %}
+    {{ b.description }}
+  </h2>
+  <div class="fs-5">
+  {% for p in b.ps %}
+    <p>{{ p }}</p>
+  {% endfor %}
+  </div>
+{% endfor %}
+
+<div class="text-center">
+  {{ arrow_btn_modal("Suggereix canvis", "feedback", icon="bi-send") }}
+</div>
+
+<div class="modal fade" id="feedback" tabindex="-1" aria-labelledby="feedbackLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form>
+      <div class="modal-content" id="feedback-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="feedbackLabel">Suggereix canvis en la pregunta o les respostes</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tanca"></button>
+        </div>
+        <div class="modal-body">
+            {{ csrf_input }}
+            <input type="hidden" name="question" value="{{ object.question.id }}">
+            <textarea class="form-control" name="content"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-warning"
+            hx-post="{{ url("civitapp:create_feedback") }}"
+            hx-target="#feedback-content"
+          >
+            Envia
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
