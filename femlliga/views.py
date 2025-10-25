@@ -1744,67 +1744,6 @@ def strip_accents(s):
     )
 
 
-def contact(request):
-    if request.method != "POST":
-        return render(request, "femlliga/contact.html", {"form": ContactForm()})
-
-    form = ContactForm(request.POST)
-    form_sent = False
-    if form.is_valid():
-        email = form.cleaned_data["email"]
-        content = form.cleaned_data["content"]
-        if ContactDenyList.objects.filter(email=clean_form_email(email)).count() > 0:
-            logging.warning(f"Ignoring SPAM message from {email}")
-            return render(
-                request,
-                "femlliga/contact.html",
-                {"form": ContactForm(), "form_sent": True},
-            )
-
-        for w in ContactWordDenyList.objects.all():
-            if w.word.casefold() in content.casefold():
-                logging.warning(f"Ignoring SPAM message containing {w.word}")
-                return render(
-                    request,
-                    "femlliga/contact.html",
-                    {"form": ContactForm(), "form_sent": True},
-                )
-
-        Contact(
-            email=email,
-            content=content,
-        ).save()
-        # send contact to managers
-        mail_managers(
-            _("S'ha rebut un contacte a la web de %(name)s")
-            % {"name": get_current_site(request).name},
-            _("Des del correu %(email)s envien el següent missatge:\n\n%(content)s")
-            % {"email": email, "content": content},
-        )
-
-        # send confirmation to user
-        subject = _(
-            "El formulari de contacte amb %(name)s s'ha enviat correctament"
-        ) % {
-            "name": get_current_site(request).name,
-        }
-        send_email(
-            to=[email],
-            subject=subject,
-            body=render_to_string(
-                "email/contact_received.html",
-                {
-                    "content": content,
-                    "current_site": get_current_site(request),
-                },
-            ),
-        )
-        form_sent = True
-    return render(
-        request, "femlliga/contact.html", {"form": form, "form_sent": form_sent}
-    )
-
-
 def maps(request):
     # novel functionality, only available in dev
     if not STAGING_ENVIRONMENT_NAME:

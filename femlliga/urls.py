@@ -7,7 +7,6 @@ from . import views
 urlpatterns = [
     # no login required
     path("", views.index, name="index"),
-    path("talk/", views.contact, name="contact"),
     path(
         "public-announcements/", views.public_announcements, name="public_announcements"
     ),

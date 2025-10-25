@@ -240,7 +240,6 @@ class SmokeTests(TestCase):
             ("index", "Fem lliga! és una xarxa on les organitzacions", []),
             ("page", "és una xarxa on les organitzacions", ["faq"]),
             ("page", "Avís legal", ["legal"]),
-            ("contact", "Si tens qualsevol pregunta o suggerència", []),
             ("account_login", "Inicia sessió", []),
         ]
         for x in URLS:
@@ -309,37 +308,6 @@ class SmokeTests(TestCase):
             .organizations.all()[0]
         )
         return org, org2
-
-
-class ComponentTests(TestCase):
-    fixtures = ["testdata.json"]
-
-    def test_contact(self):
-        self.assertEqual(len(mail.outbox), 0)
-
-        response = self.client.post(reverse("contact"), {})
-        self.assertContains(response, "Aquest camp és obligatori", count=2)
-        self.assertEqual(len(mail.outbox), 0)
-
-        content = "Email test content"
-        response = self.client.post(
-            reverse("contact"),
-            {
-                "email": "test@example.com",
-                "content": content,
-                "g-recaptcha-response": "test",
-            },
-        )
-        self.assertContains(
-            response,
-            "Gràcies per enviar el missatge! Et respondrem tan aviat com puguem",
-            count=1,
-        )
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertIn("S'ha rebut un contacte a la web", mail.outbox[0].subject)
-        self.assertIn("s'ha enviat correctament", mail.outbox[1].subject)
-        save_email(mail.outbox[0], "contact0.html")
-        save_email(mail.outbox[1], "contact1.html")
 
 
 class IntegrationTests(TestCase):
