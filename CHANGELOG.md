@@ -13,6 +13,13 @@ aChangelog](https://keepachangelog.com/en/1.0.0/), i el projecte s'adhereix al
 ### Changed
 
 
+## [1.2.4] - 2025-10-25
+
+### Removed
+
+- S'ha retirat la pàgina amb el formulari de contacte
+
+
 ## [1.2.3] - 2025-06-16
 
 ### Added

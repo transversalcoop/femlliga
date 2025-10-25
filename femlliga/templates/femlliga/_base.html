@@ -76,11 +76,10 @@
                       <li class="mb-1"><a href="{{ url("page", args=["accessibility"]) }}">{{ _("Accessibilitat") }}</a></li>
                       <li class="mb-1"><a href="{{ url("page", args=["privacy"]) }}">{{ _("Política de protecció de dades") }}</a></li>
                       <li class="mb-1"><a href="{{ url("page", args=["faq"]) }}">{{ _("Preguntes freqüents") }}</a></li>
-                      <li class="mb-1"><a href="{{ url("contact") }}">{{ _("Contacte") }}</a></li>
                     </ul>
                   </div>
                   <div class="col-12 col-lg-6 less-lg:mt-5">
-                    <p class="fw-bold">{{ _("CONTACTE") }}</p>
+                    <p class="fw-bold" id="contact">{{ _("CONTACTE") }}</p>
                     <p class="m-0">Tlf: {{ settings.CONTACT_PHONE }}</p>
                     <p class="m-0">{{ _("Correu electrònic:") }} {{ settings.CONTACT_EMAIL }}</p>
                     <p class="m-0"><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/{{ settings.CONTACT_SOCIAL }}/">Instagram</a></p>
