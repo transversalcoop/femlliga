@@ -1,17 +1,16 @@
 import json
-import urllib
 import decimal
 import unicodedata
 
 from datetime import timedelta
-from operator import attrgetter
 from functools import wraps
 from distutils.util import strtobool
+from urllib.request import Request, urlopen
 
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import F, Func, Q
+from django.db.models import F, Func
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -333,9 +332,8 @@ def get_resource_index(resource_type, resource):
 
 def get_json_body(request):
     try:
-        return json.loads(
-            request.body.decode("utf-8")
-        )  # request from Javascript's fetch API
+        # request from Javascript's fetch API
+        return json.loads(request.body.decode("utf-8"))
     except:
         return request.POST  # request from Django, or test
 
@@ -351,7 +349,9 @@ def clean_form_email(s):
 
 
 def http_get(url):
-    with urllib.request.urlopen(url) as f:
+    req = Request(url)
+    req.add_header("User-Agent", "femlliga.org")
+    with urlopen(req) as f:
         res = json.loads(f.read().decode("utf-8"))
     return res
 

@@ -18,7 +18,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.mail import mail_managers
 from django.db.models import Prefetch
 from django.dispatch import receiver
 from django.forms import inlineformset_factory
